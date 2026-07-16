@@ -68,7 +68,10 @@
       .grid { grid-template-columns: 1fr 1fr; }
     }
     @media (min-width: 960px) {
-      .grid { grid-template-columns: repeat(3, 1fr); }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1100px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
     }
     a.card {
       display: block;
@@ -153,7 +156,7 @@
       </div>
     </header>
 
-    <p class="tool-count">3 tools available · Pump Sizer · Smoke Exhaust · Flow Test Report</p>
+    <p class="tool-count">4 tools · Pump Sizer · Smoke Exhaust · Flow Test · Sprinkler Estimator</p>
 
     <section class="grid" aria-label="Available tools">
       <a class="card" href="./fire-pump-sizer/">
@@ -174,6 +177,13 @@
         <span class="badge">Live</span>
         <h2>Flow Test Report</h2>
         <p>Hydrant flow test calculator, N<sup>1.85</sup> supply curve, NFPA 13 / UFC demand estimates, pump indication, and PDF flow test report.</p>
+        <span class="open">Open tool →</span>
+      </a>
+
+      <a class="card" href="./sprinkler-system-estimator/" id="card-sprinkler">
+        <span class="badge">Live</span>
+        <h2>Sprinkler System Estimator</h2>
+        <p>Preliminary sprinkler demand + pressure stack for charette reports (NFPA 13 / UFC / FM). Feeds Fire Pump Sizer — not a final HW calc.</p>
         <span class="open">Open tool →</span>
       </a>
     </section>

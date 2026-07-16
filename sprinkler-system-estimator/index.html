@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Preliminary sprinkler system demand and pressure estimator for charette / concept design. Not a final Hazen-Williams hydraulic calculation.">
+  <title>Sprinkler System Estimator · Fire Toolshed</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div class="beta-banner" role="status">
+    <strong>Preliminary planning only</strong>
+    <span>Not a Hazen-Williams final calc. For charette / concept submittals. Verify all values against adopted NFPA 13, UFC 3-600-01, FM Global DS, and project criteria.</span>
+    <a href="../">← Fire Toolshed</a>
+  </div>
+
+  <div class="shell">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Fire Toolshed</p>
+        <h1>Sprinkler System Estimator</h1>
+        <p class="version" id="appVersion">Version 1.0.0-prelim</p>
+      </div>
+      <div class="top-actions no-print">
+        <button type="button" id="btnCopyPump" class="primary">Copy for Fire Pump Sizer</button>
+        <button type="button" id="btnPrint">Print charette report</button>
+        <button type="button" id="btnReset" class="ghost">Reset</button>
+      </div>
+    </header>
+
+    <!-- Live metrics -->
+    <section class="metrics" aria-label="Preliminary results">
+      <div class="metric">
+        <div class="label">System demand flow</div>
+        <div class="value" id="metricFlow">0</div>
+        <div class="unit">GPM (prelim)</div>
+      </div>
+      <div class="metric">
+        <div class="label">Required @ pump discharge</div>
+        <div class="value" id="metricPressure">0</div>
+        <div class="unit">PSI (prelim)</div>
+      </div>
+      <div class="metric">
+        <div class="label">Elevation loss</div>
+        <div class="value" id="metricElev">0</div>
+        <div class="unit">PSI</div>
+      </div>
+      <div class="metric">
+        <div class="label">Remote head residual</div>
+        <div class="value" id="metricRemote">7</div>
+        <div class="unit">PSI min</div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <div class="inputs-col">
+        <!-- Project -->
+        <section class="panel">
+          <h2>Project / charette info</h2>
+          <p class="hint">Appears on the printed report for AHJ / owner packages.</p>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="projectName">Project name</label>
+              <input id="projectName" type="text" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="facility">Building / area</label>
+              <input id="facility" type="text" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="preparedBy">Prepared by</label>
+              <input id="preparedBy" type="text" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="reportDate">Date</label>
+              <input id="reportDate" type="date">
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="projectNotes">Project notes / AHJ assumptions</label>
+              <textarea id="projectNotes" rows="2" placeholder="Edition year, occupancy, AHJ direction, FM account, etc."></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- Mode -->
+        <section class="panel">
+          <h2>Estimate mode</h2>
+          <div class="criteria">
+            <label>
+              <input type="radio" name="mode" value="simple" checked>
+              <div>
+                <b>Simple — manual system demand</b>
+                <small>Enter total sprinkler system demand (GPM) from a known hydraulic result or planning estimate.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="mode" value="criteria">
+              <div>
+                <b>Criteria-assisted — density / area planning</b>
+                <small>Seed demand from NFPA 13, UFC 3-600-01, or FM Global planning presets, then edit.</small>
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <!-- Simple demand -->
+        <section class="panel" id="simpleDemandPanel">
+          <h2>Manual system demand</h2>
+          <p class="hint">Use when you already have a planning demand or early hydraulic total at the pump.</p>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="manualDemandGpm">System demand flow</label>
+              <div class="row">
+                <input id="manualDemandGpm" type="number" min="0" step="10" value="500">
+                <span class="suffix">GPM</span>
+              </div>
+              <span class="sub">Typically sprinkler + hose inside hose stream allowance rules for the project.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Criteria demand -->
+        <section class="panel hidden" id="criteriaDemandPanel">
+          <h2>Criteria framework</h2>
+          <div class="criteria">
+            <label>
+              <input type="radio" name="framework" value="nfpa13" checked>
+              <div>
+                <b>NFPA 13</b>
+                <small>Density-area planning presets for light / ordinary / extra hazard.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="framework" value="ufc">
+              <div>
+                <b>UFC 3-600-01</b>
+                <small>Table 9-3 style planning rows (confirm current UFC edition).</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="framework" value="fm">
+              <div>
+                <b>FM Global data sheets</b>
+                <small>Planning placeholders — you must cite the actual DS tables used.</small>
+              </div>
+            </label>
+          </div>
+
+          <div class="field" style="margin-top:1rem">
+            <label for="presetSelect">Preset</label>
+            <select id="presetSelect"></select>
+          </div>
+
+          <div class="field-grid three" style="margin-top:0.85rem">
+            <div class="field">
+              <label for="density">Density</label>
+              <div class="row">
+                <input id="density" type="number" min="0" step="0.05" value="0.2">
+                <span class="suffix">gpm/sf</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="designArea">Design area</label>
+              <div class="row">
+                <input id="designArea" type="number" min="0" step="100" value="1500">
+                <span class="suffix">sf</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="hoseGpm">Hose allowance</label>
+              <div class="row">
+                <input id="hoseGpm" type="number" min="0" step="50" value="250">
+                <span class="suffix">GPM</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="kFactor">Min K-factor (info)</label>
+              <input id="kFactor" type="number" min="0" step="0.1" value="5.6">
+              <span class="sub">Planning note for UFC rows — demand uses density × area (+ hose).</span>
+            </div>
+            <div class="field">
+              <label style="display:flex;align-items:center;gap:0.5rem;margin-top:1.5rem">
+                <input id="includeHose" type="checkbox" checked style="width:auto;min-height:auto">
+                Include hose allowance in total demand
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Shared demand basis -->
+        <section class="panel">
+          <h2>Demand basis (AHJ-defendable)</h2>
+          <div class="field">
+            <label for="demandBasis">How was system demand established?</label>
+            <textarea id="demandBasis" rows="2" placeholder="e.g. NFPA 13 OH-2 density-area planning values per adopted edition; hose per occupancy."></textarea>
+          </div>
+        </section>
+
+        <!-- Elevation & remote -->
+        <section class="panel">
+          <h2>Elevation &amp; remote residual</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="elevFt">Elevation difference (pump discharge → highest head)</label>
+              <div class="row">
+                <input id="elevFt" type="number" min="0" step="1" value="40">
+                <span class="suffix">ft</span>
+              </div>
+              <span class="sub">Loss = ft × 0.433 psi/ft</span>
+            </div>
+            <div class="field">
+              <label for="remotePsi">Min remote sprinkler residual</label>
+              <div class="row">
+                <input id="remotePsi" type="number" min="0" step="1" value="7">
+                <span class="suffix">PSI</span>
+              </div>
+              <span class="sub">Often 7 psi for standard spray; use listing/K-factor if higher.</span>
+            </div>
+          </div>
+          <div class="field" style="margin-top:0.75rem">
+            <label for="remoteBasis">Remote residual basis</label>
+            <textarea id="remoteBasis" rows="2"></textarea>
+          </div>
+        </section>
+
+        <!-- Backflow & margin -->
+        <section class="panel">
+          <h2>Backflow &amp; contingency</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="backflowType">Backflow preventer</label>
+              <select id="backflowType">
+                <option value="none">None / N/A</option>
+                <option value="doubleCheck">Double check (typ. 8 psi)</option>
+                <option value="reducedPressure" selected>Reduced pressure (typ. 12 psi)</option>
+                <option value="custom">Custom psi</option>
+              </select>
+              <span class="sub">UFC-style planning minima; confirm manufacturer curve at design flow.</span>
+            </div>
+            <div class="field hidden" id="backflowCustomWrap">
+              <label for="backflowCustomPsi">Custom backflow loss</label>
+              <div class="row">
+                <input id="backflowCustomPsi" type="number" min="0" step="0.5" value="12">
+                <span class="suffix">PSI</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="safetyMarginPsi">Planning safety margin</label>
+              <div class="row">
+                <input id="safetyMarginPsi" type="number" min="0" step="1" value="5">
+                <span class="suffix">PSI</span>
+              </div>
+              <span class="sub">Explicit contingency for charette uncertainty.</span>
+            </div>
+            <div class="field">
+              <label for="systemOtherPsi">Other system losses (lump sum)</label>
+              <div class="row">
+                <input id="systemOtherPsi" type="number" min="0" step="0.5" value="0">
+                <span class="suffix">PSI</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Equipment losses -->
+        <section class="panel">
+          <h2>Generic equipment / main losses</h2>
+          <p class="hint">Toggle typical assemblies. These are <strong>planning lump sums</strong>, not pipe-by-pipe Hazen-Williams equivalent lengths.</p>
+          <table class="loss-table" id="lossTable">
+            <thead>
+              <tr>
+                <th>Use</th>
+                <th>Item</th>
+                <th>Loss (psi)</th>
+              </tr>
+            </thead>
+            <tbody id="lossTableBody"></tbody>
+          </table>
+          <div class="field" style="margin-top:0.85rem">
+            <label for="lossBasis">Loss methodology basis</label>
+            <textarea id="lossBasis" rows="2"></textarea>
+          </div>
+        </section>
+      </div>
+
+      <div class="results-col">
+        <section class="panel">
+          <h2>Preliminary result</h2>
+          <p class="hint">Use these values as Fire Pump Sizer duty inputs (system flow + pressure at pump discharge).</p>
+          <div class="export-box">
+            <div><strong id="resultFlow">0 GPM</strong> system demand</div>
+            <div style="margin-top:0.35rem"><strong id="resultPressure">0 PSI</strong> at pump discharge (prelim)</div>
+            <div style="margin-top:0.5rem;color:var(--muted)" id="resultMode">—</div>
+            <p style="margin:0.75rem 0 0;font-size:0.8rem">
+              Pump sizer paste: Flow = <code id="exportFlow">0</code> GPM · Pressure = <code id="exportPressure">0</code> PSI
+            </p>
+          </div>
+          <div class="callout info">
+            Next tools: paste into <strong>Fire Pump Sizer</strong> for room/driver sizing; later use demand duration × flow for a <strong>fire tank</strong> estimator.
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Pressure stack breakdown</h2>
+          <p class="hint">Each line is an explicit, reviewable allowance.</p>
+          <div class="breakdown" id="breakdownList"></div>
+        </section>
+
+        <section class="panel">
+          <h2>What this is / is not</h2>
+          <ul style="margin:0;padding-left:1.1rem;font-size:0.85rem;color:var(--muted)">
+            <li><strong>Is:</strong> transparent charette estimator with written bases for AHJ discussion.</li>
+            <li><strong>Is not:</strong> final hydraulic calculation, pipe sizing, or manufacturer pump selection.</li>
+            <li>Does not run Hazen-Williams node analysis or prove remote-area performance.</li>
+            <li>FM / UFC / NFPA presets are starting points — cite the adopted edition and tables.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+
+    <!-- Print package -->
+    <section class="print-only print-header">
+      <p class="eyebrow">Fire Toolshed · Preliminary</p>
+      <h1>Sprinkler System Estimate — Charette Report</h1>
+      <p>Version <span id="printVersion">1.0.0-prelim</span> · Not a final hydraulic calculation</p>
+    </section>
+    <section class="print-only print-meta">
+      <div><b>Project</b> <span id="printProject">—</span></div>
+      <div><b>Facility / area</b> <span id="printFacility">—</span></div>
+      <div><b>Prepared by</b> <span id="printBy">—</span></div>
+      <div><b>Date</b> <span id="printDate">—</span></div>
+      <div><b>Framework</b> <span id="printFramework">—</span></div>
+      <div><b>Mode</b> <span id="printMode">—</span></div>
+      <div><b>Preset</b> <span id="printPreset">—</span></div>
+      <div><b>Result</b> <span id="printFlow">—</span> @ <span id="printPressure">—</span></div>
+    </section>
+    <section class="print-only panel">
+      <h2>Project notes</h2>
+      <p id="printNotes">—</p>
+      <h2 style="margin-top:1rem">Demand basis</h2>
+      <p id="printDemandBasis">—</p>
+      <h2 style="margin-top:1rem">Loss methodology</h2>
+      <p id="printLossBasis">—</p>
+      <h2 style="margin-top:1rem">Pressure stack</h2>
+      <table class="loss-table">
+        <thead><tr><th>Component</th><th>Basis</th><th>PSI</th></tr></thead>
+        <tbody id="printBreakdown"></tbody>
+      </table>
+      <div class="sig-lines">
+        <div>Prepared by / date</div>
+        <div>Reviewed by (FPE) / date</div>
+        <div>AHJ discussion notes</div>
+      </div>
+      <p style="margin-top:1rem;font-size:0.8rem;color:var(--muted)">
+        This estimate supports concept design and charette discussion only. Final design requires complete hydraulic calculations per the adopted code/standard, manufacturer data, and qualified professional seal where required.
+      </p>
+    </section>
+
+    <footer class="site-foot no-print">
+      <p>
+        Sprinkler System Estimator · Fire Toolshed ·
+        <a href="../">Portal home</a> ·
+        Downstream: <a href="../fire-pump-sizer/">Fire Pump Sizer</a>
+      </p>
+    </footer>
+  </div>
+
+  <script src="./assets/app.js"></script>
+</body>
+</html>
