@@ -639,6 +639,57 @@ details.simple summary::-webkit-details-marker { display: none; }
 }
 .room-notes ul { margin: 0.4rem 0 0; padding-left: 1.1rem; color: var(--slate-600); }
 
+/* Plan-view diagram */
+.room-plan-wrap {
+  margin-top: 1.25rem;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-2xl);
+  background: #fff;
+  padding: 1rem 1rem 0.75rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.room-plan-wrap h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.room-plan-wrap .plan-caption {
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  color: var(--slate-500);
+}
+.room-plan-wrap svg,
+.room-plan-wrap .room-plan-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 520px;
+  min-width: 280px;
+  min-height: 260px;
+}
+.plan-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.7rem;
+  color: var(--slate-600);
+}
+.plan-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.plan-swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 2px;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  flex-shrink: 0;
+}
+
 .code-notes h4 { margin: 0 0 0.5rem; }
 .code-notes ul { margin: 0.4rem 0 0; padding-left: 1.2rem; }
 .code-notes li { margin-bottom: 0.35rem; }

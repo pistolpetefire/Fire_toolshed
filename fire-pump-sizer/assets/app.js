@@ -6,16 +6,16 @@
   'use strict';
 
   const STORAGE_KEY = 'firePumpSizer.v1';
-  const APP_VERSION = '2.0.0';
+  const APP_VERSION = '2.1.0';
 
   const hazardClasses = [
-    { id: 'light', name: 'Light Hazard (Offices, Barracks)', suggestedDensity: 0.10, typicalDesignArea: 1500, hoseAllowance: 250 },
-    { id: 'ordinary1', name: 'Ordinary Hazard Group 1', suggestedDensity: 0.15, typicalDesignArea: 1500, hoseAllowance: 500 },
-    { id: 'ordinary2', name: 'Ordinary Hazard Group 2', suggestedDensity: 0.20, typicalDesignArea: 1500, hoseAllowance: 500 },
-    { id: 'extra1', name: 'Extra Hazard Group 1', suggestedDensity: 0.30, typicalDesignArea: 2500, hoseAllowance: 750 },
-    { id: 'aircraft', name: 'Aircraft Hangar / Maintenance (DoD)', suggestedDensity: 0.25, typicalDesignArea: 3000, hoseAllowance: 1000 },
-    { id: 'ammo', name: 'Ammunition / Explosives Storage (DoD)', suggestedDensity: 0.35, typicalDesignArea: 2000, hoseAllowance: 1000 },
-    { id: 'warehouse', name: 'Warehouse High-Piled (UFC 2026)', suggestedDensity: 0.25, typicalDesignArea: 10000, hoseAllowance: 750 }
+    { id: 'light', name: 'Light Hazard (Offices, Barracks)', suggestedDensity: 0.10, typicalDesignArea: 1500, hoseAllowance: 250, typicalPressurePSI: 70 },
+    { id: 'ordinary1', name: 'Ordinary Hazard Group 1', suggestedDensity: 0.15, typicalDesignArea: 1500, hoseAllowance: 500, typicalPressurePSI: 85 },
+    { id: 'ordinary2', name: 'Ordinary Hazard Group 2', suggestedDensity: 0.20, typicalDesignArea: 1500, hoseAllowance: 500, typicalPressurePSI: 95 },
+    { id: 'extra1', name: 'Extra Hazard Group 1', suggestedDensity: 0.30, typicalDesignArea: 2500, hoseAllowance: 750, typicalPressurePSI: 110 },
+    { id: 'aircraft', name: 'Aircraft Hangar / Maintenance (DoD)', suggestedDensity: 0.25, typicalDesignArea: 3000, hoseAllowance: 1000, typicalPressurePSI: 105 },
+    { id: 'ammo', name: 'Ammunition / Explosives Storage (DoD)', suggestedDensity: 0.35, typicalDesignArea: 2000, hoseAllowance: 1000, typicalPressurePSI: 120 },
+    { id: 'warehouse', name: 'Warehouse High-Piled (UFC 2026)', suggestedDensity: 0.25, typicalDesignArea: 10000, hoseAllowance: 750, typicalPressurePSI: 100 }
   ];
 
   let pumpChart = null;
@@ -68,6 +68,27 @@
     });
   }
 
+  function getSimplifiedDemand() {
+    const density = num('density');
+    const area = num('designArea');
+    const hose = num('hoseAllowance');
+    const flow = density * area + hose;
+    const pressure = num('simplifiedPressure');
+    return {
+      flow: Math.max(0, flow),
+      pressure: Math.max(0, pressure),
+      density,
+      area,
+      hose
+    };
+  }
+
+  function updateSimplifiedPreview() {
+    const d = getSimplifiedDemand();
+    setText('simplifiedFlowResult', d.flow > 0 ? Math.round(d.flow).toLocaleString() : '—');
+    setText('simplifiedPressureResult', d.pressure > 0 ? d.pressure.toFixed(0) : '—');
+  }
+
   function updateHazardSelection() {
     const select = $('hazardSelect');
     if (!select) return;
@@ -76,17 +97,46 @@
     $('density').value = h.suggestedDensity;
     $('designArea').value = h.typicalDesignArea;
     $('hoseAllowance').value = h.hoseAllowance;
-    calculateAll();
+    if ($('simplifiedPressure')) {
+      $('simplifiedPressure').value = h.typicalPressurePSI;
+    }
+    updateSimplifiedPreview();
+    scheduleSave();
   }
 
+  /** Override primary system flow + pressure from simplified calculator results. */
   function useSimplifiedDemand() {
-    const density = num('density');
-    const area = num('designArea');
-    const hose = num('hoseAllowance');
-    const totalQ = density * area + hose;
-    $('systemFlow').value = Math.round(totalQ);
+    const panel = $('simplifiedDemandPanel');
+    if (panel) panel.open = true;
+
+    const d = getSimplifiedDemand();
+    if (!(d.flow > 0) || !(d.pressure > 0)) {
+      toast('Enter density, area, hose, and pressure in the simplified calculator first.');
+      return;
+    }
+
+    // Force-override primary duty inputs
+    $('systemFlow').value = Math.round(d.flow);
+    $('systemPressure').value = Math.round(d.pressure);
+
+    // Visual cue that values were replaced
+    ['systemFlow', 'systemPressure'].forEach((id) => {
+      const el = $(id);
+      if (!el) return;
+      el.style.transition = 'box-shadow 0.3s, border-color 0.3s';
+      el.style.borderColor = '#1e3a8a';
+      el.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.2)';
+      setTimeout(() => {
+        el.style.boxShadow = '';
+        el.style.borderColor = '';
+      }, 1600);
+    });
+
+    updateSimplifiedPreview();
     calculateAll();
     switchTab(0);
+    toast(`Simplified demand applied: ${Math.round(d.flow)} GPM @ ${Math.round(d.pressure)} PSI`);
+    scheduleSave();
   }
 
   function toggleUFC() {
@@ -143,7 +193,8 @@
       hazard: $('hazardSelect')?.value,
       density: $('density')?.value,
       designArea: $('designArea')?.value,
-      hoseAllowance: $('hoseAllowance')?.value
+      hoseAllowance: $('hoseAllowance')?.value,
+      simplifiedPressure: $('simplifiedPressure')?.value
     };
   }
 
@@ -177,6 +228,7 @@
       assign('density', s.density);
       assign('designArea', s.designArea);
       assign('hoseAllowance', s.hoseAllowance);
+      assign('simplifiedPressure', s.simplifiedPressure);
 
       if (s.hazard && $('hazardSelect')) $('hazardSelect').value = s.hazard;
 
@@ -201,6 +253,8 @@
   }
 
   function calculateAll() {
+    updateSimplifiedPreview();
+
     const systemFlow = num('systemFlow');
     const systemPSI = num('systemPressure');
     const finalHeadFt = systemPSI * 2.31;
@@ -249,15 +303,19 @@
         setText('motorHP', motorHP.toFixed(1));
         setText('fla', fla.toFixed(0));
         setText('breaker', breaker + 'A');
+        window.calculatedData.diesel = null;
       } else {
         const dieselHP = baseHP * 1.2;
         const runtime = num('dieselRuntime', 8);
         const fuelRate = dieselHP * 0.055;
-        const fuelTank = fuelRate * runtime * 1.2;
+        const fuelTank = Math.round(fuelRate * runtime * 1.2);
         setText('dieselHP', dieselHP.toFixed(1));
         setHtml('fuelRate', fuelRate.toFixed(1) + ' <span class="tiny">gal/hr</span>');
-        setHtml('fuelTank', Math.round(fuelTank) + ' <span class="tiny">gal</span>');
+        setHtml('fuelTank', fuelTank + ' <span class="tiny">gal</span>');
+        window.calculatedData.diesel = { dieselHP, fuelRate, fuelTank, runtime };
       }
+    } else {
+      window.calculatedData.diesel = null;
     }
 
     updateVerification(systemFlow, systemPSI, ratedGPM, ratedPSI);
@@ -424,7 +482,7 @@
       { name: 'Churn (shutoff)', flow: 0, psi: churnPSI, note: '≤ 140% rated pressure', duty: false },
       { name: '100% Rated', flow: ratedGPM, psi: ratedPSI, note: 'Rated capacity & pressure', duty: false },
       { name: '150% Flow', flow: ratedGPM * 1.5, psi: oneFiftyPSI, note: '≥ 65% rated pressure', duty: false },
-      { name: 'System Duty Point', flow: systemFlow, psi: systemPSI, note: 'Required at pump discharge', duty: true }
+      { name: 'System Demand', flow: systemFlow, psi: systemPSI, note: 'Required at pump discharge', duty: true }
     ];
 
     tbody.innerHTML = rows.map((r) => `
@@ -485,7 +543,7 @@
           fill: false
         },
         {
-          label: 'System Duty Point',
+          label: 'System Demand',
           data: [{ x: data.systemFlow, y: data.systemPSI }],
           borderColor: '#dc2626',
           backgroundColor: '#dc2626',
@@ -546,6 +604,299 @@
     }
   }
 
+  /**
+   * Estimate diesel fuel tank footprint + dike plan area (preliminary).
+   * Tank: volume → floor SF at ~4 ft working height.
+   * Dike: ≥110% tank volume at 1 ft effective containment depth, min 3 ft beyond tank.
+   */
+  function estimateFuelTankAndDike(tankGal) {
+    const gal = Math.max(0, tankGal || 0);
+    const tankCuFt = gal * 0.133681;
+    const tankSF = Math.max(20, Math.ceil(tankCuFt / 4)); // ~4 ft tall tank equivalent
+    let tankW = Math.max(3, Math.ceil(Math.sqrt(tankSF * 0.55)));
+    let tankL = Math.max(4, Math.ceil(tankSF / tankW));
+    const tankFootSF = tankW * tankL;
+
+    // Dike: 110% of tank volume at 1 ft wall height; not less than tank + 3 ft each side
+    const DIKE_BEYOND_TANK_FT = 3;
+    const dikeVolSF = Math.ceil((1.1 * tankCuFt) / 1.0);
+    const dikeMinW = tankW + DIKE_BEYOND_TANK_FT * 2;
+    const dikeMinL = tankL + DIKE_BEYOND_TANK_FT * 2;
+    let dikeW = dikeMinW;
+    let dikeL = Math.max(dikeMinL, Math.ceil(dikeVolSF / dikeW));
+    while (dikeW * dikeL < dikeVolSF) dikeL += 1;
+    const dikeSF = dikeW * dikeL;
+
+    return {
+      tankGal: gal,
+      tankCuFt,
+      tankW,
+      tankL,
+      tankFootSF,
+      dikeW,
+      dikeL,
+      dikeSF,
+      dikeBeyondFt: DIKE_BEYOND_TANK_FT,
+      containmentPct: 110,
+      dikeWallHtFt: 1
+    };
+  }
+
+  function dimsFromSF(sf, aspect) {
+    const a = aspect == null ? 0.6 : aspect;
+    const w = Math.max(6, Math.ceil(Math.sqrt(sf * a)));
+    const l = Math.max(8, Math.ceil(sf / w));
+    return { w, l, sf: w * l };
+  }
+
+  /** Typical wall-mounted fire pump controller footprint (plan), feet */
+  const CONTROLLER_TYP = {
+    alongWallFt: 3, // ~36 in wide
+    depthFt: 2,     // ~24 in deep into room
+    label: 'Controller (typ. 3\' × 2\')'
+  };
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /**
+   * Build plan-view geometry in feet.
+   * X = left→right (pump toward fuel for diesel), Y = top→bottom (room width).
+   */
+  function buildRoomPlanLayout(driverType, equip, fuel, clearanceFt, sepFt, roomWidth, roomLength) {
+    const C = clearanceFt;
+    const ctrl = CONTROLLER_TYP;
+
+    // Pump package block (equipment + clearance)
+    const pumpBlockL = equip.l + C * 2; // along X
+    const pumpBlockW = equip.w + C * 2; // along Y
+
+    let dikeBlockL = 0;
+    let dikeBlockW = 0;
+    if (driverType === 'diesel' && fuel) {
+      dikeBlockL = fuel.dikeL + C * 2;
+      dikeBlockW = fuel.dikeW + C * 2;
+    }
+
+    // Center blocks in Y
+    const pumpBlockY = Math.max(0, (roomWidth - pumpBlockW) / 2);
+    const pumpX = C;
+    const pumpY = pumpBlockY + C;
+
+    // Controller on left (west) wall, aligned with pump band
+    const ctrlX = 0;
+    const ctrlY = Math.min(
+      Math.max(0.25, pumpY + (equip.w - ctrl.alongWallFt) / 2),
+      Math.max(0, roomWidth - ctrl.alongWallFt)
+    );
+
+    // Clearance envelope around pump (dashed)
+    const clearX = pumpX - C;
+    const clearY = pumpY - C;
+    const clearW = equip.l + C * 2;
+    const clearH = equip.w + C * 2;
+
+    let dike = null;
+    let tank = null;
+    let sep = null;
+    if (driverType === 'diesel' && fuel) {
+      const dikeBlockX = pumpBlockL + sepFt;
+      const dikeBlockY = Math.max(0, (roomWidth - dikeBlockW) / 2);
+      const dikeX = dikeBlockX + C;
+      const dikeY = dikeBlockY + C;
+      dike = { x: dikeX, y: dikeY, w: fuel.dikeL, h: fuel.dikeW };
+      tank = {
+        x: dikeX + (fuel.dikeL - fuel.tankL) / 2,
+        y: dikeY + (fuel.dikeW - fuel.tankW) / 2,
+        w: fuel.tankL,
+        h: fuel.tankW,
+        gal: fuel.tankGal
+      };
+      sep = {
+        x: pumpBlockL,
+        y: 0,
+        w: sepFt,
+        h: roomWidth
+      };
+    }
+
+    return {
+      roomW: roomLength, // SVG width in ft (X)
+      roomH: roomWidth,  // SVG height in ft (Y)
+      pump: {
+        x: pumpX,
+        y: pumpY,
+        w: equip.l,
+        h: equip.w,
+        label: driverType === 'diesel' ? 'Pump + diesel engine' : 'Pump + motor'
+      },
+      clearance: { x: clearX, y: clearY, w: clearW, h: clearH, ft: C },
+      controller: {
+        x: ctrlX,
+        y: ctrlY,
+        w: ctrl.depthFt,
+        h: ctrl.alongWallFt,
+        label: ctrl.label
+      },
+      dike,
+      tank,
+      sep,
+      driverType
+    };
+  }
+
+  /** SVG plan view — dimensions in feet, scaled to viewBox */
+  function renderRoomPlanSVG(layout) {
+    const padL = 48;
+    const padR = 28;
+    const padT = 36;
+    const padB = 52;
+    const roomFtW = layout.roomW;
+    const roomFtH = layout.roomH;
+    // Scale so long side ~ 520 px
+    const scale = Math.min(520 / roomFtW, 360 / roomFtH, 28);
+    const rw = roomFtW * scale;
+    const rh = roomFtH * scale;
+    const vbW = padL + rw + padR;
+    const vbH = padT + rh + padB;
+    const ox = padL;
+    const oy = padT;
+
+    const x = (ft) => ox + ft * scale;
+    const y = (ft) => oy + ft * scale;
+    const s = (ft) => ft * scale;
+
+    const parts = [];
+    parts.push(`<svg viewBox="0 0 ${vbW.toFixed(1)} ${vbH.toFixed(1)}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fire pump room plan view">`);
+    parts.push('<defs>');
+    parts.push('<pattern id="hatchDike" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">');
+    parts.push('<line x1="0" y1="0" x2="0" y2="8" stroke="#f59e0b" stroke-width="1.5" opacity="0.45"/>');
+    parts.push('</pattern>');
+    parts.push('</defs>');
+
+    // Title / north arrow
+    parts.push(`<text x="${ox}" y="16" font-size="12" font-weight="600" fill="#1e293b">PLAN VIEW</text>`);
+    parts.push(`<g transform="translate(${ox + rw - 10}, 8)">`);
+    parts.push('<polygon points="0,0 6,14 -6,14" fill="#334155"/>');
+    parts.push('<text x="0" y="26" text-anchor="middle" font-size="9" fill="#475569">N</text>');
+    parts.push('</g>');
+
+    // Room floor
+    parts.push(`<rect x="${x(0)}" y="${y(0)}" width="${s(roomFtW)}" height="${s(roomFtH)}" fill="#f8fafc" stroke="#0f172a" stroke-width="2.5" rx="2"/>`);
+
+    // Separation strip (diesel)
+    if (layout.sep) {
+      const sp = layout.sep;
+      parts.push(`<rect x="${x(sp.x)}" y="${y(sp.y)}" width="${s(sp.w)}" height="${s(sp.h)}" fill="#e2e8f0" stroke="none" opacity="0.7"/>`);
+      parts.push(`<text x="${x(sp.x + sp.w / 2)}" y="${y(roomFtH / 2)}" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90 ${x(sp.x + sp.w / 2)} ${y(roomFtH / 2)})">${sp.w}' sep.</text>`);
+    }
+
+    // Clearance envelope (dashed)
+    const cl = layout.clearance;
+    parts.push(`<rect x="${x(cl.x)}" y="${y(cl.y)}" width="${s(cl.w)}" height="${s(cl.h)}" fill="#dbeafe" fill-opacity="0.45" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6 4" rx="2"/>`);
+    parts.push(`<text x="${x(cl.x + 0.15)}" y="${y(cl.y) + 12}" font-size="9" fill="#1d4ed8">${cl.ft}' clr</text>`);
+
+    // Dike
+    if (layout.dike) {
+      const d = layout.dike;
+      parts.push(`<rect x="${x(d.x)}" y="${y(d.y)}" width="${s(d.w)}" height="${s(d.h)}" fill="url(#hatchDike)" stroke="#d97706" stroke-width="2" rx="2"/>`);
+      parts.push(`<text x="${x(d.x + d.w / 2)}" y="${y(d.y) + 12}" text-anchor="middle" font-size="9" font-weight="600" fill="#92400e">DIKE ${d.w.toFixed(0)}'×${d.h.toFixed(0)}'</text>`);
+    }
+
+    // Fuel tank
+    if (layout.tank) {
+      const t = layout.tank;
+      parts.push(`<rect x="${x(t.x)}" y="${y(t.y)}" width="${s(t.w)}" height="${s(t.h)}" fill="#fdba74" stroke="#c2410c" stroke-width="1.5" rx="3"/>`);
+      parts.push(`<text x="${x(t.x + t.w / 2)}" y="${y(t.y + t.h / 2) - 4}" text-anchor="middle" font-size="10" font-weight="600" fill="#7c2d12">FUEL TANK</text>`);
+      parts.push(`<text x="${x(t.x + t.w / 2)}" y="${y(t.y + t.h / 2) + 10}" text-anchor="middle" font-size="9" fill="#9a3412">${Math.round(t.gal).toLocaleString()} gal</text>`);
+      parts.push(`<text x="${x(t.x + t.w / 2)}" y="${y(t.y + t.h / 2) + 22}" text-anchor="middle" font-size="8" fill="#9a3412">${t.w.toFixed(0)}'×${t.h.toFixed(0)}'</text>`);
+    }
+
+    // Pump / driver
+    const p = layout.pump;
+    parts.push(`<rect x="${x(p.x)}" y="${y(p.y)}" width="${s(p.w)}" height="${s(p.h)}" fill="#1e3a8a" stroke="#172554" stroke-width="1.5" rx="3"/>`);
+    // Simple pump symbol (circle + impeller hint)
+    const cx = x(p.x + p.w * 0.35);
+    const cy = y(p.y + p.h / 2);
+    const pr = Math.min(s(p.w), s(p.h)) * 0.22;
+    parts.push(`<circle cx="${cx}" cy="${cy}" r="${pr}" fill="none" stroke="#93c5fd" stroke-width="1.5"/>`);
+    parts.push(`<circle cx="${cx}" cy="${cy}" r="${pr * 0.35}" fill="#93c5fd"/>`);
+    parts.push(`<text x="${x(p.x + p.w / 2)}" y="${y(p.y + p.h / 2) - 2}" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">${esc(p.label)}</text>`);
+    parts.push(`<text x="${x(p.x + p.w / 2)}" y="${y(p.y + p.h / 2) + 12}" text-anchor="middle" font-size="9" fill="#bfdbfe">${p.w.toFixed(0)}'×${p.h.toFixed(0)}'</text>`);
+
+    // Controller on wall
+    const c = layout.controller;
+    parts.push(`<rect x="${x(c.x)}" y="${y(c.y)}" width="${s(c.w)}" height="${s(c.h)}" fill="#312e81" stroke="#1e1b4b" stroke-width="1.5" rx="2"/>`);
+    parts.push(`<text x="${x(c.x + c.w / 2)}" y="${y(c.y + c.h / 2)}" text-anchor="middle" dominant-baseline="middle" font-size="8" font-weight="600" fill="#e0e7ff" transform="rotate(-90 ${x(c.x + c.w / 2)} ${y(c.y + c.h / 2)})">CTRL</text>`);
+
+    // Wall tick marks for controller
+    parts.push(`<line x1="${x(0)}" y1="${y(c.y)}" x2="${x(0)}" y2="${y(c.y + c.h)}" stroke="#4f46e5" stroke-width="4" stroke-linecap="square"/>`);
+
+    // Overall dimension — width (bottom)
+    const dimY = y(roomFtH) + 22;
+    parts.push(`<line x1="${x(0)}" y1="${dimY}" x2="${x(roomFtW)}" y2="${dimY}" stroke="#334155" stroke-width="1"/>`);
+    parts.push(`<line x1="${x(0)}" y1="${dimY - 5}" x2="${x(0)}" y2="${dimY + 5}" stroke="#334155" stroke-width="1"/>`);
+    parts.push(`<line x1="${x(roomFtW)}" y1="${dimY - 5}" x2="${x(roomFtW)}" y2="${dimY + 5}" stroke="#334155" stroke-width="1"/>`);
+    parts.push(`<text x="${x(roomFtW / 2)}" y="${dimY + 14}" text-anchor="middle" font-size="11" font-weight="600" fill="#0f172a">${roomFtW.toFixed(0)} ft</text>`);
+
+    // Overall dimension — height (left)
+    const dimX = x(0) - 18;
+    parts.push(`<line x1="${dimX}" y1="${y(0)}" x2="${dimX}" y2="${y(roomFtH)}" stroke="#334155" stroke-width="1"/>`);
+    parts.push(`<line x1="${dimX - 5}" y1="${y(0)}" x2="${dimX + 5}" y2="${y(0)}" stroke="#334155" stroke-width="1"/>`);
+    parts.push(`<line x1="${dimX - 5}" y1="${y(roomFtH)}" x2="${dimX + 5}" y2="${y(roomFtH)}" stroke="#334155" stroke-width="1"/>`);
+    parts.push(`<text x="${dimX - 10}" y="${y(roomFtH / 2)}" text-anchor="middle" font-size="11" font-weight="600" fill="#0f172a" transform="rotate(-90 ${dimX - 10} ${y(roomFtH / 2)})">${roomFtH.toFixed(0)} ft</text>`);
+
+    // Clearance callout on pump right side
+    const clrMidY = p.y + p.h / 2;
+    const clrLineX1 = p.x + p.w;
+    const clrLineX2 = p.x + p.w + cl.ft;
+    if (cl.ft > 0 && clrLineX2 <= roomFtW + 0.01) {
+      parts.push(`<line x1="${x(clrLineX1)}" y1="${y(clrMidY)}" x2="${x(clrLineX2)}" y2="${y(clrMidY)}" stroke="#2563eb" stroke-width="1.2"/>`);
+      parts.push(`<text x="${x((clrLineX1 + clrLineX2) / 2)}" y="${y(clrMidY) - 4}" text-anchor="middle" font-size="8" fill="#1d4ed8">${cl.ft}'</text>`);
+    }
+
+    // Controller size note
+    parts.push(`<text x="${x(c.x + c.w + 0.15)}" y="${y(c.y) - 3}" font-size="8" fill="#4338ca">typ. ${CONTROLLER_TYP.alongWallFt}'W × ${CONTROLLER_TYP.depthFt}'D</text>`);
+
+    parts.push('</svg>');
+    return parts.join('');
+  }
+
+  function planLegendHtml(isDiesel) {
+    const dieselBits = isDiesel
+      ? '<span><i class="plan-swatch" style="background:#fdba74"></i> Fuel tank</span>' +
+        '<span><i class="plan-swatch" style="background:#fde68a;border-color:#d97706"></i> Dike / containment</span>' +
+        '<span><i class="plan-swatch" style="background:#e2e8f0"></i> Pump-fuel separation</span>'
+      : '';
+    return (
+      '<div class="plan-legend">' +
+      '<span><i class="plan-swatch" style="background:#1e3a8a"></i> Pump / driver</span>' +
+      '<span><i class="plan-swatch" style="background:#312e81"></i> Controller (wall)</span>' +
+      '<span><i class="plan-swatch" style="background:#dbeafe;border-style:dashed;border-color:#3b82f6"></i> 3 ft working clearance</span>' +
+      dieselBits +
+      '</div>'
+    );
+  }
+
+  /** Reliable plan image (avoids SVG-via-innerHTML stripping in some browsers). */
+  function planSvgToImgHtml(svgMarkup) {
+    const encoded = encodeURIComponent(svgMarkup)
+      .replace(/'/g, '%27')
+      .replace(/"/g, '%22');
+    const src = 'data:image/svg+xml;charset=utf-8,' + encoded;
+    return (
+      '<img class="room-plan-img" src="' + src + '" ' +
+      'alt="Fire pump room plan view" ' +
+      'width="640" height="420" ' +
+      'style="display:block;width:100%;max-width:720px;height:auto;min-height:280px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;" />'
+    );
+  }
+
   function updateRoomSizing(ratedGPM, driverType) {
     const container = $('roomSizingContent');
     if (!container) return;
@@ -555,42 +906,207 @@
       return;
     }
 
-    let baseSF = Math.max(120, Math.ceil(ratedGPM / 8));
+    const CLEARANCE_FT = 3; // NFPA 20 working clearance each side of equipment
+    const PUMP_TO_FUEL_SEP_FT = 5; // separation between pump package and fuel/dike zone
     const notes = [];
+    const breakdown = [];
 
+    // --- Pump / driver core footprint (fuel handled separately for diesel) ---
+    let equipSF = Math.max(120, Math.ceil(ratedGPM / 8));
     if (driverType === 'electric') {
-      baseSF = Math.max(baseSF, 180);
-      notes.push('Working clearance 3–4 ft around pump and controller (NFPA 20).');
+      equipSF = Math.max(equipSF, 180);
     } else {
-      baseSF = Math.max(baseSF * 1.6, 280);
-      notes.push('Fuel tank, exhaust, and combustion air clearances required.');
+      // Engine + pump only (tank/dike added below)
+      equipSF = Math.max(equipSF, 220);
     }
 
     if (ufcMode) {
-      baseSF = Math.round(baseSF * 1.25);
-      notes.push('UFC 3-600-01 may require additional space for redundant pump or larger clearances.');
+      equipSF = Math.round(equipSF * 1.25);
+      notes.push('UFC 3-600-01 factor applied to pump/driver core (may need redundant unit space).');
     }
 
-    const minWidth = Math.ceil(Math.sqrt(baseSF * 0.6));
-    const minLength = Math.ceil(baseSF / minWidth);
+    const equip = dimsFromSF(equipSF, 0.6);
+    breakdown.push({
+      name: driverType === 'diesel' ? 'Pump + diesel engine core' : 'Pump + electric motor core',
+      detail: `${equip.w}' × ${equip.l}'`,
+      sf: equip.sf
+    });
+    breakdown.push({
+      name: CONTROLLER_TYP.label,
+      detail: `${CONTROLLER_TYP.alongWallFt}' along wall × ${CONTROLLER_TYP.depthFt}' deep (wall-mounted)`,
+      sf: CONTROLLER_TYP.alongWallFt * CONTROLLER_TYP.depthFt
+    });
 
+    let roomWidth;
+    let roomLength;
+    let roomSF;
+    let includeLine = 'Working clearance included';
+    let fuel = null;
+
+    if (driverType === 'diesel') {
+      const diesel = (window.calculatedData && window.calculatedData.diesel) || null;
+      let tankGal = diesel ? diesel.fuelTank : 0;
+      if (!tankGal && ratedGPM) {
+        const ratedPSI = num('ratedPSI');
+        const headFt = ratedPSI * 2.31;
+        const baseHP = (ratedGPM * headFt) / (3960 * 0.75);
+        const dieselHP = baseHP * 1.2;
+        const runtime = num('dieselRuntime', 8);
+        tankGal = Math.round(dieselHP * 0.055 * runtime * 1.2);
+      }
+
+      fuel = estimateFuelTankAndDike(tankGal);
+
+      breakdown.push({
+        name: `Fuel tank (${fuel.tankGal.toLocaleString()} gal)`,
+        detail: `${fuel.tankW}' × ${fuel.tankL}' footprint (~4 ft tall equiv.)`,
+        sf: fuel.tankFootSF
+      });
+      breakdown.push({
+        name: `Diking / spill containment (${fuel.containmentPct}% of tank vol. @ ${fuel.dikeWallHtFt}' wall)`,
+        detail: `${fuel.dikeW}' × ${fuel.dikeL}' (incl. ${fuel.dikeBeyondFt}' beyond tank)`,
+        sf: fuel.dikeSF
+      });
+      breakdown.push({
+        name: `Working clearances (${CLEARANCE_FT}' around pump package & around dike)`,
+        detail: `+${CLEARANCE_FT * 2}' on each zone’s width & length`,
+        sf: null
+      });
+      breakdown.push({
+        name: `Pump-to-fuel separation`,
+        detail: `${PUMP_TO_FUEL_SEP_FT}' between pump package and dike zone`,
+        sf: null
+      });
+
+      const pumpBlockW = equip.w + CLEARANCE_FT * 2;
+      const pumpBlockL = equip.l + CLEARANCE_FT * 2;
+      const dikeBlockW = fuel.dikeW + CLEARANCE_FT * 2;
+      const dikeBlockL = fuel.dikeL + CLEARANCE_FT * 2;
+
+      roomWidth = Math.max(pumpBlockW, dikeBlockW);
+      roomLength = pumpBlockL + PUMP_TO_FUEL_SEP_FT + dikeBlockL;
+      roomSF = roomWidth * roomLength;
+
+      const clearancePumpSF = pumpBlockW * pumpBlockL - equip.sf;
+      const clearanceDikeSF = dikeBlockW * dikeBlockL - fuel.dikeSF;
+      const separationSF = roomWidth * PUMP_TO_FUEL_SEP_FT;
+      breakdown.push({
+        name: 'Clearance area (pump zone)',
+        detail: `${pumpBlockW}' × ${pumpBlockL}' package minus core`,
+        sf: Math.max(0, clearancePumpSF)
+      });
+      breakdown.push({
+        name: 'Clearance area (dike zone to walls)',
+        detail: `${dikeBlockW}' × ${dikeBlockL}' package minus dike`,
+        sf: Math.max(0, clearanceDikeSF)
+      });
+      breakdown.push({
+        name: 'Separation strip (pump ↔ fuel)',
+        detail: `${roomWidth}' × ${PUMP_TO_FUEL_SEP_FT}'`,
+        sf: separationSF
+      });
+
+      includeLine = 'Fuel tank, diking, clearances & separation included';
+      notes.unshift('All listed sizes are included in the total room dimensions and square footage.');
+      notes.push('Exhaust, combustion air, and AHJ/fuel-code setbacks may increase size further.');
+      notes.push('Dike volume uses 110% of tank capacity at a 1 ft effective wall height (preliminary).');
+      if (diesel && diesel.runtime) {
+        notes.push(`Fuel tank sized for ${diesel.runtime}-hr runtime × 1.2 contingency (matches Driver tab).`);
+      }
+    } else {
+      roomWidth = equip.w + CLEARANCE_FT * 2;
+      roomLength = equip.l + CLEARANCE_FT * 2;
+      roomSF = roomWidth * roomLength;
+      breakdown.push({
+        name: `Working clearances (${CLEARANCE_FT}' each side)`,
+        detail: `Room ${roomWidth}' × ${roomLength}' includes +${CLEARANCE_FT * 2}' each way`,
+        sf: roomSF - equip.sf
+      });
+      includeLine = 'Working clearance included';
+      notes.unshift('Working clearance included (3 ft around equipment per NFPA 20).');
+      notes.unshift('All listed sizes are included in the total room dimensions and square footage.');
+    }
+
+    notes.push('Controller shown as typical wall-mounted fire pump controller (~3\' wide × 2\' deep); verify manufacturer cabinet size.');
+
+    let planBlock = '';
+    try {
+      const planLayout = buildRoomPlanLayout(
+        driverType,
+        equip,
+        fuel,
+        CLEARANCE_FT,
+        PUMP_TO_FUEL_SEP_FT,
+        roomWidth,
+        roomLength
+      );
+      const planSvg = renderRoomPlanSVG(planLayout);
+      const planImg = planSvgToImgHtml(planSvg);
+      planBlock =
+        '<div class="room-plan-wrap" id="roomPlanDiagram">' +
+        '<h3>Room plan view (preliminary)</h3>' +
+        '<p class="plan-caption">Top-down layout. Dimensions match the totals above. Not a construction drawing — verify clearances, doors, piping, and AHJ requirements.</p>' +
+        planImg +
+        planLegendHtml(driverType === 'diesel') +
+        '</div>';
+    } catch (err) {
+      console.error('[Fire Pump Sizer] Plan diagram error:', err);
+      planBlock =
+        '<div class="room-plan-wrap" id="roomPlanDiagram">' +
+        '<h3>Room plan view</h3>' +
+        '<p class="plan-caption" style="color:#b91c1c">Diagram could not be drawn. Try refresh. (' +
+        esc(err && err.message ? err.message : 'error') + ')</p></div>';
+    }
+
+    const breakdownRows = breakdown.map((b) => `
+      <tr>
+        <td>${b.name}</td>
+        <td class="num">${b.detail}</td>
+        <td class="num">${b.sf != null ? b.sf.toLocaleString() + ' sf' : '— (in dims)'}</td>
+      </tr>
+    `).join('');
+
+    // Diagram first so it is visible without scrolling past long notes
     container.innerHTML = `
       <div class="room-grid">
         <div class="room-stat">
           <div class="stat-label">Estimated Room Size</div>
-          <div class="value tabular-nums">${baseSF}</div>
-          <div class="tiny">square feet (gross)</div>
+          <div class="value tabular-nums">${roomSF.toLocaleString()}</div>
+          <div class="tiny">square feet (${includeLine.toLowerCase()})</div>
         </div>
         <div class="room-stat">
           <div class="stat-label">Minimum Dimensions (approx)</div>
-          <div class="value tabular-nums" style="font-size:1.5rem">${minWidth}' × ${minLength}'</div>
-          <div class="tiny">Plus working clearances</div>
+          <div class="value tabular-nums" style="font-size:1.5rem">${roomWidth}' × ${roomLength}'</div>
+          <div class="tiny">${includeLine}</div>
         </div>
         <div class="room-notes">
           <div style="font-weight:600;margin-bottom:0.35rem">Key Considerations</div>
           <ul>${notes.map((n) => `<li>${n}</li>`).join('')}</ul>
         </div>
       </div>
+
+      ${planBlock}
+
+      <div class="table-wrap" style="margin-top:1rem">
+        <table class="test-points" aria-label="Room size breakdown">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Size</th>
+              <th class="num">Area</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${breakdownRows}
+            <tr class="duty">
+              <td><strong>Total room (all included)</strong></td>
+              <td class="num"><strong>${roomWidth}' × ${roomLength}'</strong></td>
+              <td class="num"><strong>${roomSF.toLocaleString()} sf</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tiny" style="margin-top:0.75rem">Preliminary layout estimate only. Every component listed above is already included in the total dimensions and square footage — do not add them again.</p>
     `;
   }
 
@@ -661,7 +1177,7 @@
     text += `UFC Mode: ${ufcMode ? 'ON' : 'OFF'}\n`;
     text += `Tool version: ${APP_VERSION}\n\n`;
 
-    text += 'SYSTEM DUTY POINT\n';
+    text += 'SYSTEM DEMAND\n';
     text += `Flow: ${Math.round(data.systemFlow || 0)} GPM\n`;
     text += `Required Pressure at Pump: ${(data.systemPSI || 0).toFixed(1)} PSI\n\n`;
 
@@ -756,8 +1272,23 @@
     // Only register when served over http(s) — not file://
     if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
 
-    navigator.serviceWorker.register('./sw.js', { scope: './' })
-      .then(() => console.log('[Fire Pump Sizer] Service worker ready'))
+    // Drop old caches so plan-diagram updates are not stuck
+    if (navigator.serviceWorker.getRegistrations) {
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((r) => {
+          // re-register fresh below
+        });
+      }).catch(() => undefined);
+    }
+    if (window.caches && caches.keys) {
+      caches.keys().then((keys) => {
+        keys.filter((k) => k.indexOf('fire-pump-sizer') === 0 && k !== 'fire-pump-sizer-v3')
+          .forEach((k) => caches.delete(k));
+      }).catch(() => undefined);
+    }
+
+    navigator.serviceWorker.register('./sw.js?v=3', { scope: './' })
+      .then(() => console.log('[Fire Pump Sizer] Service worker ready v3'))
       .catch((err) => console.warn('[Fire Pump Sizer] SW register failed', err));
   }
 
@@ -817,16 +1348,22 @@
       if ($('density')) $('density').value = h.suggestedDensity;
       if ($('designArea')) $('designArea').value = h.typicalDesignArea;
       if ($('hoseAllowance')) $('hoseAllowance').value = h.hoseAllowance;
+      if ($('simplifiedPressure')) $('simplifiedPressure').value = h.typicalPressurePSI;
       if ($('ufcToggle')) $('ufcToggle').checked = true;
       ufcMode = true;
     } else {
       ufcMode = !!$('ufcToggle')?.checked;
+      if (!$('simplifiedPressure')?.value) {
+        const h = hazardClasses.find((x) => x.id === ($('hazardSelect')?.value || 'aircraft')) || hazardClasses[0];
+        if ($('simplifiedPressure')) $('simplifiedPressure').value = h.typicalPressurePSI;
+      }
     }
 
     bindEvents();
     updateDriverUI();
     updateOnlineStatus();
     updateCodeNotes();
+    updateSimplifiedPreview();
     calculateAll();
     switchTab(0);
     registerServiceWorker();

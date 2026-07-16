@@ -14,7 +14,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-  <link rel="stylesheet" href="./assets/styles.css">
+  <link rel="stylesheet" href="./assets/styles.css?v=2.1.0">
 </head>
 <body>
   <header class="site-header">
@@ -101,8 +101,9 @@
       <section class="card">
         <div class="card-head">
           <h2 class="card-title"><span class="icon" aria-hidden="true">∑</span> System Hydraulic Results + Water Supply</h2>
-          <button type="button" id="btnSimplified" class="btn btn-sm">Use Simplified Demand</button>
+          <button type="button" id="btnSimplified" class="btn btn-sm" title="Override flow and pressure from the simplified hazard calculator below">Use Simplified Demand</button>
         </div>
+        <p class="tiny" style="margin:-0.5rem 0 1rem">Primary duty inputs. <strong>Use Simplified Demand</strong> overwrites both fields from the hazard calculator results below.</p>
 
         <div class="grid-2">
           <div class="field">
@@ -172,8 +173,9 @@
         </div>
       </section>
 
-      <details class="simple">
+      <details class="simple" id="simplifiedDemandPanel">
         <summary>Optional: Simplified Hazard-Based Demand Calculator</summary>
+        <p class="muted mt-3">Preliminary density/area method when a full hydraulic calc is not available yet. Adjust density, area, hose, and estimated pump pressure, then click <strong>Use Simplified Demand</strong> above to override the primary flow and pressure.</p>
         <div class="grid-2 mt-3">
           <div class="field">
             <label for="hazardSelect">Hazard Class</label>
@@ -181,7 +183,7 @@
           </div>
           <div class="grid-3">
             <div class="field">
-              <label for="density">Density</label>
+              <label for="density">Density (gpm/sf)</label>
               <input id="density" type="number" step="0.01" inputmode="decimal" class="engineering-input sm" style="width:100%;border:1px solid var(--slate-300);border-radius:1rem;padding:0.5rem 0.75rem">
             </div>
             <div class="field">
@@ -191,6 +193,28 @@
             <div class="field">
               <label for="hoseAllowance">Hose (gpm)</label>
               <input id="hoseAllowance" type="number" inputmode="decimal" class="engineering-input sm" style="width:100%;border:1px solid var(--slate-300);border-radius:1rem;padding:0.5rem 0.75rem">
+            </div>
+          </div>
+        </div>
+        <div class="field mt-3">
+          <label for="simplifiedPressure">Est. Required Pressure at Pump (preliminary)</label>
+          <div class="input-row">
+            <input type="number" id="simplifiedPressure" value="95" step="1" inputmode="decimal" class="engineering-input sm">
+            <span class="suffix">PSI</span>
+          </div>
+          <span class="hint">Seeded by hazard class; edit to match site elevation, residual needs, or early calcs.</span>
+        </div>
+        <div class="supply-results mt-3" id="simplifiedResultsBox">
+          <div class="grid-2">
+            <div>
+              <div class="stat-label">Simplified Demand Flow</div>
+              <div id="simplifiedFlowResult" class="stat-value tabular-nums">—</div>
+              <div class="tiny">GPM = (density × area) + hose</div>
+            </div>
+            <div>
+              <div class="stat-label">Simplified Demand Pressure</div>
+              <div id="simplifiedPressureResult" class="stat-value tabular-nums">—</div>
+              <div class="tiny">PSI at pump (from estimate above)</div>
             </div>
           </div>
         </div>
@@ -310,7 +334,7 @@
           <div id="chartFallback" class="chart-fallback hidden">Loading chart…</div>
           <canvas id="pumpChart" aria-label="Pump performance curve chart"></canvas>
         </div>
-        <p class="tiny">Chart uses approximate NFPA 20 test points in <strong>PSI</strong>. Red point = system duty. Always validate with the manufacturer curve.</p>
+        <p class="tiny">Chart uses approximate NFPA 20 test points in <strong>PSI</strong>. Red point = system demand. Always validate with the manufacturer curve.</p>
 
         <div class="table-wrap">
           <table class="test-points" aria-label="NFPA 20 test points">
@@ -353,8 +377,8 @@
     </footer>
   </main>
 
-  <!-- Chart first, then app (defensive if Chart fails to load) -->
-  <script src="./assets/chart.umd.min.js"></script>
-  <script src="./assets/app.js"></script>
+  <!-- Chart first, then app (defensive if Chart fails to load). ?v= busts old service-worker cache. -->
+  <script src="./assets/chart.umd.min.js?v=2.1.0"></script>
+  <script src="./assets/app.js?v=2.1.0"></script>
 </body>
 </html>
