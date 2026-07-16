@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Fire Pump Sizer — preliminary NFPA 20 / UFC 3-600-01 pump sizing with hydrant flow test and driver estimates. Runs offline in the browser.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Fire Pump Sizer">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Fire Pump Sizer · NFPA 20 / UFC</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3c1 3 4 4 4 8a4 4 0 1 1-8 0c0-2 1.5-3.5 2.5-5C11 5 11.5 4 12 3z"/>
+            <path d="M9 18h6"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Fire Pump Sizer</h1>
+          <p>System Calc + Hydrant Flow Test → NFPA 20 / UFC 3-600-01</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <span id="appStatus" class="app-status" title="Works offline after first load when hosted">Online</span>
+
+        <div class="ufc-toggle-wrap">
+          <span>UFC 3-600-01</span>
+          <label class="toggle-switch" title="Toggle UFC mode">
+            <input type="checkbox" id="ufcToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <button type="button" id="btnDoD" class="btn btn-sm" title="Load DoD example project">
+          Load DoD Example
+        </button>
+        <button type="button" id="btnDisclaimer" class="btn btn-ghost btn-sm" aria-label="Disclaimer" title="Disclaimer">
+          ⚠
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <input id="projectName" class="project-name" type="text" value="DoD Facility - System Hydraulic Results" placeholder="Project name" autocomplete="off" spellcheck="false">
+
+    <!-- Live summary -->
+    <section class="metrics" aria-label="Live results summary">
+      <div class="metric-card">
+        <div class="label">System Flow</div>
+        <div id="resultFlow" class="value tabular-nums">0</div>
+        <div class="unit">GPM</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Required Pressure</div>
+        <div id="resultHead" class="value tabular-nums">0</div>
+        <div id="resultHeadPSI" class="unit">PSI</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Available @ Flow</div>
+        <div id="availablePressure" class="value tabular-nums good">—</div>
+        <div class="unit">PSI from supply</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Pump Must Add</div>
+        <div id="pumpMustAdd" class="value tabular-nums">—</div>
+        <div class="unit">PSI (net)</div>
+      </div>
+      <div class="metric-card metric-verify">
+        <div class="flex-1" style="flex:1;min-width:0">
+          <div class="label" style="margin-bottom:0.25rem">Verification</div>
+          <div id="verificationStatus" style="font-size:1.1rem;font-weight:650">—</div>
+        </div>
+        <div id="verificationIcon" class="icon" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <nav class="nav-tabs" role="tablist" aria-label="Calculator sections">
+      <div class="nav-tab active" role="tab" tabindex="0" id="tab-0" data-tab="0" aria-controls="content-0">System Calc + Supply</div>
+      <div class="nav-tab" role="tab" tabindex="0" id="tab-1" data-tab="1" aria-controls="content-1">Pump + Driver</div>
+      <div class="nav-tab" role="tab" tabindex="0" id="tab-2" data-tab="2" aria-controls="content-2">Verify &amp; Curve</div>
+      <div class="nav-tab" role="tab" tabindex="0" id="tab-3" data-tab="3" aria-controls="content-3">Pump Room Size</div>
+      <div class="nav-tab" role="tab" tabindex="0" id="tab-4" data-tab="4" aria-controls="content-4">Code Notes</div>
+    </nav>
+
+    <!-- TAB 0 -->
+    <div id="content-0" class="tab-content" role="tabpanel" aria-labelledby="tab-0">
+      <section class="card">
+        <div class="card-head">
+          <h2 class="card-title"><span class="icon" aria-hidden="true">∑</span> System Hydraulic Results + Water Supply</h2>
+          <button type="button" id="btnSimplified" class="btn btn-sm">Use Simplified Demand</button>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="systemFlow">Required Flow at Pump (from hydraulic calc)</label>
+            <div class="input-row">
+              <input type="number" id="systemFlow" value="1250" step="10" inputmode="decimal" class="engineering-input">
+              <span class="suffix">GPM</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="systemPressure">Required Pressure at Pump Discharge Flange</label>
+            <div class="input-row">
+              <input type="number" id="systemPressure" value="95" step="1" inputmode="decimal" class="engineering-input">
+              <span class="suffix">PSI</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title"><span class="icon" aria-hidden="true">💧</span> Hydrant Flow Test Results</h2>
+        <p class="muted">Optional but recommended. Enter the most recent hydrant flow test to estimate available pressure at design flow.</p>
+
+        <div class="grid-3 mb-4">
+          <div class="field">
+            <label for="hydrantStatic">Static Pressure (no flow)</label>
+            <div class="input-row">
+              <input type="number" id="hydrantStatic" value="65" step="1" inputmode="decimal" class="engineering-input sm">
+              <span class="suffix">PSI</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="hydrantFlow">Flow During Test</label>
+            <div class="input-row">
+              <input type="number" id="hydrantFlow" value="1200" step="50" inputmode="decimal" class="engineering-input sm">
+              <span class="suffix">GPM</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="hydrantResidual">Residual at Test Flow</label>
+            <div class="input-row">
+              <input type="number" id="hydrantResidual" value="42" step="1" inputmode="decimal" class="engineering-input sm">
+              <span class="suffix">PSI</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-row">
+          <button type="button" id="btnSupply" class="btn btn-primary">Calculate Available Pressure at Design Flow</button>
+          <div id="supplyStatus" class="badge" aria-live="polite"></div>
+        </div>
+
+        <div id="supplyResults" class="supply-results hidden">
+          <div class="grid-3">
+            <div>
+              <div class="stat-label">Available Pressure at Required Flow</div>
+              <div id="availableAtFlow" class="stat-value tabular-nums text-emerald"></div>
+              <div class="tiny">PSI (estimated from supply curve)</div>
+            </div>
+            <div>
+              <div class="stat-label">Net Pressure Pump Must Provide</div>
+              <div id="netPumpPressure" class="stat-value tabular-nums"></div>
+              <div class="tiny">PSI</div>
+            </div>
+            <div id="supplyQualityBox"></div>
+          </div>
+        </div>
+      </section>
+
+      <details class="simple">
+        <summary>Optional: Simplified Hazard-Based Demand Calculator</summary>
+        <div class="grid-2 mt-3">
+          <div class="field">
+            <label for="hazardSelect">Hazard Class</label>
+            <select id="hazardSelect" class="inline-select"></select>
+          </div>
+          <div class="grid-3">
+            <div class="field">
+              <label for="density">Density</label>
+              <input id="density" type="number" step="0.01" inputmode="decimal" class="engineering-input sm" style="width:100%;border:1px solid var(--slate-300);border-radius:1rem;padding:0.5rem 0.75rem">
+            </div>
+            <div class="field">
+              <label for="designArea">Area (sf)</label>
+              <input id="designArea" type="number" inputmode="decimal" class="engineering-input sm" style="width:100%;border:1px solid var(--slate-300);border-radius:1rem;padding:0.5rem 0.75rem">
+            </div>
+            <div class="field">
+              <label for="hoseAllowance">Hose (gpm)</label>
+              <input id="hoseAllowance" type="number" inputmode="decimal" class="engineering-input sm" style="width:100%;border:1px solid var(--slate-300);border-radius:1rem;padding:0.5rem 0.75rem">
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- TAB 1 -->
+    <div id="content-1" class="tab-content hidden" role="tabpanel" aria-labelledby="tab-1">
+      <section class="card">
+        <h2 class="card-title"><span class="icon" aria-hidden="true">⚙</span> Pump Selection &amp; Driver Sizing</h2>
+
+        <div class="field mb-4">
+          <label>Driver Type</label>
+          <div class="driver-choice">
+            <label>
+              <input type="radio" name="driverType" value="electric" checked>
+              <div class="driver-card">⚡ Electric Motor</div>
+            </label>
+            <label>
+              <input type="radio" name="driverType" value="diesel">
+              <div class="driver-card">🛢 Diesel Engine</div>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid-2 mb-4">
+          <div class="field">
+            <label for="ratedGPM">Proposed Rated Capacity</label>
+            <div class="input-row">
+              <input type="number" id="ratedGPM" value="1500" step="50" inputmode="decimal" class="engineering-input">
+              <span class="suffix">GPM</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="ratedPSI">Proposed Rated Pressure</label>
+            <div class="input-row">
+              <input type="number" id="ratedPSI" value="110" step="5" inputmode="decimal" class="engineering-input">
+              <span class="suffix">PSI</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="electricPanel" class="panel">
+          <div class="panel-title text-blue">⚡ Electric Motor Sizing</div>
+          <div class="grid-4">
+            <div>
+              <div class="stat-label">Calculated Motor HP</div>
+              <div id="motorHP" class="stat-value tabular-nums">—</div>
+            </div>
+            <div class="field">
+              <label for="voltage" class="stat-label">Voltage</label>
+              <select id="voltage" class="inline-select">
+                <option value="460">460V 3ph</option>
+                <option value="480" selected>480V 3ph</option>
+                <option value="230">230V 3ph</option>
+                <option value="208">208V 3ph</option>
+              </select>
+            </div>
+            <div>
+              <div class="stat-label">Est. Full Load Amps</div>
+              <div id="fla" class="stat-value tabular-nums" style="font-size:1.25rem">—</div>
+            </div>
+            <div>
+              <div class="stat-label">Recommended Breaker</div>
+              <div id="breaker" class="stat-value tabular-nums" style="font-size:1.25rem">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="dieselPanel" class="panel hidden">
+          <div class="panel-title text-orange">🛢 Diesel Engine Sizing</div>
+          <div class="grid-4">
+            <div>
+              <div class="stat-label">Calculated Engine HP</div>
+              <div id="dieselHP" class="stat-value tabular-nums">—</div>
+            </div>
+            <div class="field">
+              <label for="dieselRuntime" class="stat-label">Min Runtime (UFC)</label>
+              <select id="dieselRuntime" class="inline-select">
+                <option value="8">8 hours (typical)</option>
+                <option value="12">12 hours</option>
+                <option value="24">24 hours</option>
+              </select>
+            </div>
+            <div>
+              <div class="stat-label">Fuel Consumption</div>
+              <div id="fuelRate" class="stat-value tabular-nums" style="font-size:1.15rem">—</div>
+            </div>
+            <div>
+              <div class="stat-label">Min Fuel Tank</div>
+              <div id="fuelTank" class="stat-value tabular-nums" style="font-size:1.15rem">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-end">
+          <button type="button" id="btnRecalc" class="btn btn-primary">Recalculate &amp; Verify</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- TAB 2 -->
+    <div id="content-2" class="tab-content hidden" role="tabpanel" aria-labelledby="tab-2">
+      <section class="card">
+        <h2 class="card-title"><span class="icon" aria-hidden="true">📈</span> NFPA 20 Performance Verification</h2>
+
+        <div id="highPressureWarning" class="warning-box hidden">
+          <div class="title">⚠ High Pressure Warning</div>
+          <div id="highPressureMessage" class="msg"></div>
+        </div>
+
+        <div id="verificationResults" class="mb-4">
+          <div class="checks" id="checksGrid"></div>
+        </div>
+
+        <div class="chart-wrap">
+          <div id="chartFallback" class="chart-fallback hidden">Loading chart…</div>
+          <canvas id="pumpChart" aria-label="Pump performance curve chart"></canvas>
+        </div>
+        <p class="tiny">Chart uses approximate NFPA 20 test points in <strong>PSI</strong>. Red point = system duty. Always validate with the manufacturer curve.</p>
+
+        <div class="table-wrap">
+          <table class="test-points" aria-label="NFPA 20 test points">
+            <thead>
+              <tr>
+                <th>Point</th>
+                <th class="num">Flow (GPM)</th>
+                <th class="num">Pressure (PSI)</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="testPointsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- TAB 3 -->
+    <div id="content-3" class="tab-content hidden" role="tabpanel" aria-labelledby="tab-3">
+      <section class="card">
+        <h2 class="card-title"><span class="icon" aria-hidden="true">🏗</span> Estimated Fire Pump Room Size</h2>
+        <div id="roomSizingContent"></div>
+      </section>
+    </div>
+
+    <!-- TAB 4 -->
+    <div id="content-4" class="tab-content hidden" role="tabpanel" aria-labelledby="tab-4">
+      <section class="card">
+        <h2 class="card-title"><span class="icon" aria-hidden="true">📘</span> Code Requirements &amp; References</h2>
+        <div id="codeNotesContent" class="code-notes muted"></div>
+      </section>
+    </div>
+
+    <footer class="footer-bar">
+      <div>References: NFPA 20 &amp; UFC 3-600-01. For qualified Fire Protection Engineers only. · v2.0 · Local browser app</div>
+      <div class="footer-actions">
+        <button type="button" id="btnCopy" class="btn btn-sm">Copy Results</button>
+        <button type="button" id="btnReset" class="btn btn-sm">Reset</button>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Chart first, then app (defensive if Chart fails to load) -->
+  <script src="./assets/chart.umd.min.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
