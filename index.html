@@ -67,6 +67,9 @@
     @media (min-width: 640px) {
       .grid { grid-template-columns: 1fr 1fr; }
     }
+    @media (min-width: 960px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+    }
     a.card {
       display: block;
       text-decoration: none;
@@ -102,8 +105,17 @@
       color: var(--blue-900);
       margin-bottom: 0.55rem;
     }
+    .badge.beta {
+      background: #ffedd5;
+      color: #9a3412;
+    }
     .badge.soon-badge {
       background: #f1f5f9;
+      color: var(--slate-500);
+    }
+    .tool-count {
+      margin: -0.5rem 0 1.25rem;
+      font-size: 0.8rem;
       color: var(--slate-500);
     }
     .card h2 {
@@ -141,6 +153,8 @@
       </div>
     </header>
 
+    <p class="tool-count">3 tools available · Pump Sizer · Smoke Exhaust · Flow Test Report</p>
+
     <section class="grid" aria-label="Available tools">
       <a class="card" href="./fire-pump-sizer/">
         <span class="badge">Live</span>
@@ -149,17 +163,24 @@
         <span class="open">Open tool →</span>
       </a>
 
-      <a class="card" href="./smoke-exhaust-lab/app/">
-        <span class="badge">Beta</span>
+      <a class="card" href="./smoke-exhaust-lab/app/" id="card-smoke-exhaust">
+        <span class="badge beta">Beta</span>
         <h2>Smoke Exhaust Scenario Lab</h2>
         <p>Design-fire scenarios, plume/exhaust calculations, makeup air &amp; plugholing checks, Full/Excel modes, and auditable report packages (team testing build).</p>
+        <span class="open">Open tool →</span>
+      </a>
+
+      <a class="card" href="./flow-test-report/" id="card-flow-test">
+        <span class="badge">Live</span>
+        <h2>Flow Test Report</h2>
+        <p>Hydrant flow test calculator, N<sup>1.85</sup> supply curve, NFPA 13 / UFC demand estimates, pump indication, and PDF flow test report.</p>
         <span class="open">Open tool →</span>
       </a>
     </section>
 
     <footer>
       <p><strong>For qualified engineers only.</strong> Preliminary tools — not a substitute for stamped design, manufacturer curves, or AHJ approval.</p>
-      <p>Hosted on GitHub Pages · data stays in your browser</p>
+      <p>Hosted on GitHub Pages · data stays in your browser · portal rev 2026-07-16b</p>
     </footer>
   </div>
 </body>

@@ -8,6 +8,7 @@ Browser-based engineering calculators for team use. Hosted with **GitHub Pages**
 |------|------|
 | [Fire Pump Sizer](./fire-pump-sizer/) | NFPA 20 / UFC preliminary pump sizing |
 | [Smoke Exhaust Scenario Lab](./smoke-exhaust-lab/app/) | Beta smoke exhaust scenarios (team testing package) |
+| [Flow Test Report](./flow-test-report/) | Hydrant flow test + supply curve + pump indication + PDF |
 
 ## Local test
 

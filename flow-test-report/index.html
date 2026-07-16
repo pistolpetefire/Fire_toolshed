@@ -1,0 +1,3372 @@
+<!-- Open this file in a web browser. Do not open app.js directly. -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#276c78" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Flow Test Report" />
+    <meta name="description" content="Hydrant flow test report and conceptual fire pump estimator — NFPA 13 / UFC 3-600-01. Concept tool for qualified engineers." />
+    <title>Flow Test Report · Fire Toolshed</title>
+    <style>
+:root {
+  --paper: #f6f4ef;
+  --surface: #ffffff;
+  --ink: #172124;
+  --muted: #536063;
+  --line: #d7d0c2;
+  --field: #bfc9c6;
+  --teal: #276c78;
+  --teal-soft: #e7f4f4;
+  --green: #3b7a57;
+  --green-soft: #edf8f0;
+  --red: #b64c3b;
+  --red-soft: #fff0eb;
+  --amber: #d19b28;
+  --amber-soft: #fff7df;
+  color-scheme: light;
+}
+
+.beta-banner {
+  background: linear-gradient(90deg, #7a3410, #b45309);
+  color: #fff7ed;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  align-items: baseline;
+  padding: 0.65rem 1rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  border-bottom: 2px solid #9a3412;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.beta-banner strong {
+  font-size: 0.85rem;
+}
+.beta-banner span {
+  flex: 1 1 14rem;
+  opacity: 0.95;
+}
+.portal-link {
+  color: #fff7ed;
+  font-weight: 700;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+.portal-link:hover {
+  color: #fff;
+}
+.page-heading .eyebrow {
+  margin-bottom: 4px;
+}
+.app-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.app-footer a {
+  color: var(--teal);
+  font-weight: 700;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--paper);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  touch-action: manipulation;
+}
+
+.app-shell {
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.top-bar {
+  display: grid;
+  gap: 14px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #667579;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  max-width: 780px;
+  margin-top: 0;
+  font-size: 44px;
+  line-height: 1.05;
+  font-weight: 700;
+}
+
+h2 {
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.notice {
+  max-width: 760px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.app-version {
+  margin-top: 8px;
+  color: #667579;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
+  gap: 20px;
+  padding-top: 20px;
+}
+
+.controls,
+.results {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 1px 4px rgb(23 33 36 / 0.06);
+  padding: 16px;
+}
+
+.panel > h2 + * {
+  margin-top: 16px;
+}
+
+.field-grid,
+.metric-grid,
+.criteria-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.field-grid.two,
+.metric-grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-grid.three,
+.metric-grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field.full {
+  margin-bottom: 12px;
+}
+
+.field > span:first-child,
+.switch-row > span {
+  color: #334146;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.criteria-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.shared-demand-fields {
+  margin-top: 12px;
+}
+
+.criteria-option,
+.backflow-option {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  min-height: 74px;
+  align-items: start;
+  border: 1px solid var(--field);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 12px;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.criteria-option:has(input:checked),
+.backflow-option:has(input:checked) {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+}
+
+.criteria-option:has(input:focus-visible),
+.backflow-option:has(input:focus-visible) {
+  box-shadow: 0 0 0 3px rgb(39 108 120 / 0.18);
+}
+
+.criteria-option input,
+.backflow-option input {
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  accent-color: var(--teal);
+}
+
+.criteria-option b,
+.criteria-option small,
+.backflow-option b,
+.backflow-option small {
+  display: block;
+}
+
+.criteria-option b,
+.backflow-option b {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.criteria-option small,
+.backflow-option small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.backflow-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.input-shell {
+  display: flex;
+  height: 48px;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid var(--field);
+  border-radius: 8px;
+  background: var(--surface);
+  transition: box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.input-shell:focus-within {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgb(39 108 120 / 0.18);
+}
+
+.input-shell input,
+select {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  outline: 0;
+}
+
+.input-shell input {
+  flex: 1;
+  padding: 0 12px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.input-shell b {
+  display: grid;
+  place-items: center;
+  min-width: 64px;
+  border-left: 1px solid var(--line);
+  color: #667579;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+select {
+  height: 48px;
+  border: 1px solid var(--field);
+  padding: 0 12px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+select:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgb(39 108 120 / 0.18);
+}
+
+select:disabled {
+  color: #667579;
+  background: #f5f6f4;
+}
+
+.switch-row {
+  display: grid;
+  min-height: 76px;
+  align-content: end;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.switch-standalone {
+  min-height: 0;
+}
+
+.switch-row input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+}
+
+.switch-row i {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 48px;
+  border: 1px solid var(--teal);
+  border-radius: 8px;
+  background: var(--teal-soft);
+}
+
+.switch-row i::before {
+  content: "Included";
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #194d56;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.switch-row i::after {
+  content: "";
+  position: absolute;
+  top: 11px;
+  right: 12px;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 32px 12px, #ffffff 0 8px, transparent 9px),
+    var(--teal);
+}
+
+.switch-row input:not(:checked) + i {
+  border-color: var(--field);
+  background: var(--surface);
+}
+
+.switch-row input:not(:checked) + i::before {
+  content: "Excluded";
+  color: #667579;
+}
+
+.switch-row input:not(:checked) + i::after {
+  background:
+    radial-gradient(circle at 12px 12px, #ffffff 0 8px, transparent 9px),
+    var(--field);
+}
+
+.fine-print {
+  margin-top: 12px;
+  color: #667579;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.calculate-flow-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 12px;
+  border: 1px solid var(--teal);
+  border-radius: 8px;
+  background: var(--teal-soft);
+  color: #194d56;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.calculate-flow-button:focus,
+.calculate-flow-button:hover {
+  border-color: var(--teal-dark);
+  background: #d5ecef;
+}
+
+.reset-button {
+  min-height: 46px;
+  border: 1px solid var(--field);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.print-button {
+  min-height: 46px;
+  border: 1px solid var(--teal);
+  border-radius: 8px;
+  background: var(--teal);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.reset-button:focus,
+.reset-button:hover,
+.print-button:focus,
+.print-button:hover {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgb(39 108 120 / 0.16);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: rgb(23 33 36 / 0.5);
+  padding: 16px;
+}
+
+.modal-card {
+  display: grid;
+  gap: 18px;
+  width: min(100%, 720px);
+  max-height: min(720px, calc(100vh - 32px));
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 20px 60px rgb(23 33 36 / 0.22);
+  padding: 18px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.report-status {
+  border: 1px solid #a7cdb3;
+  border-radius: 8px;
+  background: #f4fbf5;
+  color: #254f37;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.report-status a {
+  color: #194d56;
+  font-weight: 700;
+}
+
+.pdf-preview {
+  width: 100%;
+  min-height: 360px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.text-shell input {
+  border-radius: 8px;
+}
+
+.print-report {
+  display: none;
+}
+
+.outcome,
+.result-block {
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.result-block {
+  margin-top: 16px;
+}
+
+.outcome-kicker {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.outcome-title {
+  margin-top: 6px;
+  font-size: 28px;
+  line-height: 1.05;
+  font-weight: 800;
+}
+
+.outcome-text {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.outcome-good {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: #254f37;
+}
+
+.outcome-bad {
+  border-color: var(--red);
+  background: var(--red-soft);
+  color: #743124;
+}
+
+.outcome-warn {
+  border-color: var(--amber);
+  background: var(--amber-soft);
+  color: #67501a;
+}
+
+.metric {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf7;
+  padding: 12px;
+}
+
+.metric p {
+  color: #667579;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.metric.good {
+  border-color: #a7cdb3;
+  background: #f4fbf5;
+}
+
+.metric.bad {
+  border-color: #e3aea6;
+  background: #fff7f4;
+}
+
+.warning {
+  margin-top: 12px;
+  border: 1px solid #e5bf5d;
+  border-radius: 8px;
+  background: var(--amber-soft);
+  color: #67501a;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.hidden {
+  display: none;
+}
+
+#supplyChart {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 16px;
+  overflow: visible;
+}
+
+#supplyChart + .fine-print {
+  margin-top: 10px;
+}
+
+.scope-list {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding-left: 20px;
+  color: #435055;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 12px;
+  }
+
+  .page-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  .field-grid.two,
+  .field-grid.three,
+  .criteria-grid,
+  .backflow-options,
+  .metric-grid.two,
+  .metric-grid.three {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  .outcome-title {
+    font-size: 24px;
+  }
+
+  .metric strong {
+    font-size: 18px;
+  }
+}
+
+@media print {
+  @page {
+    size: letter;
+    margin: 0.45in;
+  }
+
+  html,
+  body {
+    background: white;
+    color: #111;
+  }
+
+  .beta-banner,
+  .app-shell,
+  .modal-overlay {
+    display: none;
+  }
+
+  .print-report {
+    display: block;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111;
+  }
+
+  .report-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    align-items: flex-start;
+    border-bottom: 2px solid #172124;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+  }
+
+  .report-kicker {
+    color: #435055;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .report-header h1 {
+    margin-top: 4px;
+    font-size: 24px;
+    line-height: 1.1;
+  }
+
+  .report-date {
+    min-width: 180px;
+    color: #435055;
+    font-size: 10px;
+    line-height: 1.4;
+    text-align: right;
+  }
+
+  .report-section {
+    break-inside: avoid;
+    margin-top: 14px;
+  }
+
+  .report-section h2 {
+    margin-bottom: 7px;
+    border-bottom: 1px solid #c9c9c9;
+    padding-bottom: 4px;
+    color: #172124;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .report-grid {
+    display: grid;
+    gap: 6px;
+  }
+
+  .report-grid.two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-grid.four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .report-grid p {
+    min-height: 42px;
+    border: 1px solid #d0d0d0;
+    padding: 7px;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  .report-grid b,
+  .report-grid span {
+    display: block;
+  }
+
+  .report-grid b {
+    color: #435055;
+    font-size: 8.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .report-grid span {
+    margin-top: 4px;
+    color: #111;
+    font-size: 12px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  #pdfSupplyChart {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid #d0d0d0;
+  }
+
+  .report-summary {
+    margin-bottom: 8px;
+    border: 1px solid #d0d0d0;
+    padding: 8px;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .report-blank-line {
+    height: 20px;
+    margin: 12px 0 10px;
+  }
+
+  .report-decision {
+    border: 2px solid #111;
+    padding: 10px 12px;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .report-disclaimer {
+    margin-top: 10px;
+    color: #435055;
+    font-size: 9.5px;
+    line-height: 1.35;
+  }
+
+  .report-footer-lines {
+    display: grid;
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  .report-footer-lines span {
+    display: block;
+    height: 18px;
+    border-bottom: 1px solid #111;
+  }
+}
+
+</style>
+  </head>
+  <body>
+    <div class="beta-banner" role="status">
+      <strong>Concept estimator — not final design</strong>
+      <span>
+        Hydrant flow + preliminary pump indication only. Final decisions need full hydraulics, adopted code, and a qualified design professional.
+      </span>
+      <a class="portal-link" href="../">← Fire Toolshed</a>
+    </div>
+    <main class="app-shell">
+      <header class="top-bar">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Fire Toolshed</p>
+            <h1>Flow Test Report</h1>
+            <p class="app-version" id="appVersionLabel">Version 1.3</p>
+          </div>
+          <button id="resetButton" type="button" class="reset-button">Reset defaults</button>
+        </div>
+        <aside id="outcomeBadge" class="outcome outcome-warn" aria-live="polite">
+          <p class="outcome-kicker">Estimated answer</p>
+          <p class="outcome-title">Check inputs</p>
+          <p class="outcome-text">Enter hydrant test and hazard values.</p>
+        </aside>
+      </header>
+
+      <section class="layout">
+        <form id="calculatorForm" class="controls">
+          <section class="panel">
+            <h2>Compliance criteria</h2>
+            <div class="criteria-grid" id="criteriaOptions">
+              <label class="criteria-option">
+                <input data-criterion="nfpa13" type="checkbox" />
+                <span>
+                  <b>NFPA 13</b>
+                  <small>Sprinkler density-area basis</small>
+                </span>
+              </label>
+              <label class="criteria-option">
+                <input data-criterion="ufc360001" type="checkbox" />
+                <span>
+                  <b>UFC 3-600-01</b>
+                  <small>DoD fire protection criteria</small>
+                </span>
+              </label>
+              <label class="criteria-option">
+                <input data-criterion="airForceSundown" type="checkbox" />
+                <span>
+                  <b>Air Force Sundown</b>
+                  <small>0.20 gpm/sf over 5,000 sf, K min. 11.2</small>
+                </span>
+              </label>
+            </div>
+            <p class="fine-print">
+              Select every criterion that applies. UFC uses the Table 9-3
+              selector below. Air Force Sundown applies the fixed density-area
+              basis shown.
+            </p>
+          </section>
+
+          <section class="panel">
+            <h2>Hydrant flow test</h2>
+            <div class="field-grid two">
+              <label class="field">
+                <span>Static pressure</span>
+                <span class="input-shell">
+                  <input data-field="staticPressure" type="number" min="0" step="1" inputmode="decimal" />
+                  <b>psi</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>Residual pressure</span>
+                <span class="input-shell">
+                  <input data-field="residualPressure" type="number" min="0" step="1" inputmode="decimal" />
+                  <b>psi</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>Flow at residual</span>
+                <span class="input-shell">
+                  <input data-field="flowAtResidual" type="number" min="0" step="1" inputmode="decimal" />
+                  <b>gpm</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>Minimum supply residual</span>
+                <span class="input-shell">
+                  <input data-field="minResidual" type="number" min="0" step="1" inputmode="decimal" />
+                  <b>psi</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>Pitot gauge reading</span>
+                <span class="input-shell">
+                  <input data-field="pitotPressure" type="number" min="0" step="1" inputmode="decimal" />
+                  <b>psi</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>Outlet diameter</span>
+                <span class="input-shell">
+                  <input data-field="outletDiameter" type="number" min="0" step="0.125" inputmode="decimal" />
+                  <b>in</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>Coefficient of friction</span>
+                <select id="coefficientSelect" data-field="dischargeCoefficient">
+                  <option value="1">1.0</option>
+                  <option value="0.95">0.95</option>
+                  <option value="0.9">0.90</option>
+                  <option value="0.85">0.85</option>
+                  <option value="0.8">0.80</option>
+                </select>
+              </label>
+              <label class="switch-row">
+                <span>Monster Pitot Chart</span>
+                <input id="monsterPitotChart" type="checkbox" />
+                <i aria-hidden="true"></i>
+              </label>
+              <label class="field">
+                <span>Extra flowing hydrants</span>
+                <select data-field="additionalFlowingHydrants">
+                  <option value="0">0</option>
+                  <option value="1">1 extra - 2x flow</option>
+                  <option value="2">2 extra - 3x flow</option>
+                </select>
+              </label>
+            </div>
+            <p class="fine-print">
+              Flow at residual may be typed directly. Editing pitot pressure,
+              outlet diameter, coefficient, Monster Pitot Chart, or extra flowing
+              hydrants recalculates the flow using Q = 29.83 x C x d^2 x sqrt(P),
+              rounded to the nearest 1 gpm. When Monster Pitot Chart is included,
+              flow uses the chart's 0.9 coefficient basis rounded to the nearest
+              5 gpm. Extra flowing hydrants multiply the single-hydrant flow by 2
+              or 3. Use the button below if Teams or a mobile browser does not
+              refresh the GPM after editing pitot values.
+            </p>
+            <button id="calculateFlowButton" type="button" class="calculate-flow-button">
+              Calculate GPM from pitot
+            </button>
+          </section>
+
+          <section class="panel">
+            <h2>Greatest Hazard Demand</h2>
+            <label class="field full" id="standardHazardControl">
+              <span>Hazard classification</span>
+              <select id="hazardSelect"></select>
+            </label>
+            <label class="field full hidden" id="ufcTableControl">
+              <span>UFC 3-600-01 Table 9-3 option</span>
+              <select id="ufcTableSelect"></select>
+            </label>
+            <label class="field full hidden" id="sundownControl">
+              <span>Air Force Sundown option</span>
+              <select id="sundownSelect" disabled>
+                <option>0.20 gpm/sf over 5,000 sf, K min. 11.2</option>
+              </select>
+            </label>
+            <div class="field-grid two" id="densityAreaFields">
+              <label class="field">
+                <span>Density</span>
+                <span class="input-shell">
+                  <input data-field="density" type="number" min="0" step="0.01" inputmode="decimal" />
+                  <b>gpm/sf</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>Design area</span>
+                <span class="input-shell">
+                  <input data-field="designArea" type="number" min="0" step="100" inputmode="decimal" />
+                  <b>sf</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>Area per sprinkler</span>
+                <span class="input-shell">
+                  <input data-field="sprinklerArea" type="number" min="0" step="5" inputmode="decimal" />
+                  <b>sf</b>
+                </span>
+              </label>
+            </div>
+            <div class="field-grid two hidden" id="sprinklerCountFields">
+              <label class="field">
+                <span>Number of sprinklers</span>
+                <span class="input-shell">
+                  <input data-field="sprinklerCount" type="number" min="0" step="1" inputmode="decimal" />
+                  <b>heads</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>End sprinkler pressure</span>
+                <span class="input-shell">
+                  <input data-field="endHeadPressure" type="number" min="7" step="1" inputmode="decimal" />
+                  <b>psi</b>
+                </span>
+              </label>
+            </div>
+            <div class="field-grid two shared-demand-fields">
+              <label class="field">
+                <span>Hose allowance</span>
+                <span class="input-shell">
+                  <input data-field="hoseAllowance" type="number" min="0" step="1" inputmode="decimal" />
+                  <b>gpm</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>Sprinkler K-factor</span>
+                <span class="input-shell">
+                  <input data-field="kFactor" type="number" min="0" step="0.1" inputmode="decimal" />
+                  <b>K</b>
+                </span>
+              </label>
+              <label class="switch-row">
+                <span>Include hose in decision</span>
+                <input id="includeHose" type="checkbox" />
+                <i aria-hidden="true"></i>
+              </label>
+            </div>
+            <p id="hazardNote" class="fine-print"></p>
+          </section>
+
+          <section class="panel">
+            <h2>Building allowances</h2>
+            <div class="field-grid three">
+              <label class="field">
+                <span>Roof height</span>
+                <span class="input-shell">
+                  <input data-field="roofHeight" type="number" min="0" step="1" inputmode="decimal" />
+                  <b>ft</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>Other system losses</span>
+                <span class="input-shell">
+                  <input data-field="systemLoss" type="number" min="0" step="1" inputmode="decimal" />
+                  <b>psi</b>
+                </span>
+              </label>
+              <label class="field">
+                <span>Safety margin</span>
+                <span class="input-shell">
+                  <input data-field="safetyMargin" type="number" min="0" step="1" inputmode="decimal" />
+                  <b>psi</b>
+                </span>
+              </label>
+            </div>
+            <p class="fine-print">
+              18 psi is a conservative screening allowance for uncalculated system friction, including lead-in/riser effects and estimated piping loss to the remote design area, but excluding BFP impact. It is meant to represent a Hangar with AF Sundown Policy. A light hazard building could be lowered toward 10 psi.
+            </p>
+          </section>
+
+          <section class="panel">
+            <h2>Backflow preventer</h2>
+            <label class="switch-row switch-standalone">
+              <span>Backflow preventer required</span>
+              <input id="backflowRequired" type="checkbox" />
+              <i aria-hidden="true"></i>
+            </label>
+            <div class="backflow-options hidden" id="backflowTypeBlock">
+              <label class="backflow-option">
+                <input name="backflowType" value="doubleCheck" type="radio" />
+                <span>
+                  <b>Double check</b>
+                  <small>UFC minimum pressure drop: 8 psi</small>
+                </span>
+              </label>
+              <label class="backflow-option">
+                <input name="backflowType" value="reducedPressure" type="radio" />
+                <span>
+                  <b>Reduced pressure</b>
+                  <small>UFC minimum pressure drop: 12 psi</small>
+                </span>
+              </label>
+            </div>
+            <p class="fine-print">
+              UFC 3-600-01 requires hydraulic calculations to include a minimum
+              pressure drop across backflow preventers.
+            </p>
+          </section>
+
+        </form>
+
+        <section class="results">
+          <section class="panel">
+            <h2>Result</h2>
+            <div id="resultBlock" class="result-block outcome-warn">
+              <p class="outcome-kicker">Fire pump decision</p>
+              <p class="outcome-title">Check inputs</p>
+              <p class="outcome-text">Enter hydrant test and hazard values.</p>
+            </div>
+            <div class="metric-grid three">
+              <div class="metric">
+                <p>Criteria selected</p>
+                <strong id="criteriaSummary">NFPA 13</strong>
+              </div>
+              <div class="metric" id="marginMetric">
+                <p>Pressure margin</p>
+                <strong id="pressureMargin">0 psi</strong>
+              </div>
+              <div class="metric" id="boostMetric">
+                <p>Estimated boost</p>
+                <strong id="boostNeeded">0 psi</strong>
+              </div>
+              <div class="metric">
+                <p>Checked flow</p>
+                <strong id="checkedFlow">0 gpm</strong>
+              </div>
+              <div class="metric">
+                <p>Backflow loss</p>
+                <strong id="backflowLoss">0 psi</strong>
+              </div>
+            </div>
+            <p id="extrapolatedWarning" class="warning hidden">
+              Demand exceeds the tested hydrant flow. The supply curve is
+              extrapolated past the flow test point.
+            </p>
+          </section>
+
+          <section class="panel">
+            <h2>Supply curve</h2>
+            <svg
+              id="supplyChart"
+              viewBox="0 0 640 310"
+              role="img"
+              aria-label="Hydrant supply pressure curve and sprinkler demand point"
+            ></svg>
+            <p class="fine-print">
+              Water supply curve is plotted on an N^1.85 hydraulic flow scale
+              so the supply line presents straight for fire protection analysis.
+            </p>
+          </section>
+
+          <section class="panel">
+            <h2>Calculation detail</h2>
+            <div class="metric-grid two">
+              <div class="metric"><p>Review criteria</p><strong id="detailCriteria">NFPA 13</strong></div>
+              <div class="metric"><p>Demand basis</p><strong id="demandBasis">Density-area</strong></div>
+              <div class="metric"><p>Sprinkler demand</p><strong id="sprinklerDemand">0 gpm</strong></div>
+              <div class="metric"><p>Total checked flow</p><strong id="totalDemand">0 gpm</strong></div>
+              <div class="metric"><p>Elevation loss</p><strong id="elevationLoss">0 psi</strong></div>
+              <div class="metric"><p>Remote head pressure</p><strong id="remoteHeadPressure">7 psi minimum</strong></div>
+              <div class="metric"><p>Required pressure</p><strong id="requiredPressure">0 psi</strong></div>
+              <div class="metric"><p>Supply at checked flow</p><strong id="supplyPressure">0 psi</strong></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>Scope flags</h2>
+            <ul class="scope-list">
+              <li>Tracks whether NFPA 13, UFC 3-600-01, and Air Force Sundown criteria apply to the scenario.</li>
+              <li>When UFC is selected, sprinkler demand options use UFC 3-600-01 Table 9-3.</li>
+              <li>When Air Force Sundown is selected, sprinkler demand uses 0.20 gpm/sf over 5,000 sf with minimum K 11.2 unless another selected special criterion is greater.</li>
+              <li>Backflow preventer loss adds 8 psi for double check or 12 psi for reduced pressure when required.</li>
+              <li>Handles density-area sprinkler estimates for light, ordinary, and extra hazard occupancies.</li>
+              <li>Does not size storage, ESFR, CMSA, dry system delivery, standpipe demand, private fire mains, or pump selection curves.</li>
+              <li>Add backflow, meter, underground, riser, main, and branchline losses into other system losses if no detailed calc exists.</li>
+            </ul>
+          </section>
+
+          <button id="printPdfButton" type="button" class="print-button">Print PDF</button>
+        </section>
+      </section>
+
+      <footer class="app-footer">
+        <p>
+          <strong>Version <span id="footerVersion">1.3</span></strong>
+          · Concept hydrant flow / pump indication tool for qualified engineers.
+          <a href="../">Back to Fire Toolshed</a>
+        </p>
+        <p>
+          N<sup>1.85</sup> supply-curve estimate · Pitot flow helper · NFPA 13 / UFC 3-600-01 / AF Sundown flags.
+          Not a substitute for stamped hydraulics or manufacturer pump curves.
+        </p>
+      </footer>
+    </main>
+
+    <div id="reportDialog" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="reportDialogTitle">
+      <form id="reportForm" class="modal-card">
+        <div>
+          <p class="eyebrow">PDF report</p>
+          <h2 id="reportDialogTitle">Hydrant flow test details</h2>
+        </div>
+        <div class="field-grid two">
+          <label class="field">
+            <span>Project name</span>
+            <span class="input-shell text-shell">
+              <input id="reportProjectName" type="text" />
+            </span>
+          </label>
+          <label class="field">
+            <span>Address</span>
+            <span class="input-shell text-shell">
+              <input id="reportAddress" type="text" autocomplete="street-address" />
+            </span>
+          </label>
+          <label class="field">
+            <span>Time of test</span>
+            <span class="input-shell text-shell">
+              <input id="reportTestTime" type="datetime-local" />
+            </span>
+          </label>
+          <label class="field">
+            <span>Engineer who performed the test</span>
+            <span class="input-shell text-shell">
+              <input id="reportEngineer" type="text" />
+            </span>
+          </label>
+          <label class="field">
+            <span>Witness name(s)</span>
+            <span class="input-shell text-shell">
+              <input id="reportWitness" type="text" />
+            </span>
+          </label>
+          <label class="field">
+            <span>Number of hydrants used</span>
+            <select id="reportHydrants">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Gauge hydrant label</span>
+            <span class="input-shell text-shell">
+              <input id="reportGaugeHydrant" type="text" placeholder="Example: H-1" />
+            </span>
+          </label>
+        </div>
+        <div id="flowHydrantFields" class="field-grid two flow-hydrant-fields"></div>
+        <p id="reportStatus" class="report-status hidden">
+          PDF created. If the download did not start, use the PDF preview below
+          or <a id="downloadPdfLink" href="#" download="hydrant-flow-report.pdf">Download PDF</a>.
+        </p>
+        <iframe id="pdfPreview" class="pdf-preview hidden" title="Generated PDF preview"></iframe>
+        <div class="modal-actions">
+          <button id="cancelReportButton" type="button" class="reset-button">Cancel</button>
+          <button type="submit" class="print-button">Create PDF</button>
+        </div>
+      </form>
+    </div>
+
+    <section id="printReport" class="print-report" aria-hidden="true">
+      <header class="report-header">
+        <div>
+          <p class="report-kicker">Flow Test Report - Version 1.2</p>
+          <h1>Flow Test Report</h1>
+        </div>
+        <p id="reportGeneratedDate" class="report-date"></p>
+      </header>
+
+      <section class="report-section">
+        <h2>Project and Test Information</h2>
+        <div class="report-grid two">
+          <p><b>Project name</b><span id="pdfProjectName"></span></p>
+          <p><b>Address</b><span id="pdfAddress"></span></p>
+          <p><b>Time of test</b><span id="pdfTestTime"></span></p>
+          <p><b>Engineer</b><span id="pdfEngineer"></span></p>
+          <p><b>Witness name(s)</b><span id="pdfWitness"></span></p>
+          <p><b>Hydrants used for test</b><span id="pdfHydrants"></span></p>
+          <p><b>Gauge hydrant</b><span id="pdfGaugeHydrant"></span></p>
+          <p><b>Flow hydrant(s)</b><span id="pdfFlowHydrants"></span></p>
+          <p><b>Criteria selected</b><span id="pdfCriteria"></span></p>
+          <p><b>Demand basis</b><span id="pdfDemandBasis"></span></p>
+        </div>
+      </section>
+
+      <section class="report-section">
+        <h2>Hydrant Flow Test Results</h2>
+        <div class="report-grid four">
+          <p><b>Static</b><span id="pdfStatic"></span></p>
+          <p><b>Residual</b><span id="pdfResidual"></span></p>
+          <p><b>Test flow</b><span id="pdfGpm"></span></p>
+          <p><b>Fire flow at 20 psi</b><span id="pdfFireFlow20"></span></p>
+          <p><b>Pitot gauge</b><span id="pdfPitot"></span></p>
+          <p><b>Outlet diameter</b><span id="pdfOutletDiameter"></span></p>
+          <p><b>Coefficient</b><span id="pdfCoefficient"></span></p>
+          <p><b>Flow source</b><span id="pdfFlowSource"></span></p>
+          <p><b>Extra flowing hydrants</b><span id="pdfExtraFlowingHydrants"></span></p>
+        </div>
+      </section>
+
+      <section class="report-section">
+        <h2>Supply Curve</h2>
+        <svg
+          id="pdfSupplyChart"
+          viewBox="0 0 640 310"
+          role="img"
+          aria-label="Hydrant supply pressure curve and sprinkler demand point"
+        ></svg>
+      </section>
+
+      <section class="report-section">
+        <h2>Demand Summary</h2>
+        <p id="pdfDemandSummary" class="report-summary"></p>
+        <div class="report-grid four">
+          <p><b>Worst case demand</b><span id="pdfWorstDemand"></span></p>
+          <p><b>Required pressure</b><span id="pdfRequiredPressure"></span></p>
+          <p><b>Available pressure</b><span id="pdfAvailablePressure"></span></p>
+          <p><b>Safety factor</b><span id="pdfSafetyFactor"></span></p>
+        </div>
+      </section>
+
+      <div class="report-blank-line"></div>
+
+      <p id="pdfPumpDecision" class="report-decision"></p>
+      <div class="report-footer-lines" aria-hidden="true">
+        <span></span>
+        <span></span>
+      </div>
+      <p class="report-disclaimer">
+        Concept estimator only. Final fire pump decisions require a full hydraulic calculation,
+        adopted code review, and qualified design professional approval.
+      </p>
+    </section>
+
+    <script>
+(function () {
+  "use strict";
+
+  var SUPPLY_EXPONENT = 1.85;
+  var APP_VERSION = "1.3";
+  var PSI_PER_FOOT = 0.433;
+  var STORAGE_KEY = "flow-test-report:v1";
+  var REPORT_STORAGE_KEY = "flow-test-report:report:v1";
+  var LEGACY_STORAGE_KEY = "fire-pump-estimator:v1";
+  var LEGACY_REPORT_STORAGE_KEY = "fire-pump-estimator:report:v1";
+  var FIRE_FLOW_REFERENCE_PRESSURE = 20;
+  var REMOTE_HEAD_MIN_PRESSURE = 7;
+  var SUNDOWN_MIN_K_FACTOR = 11.2;
+
+  var criteria = [
+    {
+      id: "nfpa13",
+      label: "NFPA 13",
+    },
+    {
+      id: "ufc360001",
+      label: "UFC 3-600-01",
+    },
+    {
+      id: "airForceSundown",
+      label: "Air Force Sundown",
+    },
+  ];
+
+  var airForceSundownOption = {
+    id: "airForceSundown",
+    label: "Air Force Sundown - 0.20 gpm/sf over 5,000 sf",
+    mode: "densityArea",
+    density: 0.2,
+    area: 5000,
+    kFactor: SUNDOWN_MIN_K_FACTOR,
+  };
+
+  var backflowTypes = [
+    {
+      id: "doubleCheck",
+      label: "Double check",
+      loss: 8,
+    },
+    {
+      id: "reducedPressure",
+      label: "Reduced pressure",
+      loss: 12,
+    },
+  ];
+
+  var ufcTableOptions = [
+    {
+      id: "custom",
+      label: "Custom project demand",
+      mode: "densityArea",
+    },
+    {
+      id: "light-30-wet",
+      label: "Light - wet - ceiling up to 30 ft",
+      hazardId: "light",
+      mode: "densityArea",
+      density: 0.1,
+      area: 1500,
+      kFactor: 5.6,
+      sprinklerArea: 225,
+    },
+    {
+      id: "light-30-dry",
+      label: "Light - dry - ceiling up to 30 ft",
+      hazardId: "light",
+      mode: "densityArea",
+      density: 0.1,
+      area: 1500,
+      kFactor: 5.6,
+      sprinklerArea: 225,
+    },
+    {
+      id: "light-45-wet",
+      label: "Light - wet - ceiling >30-45 ft",
+      hazardId: "light",
+      mode: "densityArea",
+      density: 0.2,
+      area: 2500,
+      kFactor: 11.2,
+      sprinklerArea: 225,
+    },
+    {
+      id: "light-45-dry",
+      label: "Light - dry - ceiling >30-45 ft",
+      hazardId: "light",
+      mode: "densityArea",
+      density: 0.2,
+      area: 3500,
+      kFactor: 11.2,
+      sprinklerArea: 225,
+    },
+    {
+      id: "light-60-wet",
+      label: "Light - wet - ceiling >45-60 ft",
+      hazardId: "light",
+      mode: "densityArea",
+      density: 0.2,
+      area: 2500,
+      kFactor: 11.2,
+      sprinklerArea: 225,
+    },
+    {
+      id: "light-60-dry",
+      label: "Light - dry - ceiling >45-60 ft",
+      hazardId: "light",
+      mode: "densityArea",
+      density: 0.2,
+      area: 3500,
+      kFactor: 11.2,
+      sprinklerArea: 225,
+    },
+    {
+      id: "light-100-wet",
+      label: "Light - wet - ceiling >60-100 ft, 12 heads @ 7 psi",
+      hazardId: "light",
+      mode: "sprinklerCount",
+      sprinklerCount: 12,
+      endHeadPressure: 7,
+      kFactor: 25.2,
+    },
+    {
+      id: "ordinary-30-wet",
+      label: "Ordinary - wet - ceiling up to 30 ft",
+      hazardId: "oh2",
+      mode: "densityArea",
+      density: 0.2,
+      area: 2500,
+      kFactor: 8,
+      sprinklerArea: 130,
+    },
+    {
+      id: "ordinary-30-dry",
+      label: "Ordinary - dry - ceiling up to 30 ft",
+      hazardId: "oh2",
+      mode: "densityArea",
+      density: 0.2,
+      area: 3500,
+      kFactor: 8,
+      sprinklerArea: 130,
+    },
+    {
+      id: "ordinary-45-wet",
+      label: "Ordinary - wet - ceiling >30-45 ft",
+      hazardId: "oh2",
+      mode: "densityArea",
+      density: 0.2,
+      area: 2500,
+      kFactor: 11.2,
+      sprinklerArea: 130,
+    },
+    {
+      id: "ordinary-45-dry",
+      label: "Ordinary - dry - ceiling >30-45 ft",
+      hazardId: "oh2",
+      mode: "densityArea",
+      density: 0.2,
+      area: 3500,
+      kFactor: 11.2,
+      sprinklerArea: 130,
+    },
+    {
+      id: "ordinary-60-wet",
+      label: "Ordinary - wet - ceiling >45-60 ft",
+      hazardId: "oh2",
+      mode: "densityArea",
+      density: 0.2,
+      area: 2500,
+      kFactor: 11.2,
+      sprinklerArea: 130,
+    },
+    {
+      id: "ordinary-60-dry",
+      label: "Ordinary - dry - ceiling >45-60 ft",
+      hazardId: "oh2",
+      mode: "densityArea",
+      density: 0.2,
+      area: 3500,
+      kFactor: 11.2,
+      sprinklerArea: 130,
+    },
+    {
+      id: "ordinary-100-wet",
+      label: "Ordinary - wet - ceiling >60-100 ft, 12 heads @ 7 psi",
+      hazardId: "oh2",
+      mode: "sprinklerCount",
+      sprinklerCount: 12,
+      endHeadPressure: 7,
+      kFactor: 25.2,
+    },
+    {
+      id: "extra-30-wet",
+      label: "Extra - wet - ceiling up to 30 ft",
+      hazardId: "eh1",
+      mode: "densityArea",
+      density: 0.3,
+      area: 2500,
+      kFactor: 11.2,
+      sprinklerArea: 100,
+    },
+    {
+      id: "extra-30-dry",
+      label: "Extra - dry - ceiling up to 30 ft",
+      hazardId: "eh1",
+      mode: "densityArea",
+      density: 0.3,
+      area: 3500,
+      kFactor: 11.2,
+      sprinklerArea: 100,
+    },
+    {
+      id: "extra-45-wet",
+      label: "Extra - wet - ceiling >30-45 ft",
+      hazardId: "eh1",
+      mode: "densityArea",
+      density: 0.3,
+      area: 3600,
+      kFactor: 11.2,
+      sprinklerArea: 100,
+    },
+    {
+      id: "extra-45-dry",
+      label: "Extra - dry - ceiling >30-45 ft",
+      hazardId: "eh1",
+      mode: "densityArea",
+      density: 0.3,
+      area: 4600,
+      kFactor: 11.2,
+      sprinklerArea: 100,
+    },
+    {
+      id: "extra-60-wet",
+      label: "Extra - wet - ceiling >45-60 ft",
+      hazardId: "eh1",
+      mode: "densityArea",
+      density: 0.5,
+      area: 3000,
+      kFactor: 11.2,
+      sprinklerArea: 100,
+    },
+    {
+      id: "extra-60-dry",
+      label: "Extra - dry - ceiling >45-60 ft",
+      hazardId: "eh1",
+      mode: "densityArea",
+      density: 0.5,
+      area: 4000,
+      kFactor: 11.2,
+      sprinklerArea: 100,
+    },
+    {
+      id: "extra-100-wet",
+      label: "Extra - wet - ceiling >60-100 ft, 12 heads @ 7 psi",
+      hazardId: "eh1",
+      mode: "sprinklerCount",
+      sprinklerCount: 12,
+      endHeadPressure: 7,
+      kFactor: 25.2,
+    },
+  ];
+
+  var hazards = [
+    {
+      id: "light",
+      label: "Light hazard",
+      density: 0.1,
+      area: 1500,
+      hose: 100,
+      kFactor: 5.6,
+      sprinklerArea: 225,
+    },
+    {
+      id: "oh1",
+      label: "Ordinary hazard 1",
+      density: 0.15,
+      area: 1500,
+      hose: 250,
+      kFactor: 5.6,
+      sprinklerArea: 130,
+    },
+    {
+      id: "oh2",
+      label: "Ordinary hazard 2",
+      density: 0.2,
+      area: 1500,
+      hose: 250,
+      kFactor: 5.6,
+      sprinklerArea: 130,
+    },
+    {
+      id: "eh1",
+      label: "Extra hazard 1",
+      density: 0.3,
+      area: 2500,
+      hose: 500,
+      kFactor: 8,
+      sprinklerArea: 100,
+    },
+    {
+      id: "eh2",
+      label: "Extra hazard 2",
+      density: 0.4,
+      area: 2500,
+      hose: 500,
+      kFactor: 8,
+      sprinklerArea: 100,
+    },
+    {
+      id: "custom",
+      label: "Custom demand",
+      density: 0.2,
+      area: 1500,
+      hose: 250,
+      kFactor: 5.6,
+      sprinklerArea: 130,
+    },
+  ];
+
+  var defaultState = {
+    hazardId: "oh2",
+    ufcTableId: "ordinary-30-wet",
+    governingDemandId: "hazard",
+    criteria: {
+      nfpa13: true,
+      ufc360001: false,
+      airForceSundown: false,
+    },
+    form: {
+      staticPressure: 72,
+      residualPressure: 48,
+      flowAtResidual: 1256,
+      flowSourceMode: "pitot",
+      pitotPressure: 56,
+      outletDiameter: 2.5,
+      dischargeCoefficient: 0.9,
+      useMonsterPitotChart: false,
+      additionalFlowingHydrants: 0,
+      minResidual: 20,
+      roofHeight: 38,
+      systemLoss: 18,
+      safetyMargin: 5,
+      demandMode: "densityArea",
+      density: 0.2,
+      designArea: 1500,
+      hoseAllowance: 250,
+      kFactor: 5.6,
+      sprinklerArea: 130,
+      sprinklerCount: 12,
+      endHeadPressure: 7,
+      includeHose: true,
+      backflowRequired: false,
+      backflowType: "doubleCheck",
+    },
+  };
+
+  var editableHazardFields = {
+    density: true,
+    designArea: true,
+    hoseAllowance: true,
+    kFactor: true,
+    sprinklerArea: true,
+    sprinklerCount: true,
+    endHeadPressure: true,
+  };
+
+  var pitotFlowFields = {
+    pitotPressure: true,
+    outletDiameter: true,
+    dischargeCoefficient: true,
+    useMonsterPitotChart: true,
+    additionalFlowingHydrants: true,
+  };
+
+  var psiFields = {
+    staticPressure: true,
+    residualPressure: true,
+    minResidual: true,
+    pitotPressure: true,
+    systemLoss: true,
+    safetyMargin: true,
+    endHeadPressure: true,
+  };
+
+  var state = clone(defaultState);
+  var reportState = {
+    projectName: "",
+    address: "",
+    testTime: "",
+    engineer: "",
+    witness: "",
+    hydrants: "1",
+    gaugeHydrant: "",
+    flowHydrants: [],
+  };
+  var reportPdfUrl = "";
+  var elements = {};
+
+  function calculate(form) {
+    var isSprinklerCountMode = form.demandMode === "sprinklerCount";
+    var staticPressure = roundPsi(Math.max(0, form.staticPressure));
+    var residualPressure = roundPsi(Math.max(0, form.residualPressure));
+    var minResidual = roundPsi(Math.max(0, form.minResidual));
+    var systemLoss = roundPsi(Math.max(0, form.systemLoss));
+    var safetyMargin = roundPsi(Math.max(0, form.safetyMargin));
+    var endHeadPressure = Math.max(REMOTE_HEAD_MIN_PRESSURE, roundPsi(Math.max(0, form.endHeadPressure)));
+    var sprinklerDemandRaw = isSprinklerCountMode
+      ? Math.max(0, form.sprinklerCount) * Math.max(0, form.kFactor) * Math.sqrt(endHeadPressure)
+      : Math.max(0, form.density) * Math.max(0, form.designArea);
+    var sprinklerDemand = roundGpm(sprinklerDemandRaw);
+    var hoseDemand = form.includeHose ? roundGpm(Math.max(0, form.hoseAllowance)) : 0;
+    var totalDemand = roundGpm(sprinklerDemand + hoseDemand);
+    var elevationLoss = roundPsi(Math.max(0, form.roofHeight) * PSI_PER_FOOT);
+    var headFlow = Math.max(0, form.density) * Math.max(0, form.sprinklerArea);
+    var calculatedHeadPressure = isSprinklerCountMode
+      ? endHeadPressure
+      : form.kFactor > 0
+        ? Math.pow(headFlow / form.kFactor, 2)
+        : 0;
+    var remoteHeadPressure = roundPsi(Math.max(REMOTE_HEAD_MIN_PRESSURE, calculatedHeadPressure));
+    var backflowLoss = form.backflowRequired ? roundPsi(getBackflowLoss(form.backflowType)) : 0;
+    var requiredPressure = roundPsi(
+      elevationLoss +
+        systemLoss +
+        safetyMargin +
+        remoteHeadPressure +
+        backflowLoss,
+    );
+
+    var pressureDrop = roundPsi(staticPressure - residualPressure);
+    var validSupply =
+      staticPressure > 0 &&
+      residualPressure > 0 &&
+      form.flowAtResidual > 0 &&
+      pressureDrop > 0 &&
+      totalDemand > 0;
+
+    var supplyPressure = validSupply
+      ? roundPsi(
+          staticPressure -
+            pressureDrop * Math.pow(totalDemand / form.flowAtResidual, SUPPLY_EXPONENT),
+        )
+      : NaN;
+    var margin = validSupply ? roundPsi(supplyPressure - requiredPressure) : NaN;
+    var boostNeeded = validSupply ? roundPsi(Math.max(0, requiredPressure - supplyPressure)) : 0;
+    var fireFlowAt20 =
+      validSupply && staticPressure > FIRE_FLOW_REFERENCE_PRESSURE
+        ? roundGpm(
+            form.flowAtResidual *
+              Math.pow(
+                (staticPressure - FIRE_FLOW_REFERENCE_PRESSURE) / pressureDrop,
+                1 / SUPPLY_EXPONENT,
+              ),
+          )
+        : NaN;
+    var lowSuction = validSupply ? supplyPressure < minResidual : false;
+    var extrapolated = validSupply ? totalDemand > form.flowAtResidual : false;
+    var status = "invalid";
+
+    if (validSupply) {
+      if (lowSuction) {
+        status = "supply-limited";
+      } else if (margin < 0) {
+        status = "pump";
+      } else {
+        status = "no-pump";
+      }
+    }
+
+    return {
+      sprinklerDemand: sprinklerDemand,
+      hoseDemand: hoseDemand,
+      totalDemand: totalDemand,
+      elevationLoss: elevationLoss,
+      remoteHeadPressure: remoteHeadPressure,
+      backflowLoss: backflowLoss,
+      requiredPressure: requiredPressure,
+      supplyPressure: supplyPressure,
+      margin: margin,
+      boostNeeded: boostNeeded,
+      fireFlowAt20: fireFlowAt20,
+      pressureDrop: pressureDrop,
+      validSupply: validSupply,
+      lowSuction: lowSuction,
+      extrapolated: extrapolated,
+      status: status,
+    };
+  }
+
+  function calculatePitotFlow(form) {
+    return calculateCheckedFlow(form);
+  }
+
+  function calculatePitotEquationFlow(form) {
+    var rawFlow =
+      29.83 *
+      Math.max(0, form.dischargeCoefficient) *
+      Math.pow(Math.max(0, form.outletDiameter), 2) *
+      Math.sqrt(Math.max(0, roundPsi(form.pitotPressure)));
+
+    return roundToNearest(rawFlow, 1);
+  }
+
+  function calculateMonsterPitotFlow(form) {
+    var rawFlow =
+      29.83 *
+      0.9 *
+      Math.pow(Math.max(0, form.outletDiameter), 2) *
+      Math.sqrt(Math.max(0, roundPsi(form.pitotPressure)));
+
+    return roundToNearest(rawFlow, 5);
+  }
+
+  function calculateCheckedFlow(form) {
+    var baseFlow = form.useMonsterPitotChart ? calculateMonsterPitotFlow(form) : calculatePitotEquationFlow(form);
+    return roundGpm(baseFlow * getFlowingHydrantMultiplier(form));
+  }
+
+  function getFlowingHydrantMultiplier(form) {
+    return Math.min(3, Math.max(1, 1 + Math.round(Number(form.additionalFlowingHydrants) || 0)));
+  }
+
+  function getExtraFlowingHydrantText(form) {
+    var count = Math.min(2, Math.max(0, Math.round(Number(form.additionalFlowingHydrants) || 0)));
+    if (count === 1) return "1 extra (2x)";
+    if (count === 2) return "2 extra (3x)";
+    return "0 extra (1x)";
+  }
+
+  function getFlowSourceText(form) {
+    if (form.flowSourceMode === "manual") {
+      return "Manual GPM entry";
+    }
+    return form.useMonsterPitotChart ? "Monster Pitot Chart" : "Pitot equation";
+  }
+
+  function init() {
+    collectElements();
+    populateHazards();
+    populateUfcOptions();
+    state = loadState();
+    normalizePressureFields(state.form);
+    applyGoverningCriteriaDemand();
+    bindEvents();
+    var versionLabel = document.getElementById("appVersionLabel");
+    var footerVersion = document.getElementById("footerVersion");
+    if (versionLabel) versionLabel.textContent = "Version " + APP_VERSION;
+    if (footerVersion) footerVersion.textContent = APP_VERSION;
+    render();
+  }
+
+  function collectElements() {
+    elements.form = document.getElementById("calculatorForm");
+    elements.hazardSelect = document.getElementById("hazardSelect");
+    elements.ufcTableSelect = document.getElementById("ufcTableSelect");
+    elements.standardHazardControl = document.getElementById("standardHazardControl");
+    elements.ufcTableControl = document.getElementById("ufcTableControl");
+    elements.sundownControl = document.getElementById("sundownControl");
+    elements.densityAreaFields = document.getElementById("densityAreaFields");
+    elements.sprinklerCountFields = document.getElementById("sprinklerCountFields");
+    elements.includeHose = document.getElementById("includeHose");
+    elements.backflowRequired = document.getElementById("backflowRequired");
+    elements.backflowTypeBlock = document.getElementById("backflowTypeBlock");
+    elements.monsterPitotChart = document.getElementById("monsterPitotChart");
+    elements.calculateFlowButton = document.getElementById("calculateFlowButton");
+    elements.coefficientSelect = document.getElementById("coefficientSelect");
+    elements.backflowTypeRadios = Array.prototype.slice.call(document.querySelectorAll("[name='backflowType']"));
+    elements.criteriaCheckboxes = Array.prototype.slice.call(document.querySelectorAll("[data-criterion]"));
+    elements.resetButton = document.getElementById("resetButton");
+    elements.printPdfButton = document.getElementById("printPdfButton");
+    elements.reportDialog = document.getElementById("reportDialog");
+    elements.reportForm = document.getElementById("reportForm");
+    elements.cancelReportButton = document.getElementById("cancelReportButton");
+    elements.reportStatus = document.getElementById("reportStatus");
+    elements.downloadPdfLink = document.getElementById("downloadPdfLink");
+    elements.pdfPreview = document.getElementById("pdfPreview");
+    elements.flowHydrantFields = document.getElementById("flowHydrantFields");
+    elements.reportFields = {
+      projectName: document.getElementById("reportProjectName"),
+      address: document.getElementById("reportAddress"),
+      testTime: document.getElementById("reportTestTime"),
+      engineer: document.getElementById("reportEngineer"),
+      witness: document.getElementById("reportWitness"),
+      hydrants: document.getElementById("reportHydrants"),
+      gaugeHydrant: document.getElementById("reportGaugeHydrant"),
+    };
+    elements.hazardNote = document.getElementById("hazardNote");
+    elements.outcomeBadge = document.getElementById("outcomeBadge");
+    elements.resultBlock = document.getElementById("resultBlock");
+    elements.extrapolatedWarning = document.getElementById("extrapolatedWarning");
+    elements.supplyChart = document.getElementById("supplyChart");
+    elements.inputs = Array.prototype.slice.call(document.querySelectorAll("[data-field]"));
+    elements.output = {
+      pressureMargin: document.getElementById("pressureMargin"),
+      boostNeeded: document.getElementById("boostNeeded"),
+      checkedFlow: document.getElementById("checkedFlow"),
+      backflowLoss: document.getElementById("backflowLoss"),
+      criteriaSummary: document.getElementById("criteriaSummary"),
+      detailCriteria: document.getElementById("detailCriteria"),
+      demandBasis: document.getElementById("demandBasis"),
+      sprinklerDemand: document.getElementById("sprinklerDemand"),
+      totalDemand: document.getElementById("totalDemand"),
+      elevationLoss: document.getElementById("elevationLoss"),
+      remoteHeadPressure: document.getElementById("remoteHeadPressure"),
+      requiredPressure: document.getElementById("requiredPressure"),
+      supplyPressure: document.getElementById("supplyPressure"),
+      marginMetric: document.getElementById("marginMetric"),
+      boostMetric: document.getElementById("boostMetric"),
+    };
+    elements.report = {
+      generatedDate: document.getElementById("reportGeneratedDate"),
+      projectName: document.getElementById("pdfProjectName"),
+      address: document.getElementById("pdfAddress"),
+      testTime: document.getElementById("pdfTestTime"),
+      engineer: document.getElementById("pdfEngineer"),
+      witness: document.getElementById("pdfWitness"),
+      hydrants: document.getElementById("pdfHydrants"),
+      gaugeHydrant: document.getElementById("pdfGaugeHydrant"),
+      flowHydrants: document.getElementById("pdfFlowHydrants"),
+      criteria: document.getElementById("pdfCriteria"),
+      demandBasis: document.getElementById("pdfDemandBasis"),
+      staticPressure: document.getElementById("pdfStatic"),
+      residualPressure: document.getElementById("pdfResidual"),
+      gpm: document.getElementById("pdfGpm"),
+      fireFlow20: document.getElementById("pdfFireFlow20"),
+      pitot: document.getElementById("pdfPitot"),
+      outletDiameter: document.getElementById("pdfOutletDiameter"),
+      coefficient: document.getElementById("pdfCoefficient"),
+      flowSource: document.getElementById("pdfFlowSource"),
+      extraFlowingHydrants: document.getElementById("pdfExtraFlowingHydrants"),
+      supplyChart: document.getElementById("pdfSupplyChart"),
+      demandSummary: document.getElementById("pdfDemandSummary"),
+      worstDemand: document.getElementById("pdfWorstDemand"),
+      requiredPressure: document.getElementById("pdfRequiredPressure"),
+      availablePressure: document.getElementById("pdfAvailablePressure"),
+      safetyFactor: document.getElementById("pdfSafetyFactor"),
+      pumpDecision: document.getElementById("pdfPumpDecision"),
+    };
+  }
+
+  function populateHazards() {
+    elements.hazardSelect.innerHTML = hazards
+      .map(function (hazard) {
+        return '<option value="' + escapeHtml(hazard.id) + '">' + escapeHtml(hazard.label) + "</option>";
+      })
+      .join("");
+  }
+
+  function populateUfcOptions() {
+    elements.ufcTableSelect.innerHTML = ufcTableOptions
+      .map(function (option) {
+        return '<option value="' + escapeHtml(option.id) + '">' + escapeHtml(option.label) + "</option>";
+      })
+      .join("");
+  }
+
+  function bindEvents() {
+    elements.inputs.forEach(function (input) {
+      var eventNames = input.tagName === "SELECT" ? ["change"] : ["input", "change"];
+      eventNames.forEach(function (eventName) {
+        input.addEventListener(eventName, function () {
+          handleFieldInput(input);
+        });
+      });
+    });
+
+    elements.includeHose.addEventListener("change", function () {
+      state.form.includeHose = elements.includeHose.checked;
+      persistAndRender();
+    });
+
+    elements.monsterPitotChart.addEventListener("change", function () {
+      state.form.useMonsterPitotChart = elements.monsterPitotChart.checked;
+      if (state.form.useMonsterPitotChart) {
+        state.form.dischargeCoefficient = 0.9;
+      }
+      updateFlowFromPitot();
+      persistAndRender();
+    });
+
+    elements.calculateFlowButton.addEventListener("click", function () {
+      updateFlowFromPitot();
+      persistAndRender();
+    });
+
+    elements.backflowRequired.addEventListener("change", function () {
+      state.form.backflowRequired = elements.backflowRequired.checked;
+      persistAndRender();
+    });
+
+    elements.backflowTypeRadios.forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        if (radio.checked) {
+          state.form.backflowType = radio.value;
+          persistAndRender();
+        }
+      });
+    });
+
+    elements.criteriaCheckboxes.forEach(function (checkbox) {
+      checkbox.addEventListener("change", function () {
+        var criterion = checkbox.getAttribute("data-criterion");
+        state.criteria[criterion] = checkbox.checked;
+        if (criterion === "ufc360001" && checkbox.checked) {
+          state.ufcTableId = state.ufcTableId === "custom" ? "ordinary-30-wet" : state.ufcTableId;
+        }
+        applyGoverningCriteriaDemand();
+        persistAndRender();
+      });
+    });
+
+    elements.hazardSelect.addEventListener("change", function () {
+      applyHazard(elements.hazardSelect.value);
+      persistAndRender();
+    });
+
+    elements.ufcTableSelect.addEventListener("change", function () {
+      applyUfcOption(elements.ufcTableSelect.value);
+      persistAndRender();
+    });
+
+    elements.resetButton.addEventListener("click", function () {
+      if (
+        !confirm(
+          "Reset all calculator fields to defaults?\n\nSaved form data in this browser will be cleared. PDF report fields are kept unless you clear them separately.",
+        )
+      ) {
+        return;
+      }
+      resetToDefaults();
+    });
+
+    elements.printPdfButton.addEventListener("click", function () {
+      openReportDialog();
+    });
+
+    elements.cancelReportButton.addEventListener("click", function () {
+      closeReportDialog();
+    });
+
+    elements.reportFields.hydrants.addEventListener("change", function () {
+      readReportFields();
+      renderFlowHydrantFields();
+    });
+
+    elements.reportDialog.addEventListener("click", function (event) {
+      if (event.target === elements.reportDialog) {
+        closeReportDialog();
+      }
+    });
+
+    elements.reportForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      readReportFields();
+      saveReportState();
+      buildPrintReport();
+      downloadReportPdf();
+    });
+  }
+
+  function handleFieldInput(input) {
+    var field = input.getAttribute("data-field");
+    var value = Number(input.value);
+    if (psiFields[field] && Number.isFinite(value)) {
+      value = roundPsi(Math.max(0, value));
+      input.value = value;
+    }
+    if (field === "endHeadPressure" && Number.isFinite(value)) {
+      value = Math.max(REMOTE_HEAD_MIN_PRESSURE, value);
+      input.value = value;
+    }
+    if (field === "hoseAllowance" && Number.isFinite(value)) {
+      value = roundGpm(value);
+      input.value = value;
+    }
+    if (field === "flowAtResidual" && Number.isFinite(value)) {
+      value = roundGpm(Math.max(0, value));
+      input.value = value;
+    }
+    if (field === "additionalFlowingHydrants" && Number.isFinite(value)) {
+      value = Math.min(2, Math.max(0, Math.round(value)));
+      input.value = value;
+    }
+    if (field === "kFactor" && state.governingDemandId === "airForceSundown" && Number.isFinite(value)) {
+      value = Math.max(SUNDOWN_MIN_K_FACTOR, value);
+      input.value = value;
+    }
+    state.form[field] = Number.isFinite(value) ? value : 0;
+    if (field === "flowAtResidual") {
+      state.form.flowSourceMode = "manual";
+    }
+    if (pitotFlowFields[field]) {
+      updateFlowFromPitot();
+    }
+    if (editableHazardFields[field]) {
+      if (state.governingDemandId === "airForceSundown") {
+        if (field === "density" || field === "designArea") {
+          applyGoverningCriteriaDemand();
+        }
+      } else {
+        state.hazardId = "custom";
+        if (state.criteria.ufc360001) {
+          state.ufcTableId = "custom";
+          elements.ufcTableSelect.value = "custom";
+        }
+        elements.hazardSelect.value = "custom";
+      }
+    }
+    persistAndRender();
+  }
+
+  function updateFlowFromPitot() {
+    state.form.flowAtResidual = calculatePitotFlow(state.form);
+    state.form.flowSourceMode = "pitot";
+    writeForm();
+  }
+
+  function resetToDefaults() {
+    clearSavedState();
+    state = clone(defaultState);
+    normalizePressureFields(state.form);
+    state.form.flowAtResidual = calculateCheckedFlow(state.form);
+    state.form.flowSourceMode = "pitot";
+    applyGoverningCriteriaDemand();
+    writeForm();
+    persistAndRender();
+  }
+
+  function applyHazard(hazardId) {
+    var hazard = getHazard(hazardId);
+    if (!hazard) return;
+    state.hazardId = hazard.id;
+    state.governingDemandId = hazard.id === "custom" ? "custom" : "hazard";
+    applyHazardForm(hazard);
+    writeForm();
+  }
+
+  function applyHazardForm(hazard) {
+    state.form.demandMode = "densityArea";
+    state.form.density = hazard.density;
+    state.form.designArea = hazard.area;
+    state.form.hoseAllowance = hazard.hose;
+    state.form.kFactor = hazard.kFactor;
+    state.form.sprinklerArea = hazard.sprinklerArea;
+  }
+
+  function applyUfcOption(optionId) {
+    var option = getUfcOption(optionId);
+    if (!option) return;
+    state.ufcTableId = option.id;
+    applyGoverningCriteriaDemand();
+  }
+
+  function applyUfcFormOption(option) {
+    state.hazardId = option.hazardId || state.hazardId;
+    state.form.demandMode = option.mode;
+    state.form.kFactor = option.kFactor;
+    if (option.mode === "sprinklerCount") {
+      state.form.sprinklerCount = option.sprinklerCount;
+      state.form.endHeadPressure = option.endHeadPressure;
+    } else {
+      state.form.density = option.density;
+      state.form.designArea = option.area;
+      state.form.sprinklerArea = option.sprinklerArea;
+    }
+  }
+
+  function applyAirForceSundownOption() {
+    state.form.demandMode = airForceSundownOption.mode;
+    state.form.density = airForceSundownOption.density;
+    state.form.designArea = airForceSundownOption.area;
+    state.form.kFactor = Math.max(SUNDOWN_MIN_K_FACTOR, Math.max(0, state.form.kFactor || 0));
+  }
+
+  function applyGoverningCriteriaDemand() {
+    var candidates = [];
+    var ufcOption = getUfcOption(state.ufcTableId);
+
+    if (state.criteria.ufc360001 && ufcOption && ufcOption.id !== "custom") {
+      candidates.push({
+        id: "ufc360001",
+        demand: getOptionSprinklerDemand(ufcOption),
+        option: ufcOption,
+      });
+    }
+
+    if (state.criteria.airForceSundown) {
+      candidates.push({
+        id: "airForceSundown",
+        demand: getOptionSprinklerDemand(airForceSundownOption),
+        option: airForceSundownOption,
+      });
+    }
+
+    if (candidates.length) {
+      var winner = candidates.reduce(function (current, candidate) {
+        return candidate.demand > current.demand ? candidate : current;
+      });
+      state.governingDemandId = winner.id;
+      if (winner.id === "ufc360001") {
+        applyUfcFormOption(winner.option);
+      } else {
+        applyAirForceSundownOption();
+      }
+      writeForm();
+      return;
+    }
+
+    if (state.criteria.ufc360001 && state.ufcTableId === "custom") {
+      state.governingDemandId = "custom";
+      writeForm();
+      return;
+    }
+
+    var hazard = getHazard(state.hazardId);
+    if (hazard && hazard.id !== "custom") {
+      state.governingDemandId = "hazard";
+      applyHazardForm(hazard);
+    } else {
+      state.governingDemandId = "custom";
+    }
+    writeForm();
+  }
+
+  function writeForm() {
+    elements.hazardSelect.value = state.hazardId;
+    elements.ufcTableSelect.value = state.ufcTableId;
+    elements.inputs.forEach(function (input) {
+      var field = input.getAttribute("data-field");
+      input.value = state.form[field];
+    });
+    elements.includeHose.checked = Boolean(state.form.includeHose);
+    elements.monsterPitotChart.checked = Boolean(state.form.useMonsterPitotChart);
+    elements.coefficientSelect.disabled = Boolean(state.form.useMonsterPitotChart);
+    elements.coefficientSelect.title = state.form.useMonsterPitotChart
+      ? "Monster Pitot Chart uses the 0.9 coefficient basis."
+      : "";
+    elements.backflowRequired.checked = Boolean(state.form.backflowRequired);
+    elements.backflowTypeRadios.forEach(function (radio) {
+      radio.checked = radio.value === state.form.backflowType;
+    });
+    elements.criteriaCheckboxes.forEach(function (checkbox) {
+      var criterion = checkbox.getAttribute("data-criterion");
+      checkbox.checked = Boolean(state.criteria[criterion]);
+    });
+    setFormFieldMinimum("kFactor", state.governingDemandId === "airForceSundown" ? SUNDOWN_MIN_K_FACTOR : 0);
+    setFormFieldReadOnly("density", state.governingDemandId === "airForceSundown");
+    setFormFieldReadOnly("designArea", state.governingDemandId === "airForceSundown");
+    syncConditionalControls();
+  }
+
+  function setFormFieldMinimum(field, minimum) {
+    elements.inputs.forEach(function (input) {
+      if (input.getAttribute("data-field") === field && input.tagName === "INPUT") {
+        input.min = String(minimum);
+      }
+    });
+  }
+
+  function setFormFieldReadOnly(field, readOnly) {
+    elements.inputs.forEach(function (input) {
+      if (input.getAttribute("data-field") === field && input.tagName === "INPUT") {
+        input.readOnly = readOnly;
+      }
+    });
+  }
+
+  function persistAndRender() {
+    saveState();
+    render();
+  }
+
+  function render() {
+    syncConditionalControls();
+    var calc = calculate(state.form);
+    var outcome = getOutcome(calc);
+    var selectedCriteria = getSelectedCriteriaText();
+    setOutcome(elements.outcomeBadge, "Estimated answer", outcome);
+    setOutcome(elements.resultBlock, "Fire pump decision", outcome);
+    elements.output.criteriaSummary.textContent = selectedCriteria;
+    elements.output.detailCriteria.textContent = selectedCriteria;
+    elements.output.demandBasis.textContent = getDemandBasisText();
+    elements.output.pressureMargin.textContent = signedPsi(calc.margin);
+    elements.output.boostNeeded.textContent = formatPsi(calc.boostNeeded);
+    elements.output.checkedFlow.textContent = format(calc.totalDemand, 0) + " gpm";
+    elements.output.backflowLoss.textContent = formatPsi(calc.backflowLoss);
+    elements.output.sprinklerDemand.textContent = format(calc.sprinklerDemand, 0) + " gpm";
+    elements.output.totalDemand.textContent = format(calc.totalDemand, 0) + " gpm";
+    elements.output.elevationLoss.textContent = formatPsi(calc.elevationLoss);
+    elements.output.remoteHeadPressure.textContent = formatPsi(calc.remoteHeadPressure);
+    elements.output.requiredPressure.textContent = formatPsi(calc.requiredPressure);
+    elements.output.supplyPressure.textContent = formatPsi(calc.supplyPressure);
+
+    setMetricTone(elements.output.marginMetric, calc.margin >= 0 ? "good" : "bad");
+    setMetricTone(elements.output.boostMetric, calc.boostNeeded > 0 ? "bad" : "good");
+    elements.extrapolatedWarning.classList.toggle("hidden", !calc.extrapolated);
+    elements.hazardNote.textContent = getHazardNote();
+
+    renderChart(calc, state.form);
+  }
+
+  function openReportDialog() {
+    reportState = loadReportState();
+    if (!reportState.testTime) {
+      reportState.testTime = toDateTimeLocalValue(new Date());
+    }
+    writeReportFields();
+    elements.reportStatus.classList.add("hidden");
+    elements.pdfPreview.classList.add("hidden");
+    elements.reportDialog.classList.remove("hidden");
+    elements.reportFields.projectName.focus();
+  }
+
+  function closeReportDialog() {
+    elements.reportDialog.classList.add("hidden");
+  }
+
+  function writeReportFields() {
+    elements.reportFields.projectName.value = reportState.projectName || "";
+    elements.reportFields.address.value = reportState.address || "";
+    elements.reportFields.testTime.value = reportState.testTime || "";
+    elements.reportFields.engineer.value = reportState.engineer || "";
+    elements.reportFields.witness.value = reportState.witness || "";
+    elements.reportFields.hydrants.value = normalizeHydrantCount(reportState.hydrants);
+    elements.reportFields.gaugeHydrant.value = reportState.gaugeHydrant || "";
+    renderFlowHydrantFields();
+  }
+
+  function readReportFields() {
+    var existingFlowInputs = Array.prototype.slice.call(elements.flowHydrantFields.querySelectorAll("[data-flow-hydrant-index]"));
+    reportState = {
+      projectName: elements.reportFields.projectName.value.trim(),
+      address: elements.reportFields.address.value.trim(),
+      testTime: elements.reportFields.testTime.value,
+      engineer: elements.reportFields.engineer.value.trim(),
+      witness: elements.reportFields.witness.value.trim(),
+      hydrants: normalizeHydrantCount(elements.reportFields.hydrants.value),
+      gaugeHydrant: elements.reportFields.gaugeHydrant.value.trim(),
+      flowHydrants: existingFlowInputs.map(function (input) {
+        return input.value.trim();
+      }),
+    };
+  }
+
+  function renderFlowHydrantFields() {
+    var hydrantCount = Number(normalizeHydrantCount(reportState.hydrants));
+    var flowCount = Math.max(0, hydrantCount - 1);
+    var savedValues = reportState.flowHydrants || [];
+    var html = "";
+    for (var index = 0; index < flowCount; index += 1) {
+      html +=
+        '<label class="field">' +
+        "<span>Flow hydrant " +
+        (index + 1) +
+        " label</span>" +
+        '<span class="input-shell text-shell">' +
+        '<input data-flow-hydrant-index="' +
+        index +
+        '" type="text" value="' +
+        escapeHtml(savedValues[index] || "") +
+        '" placeholder="Example: H-' +
+        (index + 2) +
+        '" />' +
+        "</span>" +
+        "</label>";
+    }
+    elements.flowHydrantFields.innerHTML = html;
+  }
+
+  function loadReportState() {
+    try {
+      var saved = localStorage.getItem(REPORT_STORAGE_KEY) || localStorage.getItem(LEGACY_REPORT_STORAGE_KEY);
+      if (!saved) return Object.assign({}, reportState);
+      var parsed = JSON.parse(saved);
+      var merged = Object.assign({}, reportState, parsed);
+      if (!merged.gaugeHydrant && parsed.hydrantLabels) {
+        var labels = String(parsed.hydrantLabels).split(",");
+        merged.gaugeHydrant = (labels.shift() || "").trim();
+        merged.flowHydrants = labels.map(function (label) {
+          return label.trim();
+        });
+      }
+      merged.hydrants = normalizeHydrantCount(merged.hydrants);
+      merged.flowHydrants = Array.isArray(merged.flowHydrants) ? merged.flowHydrants : [];
+      return merged;
+    } catch (error) {
+      return Object.assign({}, reportState);
+    }
+  }
+
+  function saveReportState() {
+    try {
+      localStorage.setItem(REPORT_STORAGE_KEY, JSON.stringify(reportState));
+    } catch (error) {
+      return false;
+    }
+    return true;
+  }
+
+  function buildPrintReport() {
+    var calc = calculate(state.form);
+    var outcome = getOutcome(calc);
+    var chart = buildChart(calc, state.form);
+    var worstDemand = getWorstDemandLabel(calc);
+    var safetyFactor = getSafetyFactor(calc);
+
+    elements.report.generatedDate.textContent = "Generated " + formatReportDateTime(new Date());
+    elements.report.projectName.textContent = reportState.projectName || "Not provided";
+    elements.report.address.textContent = reportState.address || "Not provided";
+    elements.report.testTime.textContent = reportState.testTime
+      ? formatReportDateTime(new Date(reportState.testTime))
+      : "Not provided";
+    elements.report.engineer.textContent = reportState.engineer || "Not provided";
+    elements.report.witness.textContent = reportState.witness || "Not provided";
+    elements.report.hydrants.textContent = normalizeHydrantCount(reportState.hydrants);
+    elements.report.gaugeHydrant.textContent = reportState.gaugeHydrant || "Not provided";
+    elements.report.flowHydrants.textContent = getFlowHydrantText(reportState);
+    elements.report.criteria.textContent = getSelectedCriteriaText();
+    elements.report.demandBasis.textContent = getDemandBasisText();
+    elements.report.staticPressure.textContent = formatPsi(state.form.staticPressure);
+    elements.report.residualPressure.textContent = formatPsi(state.form.residualPressure);
+    elements.report.gpm.textContent = format(state.form.flowAtResidual, 0) + " gpm";
+    elements.report.fireFlow20.textContent = formatReportNumber(calc.fireFlowAt20, 0, "gpm");
+    elements.report.pitot.textContent = formatPsi(state.form.pitotPressure);
+    elements.report.outletDiameter.textContent = format(state.form.outletDiameter, 3) + " in";
+    elements.report.coefficient.textContent = format(state.form.dischargeCoefficient, 2);
+    elements.report.flowSource.textContent = getFlowSourceText(state.form);
+    elements.report.extraFlowingHydrants.textContent = getExtraFlowingHydrantText(state.form);
+    elements.report.supplyChart.innerHTML = getChartSvgMarkup(calc, state.form, chart);
+    elements.report.demandSummary.textContent =
+      "Worst case demand estimated at " +
+      format(calc.totalDemand, 0) +
+      " gpm requiring " +
+      format(roundPsi(calc.requiredPressure), 0) +
+      " psi. Available supply at that flow is " +
+      formatReportPressure(calc.supplyPressure) +
+      ", giving a safety factor of " +
+      safetyFactor +
+      ".";
+    elements.report.worstDemand.textContent = worstDemand;
+    elements.report.requiredPressure.textContent = formatPsi(calc.requiredPressure);
+    elements.report.availablePressure.textContent = formatReportPressure(calc.supplyPressure);
+    elements.report.safetyFactor.textContent = safetyFactor;
+    elements.report.pumpDecision.textContent = getPumpLine(outcome);
+  }
+
+  function downloadReportPdf() {
+    var bytes = buildPdfReportBytes(reportState);
+    var blob = new Blob([bytes], { type: "application/pdf" });
+    if (reportPdfUrl) {
+      URL.revokeObjectURL(reportPdfUrl);
+    }
+    reportPdfUrl = URL.createObjectURL(blob);
+    var filename = getPdfFilename();
+    elements.downloadPdfLink.href = reportPdfUrl;
+    elements.downloadPdfLink.download = filename;
+    elements.pdfPreview.src = reportPdfUrl;
+    elements.reportStatus.classList.remove("hidden");
+    elements.pdfPreview.classList.remove("hidden");
+
+    var link = document.createElement("a");
+    link.href = reportPdfUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  function syncConditionalControls() {
+    var useUfc = Boolean(state.criteria.ufc360001);
+    var useSundown = Boolean(state.criteria.airForceSundown);
+    elements.standardHazardControl.classList.toggle("hidden", useUfc || useSundown);
+    elements.ufcTableControl.classList.toggle("hidden", !useUfc);
+    elements.sundownControl.classList.toggle("hidden", !useSundown);
+    elements.densityAreaFields.classList.toggle("hidden", state.form.demandMode === "sprinklerCount");
+    elements.sprinklerCountFields.classList.toggle("hidden", state.form.demandMode !== "sprinklerCount");
+    elements.backflowTypeBlock.classList.toggle("hidden", !state.form.backflowRequired);
+  }
+
+  function setOutcome(node, kicker, outcome) {
+    node.className = node.className
+      .replace(/\boutcome-good\b|\boutcome-bad\b|\boutcome-warn\b/g, "")
+      .trim();
+    node.classList.add(outcome.className);
+    node.querySelector(".outcome-kicker").textContent = kicker;
+    node.querySelector(".outcome-title").textContent = outcome.title;
+    node.querySelector(".outcome-text").textContent = outcome.description;
+  }
+
+  function setMetricTone(node, tone) {
+    node.classList.remove("good", "bad");
+    node.classList.add(tone);
+  }
+
+  function getOutcome(calc) {
+    if (!calc.validSupply) {
+      return {
+        title: "Check inputs",
+        description:
+          "Static pressure must be higher than residual pressure, and the tested flow must be greater than zero.",
+        className: "outcome-warn",
+      };
+    }
+
+    if (calc.status === "supply-limited") {
+      return {
+        title: "Yes - pump likely",
+        description:
+          "The calculated supply pressure falls below the selected minimum residual at the checked demand. Confirm utility limits, suction conditions, or alternate water supply.",
+        className: "outcome-bad",
+      };
+    }
+
+    if (calc.status === "pump") {
+      return {
+        title: "Yes - fire pump likely",
+        description:
+          "Available pressure is below the estimated pressure demand at the checked flow. The deficit is the conceptual boost to investigate.",
+        className: "outcome-bad",
+      };
+    }
+
+    return {
+      title: "No - pump not indicated",
+      description:
+        "Available pressure meets or exceeds the estimated pressure demand with the current assumptions.",
+      className: "outcome-good",
+    };
+  }
+
+  function renderChart(calc, form) {
+    var chart = buildChart(calc, form);
+    elements.supplyChart.innerHTML = getChartSvgMarkup(calc, form, chart);
+  }
+
+  function getChartSvgMarkup(calc, form, chart) {
+    var svg = [];
+    svg.push('<rect x="0" y="0" width="640" height="310" rx="8" fill="#fbfaf7"></rect>');
+    svg.push('<line x1="56" y1="250" x2="604" y2="250" stroke="#9ba8a8"></line>');
+    svg.push('<line x1="56" y1="26" x2="56" y2="250" stroke="#9ba8a8"></line>');
+
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (tick) {
+      var pressure = tick * chart.maxPressure;
+      var y = chart.y(pressure);
+      svg.push('<line x1="56" y1="' + y + '" x2="604" y2="' + y + '" stroke="#e4ded2"></line>');
+      svg.push(
+        '<text x="48" y="' +
+          (y + 4) +
+          '" text-anchor="end" fill="#667579" font-size="12">' +
+          format(pressure, 0) +
+          "</text>",
+      );
+    });
+
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (tick) {
+      var flow = tick * chart.maxFlow;
+      var x = chart.x(flow);
+      svg.push('<line x1="' + x + '" y1="250" x2="' + x + '" y2="256" stroke="#9ba8a8"></line>');
+      svg.push(
+        '<text x="' +
+          x +
+          '" y="276" text-anchor="middle" fill="#667579" font-size="12">' +
+          format(flow, 0) +
+          "</text>",
+      );
+    });
+
+    svg.push('<text x="56" y="302" fill="#667579" font-size="12">Flow, gpm (N^1.85 scale)</text>');
+    svg.push(
+      '<text x="-178" y="16" transform="rotate(-90)" fill="#667579" font-size="12">Pressure, psi</text>',
+    );
+    svg.push('<path d="' + chart.supplyPath + '" fill="none" stroke="#276c78" stroke-width="4"></path>');
+    svg.push(
+      '<path d="' +
+        chart.requiredPath +
+        '" fill="none" stroke="#b64c3b" stroke-dasharray="7 7" stroke-width="2"></path>',
+    );
+    svg.push(
+      '<path d="' +
+        chart.minResidualPath +
+        '" fill="none" stroke="#d19b28" stroke-dasharray="4 6" stroke-width="2"></path>',
+    );
+
+    if (calc.validSupply) {
+      svg.push(
+        '<line x1="' +
+          chart.demandX +
+          '" x2="' +
+          chart.demandX +
+          '" y1="' +
+          chart.y(0) +
+          '" y2="' +
+          chart.y(chart.maxPressure) +
+          '" stroke="#7f8d8d" stroke-dasharray="5 7"></line>',
+      );
+      svg.push('<circle cx="' + chart.demandX + '" cy="' + chart.supplyY + '" r="6" fill="#276c78"></circle>');
+      svg.push(
+        '<circle cx="' + chart.demandX + '" cy="' + chart.requiredY + '" r="6" fill="#b64c3b"></circle>',
+      );
+    }
+
+    svg.push(legend("#276c78", "Available supply", 384, 34));
+    svg.push(legend("#b64c3b", "Required pressure", 384, 58));
+    svg.push(legend("#d19b28", "Minimum residual", 384, 82));
+    return svg.join("");
+  }
+
+  function buildChart(calc, form) {
+    var maxFlow = Math.max(600, calc.totalDemand * 1.25, form.flowAtResidual * 1.15);
+    var maxPressure = Math.max(60, form.staticPressure * 1.15, calc.requiredPressure * 1.2, form.minResidual * 1.4);
+    var maxHydraulicFlow = Math.pow(Math.max(maxFlow, 1), SUPPLY_EXPONENT);
+    var x = function (flow) {
+      var hydraulicFlow = Math.pow(Math.max(0, flow), SUPPLY_EXPONENT);
+      return round(56 + (hydraulicFlow / maxHydraulicFlow) * 548);
+    };
+    var y = function (pressure) {
+      return round(250 - (Math.max(0, pressure) / maxPressure) * 224);
+    };
+    var points = [];
+
+    for (var index = 0; index < 56; index += 1) {
+      var flow = (index / 55) * maxFlow;
+      var pressure =
+        form.staticPressure -
+        calc.pressureDrop * Math.pow(flow / Math.max(form.flowAtResidual, 1), SUPPLY_EXPONENT);
+      points.push([x(flow), y(Math.max(0, pressure))]);
+    }
+
+    return {
+      maxFlow: maxFlow,
+      maxPressure: maxPressure,
+      x: x,
+      y: y,
+      supplyPath: points
+        .map(function (point, index) {
+          return (index === 0 ? "M " : "L ") + point[0] + " " + point[1];
+        })
+        .join(" "),
+      requiredPath: "M 56 " + y(calc.requiredPressure) + " L 604 " + y(calc.requiredPressure),
+      minResidualPath: "M 56 " + y(form.minResidual) + " L 604 " + y(form.minResidual),
+      demandX: x(calc.totalDemand),
+      supplyY: y(calc.supplyPressure),
+      requiredY: y(calc.requiredPressure),
+    };
+  }
+
+  function legend(color, label, x, y) {
+    return (
+      '<g transform="translate(' +
+      x +
+      " " +
+      y +
+      ')"><line x1="0" y1="0" x2="24" y2="0" stroke="' +
+      color +
+      '" stroke-width="4"></line><text x="32" y="4" fill="#435055" font-size="12">' +
+      escapeHtml(label) +
+      "</text></g>"
+    );
+  }
+
+  function getHazard(id) {
+    return hazards.filter(function (hazard) {
+      return hazard.id === id;
+    })[0];
+  }
+
+  function getUfcOption(id) {
+    return ufcTableOptions.filter(function (option) {
+      return option.id === id;
+    })[0];
+  }
+
+  function getOptionSprinklerDemand(option) {
+    if (!option || option.id === "custom") return 0;
+    if (option.mode === "sprinklerCount") {
+      return roundGpm(
+        Math.max(0, option.sprinklerCount || 0) *
+          Math.max(0, option.kFactor || 0) *
+          Math.sqrt(Math.max(REMOTE_HEAD_MIN_PRESSURE, Math.max(0, option.endHeadPressure || 0))),
+      );
+    }
+    return roundGpm(Math.max(0, option.density || 0) * Math.max(0, option.area || 0));
+  }
+
+  function getBackflowLoss(typeId) {
+    var type = backflowTypes.filter(function (item) {
+      return item.id === typeId;
+    })[0];
+    return type ? type.loss : 0;
+  }
+
+  function loadState() {
+    try {
+      var saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (!saved) {
+        var fresh = clone(defaultState);
+        normalizePressureFields(fresh.form);
+        return fresh;
+      }
+      var parsed = JSON.parse(saved);
+      var merged = clone(defaultState);
+      merged.hazardId = parsed.hazardId || merged.hazardId;
+      merged.ufcTableId = parsed.ufcTableId || merged.ufcTableId;
+      merged.governingDemandId = parsed.governingDemandId || merged.governingDemandId;
+      merged.criteria = Object.assign(merged.criteria, parsed.criteria || {});
+      merged.form = Object.assign(merged.form, parsed.form || {});
+      normalizePressureFields(merged.form);
+      if (!getUfcOption(merged.ufcTableId)) {
+        merged.ufcTableId = merged.criteria.ufc360001 ? "ordinary-30-wet" : "custom";
+      }
+      return merged;
+    } catch (error) {
+      var fallback = clone(defaultState);
+      normalizePressureFields(fallback.form);
+      return fallback;
+    }
+  }
+
+  function normalizePressureFields(form) {
+    Object.keys(psiFields).forEach(function (field) {
+      if (Number.isFinite(Number(form[field]))) {
+        form[field] = roundPsi(Math.max(0, Number(form[field])));
+      }
+    });
+    if (Number.isFinite(Number(form.flowAtResidual))) {
+      form.flowAtResidual = roundGpm(Math.max(0, Number(form.flowAtResidual)));
+    }
+    form.endHeadPressure = Math.max(REMOTE_HEAD_MIN_PRESSURE, form.endHeadPressure || 0);
+    form.useMonsterPitotChart = Boolean(form.useMonsterPitotChart);
+    form.flowSourceMode = form.flowSourceMode === "manual" ? "manual" : "pitot";
+    form.additionalFlowingHydrants = Math.min(2, Math.max(0, Math.round(Number(form.additionalFlowingHydrants) || 0)));
+    if (form.useMonsterPitotChart) {
+      form.dischargeCoefficient = 0.9;
+    }
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+      return false;
+    }
+    return true;
+  }
+
+  function clearSavedState() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+    } catch (error) {
+      return false;
+    }
+    return true;
+  }
+
+  function clone(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function getSelectedCriteriaText() {
+    var selected = criteria
+      .filter(function (item) {
+        return Boolean(state.criteria[item.id]);
+      })
+      .map(function (item) {
+        return item.label;
+      });
+    return selected.length ? selected.join(", ") : "None selected";
+  }
+
+  function getDemandBasisText() {
+    if (state.governingDemandId === "airForceSundown") {
+      return "Air Force Sundown";
+    }
+    if (state.governingDemandId === "ufc360001") {
+      return "UFC Table 9-3";
+    }
+    if (state.form.demandMode === "sprinklerCount") {
+      return "Sprinkler count";
+    }
+    return "Density-area";
+  }
+
+  function getHazardNote() {
+    if (state.governingDemandId === "airForceSundown") {
+      return "Air Force Sundown applies 0.20 gpm/sf over 5,000 sf with minimum K 11.2. Adjust hose allowance separately if required.";
+    }
+    if (state.criteria.airForceSundown && state.governingDemandId === "ufc360001") {
+      return "Air Force Sundown is selected, but the selected UFC Table 9-3 option is the greater sprinkler demand. Adjust hose allowance separately if required.";
+    }
+    if (state.governingDemandId === "ufc360001") {
+      return "UFC Table 9-3 changes the sprinkler demand and minimum K-factor. Verify hose stream and duration separately, and adjust hose allowance if another UFC criterion governs.";
+    }
+    if (state.hazardId === "custom" || state.ufcTableId === "custom") {
+      return "Custom values stay editable for project-specific criteria.";
+    }
+    return "Preset values are common density-area estimator inputs. Verify against the adopted standard and project occupancy.";
+  }
+
+  function getWorstDemandLabel(calc) {
+    if (state.form.demandMode === "sprinklerCount") {
+      var endHeadPressure = Math.max(REMOTE_HEAD_MIN_PRESSURE, Math.max(0, state.form.endHeadPressure));
+      return (
+        format(calc.totalDemand, 0) +
+        " gpm (" +
+        format(state.form.sprinklerCount, 0) +
+        " sprinklers at " +
+        formatPsi(endHeadPressure) +
+        (state.form.includeHose ? " plus hose" : "") +
+        ")"
+      );
+    }
+
+    return (
+      format(calc.totalDemand, 0) +
+      " gpm (" +
+      format(state.form.density, 2) +
+      " gpm/sf over " +
+      format(state.form.designArea, 0) +
+      " sf" +
+      (state.form.includeHose ? " plus hose" : "") +
+      ")"
+    );
+  }
+
+  function getSafetyFactor(calc) {
+    if (!Number.isFinite(calc.supplyPressure) || calc.requiredPressure <= 0) {
+      return "not available";
+    }
+    return format(calc.supplyPressure / calc.requiredPressure, 2) + "x";
+  }
+
+  function getPumpLine(outcome) {
+    if (outcome.title.indexOf("No") === 0) {
+      return "Pump is not indicated";
+    }
+    if (outcome.title.indexOf("Check") === 0) {
+      return "Pump decision cannot be determined";
+    }
+    return "Pump is indicated";
+  }
+
+  function getFlowHydrantText(report) {
+    var values = (report.flowHydrants || []).filter(function (label) {
+      return label;
+    });
+    return values.length ? values.join(", ") : "Not provided";
+  }
+
+  function buildPdfReportBytes(report) {
+    var calc = calculate(state.form);
+    var outcome = getOutcome(calc);
+    var pdf = createPdfCanvas();
+    var y = 112;
+    var boxHeight = 30;
+    var rowGap = 36;
+    var teal = [0.05, 0.24, 0.28];
+    var tealText = [0.1, 0.36, 0.4];
+    var softTeal = [0.9, 0.97, 0.97];
+    var paper = [0.99, 0.98, 0.94];
+    var muted = [0.35, 0.42, 0.43];
+    var gold = [0.84, 0.62, 0.16];
+
+    function shortenText(value, maxChars) {
+      var text = String(value || "");
+      if (text.length <= maxChars) return text;
+      return text.slice(0, maxChars - 3) + "...";
+    }
+
+    function drawSectionPanel(title, top, height) {
+      pdf.panel(30, top - 14, 552, height);
+      pdf.sectionTitle(title, top);
+    }
+
+    pdf.rect(0, 0, 612, 792, null, paper, 1);
+    pdf.rect(0, 0, 612, 92, null, teal, 1);
+    pdf.rect(42, 24, 5, 46, null, gold, 1);
+    pdf.text("FLOW TEST REPORT", 58, 32, 9, "bold", [0.74, 0.9, 0.9]);
+    pdf.text("Flow Test Report", 58, 58, 24, "bold", [1, 1, 1]);
+    pdf.text(shortenText(report.projectName || report.address || "Flow Test Report", 70), 58, 78, 9.5, "regular", [0.83, 0.93, 0.93]);
+    pdf.rect(430, 24, 140, 42, [0.54, 0.74, 0.74], null, 0.8);
+    pdf.text("GENERATED", 442, 39, 7.5, "bold", [0.74, 0.9, 0.9]);
+    pdf.text(shortenText(formatReportDateTime(new Date()), 25), 442, 57, 9.5, "bold", [1, 1, 1]);
+    pdf.text("Version " + APP_VERSION, 442, 74, 7.5, "regular", [0.83, 0.93, 0.93]);
+
+    drawSectionPanel("Project and Test Information", y, 176);
+    y += 18;
+    pdf.infoBox("Project name", report.projectName || "Not provided", 42, y, 258, boxHeight);
+    pdf.infoBox("Engineer", report.engineer || "Not provided", 312, y, 258, boxHeight);
+    y += rowGap;
+    pdf.infoBox("Address", report.address || "Not provided", 42, y, 258, boxHeight);
+    pdf.infoBox("Time of test", report.testTime ? formatReportDateTime(new Date(report.testTime)) : "Not provided", 312, y, 258, boxHeight);
+    y += rowGap;
+    pdf.infoBox("Witness name(s)", report.witness || "Not provided", 42, y, 258, boxHeight);
+    pdf.infoBox("Hydrants used", normalizeHydrantCount(report.hydrants), 312, y, 124, boxHeight);
+    pdf.infoBox("Gauge hydrant", report.gaugeHydrant || "Not provided", 446, y, 124, boxHeight);
+    y += rowGap;
+    pdf.infoBox("Flow hydrant(s)", getFlowHydrantText(report), 42, y, 258, boxHeight);
+    pdf.infoBox("Criteria selected", getSelectedCriteriaText(), 312, y, 124, boxHeight);
+    pdf.infoBox("Demand basis", getDemandBasisText(), 446, y, 124, boxHeight);
+    y += 54;
+
+    drawSectionPanel("Hydrant Flow Test Results", y, 94);
+    y += 18;
+    pdf.infoBox("Static", formatPsi(state.form.staticPressure), 42, y, 124, boxHeight, { fill: softTeal });
+    pdf.infoBox("Residual", formatPsi(state.form.residualPressure), 176, y, 124, boxHeight, { fill: softTeal });
+    pdf.infoBox("Test flow", format(state.form.flowAtResidual, 0) + " gpm", 312, y, 124, boxHeight, { fill: softTeal });
+    pdf.infoBox("Fire flow at 20 psi", formatReportNumber(calc.fireFlowAt20, 0, "gpm"), 446, y, 124, boxHeight, { fill: softTeal });
+    y += rowGap;
+    pdf.infoBox("Pitot gauge", formatPsi(state.form.pitotPressure), 42, y, 124, boxHeight);
+    pdf.infoBox("Outlet diameter", format(state.form.outletDiameter, 3) + " in", 176, y, 124, boxHeight);
+    pdf.infoBox("Flow source", getFlowSourceText(state.form), 312, y, 124, boxHeight);
+    pdf.infoBox("Extra hydrants", getExtraFlowingHydrantText(state.form), 446, y, 124, boxHeight);
+    y += 54;
+
+    drawSectionPanel("Supply Curve", y, 132);
+    y += 14;
+    pdf.drawSupplyCurve(calc, state.form, 42, y, 528, 104);
+    y += 126;
+
+    drawSectionPanel("Demand Summary", y, 130);
+    y += 18;
+    var summary =
+      "Worst case demand estimated at " +
+      format(calc.totalDemand, 0) +
+      " gpm requiring " +
+      format(roundPsi(calc.requiredPressure), 0) +
+      " psi. Available supply at that flow is " +
+      formatReportPressure(calc.supplyPressure) +
+      ", giving a safety factor of " +
+      getSafetyFactor(calc) +
+      ".";
+    y = pdf.wrappedText(summary, 42, y, 528, 9.5, 12, muted);
+    y += 6;
+    pdf.infoBox("Worst case demand", getWorstDemandLabel(calc), 42, y, 258, boxHeight, { fill: [0.96, 0.98, 1] });
+    pdf.infoBox("Required pressure", formatPsi(calc.requiredPressure), 312, y, 124, boxHeight, { fill: [0.96, 0.98, 1] });
+    pdf.infoBox("Available pressure", formatReportPressure(calc.supplyPressure), 446, y, 124, boxHeight, { fill: [0.96, 0.98, 1] });
+    y += rowGap;
+    pdf.infoBox("Safety factor", getSafetyFactor(calc), 42, y, 124, boxHeight);
+    pdf.infoBox("Pressure margin", signedPsi(calc.margin), 176, y, 124, boxHeight);
+    pdf.infoBox("Estimated boost", formatPsi(calc.boostNeeded), 312, y, 124, boxHeight);
+    pdf.infoBox("Backflow loss", formatPsi(calc.backflowLoss), 446, y, 124, boxHeight);
+    y += 50;
+
+    var decisionFill = outcome.className === "outcome-good" ? [0.88, 0.96, 0.9] : outcome.className === "outcome-warn" ? [1, 0.96, 0.82] : [1, 0.91, 0.88];
+    var decisionStroke = outcome.className === "outcome-good" ? [0.16, 0.48, 0.28] : outcome.className === "outcome-warn" ? [0.72, 0.5, 0.12] : [0.68, 0.22, 0.16];
+    var decisionText = outcome.className === "outcome-good" ? [0.12, 0.34, 0.2] : outcome.className === "outcome-warn" ? [0.46, 0.32, 0.08] : [0.5, 0.16, 0.12];
+
+    pdf.panel(30, y - 8, 552, 124);
+    pdf.rect(42, y + 4, 528, 38, decisionStroke, decisionFill, 1.2);
+    pdf.text("FIRE PUMP DECISION", 54, y + 18, 7.5, "bold", decisionText);
+    pdf.text(getPumpLine(outcome), 54, y + 34, 16, "bold", decisionText);
+    y += 64;
+    pdf.line(42, y, 570, y, [0.62, 0.68, 0.68], 0.8);
+    y += 22;
+    pdf.line(42, y, 570, y, [0.62, 0.68, 0.68], 0.8);
+    y += 16;
+    pdf.wrappedText(
+      "Concept estimator only. Final fire pump decisions require a full hydraulic calculation, adopted code review, and qualified design professional approval.",
+      42,
+      y,
+      528,
+      8.5,
+      11,
+      muted,
+    );
+
+    return pdf.output();
+  }
+
+  function createPdfCanvas() {
+    var pageWidth = 612;
+    var pageHeight = 792;
+    var commands = [];
+
+    function py(top) {
+      return pageHeight - top;
+    }
+
+    function color(values) {
+      return values.map(function (value) {
+        return round(value);
+      }).join(" ");
+    }
+
+    function safeText(value) {
+      return String(value == null ? "" : value)
+        .replace(/[^\x09\x0A\x0D\x20-\x7E]/g, "?")
+        .replace(/\\/g, "\\\\")
+        .replace(/\(/g, "\\(")
+        .replace(/\)/g, "\\)");
+    }
+
+    function textWidth(value, size) {
+      return String(value || "").length * size * 0.52;
+    }
+
+    function drawText(value, x, top, size, weight, fill) {
+      var font = weight === "bold" ? "F2" : "F1";
+      var fillColor = fill || [0.07, 0.08, 0.09];
+      commands.push(color(fillColor) + " rg");
+      commands.push("BT /" + font + " " + size + " Tf " + round(x) + " " + round(py(top)) + " Td (" + safeText(value) + ") Tj ET");
+    }
+
+    function drawLine(x1, top1, x2, top2, stroke, width) {
+      commands.push(color(stroke || [0, 0, 0]) + " RG");
+      commands.push(round(width || 1) + " w");
+      commands.push(round(x1) + " " + round(py(top1)) + " m " + round(x2) + " " + round(py(top2)) + " l S");
+    }
+
+    function drawRect(x, top, width, height, stroke, fill, lineWidth) {
+      if (fill) commands.push(color(fill) + " rg");
+      if (stroke) commands.push(color(stroke) + " RG");
+      commands.push(round(lineWidth || 1) + " w");
+      commands.push(round(x) + " " + round(py(top + height)) + " " + round(width) + " " + round(height) + " re " + (fill && stroke ? "B" : fill ? "f" : "S"));
+    }
+
+    function wrappedText(value, x, top, maxWidth, size, lineHeight, fill) {
+      var words = String(value || "").split(/\s+/);
+      var line = "";
+      var cursor = top;
+      words.forEach(function (word) {
+        var next = line ? line + " " + word : word;
+        if (line && textWidth(next, size) > maxWidth) {
+          drawText(line, x, cursor, size, "regular", fill);
+          cursor += lineHeight;
+          line = word;
+        } else {
+          line = next;
+        }
+      });
+      if (line) {
+        drawText(line, x, cursor, size, "regular", fill);
+        cursor += lineHeight;
+      }
+      return cursor;
+    }
+
+    function drawPanel(x, top, width, height) {
+      drawRect(x, top, width, height, [0.87, 0.88, 0.84], [1, 1, 0.97], 0.6);
+    }
+
+    function infoBox(label, value, x, top, width, height, options) {
+      var settings = options || {};
+      var fill = settings.fill || [1, 1, 0.98];
+      var stroke = settings.stroke || [0.78, 0.82, 0.82];
+      var labelFill = settings.labelFill || [0.24, 0.35, 0.37];
+      var valueFill = settings.valueFill || [0.07, 0.1, 0.11];
+      drawRect(x, top, width, height, stroke, fill, 0.7);
+      drawText(label.toUpperCase(), x + 6, top + 8, 6.7, "bold", labelFill);
+      var text = String(value || "");
+      var maxChars = Math.max(10, Math.floor(width / 5.5));
+      if (text.length > maxChars) text = text.slice(0, maxChars - 3) + "...";
+      drawText(text, x + 6, top + Math.max(23, height - 7), 10, "bold", valueFill);
+    }
+
+    function sectionTitle(title, top) {
+      drawRect(42, top - 8, 4, 14, null, [0.84, 0.62, 0.16], 1);
+      drawText(title, 52, top, 11.5, "bold", [0.06, 0.22, 0.25]);
+      drawLine(52, top + 6, 570, top + 6, [0.83, 0.84, 0.8], 0.7);
+    }
+
+    function drawSupplyCurve(calc, form, x, top, width, height) {
+      var chart = buildChart(calc, form);
+      function sx(svgX) {
+        return x + (svgX / 640) * width;
+      }
+      function sy(svgY) {
+        return top + (svgY / 310) * height;
+      }
+
+      drawRect(x, top, width, height, [0.78, 0.82, 0.82], [1, 1, 0.98], 0.8);
+      drawRect(sx(56), sy(26), sx(604) - sx(56), sy(250) - sy(26), [0.9, 0.91, 0.88], [0.96, 0.99, 0.99], 0.5);
+      [0, 0.25, 0.5, 0.75, 1].forEach(function (tick) {
+        var flow = tick * chart.maxFlow;
+        var tickX = sx(chart.x(flow));
+        drawLine(sx(56), sy(chart.y(tick * chart.maxPressure)), sx(604), sy(chart.y(tick * chart.maxPressure)), [0.86, 0.89, 0.88], 0.5);
+        drawText(format(tick * chart.maxPressure, 0), sx(26), sy(chart.y(tick * chart.maxPressure)) + 3, 6.5, "regular", [0.36, 0.42, 0.43]);
+        drawLine(tickX, sy(250), tickX, sy(256), [0.61, 0.66, 0.66], 0.5);
+        drawText(format(flow, 0), tickX - 14, sy(278), 6.5, "regular", [0.36, 0.42, 0.43]);
+      });
+
+      drawLine(sx(56), sy(250), sx(604), sy(250), [0.45, 0.54, 0.55], 0.9);
+      drawLine(sx(56), sy(26), sx(56), sy(250), [0.45, 0.54, 0.55], 0.9);
+      drawLine(sx(56), sy(chart.y(calc.requiredPressure)), sx(604), sy(chart.y(calc.requiredPressure)), [0.68, 0.22, 0.16], 1.2);
+      drawLine(sx(56), sy(chart.y(form.minResidual)), sx(604), sy(chart.y(form.minResidual)), [0.84, 0.62, 0.16], 1.2);
+
+      var points = [];
+      for (var index = 0; index < 56; index += 1) {
+        var flow = (index / 55) * chart.maxFlow;
+        var pressure =
+          form.staticPressure -
+          calc.pressureDrop * Math.pow(flow / Math.max(form.flowAtResidual, 1), SUPPLY_EXPONENT);
+        points.push([sx(chart.x(flow)), sy(chart.y(Math.max(0, pressure)))]);
+      }
+      commands.push("0.1 0.4 0.4 RG 2.2 w");
+      commands.push(points.map(function (point, index) {
+        return round(point[0]) + " " + round(py(point[1])) + (index === 0 ? " m" : " l");
+      }).join(" ") + " S");
+
+      if (calc.validSupply) {
+        drawLine(sx(chart.demandX), sy(250), sx(chart.demandX), sy(26), [0.5, 0.55, 0.55], 0.8);
+        drawRect(sx(chart.demandX) - 2.5, sy(chart.supplyY) - 2.5, 5, 5, null, [0.1, 0.4, 0.4], 1);
+        drawRect(sx(chart.demandX) - 2.5, sy(chart.requiredY) - 2.5, 5, 5, null, [0.68, 0.22, 0.16], 1);
+      }
+
+      drawText("Flow, gpm (N^1.85 scale)", x + 10, top + height - 7, 7, "regular", [0.36, 0.42, 0.43]);
+      drawText("Pressure, psi", x + 10, top + 15, 7, "regular", [0.36, 0.42, 0.43]);
+      drawLine(x + width - 160, top + 17, x + width - 132, top + 17, [0.1, 0.4, 0.4], 1.8);
+      drawText("Available supply", x + width - 126, top + 20, 7, "bold", [0.1, 0.4, 0.4]);
+      drawLine(x + width - 160, top + 31, x + width - 132, top + 31, [0.68, 0.22, 0.16], 1.2);
+      drawText("Required pressure", x + width - 126, top + 34, 7, "bold", [0.68, 0.22, 0.16]);
+      drawLine(x + width - 160, top + 45, x + width - 132, top + 45, [0.84, 0.62, 0.16], 1.2);
+      drawText("Minimum residual", x + width - 126, top + 48, 7, "bold", [0.84, 0.62, 0.16]);
+    }
+
+    function output() {
+      var stream = commands.join("\n") + "\n";
+      var objects = [
+        "<< /Type /Catalog /Pages 2 0 R >>",
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>",
+        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>",
+        "<< /Length " + new TextEncoder().encode(stream).length + " >>\nstream\n" + stream + "endstream",
+      ];
+      var pdf = "%PDF-1.4\n";
+      var offsets = [0];
+      objects.forEach(function (object, index) {
+        offsets.push(new TextEncoder().encode(pdf).length);
+        pdf += index + 1 + " 0 obj\n" + object + "\nendobj\n";
+      });
+      var xref = new TextEncoder().encode(pdf).length;
+      pdf += "xref\n0 " + (objects.length + 1) + "\n";
+      pdf += "0000000000 65535 f \n";
+      for (var i = 1; i < offsets.length; i += 1) {
+        pdf += String(offsets[i]).padStart(10, "0") + " 00000 n \n";
+      }
+      pdf += "trailer\n<< /Size " + (objects.length + 1) + " /Root 1 0 R >>\n";
+      pdf += "startxref\n" + xref + "\n%%EOF\n";
+      return new TextEncoder().encode(pdf);
+    }
+
+    return {
+      drawSupplyCurve: drawSupplyCurve,
+      infoBox: infoBox,
+      line: drawLine,
+      output: output,
+      panel: drawPanel,
+      rect: drawRect,
+      sectionTitle: sectionTitle,
+      text: drawText,
+      wrappedText: wrappedText,
+    };
+  }
+
+  function getPdfFilename() {
+    var reportName = reportState.projectName || reportState.address;
+    var base = reportName
+      ? reportName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+      : "hydrant-flow-report";
+    return (base || "hydrant-flow-report") + ".pdf";
+  }
+
+  function toDateTimeLocalValue(date) {
+    var offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return offsetDate.toISOString().slice(0, 16);
+  }
+
+  function formatReportDateTime(date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+      return "Not provided";
+    }
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  }
+
+  function normalizeHydrantCount(value) {
+    var count = String(value || "1");
+    return ["1", "2", "3", "4"].indexOf(count) >= 0 ? count : "1";
+  }
+
+  function format(value, digits) {
+    var places = typeof digits === "number" ? digits : 0;
+    if (!Number.isFinite(value)) return "0";
+    return value.toLocaleString("en-US", {
+      maximumFractionDigits: places,
+      minimumFractionDigits: places,
+    });
+  }
+
+  function formatReportNumber(value, digits, unit) {
+    if (!Number.isFinite(value)) return "Not available";
+    return format(value, digits) + (unit ? " " + unit : "");
+  }
+
+  function formatPsi(value) {
+    if (!Number.isFinite(value)) return "0 psi";
+    return format(roundPsi(value), 0) + " psi";
+  }
+
+  function formatReportPressure(value) {
+    if (!Number.isFinite(value)) return "Not available";
+    return format(roundPsi(value), 0) + " psi";
+  }
+
+  function signedPsi(value) {
+    if (!Number.isFinite(value)) return "0 psi";
+    var rounded = roundPsi(value);
+    return (rounded > 0 ? "+" : "") + format(rounded, 0) + " psi";
+  }
+
+  function signed(value) {
+    if (!Number.isFinite(value)) return "0.0";
+    return (value > 0 ? "+" : "") + format(value, 1);
+  }
+
+  function round(value) {
+    return Math.round(value * 10) / 10;
+  }
+
+  function roundGpm(value) {
+    if (!Number.isFinite(value)) return value;
+    return Math.round(value);
+  }
+
+  function roundPsi(value) {
+    if (!Number.isFinite(value)) return value;
+    return Math.round(value);
+  }
+
+  function roundToNearest(value, nearest) {
+    if (!Number.isFinite(value) || nearest <= 0) return 0;
+    return Math.round(value / nearest) * nearest;
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, function (character) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      }[character];
+    });
+  }
+
+  globalThis.FirePumpEstimator = {
+    calculate: calculate,
+    hazards: hazards,
+    criteria: criteria,
+    backflowTypes: backflowTypes,
+    ufcTableOptions: ufcTableOptions,
+    airForceSundownOption: airForceSundownOption,
+    defaultState: defaultState,
+    calculatePitotFlow: calculatePitotFlow,
+    createPdfReportBytes: function (report) {
+      return buildPdfReportBytes(report || reportState);
+    },
+  };
+
+  if (typeof document !== "undefined") {
+    init();
+  }
+})();
+
+</script>
+  </body>
+</html>
+
