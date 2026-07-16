@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "requiredFields": [
+    "missionClass",
+    "macCategory",
+    "facilityType",
+    "operationMode",
+    "designFirePresetId",
+    "hrrKw",
+    "convectiveFraction",
+    "ambientTempC",
+    "roomLengthFt",
+    "roomWidthFt",
+    "roomHeightFt",
+    "smokeInterfaceFt",
+    "makeupRatio",
+    "makeupFreeAreaFt2",
+    "leakageAreaFt2",
+    "flowCoefficient",
+    "exhaustLocationFactor",
+    "selectedInletCount",
+    "exhaustInletLengthIn",
+    "exhaustInletWidthIn",
+    "exhaustMarginPercent",
+    "targetPressurePa",
+    "maxMakeupVelocityFpm",
+    "cleanAgent",
+    "directExteriorDoor",
+    "confirmsAxisymmetricPlume",
+    "confirmsSteadyEquivalent",
+    "confirmsNoWallOrRackPlume",
+    "confirmsNoSuppressionInteraction",
+    "name",
+    "designFireBasis"
+  ],
+  "enumOptions": {
+    "missionClass": [
+      "Mission-essential",
+      "Mission-critical"
+    ],
+    "macCategory": [
+      "MAC III",
+      "MAC II",
+      "MAC I"
+    ],
+    "facilityType": [
+      "Typical",
+      "Remote",
+      "Modular"
+    ],
+    "operationMode": [
+      "Occupied",
+      "Unoccupied"
+    ],
+    "designFirePresetId": [
+      "detection-10kw",
+      "electronic-small-23kw",
+      "electronic-enclosure-200kw",
+      "packaging-carton-500kw",
+      "electrical-cabinet-300kw",
+      "electrical-cabinet-600kw",
+      "li-ion-bbu-project",
+      "transient-custom-curve",
+      "custom-steady"
+    ]
+  },
+  "units": {
+    "hrrKw": "kW",
+    "ambientTempC": "deg C",
+    "roomLengthFt": "ft",
+    "roomWidthFt": "ft",
+    "roomHeightFt": "ft",
+    "smokeInterfaceFt": "ft",
+    "makeupRatio": "decimal",
+    "makeupFreeAreaFt2": "ft2",
+    "leakageAreaFt2": "ft2",
+    "flowCoefficient": "decimal",
+    "targetPressurePa": "Pa",
+    "maxMakeupVelocityFpm": "fpm",
+    "convectiveFraction": "decimal",
+    "exhaustInletLengthIn": "in",
+    "exhaustInletWidthIn": "in",
+    "exhaustLocationFactor": "decimal",
+    "selectedInletCount": "count",
+    "exhaustMarginPercent": "percent"
+  },
+  "wholeNumberFields": [
+    "revision",
+    "selectedInletCount"
+  ],
+  "decimalRatioFields": [
+    "convectiveFraction",
+    "makeupRatio",
+    "flowCoefficient",
+    "exhaustLocationFactor"
+  ],
+  "percentFields": [
+    "exhaustMarginPercent"
+  ],
+  "importLimit": 25
+}

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#16231f" />
+    <title>Smoke Exhaust Scenario Lab</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="betaBanner" class="betaBanner" role="status">
+      <strong>Team testing build — not for project design</strong>
+      <span>
+        Preliminary tool only. Results require qualified FPE / AHJ / insurer acceptance before design use.
+        Golden regression baselines are software checks, not certified hand calculations.
+      </span>
+    </div>
+    <main class="appShell">
+      <aside class="sideRail">
+        <div>
+          <p class="eyebrow">Smoke exhaust</p>
+          <h1>Scenario Lab</h1>
+          <p id="versionChip" class="versionChip" aria-label="App version"></p>
+        </div>
+        <div id="scenarioList" class="scenarioList"></div>
+        <div class="railActions">
+          <button id="duplicateScenario" type="button">Duplicate</button>
+          <button id="deleteScenario" type="button">Delete</button>
+        </div>
+        <section class="dataPanel">
+          <h2>Scenario Data</h2>
+          <textarea id="scenarioImport" aria-label="Scenario JSON" rows="7" placeholder="Paste scenario JSON"></textarea>
+          <div class="dataActions">
+            <button id="exportScenarios" type="button">Export</button>
+            <button id="importScenarios" type="button">Import</button>
+            <button id="loadTemplate" type="button">Template</button>
+            <button id="clearLocalSave" type="button" class="ghostButton" title="Clear autosaved scenarios on this device">Clear save</button>
+          </div>
+          <p id="importStatus" class="importStatus" aria-live="polite"></p>
+          <p id="saveStatus" class="saveStatus" aria-live="polite"></p>
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <header class="topBar">
+          <div>
+            <input id="scenarioName" class="scenarioName" aria-label="Scenario name" />
+            <p id="comparisonNote"></p>
+          </div>
+          <div class="topActions">
+            <span id="versionChipTop" class="versionChipTop" aria-hidden="true"></span>
+            <div class="modeSwitch" aria-label="View mode">
+              <button type="button" data-app-mode="standard">Full</button>
+              <button type="button" data-app-mode="excel">Excel</button>
+            </div>
+            <a class="helpButton" href="./smoke-exhaust-user-manual.pdf" target="_blank" rel="noopener">Help manual</a>
+            <button id="printReport" type="button">Print report</button>
+          </div>
+        </header>
+
+        <section id="summaryStrip" class="summaryStrip" aria-label="Calculated outputs"></section>
+
+        <div class="mainGrid">
+          <section class="panel inputsPanel">
+            <div class="panelHeader">
+              <h2>Scenario Inputs</h2>
+              <span>Editable</span>
+            </div>
+            <div id="inputs"></div>
+          </section>
+
+          <section class="panel calculationPanel">
+            <div class="panelHeader">
+              <h2>Calculation View</h2>
+              <span>Live</span>
+            </div>
+            <div id="calculationView"></div>
+          </section>
+
+          <section class="panel excelPanel">
+            <div class="panelHeader">
+              <h2>Excel Mode</h2>
+              <span>Simple</span>
+            </div>
+            <div id="excelMode"></div>
+          </section>
+
+          <section class="panel reportPanel">
+            <div class="panelHeader">
+              <h2>Report Preview</h2>
+              <span>Auditable</span>
+            </div>
+            <div id="reportPreview"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

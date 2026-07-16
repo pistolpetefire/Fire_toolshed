@@ -1,0 +1,132 @@
+{
+  "generatedFrom": {
+    "appVersion": "2026.07.05-validation",
+    "calculationEngineVersion": "steady-axisymmetric-1.1",
+    "schemaVersion": 2,
+    "generatedDate": "2026-07-05",
+    "sourceDocuments": [
+      {
+        "id": "TSFPEWG-G-3-600-01.01-18-C1",
+        "title": "TSFPEWG G 3-600-01.01-18 with Change 1",
+        "date": "2021-04-21",
+        "role": "Mission continuity path, smoke exhaust triggers, controls, and pressure objective."
+      },
+      {
+        "id": "HOSCE-CH16",
+        "title": "Handbook of Smoke Control Engineering, Chapter 16",
+        "date": "2012",
+        "role": "Steady axisymmetric plume, exhaust volume, plugholing, inlet separation, and makeup velocity equations."
+      },
+      {
+        "id": "HOSCE-CH3",
+        "title": "Handbook of Smoke Control Engineering, Chapter 3",
+        "date": "2012",
+        "role": "Flow, leakage area, flow coefficient, and pressure-difference relationships."
+      },
+      {
+        "id": "NFPA-92-2024",
+        "title": "NFPA 92 (2024)",
+        "date": "2024",
+        "role": "Rectangular inlet geometry and smoke control criteria cross-checks used by the source spreadsheet."
+      }
+    ]
+  },
+  "requirements": [
+    {
+      "id": "TSF-001",
+      "section": "1-5 and Appendix A",
+      "requirement": "Classify the information technology equipment mission and mission assurance category before selecting the protection path.",
+      "trigger": "All scenarios",
+      "appField": "missionClass, macCategory",
+      "appResponse": "Decision Path step 1 selects Chapter 2, 3, 4, 5, or 6 based on mission, MAC, and facility type."
+    },
+    {
+      "id": "TSF-002",
+      "section": "2-13.1",
+      "requirement": "Provide smoke exhaust from the information technology equipment room to the exterior unless a direct outside door supports a pre-positioned portable fan approach.",
+      "trigger": "Chapter 2 baseline and paths that inherit Chapter 2",
+      "appField": "directExteriorDoor",
+      "appResponse": "Decision Path identifies permanent exhaust or the MAC III portable fan exception path."
+    },
+    {
+      "id": "TSF-003",
+      "section": "2-13.2",
+      "requirement": "Size exhaust for a smoke layer interface or concentration objective and keep makeup less than exhaust to limit spread to adjacent spaces.",
+      "trigger": "Smoke exhaust calculation path",
+      "appField": "smokeInterfaceFt, hrrKw, convectiveFraction, makeupRatio",
+      "appResponse": "Trace steps F-001 through F-007 calculate exhaust; Compliance Checklist checks makeup less than exhaust."
+    },
+    {
+      "id": "TSF-004",
+      "section": "2-13.2",
+      "requirement": "Evaluate the referenced 12 Pa / 0.05 in. w.g. pressure-differential objective with respect to adjacent spaces.",
+      "trigger": "Smoke exhaust calculation path",
+      "appField": "makeupRatio, leakageAreaFt2, flowCoefficient, targetPressurePa",
+      "appResponse": "Pressure Helper and trace steps F-011/F-012 estimate pressure and solve required imbalance/helper values."
+    },
+    {
+      "id": "TSF-005",
+      "section": "2-13.3",
+      "requirement": "Use dedicated smoke exhaust separate from normal IT room air handling; makeup may be dedicated or normal HVAC and brought in below the design smoke layer interface.",
+      "trigger": "Permanent smoke exhaust path",
+      "appField": "hvacStateBasis, activationSequence",
+      "appResponse": "Reviewer Basis requires HVAC/fire-mode and activation-sequence evidence before a final calculation package."
+    },
+    {
+      "id": "TSF-006",
+      "section": "2-13.4 and 2-13.4.1",
+      "requirement": "Control smoke exhaust from the fire alarm system, include required smoke/fire damper isolation, manual deactivation, and fire-protection power supply features.",
+      "trigger": "Permanent smoke exhaust path without clean agent manual-only override",
+      "appField": "cleanAgent, activationSequence",
+      "appResponse": "Decision Path and Reviewer Basis require the activation sequence and control basis to be documented."
+    },
+    {
+      "id": "TSF-007",
+      "section": "3-1, 3-3.3.2, 3-3.4.2",
+      "requirement": "MAC II facilities follow Chapter 2 as modified by Chapter 3; Alarm detection level activates smoke exhaust except where otherwise indicated.",
+      "trigger": "MAC II, typical occupied or unoccupied facilities",
+      "appField": "macCategory, operationMode",
+      "appResponse": "Decision Path routes MAC II to Chapter 3 and records Alarm-level activation basis."
+    },
+    {
+      "id": "TSF-008",
+      "section": "4-3.1, 4-3.1.8, 4-4",
+      "requirement": "Mission-critical/MAC I spaces require clean agent supplemental fire suppression; clean-agent activation does not activate smoke exhaust; smoke exhaust is manual-only from outside the IT room.",
+      "trigger": "Mission-critical / MAC I or clean-agent scenario",
+      "appField": "missionClass, macCategory, cleanAgent",
+      "appResponse": "Decision Path routes MAC I to Chapter 4 and forces the report to document manual-only smoke exhaust activation."
+    },
+    {
+      "id": "TSF-009",
+      "section": "5-1.1, 5-1.2, 5-5.1",
+      "requirement": "Remote continuously occupied facilities follow the appropriate Chapter 2/3/4 path; remote unoccupied facilities follow Chapter 4 as modified, and Alarm detection activates smoke exhaust unless clean agent is provided.",
+      "trigger": "Remote facilities",
+      "appField": "facilityType, operationMode, cleanAgent",
+      "appResponse": "Decision Path routes Remote selections to Chapter 5 and flags clean-agent/activation evidence in Reviewer Basis."
+    },
+    {
+      "id": "TSF-010",
+      "section": "6-1, 6-4.1, 6-4.2, 6-5.1, 6-5.2",
+      "requirement": "Modular data centers follow Chapter 2 as modified by Chapter 6; mission-critical modular facilities use Chapter 3 detection and clean agent in accordance with Chapter 4.",
+      "trigger": "Modular data centers",
+      "appField": "facilityType, missionClass, macCategory",
+      "appResponse": "Decision Path routes Modular selections to Chapter 6 and leaves clean-agent/detection proof in Reviewer Basis."
+    },
+    {
+      "id": "CALC-001",
+      "section": "TSFPEWG 2-13.2; Handbook Ch. 16; NFPA 92",
+      "requirement": "Show all variables, formulas, substitutions, and limitations for the selected smoke exhaust calculation path.",
+      "trigger": "All calculated smoke exhaust scenarios",
+      "appField": "all calculation inputs",
+      "appResponse": "Variable Register, Formula Register, Calculation Trace, Excel Mode formula path, and Raw JSON are included in the report."
+    },
+    {
+      "id": "CALC-002",
+      "section": "Engineering review limitation",
+      "requirement": "Document equation applicability, design fire basis, AHJ/insurer assumptions, and independent validation before submittal.",
+      "trigger": "All scenarios intended for project use",
+      "appField": "reviewerBasisAudit and confirmation toggles",
+      "appResponse": "Data Quality remains Review or Blocked until reviewer-basis entries and confirmations are completed."
+    }
+  ]
+}
