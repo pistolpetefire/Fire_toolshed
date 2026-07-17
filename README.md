@@ -6,6 +6,7 @@ Browser-based engineering calculators for team use. Hosted with **GitHub Pages**
 
 **[Path hub](./water-supply/)** — light shell overview (steps + capture status). Shared chrome (`shared/water-path-shell.js`) appears on every water tool; each app still works alone if bookmarked.
 
+0. **[Flow Test Request](./flow-test-request/)** — Stock request form (suppression or fire flow), NFPA 291 procedures for 2½″ outlets only, base/city fields, hydrant selection reasons, jurisdiction ask.
 1. **[Flow Test Report](./flow-test-report/)** — Hydrant static/residual/pitot GPM, N^1.85 supply curve, fire flow @ 20 psi. Capture for Sprinkler Estimator (no system demand).
 2. **[Sprinkler System Estimator](./sprinkler-system-estimator/)** — Prelim demand, pressure stack, duration (NFPA 13 / UFC / FM). Overlay flow-test curve; capture duty for pump sizer.
 3. **[Fire Pump Sizer](./fire-pump-sizer/)** — Import sprinkler flow/pressure/duration; NFPA 20 / UFC preliminary pump, driver, room.
