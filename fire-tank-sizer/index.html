@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Preliminary fire water tank sizer — flow × duration + NFPA/UFC/FM safety, prefab steel sizes, concrete pad plan view.">
+  <title>Fire Tank Sizer · Fire Toolshed</title>
+  <link rel="stylesheet" href="../shared/water-path-shell.css">
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div id="waterPathShell" class="no-print"></div>
+
+  <div class="shell">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Fire Toolshed</p>
+        <h1>Fire Tank Sizer</h1>
+        <p class="version" id="appVersion">Version 1.0.0-prelim</p>
+      </div>
+      <div class="top-actions no-print">
+        <button type="button" id="btnHelp" class="ghost" title="Help for every input">Help / Guide</button>
+        <button type="button" id="btnImport" class="primary" title="Import pump capture if present, else sprinkler">Import Upstream Demand</button>
+        <button type="button" id="btnImportPump" title="Import flow × duration from Fire Pump Sizer">Import Pump Demand</button>
+        <button type="button" id="btnImportSprinkler" title="Import from Sprinkler Estimator">Import Sprinkler</button>
+        <button type="button" id="btnReport">Clean Report</button>
+        <button type="button" id="btnSaveReport">Save Report</button>
+        <button type="button" id="btnCapture">Save tank handoff</button>
+        <button type="button" id="btnPrint" class="ghost">Print</button>
+        <button type="button" id="btnReset" class="ghost">Reset</button>
+      </div>
+    </header>
+
+    <div id="handoffBanner" class="callout info hidden no-print" style="margin:0.75rem 0" role="status"></div>
+
+    <section class="metrics" aria-label="Results">
+      <div class="metric">
+        <div class="label">Base volume</div>
+        <div class="value" id="metricBase">0</div>
+        <div class="unit">gal (Q × t)</div>
+      </div>
+      <div class="metric">
+        <div class="label">Required shell</div>
+        <div class="value" id="metricRequired">0</div>
+        <div class="unit">gal (w/ safety)</div>
+      </div>
+      <div class="metric">
+        <div class="label">Selected tank</div>
+        <div class="value" id="metricTank">—</div>
+        <div class="unit">gal</div>
+      </div>
+      <div class="metric">
+        <div class="label">Pad diameter</div>
+        <div class="value" id="metricPad">—</div>
+        <div class="unit">ft</div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <div>
+        <section class="panel">
+          <h2>Project</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="projectName">Project name</label>
+              <input id="projectName" type="text" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="facility">Site / building</label>
+              <input id="facility" type="text">
+            </div>
+            <div class="field">
+              <label for="preparedBy">Prepared by</label>
+              <input id="preparedBy" type="text" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="reportDate">Date</label>
+              <input id="reportDate" type="date">
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="projectNotes">Notes</label>
+              <textarea id="projectNotes" rows="2" placeholder="AHJ height limit basis, manufacturer, NFPA 22 notes…"></textarea>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="reportLogoSource">Report logo</label>
+              <select id="reportLogoSource">
+                <option value="benham">Benham</option>
+                <option value="haskell">Haskell</option>
+                <option value="upload">Upload image…</option>
+              </select>
+              <span class="sub">Appears on print and saved HTML reports. Shared across water-path tools. Replace brand art later under <code>shared/logos/</code>.</span>
+              <div id="reportLogoFileWrap" class="hidden" style="margin-top:0.5rem">
+                <label for="reportLogoFile" class="sub" style="display:block;margin-bottom:0.25rem">Choose logo image</label>
+                <input id="reportLogoFile" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp,image/*" />
+              </div>
+              <div id="reportLogoPreview" style="margin-top:0.5rem;min-height:2rem"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Demand (from system / pump)</h2>
+          <p class="hint">Import from Sprinkler Estimator capture, or enter flow and duration manually. Volume = flow × duration + framework safety.</p>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="flowGpm">System / pump flow</label>
+              <div class="row">
+                <input id="flowGpm" type="number" min="0" step="10" value="1250">
+                <span class="suffix">GPM</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="durationMin">Duration required</label>
+              <div class="row">
+                <input id="durationMin" type="number" min="0" step="5" value="60">
+                <span class="suffix">min</span>
+              </div>
+            </div>
+          </div>
+          <h2 style="margin-top:1rem;font-size:0.95rem">Safety framework</h2>
+          <div class="criteria" style="margin-top:0.5rem">
+            <label>
+              <input type="radio" name="framework" value="nfpa" checked>
+              <div>
+                <b>NFPA 13 / 20 / 22 planning</b>
+                <small>+5% contingency on Q×t (default). Confirm effective capacity per NFPA 22.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="framework" value="ufc">
+              <div>
+                <b>UFC 3-600-01 planning</b>
+                <small>+10% contingency. Confirm UFC duration &amp; redundancy for occupancy.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="framework" value="fm">
+              <div>
+                <b>FM Global planning</b>
+                <small>+15% contingency. Cite governing FM DS for duration / usable volume.</small>
+              </div>
+            </label>
+          </div>
+          <div class="field-grid two" style="margin-top:0.85rem">
+            <div class="field">
+              <label for="safetyPct">Safety contingency override</label>
+              <div class="row">
+                <input id="safetyPct" type="number" min="0" step="1" placeholder="auto">
+                <span class="suffix">%</span>
+              </div>
+              <span class="sub">Leave blank to use framework default.</span>
+            </div>
+            <div class="field">
+              <label for="unusablePct">Unusable / freeboard / suction allowance</label>
+              <div class="row">
+                <input id="unusablePct" type="number" min="0" max="40" step="1" value="5">
+                <span class="suffix">%</span>
+              </div>
+              <span class="sub">Increases required shell volume so usable water meets demand.</span>
+            </div>
+          </div>
+          <div class="callout info" style="margin-top:0.75rem">
+            <div id="resultBase">—</div>
+            <div id="resultSafety" style="margin-top:0.25rem">—</div>
+            <div id="resultUnusable" style="margin-top:0.25rem">—</div>
+            <div id="resultFramework" style="margin-top:0.35rem;font-weight:700">—</div>
+            <div id="resultNote" class="hint" style="margin:0.35rem 0 0">—</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Site constraints</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="maxHeightFt">Max tank height allowed (local / AHJ)</label>
+              <div class="row">
+                <input id="maxHeightFt" type="number" min="0" step="1" value="24" placeholder="e.g. 24">
+                <span class="suffix">ft</span>
+              </div>
+              <span class="sub">Zoning, aircraft, aesthetics, or AHJ limit. 0 = no limit.</span>
+            </div>
+            <div class="field">
+              <label for="maxDiaFt">Max diameter (site constraint)</label>
+              <div class="row">
+                <input id="maxDiaFt" type="number" min="0" step="0.5" value="40" placeholder="e.g. 40">
+                <span class="suffix">ft</span>
+              </div>
+              <span class="sub">Yard clearances, setbacks, property lines. 0 = no limit.</span>
+            </div>
+            <div class="field">
+              <label for="padBeyondFt">Pad beyond tank shell</label>
+              <div class="row">
+                <input id="padBeyondFt" type="number" min="0" step="0.5" value="2">
+                <span class="suffix">ft ea. side</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="padThicknessIn">Pad thickness</label>
+              <div class="row">
+                <input id="padThicknessIn" type="number" min="0" step="1" value="12">
+                <span class="suffix">in</span>
+              </div>
+              <span class="sub">Preliminary concrete volume only — structural design by others.</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div>
+        <section class="panel">
+          <h2>Selected tank &amp; pad</h2>
+          <div class="export-box" id="exportSummary">—</div>
+          <div class="callout info" id="selectCallout">Choose a prefab row or custom dimensions.</div>
+          <p class="hint no-print">Use top bar to import sprinkler demand, save result, or print.</p>
+        </section>
+
+        <section class="panel">
+          <h2>Plan diagram</h2>
+          <p class="hint">Plan view of steel tank on concrete pad (similar style to Fire Pump Sizer room plan).</p>
+          <div class="plan-frame" id="planHost"></div>
+          <div class="plan-legend">
+            <span><i class="swatch" style="background:#1e3a8a"></i> Steel tank shell</span>
+            <span><i class="swatch" style="background:#cbd5e1"></i> Concrete pad</span>
+            <span><i class="swatch" style="background:#93c5fd;border-style:dashed"></i> Inner ring (graphic)</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Prefab steel options (US-typical)</h2>
+          <p class="hint">
+            Catalog approximates common bolted / corrugated / reservoir-style steel fire tanks from US product lines
+            (e.g. multi-ring bolted, corrugated panel systems). Sizes are planning nominals — verify with the manufacturer.
+            Filtered by required volume, max height, and max diameter. Click a green/white row to select.
+          </p>
+          <label class="field" style="margin-bottom:0.65rem">
+            <span style="display:flex;align-items:center;gap:0.5rem;font-weight:600;font-size:0.85rem">
+              <input id="useCustom" type="checkbox" style="width:auto;min-height:auto">
+              Use custom diameter &amp; height instead of catalog
+            </span>
+          </label>
+          <div class="field-grid two hidden" id="customFields">
+            <div class="field">
+              <label for="customDiaFt">Custom diameter</label>
+              <div class="row">
+                <input id="customDiaFt" type="number" min="0" step="0.5">
+                <span class="suffix">ft</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="customHtFt">Custom height</label>
+              <div class="row">
+                <input id="customHtFt" type="number" min="0" step="0.5">
+                <span class="suffix">ft</span>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="catalog">
+              <thead>
+                <tr>
+                  <th>Nominal gal</th>
+                  <th class="num">⌀ ft</th>
+                  <th class="num">H ft</th>
+                  <th class="num">Shell gal</th>
+                  <th>Style</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="catalogBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <section class="panel hidden no-print" id="cleanReportPanel">
+      <h2>Clean charette report (preview)</h2>
+      <p class="hint">This is the package that prints / saves. Use <strong>Clean Report</strong> or <strong>Save Report</strong> in the top bar.</p>
+      <div id="cleanReportBody"></div>
+    </section>
+
+    <section class="print-only panel">
+      <div id="reportLogoPrint" class="report-logo-print"></div>
+      <h2>Fire water tank — preliminary sizing report</h2>
+      <p>Version <span id="printVersion">1.0.0-prelim</span> · Not a sealed NFPA 22 design</p>
+      <p><b>Project</b> <span id="printProject">—</span> · <b>Site</b> <span id="printFacility">—</span></p>
+      <p><b>By</b> <span id="printBy">—</span> · <b>Date</b> <span id="printDate">—</span></p>
+      <p><b>Demand</b> <span id="printDemand">—</span></p>
+      <p><b>Required shell</b> <span id="printRequired">—</span></p>
+      <p><b>Selected tank</b> <span id="printTank">—</span></p>
+      <p><b>Concrete pad</b> <span id="printPad">—</span></p>
+      <p><b>Constraints</b> <span id="printConstraints">—</span></p>
+      <p><b>Notes</b> <span id="printNotes">—</span></p>
+      <div id="printPlanHost" class="plan-frame" style="margin-top:1rem"></div>
+    </section>
+
+    <div id="helpModal" class="modal hidden" aria-hidden="true" role="dialog" aria-labelledby="helpTitle">
+      <div class="modal-backdrop" id="helpBackdrop"></div>
+      <div class="modal-card" role="document">
+        <div class="modal-head">
+          <h2 id="helpTitle">Fire Tank Sizer — Help / Input Guide</h2>
+          <button type="button" id="helpClose" class="ghost">Close</button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Purpose:</strong> Preliminary fire water tank sizing from system/pump flow × duration, plus planning safety factors. Select a US-typical prefab steel size under site height/diameter limits, with a concrete pad plan. Not a sealed NFPA 22 design.</p>
+          <p><strong>Path:</strong> Flow Test → Sprinkler Estimator → Fire Pump Sizer → <b>Tank Sizer</b>.</p>
+
+          <h3>Demand inputs</h3>
+          <ul>
+            <li><strong>System / pump flow (GPM):</strong> Usually total fire water demand from the Sprinkler Estimator (or pump duty flow).</li>
+            <li><strong>Duration (min):</strong> Water-supply duration from code/framework (UFC Table 9-4, NFPA 13, FM, project). Imported with sprinkler capture when available.</li>
+            <li><strong>Import Upstream Demand:</strong> Prefers Fire Pump Sizer capture (flow × duration), else Sprinkler Estimator handoff.</li>
+            <li><strong>Import Pump Demand:</strong> Loads Capture for Tank from Fire Pump Sizer.</li>
+            <li><strong>Import Sprinkler:</strong> Loads Capture for Pump Sizer (flow + duration + project fields).</li>
+          </ul>
+
+          <h3>Safety framework scenarios</h3>
+          <ul>
+            <li><strong>NFPA planning (+5% default):</strong> Base = Q×t; small contingency for freeboard/suction planning. Confirm NFPA 22 effective capacity.</li>
+            <li><strong>UFC planning (+10%):</strong> Higher contingency for DoD-style projects; confirm UFC duration/redundancy.</li>
+            <li><strong>FM Global planning (+15%):</strong> More conservative planning; cite governing FM DS.</li>
+            <li><strong>Safety contingency override %:</strong> Blank = use framework default; enter a number to force a custom %.</li>
+            <li><strong>Unusable %:</strong> Increases required shell volume so usable water still meets demand after freeboard/suction allowances.</li>
+          </ul>
+
+          <h3>Site constraints</h3>
+          <ul>
+            <li><strong>Max tank height:</strong> Local zoning / AHJ / aircraft / aesthetic limit. Filters prefab catalog. 0 = no limit.</li>
+            <li><strong>Max diameter:</strong> Site footprint / setbacks. Filters catalog. 0 = no limit.</li>
+            <li><strong>Pad beyond shell:</strong> Concrete pad extends this far past tank diameter on each side (plan diameter = tank ⌀ + 2× beyond).</li>
+            <li><strong>Pad thickness:</strong> Used only for approximate concrete volume (cu yd). Structural design by others.</li>
+          </ul>
+
+          <h3>Prefab catalog &amp; custom</h3>
+          <ul>
+            <li>Rows are typical US bolted/reservoir/standpipe-style steel fire tanks (planning nominals).</li>
+            <li>Green/white rows meet volume + max H + max ⌀. Click to select.</li>
+            <li><strong>Custom diameter &amp; height:</strong> Override catalog with project-specific geometry; capacity from cylinder volume.</li>
+          </ul>
+
+          <h3>Outputs</h3>
+          <ul>
+            <li><strong>Plan diagram:</strong> Tank + concrete pad with dimensions (pump-sizer style).</li>
+            <li><strong>Clean Report:</strong> On-screen preview + print dialog.</li>
+            <li><strong>Save Report:</strong> Downloads HTML report + JSON data files.</li>
+            <li><strong>Save tank handoff:</strong> Stores selection for future tools / records in browser storage.</li>
+          </ul>
+
+          <h3>Scenarios</h3>
+          <ul>
+            <li><strong>Height-limited site:</strong> Set max H low; catalog prefers wider, shorter tanks.</li>
+            <li><strong>Tight footprint:</strong> Set max ⌀; taller options appear if height allows.</li>
+            <li><strong>Long duration (UFC extra / FM):</strong> Import duration from sprinkler app; required shell grows with Q×t and safety %.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-foot no-print">
+      <p>
+        Fire Tank Sizer · Fire Toolshed ·
+        <a href="../">Portal</a> ·
+        <a href="../sprinkler-system-estimator/">Sprinkler Estimator</a> ·
+        <a href="../fire-pump-sizer/">Fire Pump Sizer</a>
+      </p>
+      <p>Preliminary planning only. Tank construction, foundation, anchorage, and effective capacity per NFPA 22 / manufacturer / SE.</p>
+    </footer>
+  </div>
+
+  <script src="../shared/water-path-shell.js"></script>
+  <script src="../shared/report-logo.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>

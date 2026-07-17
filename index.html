@@ -156,41 +156,58 @@
       </div>
     </header>
 
-    <p class="tool-count">4 tools · Pump Sizer · Smoke Exhaust · Flow Test · Sprinkler Estimator</p>
+    <p class="tool-count">
+      <a href="./water-supply/" style="color:var(--blue-900);font-weight:650;text-decoration:none">Water supply path hub</a>
+      — Flow Test → Sprinkler → Pump → Tank (shared shell, tools stay independent) · plus Smoke Exhaust
+    </p>
 
     <section class="grid" aria-label="Available tools">
-      <a class="card" href="./fire-pump-sizer/">
-        <span class="badge">Live</span>
+      <a class="card" href="./water-supply/" id="card-water-hub" style="grid-column:1/-1;min-height:auto;background:linear-gradient(135deg,#eff6ff,#fff)">
+        <span class="badge">Water path</span>
+        <h2>Open water supply path</h2>
+        <p>Light shell across all four tools: step strip, capture status, next-step links. Each calculator still opens alone if you bookmark it.</p>
+        <span class="open">Path hub →</span>
+      </a>
+
+      <a class="card" href="./flow-test-report/" id="card-flow-test">
+        <span class="badge">1 · Live</span>
+        <h2>Flow Test Report</h2>
+        <p>Hydrant static/residual/pitot GPM, N<sup>1.85</sup> supply curve, fire flow @ 20 psi. Capture results for the Sprinkler Estimator (no system demand here).</p>
+        <span class="open">Open tool →</span>
+      </a>
+
+      <a class="card" href="./sprinkler-system-estimator/" id="card-sprinkler">
+        <span class="badge">2 · Live</span>
+        <h2>Sprinkler System Estimator</h2>
+        <p>Prelim demand + pressure stack + duration (NFPA 13 / UFC / FM). Overlay flow-test supply curve; capture duty for Fire Pump Sizer.</p>
+        <span class="open">Open tool →</span>
+      </a>
+
+      <a class="card" href="./fire-pump-sizer/" id="card-pump">
+        <span class="badge">3 · Live</span>
         <h2>Fire Pump Sizer</h2>
-        <p>System hydraulics + hydrant flow test → NFPA 20 / UFC 3-600-01 preliminary pump sizing, drivers, curve, and room estimate.</p>
+        <p>Import sprinkler duty (flow, pressure, duration). NFPA 20 / UFC preliminary pump, driver, curve, and room sizing.</p>
+        <span class="open">Open tool →</span>
+      </a>
+
+      <a class="card" href="./fire-tank-sizer/" id="card-tank">
+        <span class="badge">4 · Live</span>
+        <h2>Fire Tank Sizer</h2>
+        <p>Flow × duration + NFPA/UFC/FM safety, US-typical prefab steel sizes, max H/⌀ limits, concrete pad, plan diagram.</p>
         <span class="open">Open tool →</span>
       </a>
 
       <a class="card" href="./smoke-exhaust-lab/app/" id="card-smoke-exhaust">
         <span class="badge beta">Beta</span>
         <h2>Smoke Exhaust Scenario Lab</h2>
-        <p>Design-fire scenarios, plume/exhaust calculations, makeup air &amp; plugholing checks, Full/Excel modes, and auditable report packages (team testing build).</p>
-        <span class="open">Open tool →</span>
-      </a>
-
-      <a class="card" href="./flow-test-report/" id="card-flow-test">
-        <span class="badge">Live</span>
-        <h2>Flow Test Report</h2>
-        <p>Hydrant flow test calculator, N<sup>1.85</sup> supply curve, NFPA 13 / UFC demand estimates, pump indication, and PDF flow test report.</p>
-        <span class="open">Open tool →</span>
-      </a>
-
-      <a class="card" href="./sprinkler-system-estimator/" id="card-sprinkler">
-        <span class="badge">Live</span>
-        <h2>Sprinkler System Estimator</h2>
-        <p>Preliminary sprinkler demand + pressure stack for charette reports (NFPA 13 / UFC / FM). Feeds Fire Pump Sizer — not a final HW calc.</p>
+        <p>Design-fire scenarios, plume/exhaust calculations, makeup air &amp; plugholing checks, Full/Excel modes, and auditable report packages.</p>
         <span class="open">Open tool →</span>
       </a>
     </section>
 
     <footer>
       <p><strong>For qualified engineers only.</strong> Preliminary tools — not a substitute for stamped design, manufacturer curves, or AHJ approval.</p>
-      <p>Hosted on GitHub Pages · data stays in your browser · portal rev 2026-07-16b</p>
+      <p>Hosted on GitHub Pages · data stays in your browser · portal rev 2026-07-16e · water path shell: Flow → Sprinkler → Pump → Tank</p>
     </footer>
   </div>
 </body>

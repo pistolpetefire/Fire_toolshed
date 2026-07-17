@@ -6,25 +6,27 @@
   <meta name="theme-color" content="#1e3a8a">
   <meta name="description" content="Preliminary sprinkler system demand and pressure estimator for charette / concept design. Not a final Hazen-Williams hydraulic calculation.">
   <title>Sprinkler System Estimator · Fire Toolshed</title>
+  <link rel="stylesheet" href="../shared/water-path-shell.css">
   <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
-  <div class="beta-banner" role="status">
-    <strong>Preliminary planning only</strong>
-    <span>Not a Hazen-Williams final calc. For charette / concept submittals. Verify all values against adopted NFPA 13, UFC 3-600-01, FM Global DS, and project criteria.</span>
-    <a href="../">← Fire Toolshed</a>
-  </div>
+  <div id="waterPathShell" class="no-print"></div>
 
   <div class="shell">
     <header class="top">
       <div>
         <p class="eyebrow">Fire Toolshed</p>
         <h1>Sprinkler System Estimator</h1>
-        <p class="version" id="appVersion">Version 1.0.0-prelim</p>
+        <p class="version" id="appVersion">Version 1.6.0-prelim</p>
       </div>
       <div class="top-actions no-print">
-        <button type="button" id="btnCopyPump" class="primary">Copy for Fire Pump Sizer</button>
-        <button type="button" id="btnPrint">Print charette report</button>
+        <button type="button" id="btnReadme" class="ghost" title="Guidance for every input">Help / Guide</button>
+        <button type="button" id="btnCaptureDemand" class="primary" title="Save flow, pressure, duration, and supply assessment for Fire Pump Sizer">Capture for Pump Sizer</button>
+        <button type="button" id="btnCaptureOpenPump" title="Capture and open Fire Pump Sizer">Capture &amp; Open Pump</button>
+        <button type="button" id="btnCleanReport" title="Open clean charette report and print">Clean Report</button>
+        <button type="button" id="btnSaveReport" title="Download HTML report + JSON project">Save Report</button>
+        <button type="button" id="btnCopyPump" class="ghost">Copy handoff text</button>
+        <button type="button" id="btnPrint" class="ghost">Print</button>
         <button type="button" id="btnReset" class="ghost">Reset</button>
       </div>
     </header>
@@ -37,9 +39,14 @@
         <div class="unit">GPM (prelim)</div>
       </div>
       <div class="metric">
-        <div class="label">Required @ pump discharge</div>
+        <div class="label">System demand pressure</div>
         <div class="value" id="metricPressure">0</div>
         <div class="unit">PSI (prelim)</div>
+      </div>
+      <div class="metric">
+        <div class="label">Duration required</div>
+        <div class="value" id="metricDuration">60</div>
+        <div class="unit">minutes</div>
       </div>
       <div class="metric">
         <div class="label">Elevation loss</div>
@@ -47,7 +54,7 @@
         <div class="unit">PSI</div>
       </div>
       <div class="metric">
-        <div class="label">Remote head residual</div>
+        <div class="label">Remote head required pressure</div>
         <div class="value" id="metricRemote">7</div>
         <div class="unit">PSI min</div>
       </div>
@@ -80,6 +87,20 @@
               <label for="projectNotes">Project notes / AHJ assumptions</label>
               <textarea id="projectNotes" rows="2" placeholder="Edition year, occupancy, AHJ direction, FM account, etc."></textarea>
             </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="reportLogoSource">Report logo</label>
+              <select id="reportLogoSource">
+                <option value="benham">Benham</option>
+                <option value="haskell">Haskell</option>
+                <option value="upload">Upload image…</option>
+              </select>
+              <span class="sub">Appears on print and saved HTML reports. Shared across water-path tools. Replace brand art later under <code>shared/logos/</code>.</span>
+              <div id="reportLogoFileWrap" class="hidden" style="margin-top:0.5rem">
+                <label for="reportLogoFile" class="sub" style="display:block;margin-bottom:0.25rem">Choose logo image</label>
+                <input id="reportLogoFile" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp,image/*" />
+              </div>
+              <div id="reportLogoPreview" style="margin-top:0.5rem;min-height:2rem"></div>
+            </div>
           </div>
         </section>
 
@@ -98,7 +119,7 @@
               <input type="radio" name="mode" value="criteria">
               <div>
                 <b>Criteria-assisted — density / area planning</b>
-                <small>Seed demand from NFPA 13, UFC 3-600-01, or FM Global planning presets, then edit.</small>
+                <small>Seed demand from NFPA 13, UFC 3-600-01, AF Sundown, or FM Global planning presets (wet or dry pipe), then edit.</small>
               </div>
             </label>
           </div>
@@ -135,7 +156,14 @@
               <input type="radio" name="framework" value="ufc">
               <div>
                 <b>UFC 3-600-01</b>
-                <small>Table 9-3 style planning rows (confirm current UFC edition).</small>
+                <small>Full Table 9-3 density/area/K rows (wet &amp; dry · all ceiling heights) + Table 9-4 hose. Confirm adopted edition.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="framework" value="afsundown">
+              <div>
+                <b>AF Sundown</b>
+                <small>Wet only: 0.20 gpm/sf over 5,000 sf · K 8.0 · 130 sf/head. No dry path.</small>
               </div>
             </label>
             <label>
@@ -146,6 +174,27 @@
               </div>
             </label>
           </div>
+
+          <h2 style="margin-top:1.1rem;font-size:1rem">System type</h2>
+          <div class="criteria" style="margin-top:0.5rem">
+            <label>
+              <input type="radio" name="systemType" value="wet" checked>
+              <div>
+                <b>Wet pipe</b>
+                <small>Also covers single-interlock &amp; non-interlock preaction (UFC “wet” column).</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="systemType" value="dry">
+              <div>
+                <b>Dry pipe</b>
+                <small>Also double-interlock preaction &amp; deluge (UFC “dry” column). Design areas increase per code/table.</small>
+              </div>
+            </label>
+          </div>
+          <p class="hint" id="systemTypeHint" style="margin-top:0.5rem">
+            No dry-pipe criteria for AF Sundown or ESFR/storage-type protection. UFC Table 9-3 dry is also N/A for ceiling heights &gt;60–100 ft.
+          </p>
 
           <div class="field" style="margin-top:1rem">
             <label for="presetSelect">Preset</label>
@@ -175,15 +224,40 @@
               </div>
             </div>
             <div class="field">
-              <label for="kFactor">Min K-factor (info)</label>
-              <input id="kFactor" type="number" min="0" step="0.1" value="5.6">
-              <span class="sub">Planning note for UFC rows — demand uses density × area (+ hose).</span>
-            </div>
-            <div class="field">
               <label style="display:flex;align-items:center;gap:0.5rem;margin-top:1.5rem">
                 <input id="includeHose" type="checkbox" checked style="width:auto;min-height:auto">
                 Include hose allowance in total demand
               </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Duration -->
+        <section class="panel" id="durationPanel">
+          <h2>Water-supply duration required</h2>
+          <p class="hint">
+            Auto values: <strong>UFC Table 9-4</strong> (Light/Ordinary 60 min, Extra 90 min);
+            <strong>NFPA 13</strong> typical hazard durations; <strong>FM Global</strong> planning defaults (confirm DS);
+            <strong>AF Sundown</strong> 60 min.
+          </p>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="durationMin">Duration required</label>
+              <div class="row">
+                <input id="durationMin" type="number" min="0" step="5" value="60">
+                <span class="suffix">min</span>
+              </div>
+            </div>
+            <div class="field">
+              <label style="display:flex;align-items:center;gap:0.5rem;margin-top:1.5rem">
+                <input id="durationAuto" type="checkbox" checked style="width:auto;min-height:auto">
+                Auto-set duration from framework table
+              </label>
+              <span class="sub">Uncheck to enter a project-specific duration.</span>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="durationBasis">Duration basis</label>
+              <textarea id="durationBasis" rows="2"></textarea>
             </div>
           </div>
         </section>
@@ -199,7 +273,7 @@
 
         <!-- Elevation & remote -->
         <section class="panel">
-          <h2>Elevation &amp; remote residual</h2>
+          <h2>Elevation &amp; remote head required pressure</h2>
           <div class="field-grid two">
             <div class="field">
               <label for="elevFt">Elevation difference (pump discharge → highest head)</label>
@@ -210,16 +284,58 @@
               <span class="sub">Loss = ft × 0.433 psi/ft</span>
             </div>
             <div class="field">
-              <label for="remotePsi">Min remote sprinkler residual</label>
+              <label for="kFactor">Sprinkler K-factor (if known)</label>
               <div class="row">
-                <input id="remotePsi" type="number" min="0" step="1" value="7">
+                <input id="kFactor" type="number" min="0" step="0.1" value="5.6">
+                <span class="suffix">K</span>
+              </div>
+              <span class="sub">Used with head flow: P = (Q/K)² at the most remote head.</span>
+            </div>
+            <div class="field">
+              <label for="sprinklerCoverageSf">Area per sprinkler (coverage)</label>
+              <div class="row">
+                <input id="sprinklerCoverageSf" type="number" min="0" step="5" value="130">
+                <span class="suffix">sf</span>
+              </div>
+              <span class="sub">For density-area: head flow ≈ density × coverage. Typical 130–225 sf.</span>
+            </div>
+            <div class="field">
+              <label for="remoteHeadGpm">Remote head flow (override)</label>
+              <div class="row">
+                <input id="remoteHeadGpm" type="number" min="0" step="0.5" value="0" placeholder="Auto">
+                <span class="suffix">GPM</span>
+              </div>
+              <span class="sub">Leave 0 to auto-use density × coverage. Enter known head flow to override.</span>
+            </div>
+            <div class="field">
+              <label for="minResidualFloor">Code / listing minimum pressure floor</label>
+              <div class="row">
+                <input id="minResidualFloor" type="number" min="0" step="1" value="7">
                 <span class="suffix">PSI</span>
               </div>
-              <span class="sub">Often 7 psi for standard spray; use listing/K-factor if higher.</span>
+              <span class="sub">Usually 7 psi for standard spray; never go below this when auto-calculating.</span>
+            </div>
+            <div class="field">
+              <label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.35rem">
+                <input id="autoRemoteFromK" type="checkbox" checked style="width:auto;min-height:auto">
+                Auto-set remote head required pressure from K-factor
+              </label>
+              <span class="sub" id="kCalcNote">P = max(floor, (Q<sub>head</sub>/K)²)</span>
+            </div>
+            <div class="field">
+              <label for="remotePsi">Remote head required pressure (used in stack)</label>
+              <div class="row">
+                <input id="remotePsi" type="number" min="0" step="0.1" value="7">
+                <span class="suffix">PSI</span>
+              </div>
+              <span class="sub" id="remotePsiHint">When auto is on, this updates from K and head flow.</span>
             </div>
           </div>
+          <div class="callout info" id="kResultCallout" style="margin-top:0.85rem">
+            K-factor required pressure will appear here when calculated.
+          </div>
           <div class="field" style="margin-top:0.75rem">
-            <label for="remoteBasis">Remote residual basis</label>
+            <label for="remoteBasis">Remote head required pressure basis</label>
             <textarea id="remoteBasis" rows="2"></textarea>
           </div>
         </section>
@@ -287,24 +403,111 @@
       <div class="results-col">
         <section class="panel">
           <h2>Preliminary result</h2>
-          <p class="hint">Use these values as Fire Pump Sizer duty inputs (system flow + pressure at pump discharge).</p>
+          <p class="hint">Capture flow, pressure, and duration into Fire Pump Sizer (browser handoff + clipboard).</p>
           <div class="export-box">
-            <div><strong id="resultFlow">0 GPM</strong> system demand</div>
-            <div style="margin-top:0.35rem"><strong id="resultPressure">0 PSI</strong> at pump discharge (prelim)</div>
+            <div><strong id="resultFlow">0 GPM</strong> system demand flow</div>
+            <div style="margin-top:0.35rem"><strong id="resultPressure">0 PSI</strong> system demand pressure (prelim)</div>
+            <div style="margin-top:0.35rem"><strong id="resultDuration">0 min</strong> duration required</div>
+            <div style="margin-top:0.35rem"><strong id="resultTank">0 gal</strong> prelim tank volume (flow × duration)</div>
             <div style="margin-top:0.5rem;color:var(--muted)" id="resultMode">—</div>
             <p style="margin:0.75rem 0 0;font-size:0.8rem">
-              Pump sizer paste: Flow = <code id="exportFlow">0</code> GPM · Pressure = <code id="exportPressure">0</code> PSI
+              Handoff: Flow = <code id="exportFlow">0</code> GPM · Pressure = <code id="exportPressure">0</code> PSI · Duration = <code id="exportDuration">0</code> min
             </p>
           </div>
           <div class="callout info">
-            Next tools: paste into <strong>Fire Pump Sizer</strong> for room/driver sizing; later use demand duration × flow for a <strong>fire tank</strong> estimator.
+            <strong>Path:</strong> load flow test (Step 1) → set demand &amp; duration here →
+            <strong>Capture for Pump Sizer</strong> (Step 3) → <a href="../fire-tank-sizer/">Tank Sizer</a> (Step 4: flow × duration + safety).
+            Top bar: Clean Report for print package.
           </div>
+        </section>
+
+        <section class="panel hidden no-print" id="cleanReportPanel">
+          <h2>Clean charette report (preview)</h2>
+          <p class="hint">This summary is what prints. Use the browser print dialog (or Clean Report) for a PDF/hard copy.</p>
+          <div id="cleanReportBody"></div>
         </section>
 
         <section class="panel">
           <h2>Pressure stack breakdown</h2>
           <p class="hint">Each line is an explicit, reviewable allowance.</p>
           <div class="breakdown" id="breakdownList"></div>
+        </section>
+
+        <!-- Flow test supply curve -->
+        <section class="panel" id="flowTestPanel">
+          <h2>Water supply — flow test curve</h2>
+          <p class="hint">
+            Load a capture from <strong>Flow Test Report</strong> (Step 1) — or enter hydrant data — and plot the N<sup>1.85</sup> supply curve against this estimator’s system demand point.
+          </p>
+          <div class="field-grid two">
+            <div class="field" style="grid-column:1/-1">
+              <label style="display:flex;align-items:center;gap:0.5rem">
+                <input id="flowTestEnabled" type="checkbox" style="width:auto;min-height:auto">
+                Include flow test supply curve on results &amp; report
+              </label>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <div class="btn-row">
+                <button type="button" id="btnLoadFlowTest" class="primary">Use saved flow test</button>
+                <button type="button" id="btnClearFlowTest" class="ghost">Clear</button>
+                <a class="ghost-link" href="../flow-test-report/">Open Flow Test Report →</a>
+              </div>
+              <span class="sub" id="flowTestStatus">No flow test loaded. In Flow Test Report click “Capture for Sprinkler Estimator”, then load it here.</span>
+            </div>
+            <div class="field">
+              <label for="ftStatic">Static pressure</label>
+              <div class="row">
+                <input id="ftStatic" type="number" min="0" step="1" value="0">
+                <span class="suffix">PSI</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="ftResidual">Residual at test flow</label>
+              <div class="row">
+                <input id="ftResidual" type="number" min="0" step="1" value="0">
+                <span class="suffix">PSI</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="ftFlow">Flow at residual</label>
+              <div class="row">
+                <input id="ftFlow" type="number" min="0" step="10" value="0">
+                <span class="suffix">GPM</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="ftMinResidual">Min residual reference</label>
+              <div class="row">
+                <input id="ftMinResidual" type="number" min="0" step="1" value="20">
+                <span class="suffix">PSI</span>
+              </div>
+              <span class="sub">Reference line only (often 20 psi). Not the sprinkler demand.</span>
+            </div>
+          </div>
+
+          <div id="supplyCurveWrap" class="supply-curve-wrap hidden">
+            <div class="callout info" id="supplyAssessment" style="margin-top:0.85rem"></div>
+            <div class="chart-frame" aria-label="Water supply curve graph">
+              <svg id="supplyCurveSvg" viewBox="0 0 640 320" role="img" aria-labelledby="supplyCurveTitle">
+                <title id="supplyCurveTitle">Hydrant supply curve N^1.85 with system demand point</title>
+              </svg>
+            </div>
+            <p class="hint" style="margin-top:0.5rem">
+              Horizontal axis is hydraulic flow scale (Q<sup>1.85</sup>). Legend defines supply curve and demand point.
+            </p>
+            <h3 class="subhead">Supply / demand chart</h3>
+            <table class="loss-table" id="supplyChartTable">
+              <thead>
+                <tr>
+                  <th>Point</th>
+                  <th>Flow (GPM)</th>
+                  <th>Pressure (PSI)</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody id="supplyChartTableBody"></tbody>
+            </table>
+          </div>
         </section>
 
         <section class="panel">
@@ -319,11 +522,12 @@
       </div>
     </div>
 
-    <!-- Print package -->
+    <!-- Print package (clean report) -->
     <section class="print-only print-header">
-      <p class="eyebrow">Fire Toolshed · Preliminary</p>
-      <h1>Sprinkler System Estimate — Charette Report</h1>
-      <p>Version <span id="printVersion">1.0.0-prelim</span> · Not a final hydraulic calculation</p>
+      <div id="reportLogoPrint" class="report-logo-print"></div>
+      <p class="eyebrow">Fire Toolshed · Preliminary Charette Report</p>
+      <h1>Sprinkler System Demand Estimate</h1>
+      <p>Version <span id="printVersion">1.6.0-prelim</span> · Not a final Hazen-Williams hydraulic calculation</p>
     </section>
     <section class="print-only print-meta">
       <div><b>Project</b> <span id="printProject">—</span></div>
@@ -331,15 +535,30 @@
       <div><b>Prepared by</b> <span id="printBy">—</span></div>
       <div><b>Date</b> <span id="printDate">—</span></div>
       <div><b>Framework</b> <span id="printFramework">—</span></div>
+      <div><b>System type</b> <span id="printSystemType">—</span></div>
       <div><b>Mode</b> <span id="printMode">—</span></div>
       <div><b>Preset</b> <span id="printPreset">—</span></div>
-      <div><b>Result</b> <span id="printFlow">—</span> @ <span id="printPressure">—</span></div>
     </section>
     <section class="print-only panel">
-      <h2>Project notes</h2>
+      <h2>System demand summary</h2>
+      <table class="loss-table">
+        <tbody>
+          <tr><td>System demand flow</td><td class="num" id="printFlow">—</td></tr>
+          <tr><td>Sprinkler-only flow</td><td class="num" id="printSprinklerOnly">—</td></tr>
+          <tr><td>Hose allowance</td><td class="num" id="printHose">—</td></tr>
+          <tr><td>System demand pressure</td><td class="num" id="printPressure">—</td></tr>
+          <tr><td>Duration required</td><td class="num" id="printDuration">—</td></tr>
+          <tr><td>Prelim tank volume (flow × duration)</td><td class="num" id="printTank">—</td></tr>
+        </tbody>
+      </table>
+      <h2 style="margin-top:1rem">Project notes</h2>
       <p id="printNotes">—</p>
       <h2 style="margin-top:1rem">Demand basis</h2>
       <p id="printDemandBasis">—</p>
+      <h2 style="margin-top:1rem">Duration basis</h2>
+      <p id="printDurationBasis">—</p>
+      <h2 style="margin-top:1rem">Remote head required pressure basis</h2>
+      <p id="printRemoteBasis">—</p>
       <h2 style="margin-top:1rem">Loss methodology</h2>
       <p id="printLossBasis">—</p>
       <h2 style="margin-top:1rem">Pressure stack</h2>
@@ -347,6 +566,31 @@
         <thead><tr><th>Component</th><th>Basis</th><th>PSI</th></tr></thead>
         <tbody id="printBreakdown"></tbody>
       </table>
+
+      <div id="printSupplySection" class="print-supply-section" style="display:none;margin-top:1.25rem">
+        <h2>Water supply curve (flow test) vs system demand</h2>
+        <p id="printSupplyMeta" class="hint">—</p>
+        <div class="chart-frame print-chart">
+          <div id="printSupplySvgHost"></div>
+        </div>
+        <table class="loss-table" style="margin-top:0.75rem">
+          <thead>
+            <tr>
+              <th>Point</th>
+              <th>Flow (GPM)</th>
+              <th>Pressure (PSI)</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="printSupplyTableBody"></tbody>
+        </table>
+        <p id="printSupplyAssessment" class="hint" style="margin-top:0.5rem"></p>
+      </div>
+
+      <p class="hint" style="margin-top:1rem">
+        This report is for charette / concept discussion only. Verify all values against the adopted code edition,
+        project specifications, and AHJ direction before design or construction use.
+      </p>
       <div class="sig-lines">
         <div>Prepared by / date</div>
         <div>Reviewed by (FPE) / date</div>
@@ -366,6 +610,86 @@
     </footer>
   </div>
 
+  <!-- README / input guide modal -->
+  <div id="readmeModal" class="modal hidden" aria-hidden="true" role="dialog" aria-labelledby="readmeTitle">
+    <div class="modal-backdrop" id="readmeBackdrop"></div>
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h2 id="readmeTitle">Sprinkler Estimator — README / Input Guide</h2>
+        <button type="button" id="readmeClose" class="ghost" aria-label="Close guide">Close</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Purpose:</strong> Preliminary / charette sprinkler demand + pressure stack for AHJ discussion. Not a final Hazen-Williams calc.</p>
+        <p><strong>Path:</strong> Flow Test → <b>Sprinkler Estimator</b> → Fire Pump Sizer → Tank Sizer.</p>
+        <p><strong>Save Report</strong> downloads an HTML report and a JSON project snapshot. <strong>Clean Report</strong> opens the print package.</p>
+
+        <h3>Estimate mode</h3>
+        <ul>
+          <li><strong>Simple — manual system demand:</strong> Enter total GPM when you already have a planning or hydraulic total.</li>
+          <li><strong>Criteria-assisted:</strong> Seed density, design area, hose, K, and duration from NFPA 13, UFC 3-600-01, AF Sundown, or FM Global presets, then edit.</li>
+        </ul>
+
+        <h3>Criteria framework</h3>
+        <ul>
+          <li><strong>NFPA 13:</strong> Density-area light / ordinary / extra. Dry uses +30% design area (typical dry/double-interlock rule).</li>
+          <li><strong>UFC 3-600-01:</strong> Full Table 9-3 density/area/K by hazard, wet/dry, ceiling height. Hose from Table 9-4. High bay (&gt;60–100 ft) uses 12 sprinklers @ 7 psi, K25.2 (wet only).</li>
+          <li><strong>AF Sundown:</strong> Fixed wet criteria 0.20 gpm/sf over 5,000 sf, K8.0, 130 sf/head. No dry path.</li>
+          <li><strong>FM Global:</strong> Planning placeholders — cite the actual DS. Storage/ESFR wet only.</li>
+        </ul>
+
+        <h3>System type</h3>
+        <ul>
+          <li><strong>Wet pipe:</strong> Also single-interlock / non-interlock preaction (UFC “wet” column).</li>
+          <li><strong>Dry pipe:</strong> Also double-interlock preaction / deluge (UFC “dry” column). Larger design areas where table requires. Not available for AF Sundown or ESFR/storage.</li>
+        </ul>
+
+        <h3>Demand inputs</h3>
+        <ul>
+          <li><strong>Density / design area:</strong> Sprinkler demand = density × area (unless high-bay heads mode).</li>
+          <li><strong>Hose allowance:</strong> Inside/outside hose stream GPM added when checkbox is on.</li>
+          <li><strong>K-factor / coverage / remote head flow:</strong> Used to compute remote head required pressure P = (Q/K)², floored by code minimum (often 7 psi).</li>
+          <li><strong>Elevation:</strong> Static head = feet × 0.433 psi/ft from pump discharge datum to highest head.</li>
+          <li><strong>Backflow / equipment losses:</strong> Planning lump-sum pressure losses — not pipe-by-pipe HW.</li>
+          <li><strong>Safety margin:</strong> Explicit charette contingency in psi.</li>
+        </ul>
+
+        <h3>Duration required (minutes)</h3>
+        <ul>
+          <li><strong>UFC Table 9-4:</strong> Light &amp; Ordinary = <strong>60 min</strong>; Extra = <strong>90 min</strong>.</li>
+          <li><strong>NFPA 13 (typical):</strong> Light 30; OH-1 60; OH-2 90; EH-1 90; EH-2 120 (confirm adopted edition — some values are ranges).</li>
+          <li><strong>FM Global (planning):</strong> Ordinary/general 60; Extra 90; Storage/ESFR 90 (confirm governing DS — may be longer).</li>
+          <li><strong>AF Sundown:</strong> 60 min planning default.</li>
+          <li>Uncheck <em>Auto-set duration</em> to enter a project-specific value. Duration × flow ≈ prelim tank gallons.</li>
+        </ul>
+
+        <h3>Water supply — flow test curve</h3>
+        <ul>
+          <li><strong>Use saved flow test:</strong> Loads the last Flow Test Report save (static, residual, flow @ residual) from this browser.</li>
+          <li><strong>Supply curve:</strong> P = P<sub>static</sub> − (P<sub>static</sub>−P<sub>residual</sub>)×(Q/Q<sub>test</sub>)<sup>1.85</sup> on an N<sup>1.85</sup> flow scale.</li>
+          <li><strong>Demand point:</strong> This estimator’s system demand flow @ system demand pressure.</li>
+          <li>Graph + table appear on screen and on the Clean Report when enabled.</li>
+        </ul>
+
+        <h3>Outputs &amp; handoff</h3>
+        <ul>
+          <li><strong>System demand flow / pressure:</strong> Prelim duty at pump (for Fire Pump Sizer).</li>
+          <li><strong>Capture for Pump Sizer:</strong> Saves flow, pressure, duration, and basis to browser storage and copies a text handoff. Open Fire Pump Sizer → Import Sprinkler Demand.</li>
+          <li><strong>Clean Report:</strong> Print-ready charette package with summary, bases, pressure stack, and supply/demand graph when a flow test is loaded.</li>
+          <li><strong>Save Report:</strong> Downloads HTML report + JSON project snapshot to your computer.</li>
+        </ul>
+
+        <h3>Limitations</h3>
+        <ul>
+          <li>No node-by-node Hazen-Williams analysis or remote-area proof.</li>
+          <li>Presets are starting points — cite adopted edition, tables, and AHJ direction.</li>
+          <li>Sloped-ceiling +30% area (UFC when slope &gt; 2:12) is not auto-applied; increase design area manually if required.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/water-path-shell.js"></script>
+  <script src="../shared/report-logo.js"></script>
   <script src="./assets/app.js"></script>
 </body>
 </html>

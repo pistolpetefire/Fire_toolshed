@@ -6,3 +6,7 @@ Thumbs.db
 node_modules/
 .env
 .env.*
+
+# Generated e2e artifacts
+validation/e2e-out/
+

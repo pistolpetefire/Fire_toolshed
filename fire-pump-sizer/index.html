@@ -14,9 +14,11 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="../shared/water-path-shell.css">
   <link rel="stylesheet" href="./assets/styles.css?v=2.1.0">
 </head>
 <body>
+  <div id="waterPathShell" class="no-print"></div>
   <header class="site-header">
     <div class="header-inner">
       <div class="brand">
@@ -43,6 +45,12 @@
           </label>
         </div>
 
+        <button type="button" id="btnHelp" class="btn btn-sm" title="Help for every input and scenario">
+          Help / Guide
+        </button>
+        <button type="button" id="btnSaveReport" class="btn btn-sm" title="Download HTML report + JSON data">
+          Save Report
+        </button>
         <button type="button" id="btnDoD" class="btn btn-sm" title="Load DoD example project">
           Load DoD Example
         </button>
@@ -55,6 +63,25 @@
 
   <main class="container">
     <input id="projectName" class="project-name" type="text" value="DoD Facility - System Hydraulic Results" placeholder="Project name" autocomplete="off" spellcheck="false">
+
+    <section class="card" style="margin-bottom:1rem;padding:0.85rem 1rem">
+      <div class="grid-3" style="align-items:end;gap:0.75rem">
+        <div class="field" style="margin:0">
+          <label for="reportLogoSource">Report logo</label>
+          <select id="reportLogoSource" class="inline-select" style="width:100%;border:1px solid var(--slate-300);border-radius:0.75rem;padding:0.5rem 0.75rem">
+            <option value="benham">Benham</option>
+            <option value="haskell">Haskell</option>
+            <option value="upload">Upload image…</option>
+          </select>
+          <p class="tiny" style="margin:0.35rem 0 0">On Save Report HTML. Shared across water-path tools. Replace art later in <code>shared/logos/</code>.</p>
+        </div>
+        <div id="reportLogoFileWrap" class="field hidden" style="margin:0">
+          <label for="reportLogoFile">Upload image</label>
+          <input id="reportLogoFile" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp,image/*" style="width:100%;font-size:0.8rem">
+        </div>
+        <div id="reportLogoPreview" style="min-height:2rem;display:flex;align-items:center"></div>
+      </div>
+    </section>
 
     <!-- Live summary -->
     <section class="metrics" aria-label="Live results summary">
@@ -101,11 +128,22 @@
       <section class="card">
         <div class="card-head">
           <h2 class="card-title"><span class="icon" aria-hidden="true">∑</span> System Hydraulic Results + Water Supply</h2>
+          <button type="button" id="btnImportSprinkler" class="btn btn-sm btn-primary" title="Import flow, pressure, duration, and supply curve from Sprinkler System Estimator">Import Sprinkler Demand</button>
           <button type="button" id="btnSimplified" class="btn btn-sm" title="Override flow and pressure from the simplified hazard calculator below">Use Simplified Demand</button>
+          <button type="button" id="btnCaptureTank" class="btn btn-sm" title="Save flow × duration for Fire Tank Sizer">Capture for Tank</button>
+          <button type="button" id="btnCaptureTankOpen" class="btn btn-sm btn-primary" title="Capture and open Fire Tank Sizer">Capture &amp; Open Tank</button>
         </div>
-        <p class="tiny" style="margin:-0.5rem 0 1rem">Primary duty inputs. <strong>Use Simplified Demand</strong> overwrites both fields from the hazard calculator results below.</p>
+        <p class="tiny" style="margin:-0.5rem 0 1rem">
+          <strong>Step 3 · Water supply path:</strong> use the shared strip above, or work this page alone.
+          <strong>Import Sprinkler Demand</strong> loads flow, pressure, duration, hydrant test, and available PSI (N<sup>1.85</sup>).
+          <strong>Capture for Tank</strong> saves flow × duration for <a href="../fire-tank-sizer/">Fire Tank Sizer</a>.
+          <strong>Use Simplified Demand</strong> overwrites from the hazard calculator below.
+        </p>
+        <div id="sprinklerHandoffBanner" class="status-row hidden" style="margin-bottom:0.85rem">
+          <div id="sprinklerHandoffStatus" class="badge" aria-live="polite"></div>
+        </div>
 
-        <div class="grid-2">
+        <div class="grid-3">
           <div class="field">
             <label for="systemFlow">Required Flow at Pump (from hydraulic calc)</label>
             <div class="input-row">
@@ -114,11 +152,19 @@
             </div>
           </div>
           <div class="field">
-            <label for="systemPressure">Required Pressure at Pump Discharge Flange</label>
+            <label for="systemPressure">System Demand Pressure / Required at Pump</label>
             <div class="input-row">
               <input type="number" id="systemPressure" value="95" step="1" inputmode="decimal" class="engineering-input">
               <span class="suffix">PSI</span>
             </div>
+          </div>
+          <div class="field">
+            <label for="systemDuration">Duration Required (from sprinkler / code table)</label>
+            <div class="input-row">
+              <input type="number" id="systemDuration" value="60" step="5" min="0" inputmode="decimal" class="engineering-input">
+              <span class="suffix">min</span>
+            </div>
+            <p class="tiny" id="systemDurationBasis" style="margin:0.35rem 0 0">For tank sizing and water-supply documentation. Imported from Sprinkler Estimator when captured.</p>
           </div>
         </div>
       </section>
@@ -372,12 +418,15 @@
       <div>References: NFPA 20 &amp; UFC 3-600-01. For qualified Fire Protection Engineers only. · v2.0 · Local browser app</div>
       <div class="footer-actions">
         <button type="button" id="btnCopy" class="btn btn-sm">Copy Results</button>
+        <button type="button" id="btnSaveReportFooter" class="btn btn-sm">Save Report</button>
         <button type="button" id="btnReset" class="btn btn-sm">Reset</button>
       </div>
     </footer>
   </main>
 
   <!-- Chart first, then app (defensive if Chart fails to load). ?v= busts old service-worker cache. -->
+  <script src="../shared/water-path-shell.js"></script>
+  <script src="../shared/report-logo.js"></script>
   <script src="./assets/chart.umd.min.js?v=2.1.0"></script>
   <script src="./assets/app.js?v=2.1.0"></script>
 </body>

@@ -2,14 +2,20 @@
 
 Browser-based engineering calculators for team use. Hosted with **GitHub Pages**.
 
-## Live tools
+## Water supply tool path
+
+**[Path hub](./water-supply/)** — light shell overview (steps + capture status). Shared chrome (`shared/water-path-shell.js`) appears on every water tool; each app still works alone if bookmarked.
+
+1. **[Flow Test Report](./flow-test-report/)** — Hydrant static/residual/pitot GPM, N^1.85 supply curve, fire flow @ 20 psi. Capture for Sprinkler Estimator (no system demand).
+2. **[Sprinkler System Estimator](./sprinkler-system-estimator/)** — Prelim demand, pressure stack, duration (NFPA 13 / UFC / FM). Overlay flow-test curve; capture duty for pump sizer.
+3. **[Fire Pump Sizer](./fire-pump-sizer/)** — Import sprinkler flow/pressure/duration; NFPA 20 / UFC preliminary pump, driver, room.
+4. **[Fire Tank Sizer](./fire-tank-sizer/)** — Tank volume ≈ system/pump flow × duration + NFPA/UFC/FM safety; prefab steel catalog; max height/diameter; concrete pad plan.
+
+## Other tools
 
 | Tool | Path |
 |------|------|
-| [Fire Pump Sizer](./fire-pump-sizer/) | NFPA 20 / UFC preliminary pump sizing |
 | [Smoke Exhaust Scenario Lab](./smoke-exhaust-lab/app/) | Beta smoke exhaust scenarios (team testing package) |
-| [Flow Test Report](./flow-test-report/) | Hydrant flow test + supply curve + pump indication + PDF |
-| [Sprinkler System Estimator](./sprinkler-system-estimator/) | Preliminary sprinkler demand + pressure stack for charette / pump sizer |
 
 ## Local test
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Fire Toolshed water supply path — Flow Test → Sprinkler Estimator → Fire Pump Sizer → Tank Sizer. Tools work alone or as a chain.">
+  <title>Water Supply Path · Fire Toolshed</title>
+  <link rel="stylesheet" href="../shared/water-path-shell.css">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: #f8fafc;
+      color: #0f172a;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .hub-foot {
+      margin-top: 1.75rem;
+      font-size: 0.78rem;
+      color: #64748b;
+      line-height: 1.45;
+    }
+    .hub-foot a { color: #1e3a8a; font-weight: 600; }
+    .hub-points {
+      margin: 1.25rem 0 0;
+      padding: 0.9rem 1rem;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.85rem;
+      font-size: 0.88rem;
+      color: #334155;
+    }
+    .hub-points ul { margin: 0.4rem 0 0; padding-left: 1.15rem; }
+    .hub-points li { margin: 0.25rem 0; }
+  </style>
+</head>
+<body>
+  <div id="waterPathShell"></div>
+
+  <main class="wps-hub">
+    <h1>Water supply path</h1>
+    <p class="lead">
+      Four browser tools that share captures when you want a full chain — and still open cleanly on their own for field or charette work.
+      Data stays in this browser (<code>localStorage</code>). No account required.
+    </p>
+
+    <div class="wps-hub-grid" id="hubCards" aria-label="Water path tools"></div>
+
+    <div class="hub-points">
+      <strong>How the light shell works</strong>
+      <ul>
+        <li><strong>Shared chrome</strong> — same step strip and capture pills on every water tool.</li>
+        <li><strong>Project name</strong> — enter once in the shell; it follows all four steps and report captures.</li>
+        <li><strong>Independent use</strong> — bookmark any step; skip imports and enter numbers manually.</li>
+        <li><strong>Handoffs</strong> — Capture / Capture &amp; Open writes the next tool’s input when you need synergy.</li>
+        <li><strong>Reports</strong> — Benham / Haskell / upload logo is shared across the path.</li>
+      </ul>
+    </div>
+
+    <p class="hub-foot">
+      <a href="../">← All engineering tools</a>
+      · Preliminary only — not stamped design or AHJ approval.
+    </p>
+  </main>
+
+  <script src="../shared/water-path-shell.js"></script>
+  <script>
+    (function () {
+      var shell = window.FireToolshedShell;
+      if (!shell) return;
+      shell.mount({ step: "hub", base: ".." });
+
+      var host = document.getElementById("hubCards");
+      if (!host) return;
+      host.innerHTML = shell.STEPS.map(function (s) {
+        return (
+          '<a class="wps-hub-card" href="../' +
+          s.path +
+          '">' +
+          '<span class="n">Step ' +
+          s.n +
+          "</span>" +
+          "<h2>" +
+          s.title +
+          "</h2>" +
+          "<p>" +
+          s.blurb +
+          "</p>" +
+          '<span class="go">Open →</span>' +
+          "</a>"
+        );
+      }).join("");
+    })();
+  </script>
+</body>
+</html>

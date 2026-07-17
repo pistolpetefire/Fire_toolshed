@@ -6,7 +6,13 @@
   'use strict';
 
   const STORAGE_KEY = 'firePumpSizer.v1';
-  const APP_VERSION = '2.1.0';
+  /** Shared handoff from Sprinkler System Estimator */
+  const SPRINKLER_HANDOFF_KEY = 'fireToolshed.sprinklerHandoff.v1';
+  /** Shared handoff to Fire Tank Sizer */
+  const PUMP_HANDOFF_KEY = 'fireToolshed.pumpHandoff.v1';
+  const APP_VERSION = '2.3.0';
+  /** NFPA 291 / water-supply curve exponent (matches Flow Test + Sprinkler apps) */
+  const SUPPLY_EXPONENT = 1.85;
 
   const hazardClasses = [
     { id: 'light', name: 'Light Hazard (Offices, Barracks)', suggestedDensity: 0.10, typicalDesignArea: 1500, hoseAllowance: 250, typicalPressurePSI: 70 },
@@ -104,6 +110,183 @@
     scheduleSave();
   }
 
+  function readSprinklerHandoff() {
+    try {
+      const raw = localStorage.getItem(SPRINKLER_HANDOFF_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (!data || typeof data !== 'object') return null;
+      if (!(Number(data.flowGpm) > 0) || !(Number(data.pressurePsi) > 0)) return null;
+      return data;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function updateSprinklerHandoffBanner() {
+    const data = readSprinklerHandoff();
+    const banner = $('sprinklerHandoffBanner');
+    const status = $('sprinklerHandoffStatus');
+    if (!banner || !status) return;
+    if (!data) {
+      banner.classList.add('hidden');
+      return;
+    }
+    banner.classList.remove('hidden');
+    const when = data.capturedAt ? new Date(data.capturedAt).toLocaleString() : 'recently';
+    const sa = data.supplyAssessment;
+    const supplyBit =
+      sa && sa.status
+        ? ` · supply ${sa.status}${Number.isFinite(Number(sa.marginPsi)) ? ` (margin ${Number(sa.marginPsi).toFixed(1)} psi)` : ''}`
+        : '';
+    status.textContent =
+      `Sprinkler capture ready: ${Math.round(data.flowGpm)} GPM @ ${Number(data.pressurePsi).toFixed(1)} PSI · ${Math.round(data.durationMin || 0)} min${supplyBit} (${when})`;
+    status.className = 'badge badge-info';
+  }
+
+  /** Import flow, pressure, duration (+ supply curve) from Sprinkler System Estimator capture. */
+  function importSprinklerDemand() {
+    const data = readSprinklerHandoff();
+    if (!data) {
+      toast('No sprinkler capture found. Open Sprinkler System Estimator and click “Capture for Pump Sizer”.');
+      updateSprinklerHandoffBanner();
+      return;
+    }
+
+    if ($('systemFlow')) $('systemFlow').value = Math.round(Number(data.flowGpm));
+    if ($('systemPressure')) $('systemPressure').value = Number(data.pressurePsi).toFixed(1);
+    if ($('systemDuration')) $('systemDuration').value = Math.round(Number(data.durationMin) || 60);
+    if ($('systemDurationBasis')) {
+      $('systemDurationBasis').textContent =
+        data.durationBasis ||
+        data.frameworkLabel ||
+        'Imported from Sprinkler System Estimator.';
+    }
+    if (data.projectName && $('projectName') && !$('projectName').value) {
+      $('projectName').value = data.projectName;
+    }
+
+    // Hydrant test from sprinkler handoff (flowTest snapshot or supplyAssessment)
+    const ft = data.flowTest || null;
+    const sa = data.supplyAssessment || null;
+    if (ft && Number(ft.staticPsi) > 0 && Number(ft.residualPsi) > 0 && Number(ft.flowGpm) > 0) {
+      if ($('hydrantStatic')) $('hydrantStatic').value = Number(ft.staticPsi);
+      if ($('hydrantResidual')) $('hydrantResidual').value = Number(ft.residualPsi);
+      if ($('hydrantFlow')) $('hydrantFlow').value = Math.round(Number(ft.flowGpm));
+    } else if (sa && Number(sa.testStatic) > 0 && Number(sa.testResidual) > 0 && Number(sa.testFlow) > 0) {
+      if ($('hydrantStatic')) $('hydrantStatic').value = Number(sa.testStatic);
+      if ($('hydrantResidual')) $('hydrantResidual').value = Number(sa.testResidual);
+      if ($('hydrantFlow')) $('hydrantFlow').value = Math.round(Number(sa.testFlow));
+    }
+
+    // Prefer sprinkler's N^1.85 available residual when demand matches
+    if (sa && Number.isFinite(Number(sa.availablePsi))) {
+      window.__sprinklerSupplyAssessment = {
+        availablePsi: Number(sa.availablePsi),
+        demandGpm: Number(sa.demandGpm != null ? sa.demandGpm : data.flowGpm),
+        demandPsi: Number(sa.demandPsi != null ? sa.demandPsi : data.pressurePsi),
+        marginPsi: Number(sa.marginPsi),
+        status: sa.status || '',
+        netBoostPsi: Number(sa.netBoostPsi != null ? sa.netBoostPsi : Math.max(0, -(sa.marginPsi || 0))),
+      };
+    } else {
+      window.__sprinklerSupplyAssessment = null;
+    }
+
+    ['systemFlow', 'systemPressure', 'systemDuration', 'hydrantStatic', 'hydrantFlow', 'hydrantResidual'].forEach((id) => {
+      const el = $(id);
+      if (!el) return;
+      el.style.transition = 'box-shadow 0.3s, border-color 0.3s';
+      el.style.borderColor = '#1e3a8a';
+      el.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.2)';
+      setTimeout(() => {
+        el.style.boxShadow = '';
+        el.style.borderColor = '';
+      }, 1600);
+    });
+
+    calculateAll();
+    calculateSupplyCurve(true);
+    switchTab(0);
+    scheduleSave();
+    updateSprinklerHandoffBanner();
+    const supplyNote =
+      sa && sa.status
+        ? ` · supply ${sa.status}${Number.isFinite(Number(sa.availablePsi)) ? ` (avail ${Number(sa.availablePsi).toFixed(1)} psi)` : ''}`
+        : '';
+    toast(
+      `Imported sprinkler demand: ${Math.round(data.flowGpm)} GPM @ ${Number(data.pressurePsi).toFixed(1)} PSI · ${Math.round(data.durationMin || 0)} min${supplyNote}`
+    );
+  }
+
+  function sharedProjectName(fallback) {
+    const local = String(fallback != null ? fallback : $('projectName')?.value || '').trim();
+    if (window.FireToolshedShell?.getProjectName) {
+      const shared = String(window.FireToolshedShell.getProjectName() || '').trim();
+      if (shared) {
+        if (local && local !== shared) {
+          window.FireToolshedShell.saveProject?.({ projectName: local });
+          return local;
+        }
+        return shared;
+      }
+    }
+    if (local) window.FireToolshedShell?.saveProject?.({ projectName: local });
+    return local;
+  }
+
+  /** Capture flow + duration (+ duty) for Fire Tank Sizer. */
+  function captureForTankSizer(openNext) {
+    const flowGpm = num('systemFlow');
+    const durationMin = num('systemDuration');
+    const pressurePsi = num('systemPressure');
+    if (!(flowGpm > 0) || !(durationMin > 0)) {
+      toast('Enter system flow and duration before capturing for Tank Sizer.');
+      return false;
+    }
+    const projectName = sharedProjectName($('projectName')?.value);
+    if (projectName && $('projectName') && !$('projectName').value.trim()) {
+      $('projectName').value = projectName;
+    }
+    const payload = {
+      source: 'fire-pump-sizer',
+      version: APP_VERSION,
+      capturedAt: new Date().toISOString(),
+      projectName: projectName || '',
+      flowGpm: Math.round(flowGpm),
+      durationMin: Math.round(durationMin),
+      pressurePsi: Math.round(pressurePsi * 10) / 10,
+      ratedGPM: num('ratedGPM') || null,
+      ratedPSI: num('ratedPSI') || null,
+      availablePSI:
+        window.calculatedData && Number.isFinite(window.calculatedData.availablePSI)
+          ? window.calculatedData.availablePSI
+          : null,
+      netPumpPSI:
+        window.calculatedData && Number.isFinite(window.calculatedData.netPumpPSI)
+          ? window.calculatedData.netPumpPSI
+          : null,
+      supplyStatus: (window.calculatedData && window.calculatedData.supplyStatus) || '',
+      durationBasis: $('systemDurationBasis')?.textContent || '',
+    };
+    try {
+      localStorage.setItem(PUMP_HANDOFF_KEY, JSON.stringify(payload));
+    } catch (_) {
+      toast('Could not save pump handoff to browser storage');
+      return false;
+    }
+    toast(
+      `Captured for Tank Sizer: ${payload.flowGpm} GPM × ${payload.durationMin} min` +
+        (openNext ? ' — opening Tank Sizer…' : '')
+    );
+    if (openNext) {
+      setTimeout(() => {
+        window.location.href = '../fire-tank-sizer/';
+      }, 350);
+    }
+    return true;
+  }
+
   /** Override primary system flow + pressure from simplified calculator results. */
   function useSimplifiedDemand() {
     const panel = $('simplifiedDemandPanel');
@@ -182,6 +365,7 @@
       ufcMode: !!$('ufcToggle')?.checked,
       systemFlow: $('systemFlow')?.value,
       systemPressure: $('systemPressure')?.value,
+      systemDuration: $('systemDuration')?.value,
       hydrantStatic: $('hydrantStatic')?.value,
       hydrantFlow: $('hydrantFlow')?.value,
       hydrantResidual: $('hydrantResidual')?.value,
@@ -218,6 +402,7 @@
       assign('projectName', s.projectName);
       assign('systemFlow', s.systemFlow);
       assign('systemPressure', s.systemPressure);
+      assign('systemDuration', s.systemDuration);
       assign('hydrantStatic', s.hydrantStatic);
       assign('hydrantFlow', s.hydrantFlow);
       assign('hydrantResidual', s.hydrantResidual);
@@ -331,6 +516,77 @@
     scheduleSave();
   }
 
+  /**
+   * Available residual on hydrant supply curve at flow Q (NFPA 291 N^1.85):
+   *   P(Q) = Pstatic − (Pstatic − Presidual) × (Q / Qtest)^1.85
+   */
+  function supplyPressureN185(staticPsi, residualPsi, testFlowGpm, qGpm) {
+    const st = Math.max(0, staticPsi);
+    const res = Math.max(0, residualPsi);
+    const qTest = Math.max(testFlowGpm, 1e-9);
+    const q = Math.max(0, qGpm);
+    if (!(st > res) || !(testFlowGpm > 0)) return NaN;
+    const drop = st - res;
+    return st - drop * Math.pow(q / qTest, SUPPLY_EXPONENT);
+  }
+
+  function classifySupply(availablePSI, systemPressure) {
+    const net = Math.max(0, systemPressure - Math.max(0, availablePSI));
+    if (!(Number.isFinite(availablePSI))) {
+      return {
+        status: 'invalid',
+        label: 'Check inputs',
+        badge: 'badge',
+        qualityClass: 'supply-marginal',
+        qualityText: '<strong>Invalid supply data</strong><br>Enter static &gt; residual, test flow, and system demand.',
+        netBoostPsi: net,
+      };
+    }
+    if (availablePSI >= systemPressure - 0.05) {
+      return {
+        status: 'adequate',
+        label: 'Supply Adequate',
+        badge: 'badge badge-good',
+        qualityClass: 'supply-good',
+        qualityText:
+          '<strong class="text-emerald">Supply Adequate</strong><br>Available residual at design flow meets or exceeds system demand (N^' +
+          SUPPLY_EXPONENT +
+          ' curve). Net boost ≈ ' +
+          net.toFixed(1) +
+          ' psi.',
+        netBoostPsi: net,
+      };
+    }
+    if (availablePSI >= systemPressure * 0.6) {
+      return {
+        status: 'marginal',
+        label: 'Marginal — Pump Boost',
+        badge: 'badge badge-warn',
+        qualityClass: 'supply-marginal',
+        qualityText:
+          '<strong class="text-amber">Marginal Supply</strong><br>Pump must add about <strong>' +
+          net.toFixed(1) +
+          ' psi</strong> (N^' +
+          SUPPLY_EXPONENT +
+          ' curve). Verify test location and consider redundancy.',
+        netBoostPsi: net,
+      };
+    }
+    return {
+      status: 'pump_required',
+      label: 'Pump Required',
+      badge: 'badge badge-bad',
+      qualityClass: 'supply-poor',
+      qualityText:
+        '<strong class="text-red">Pump Required</strong><br>Available residual is well below demand. Net boost ≈ <strong>' +
+        net.toFixed(1) +
+        ' psi</strong> (N^' +
+        SUPPLY_EXPONENT +
+        '). Confirm hydrant test and supply improvements.',
+      netBoostPsi: net,
+    };
+  }
+
   function calculateSupplyCurve(silent) {
     const systemFlow = num('systemFlow');
     const hydrantStatic = num('hydrantStatic');
@@ -342,14 +598,33 @@
       if (!silent) toast('Enter valid hydrant test data and system flow.');
       return;
     }
+    if (!(hydrantStatic > hydrantResidual)) {
+      if (!silent) toast('Static pressure must be greater than residual.');
+      return;
+    }
 
-    // Linear supply-curve estimate (quick field method)
-    const pressureDrop = hydrantStatic - hydrantResidual;
-    const flowRatio = systemFlow / hydrantFlow;
-    let availablePSI = hydrantStatic - pressureDrop * flowRatio;
+    // Prefer supply assessment imported from Sprinkler Estimator when flows match
+    let availablePSI = supplyPressureN185(
+      hydrantStatic,
+      hydrantResidual,
+      hydrantFlow,
+      systemFlow
+    );
+    if (!Number.isFinite(availablePSI)) availablePSI = 0;
     if (availablePSI < 0) availablePSI = 0;
 
+    const imported = window.__sprinklerSupplyAssessment;
+    if (
+      imported &&
+      Number.isFinite(imported.availablePsi) &&
+      Math.abs((imported.demandGpm || 0) - systemFlow) < 1.5 &&
+      Math.abs((imported.demandPsi || 0) - systemPressure) < 0.6
+    ) {
+      availablePSI = Math.max(0, imported.availablePsi);
+    }
+
     const netPumpPressure = Math.max(0, systemPressure - availablePSI);
+    const cls = classifySupply(availablePSI, systemPressure);
 
     setText('availablePressure', availablePSI.toFixed(0));
     setText('pumpMustAdd', netPumpPressure.toFixed(0));
@@ -362,39 +637,28 @@
 
     const qualityBox = $('supplyQualityBox');
     const statusEl = $('supplyStatus');
-    let qualityClass = '';
-    let qualityText = '';
-
-    if (availablePSI >= systemPressure * 0.9) {
-      qualityClass = 'supply-good';
-      qualityText = '<strong class="text-emerald">Supply Adequate</strong><br>System can likely meet demand with minimal pump boost.';
-      if (statusEl) {
-        statusEl.className = 'badge badge-good';
-        statusEl.textContent = 'Supply Strong';
-      }
-    } else if (availablePSI >= systemPressure * 0.6) {
-      qualityClass = 'supply-marginal';
-      qualityText = '<strong class="text-amber">Marginal Supply</strong><br>Pump will need to make up significant pressure. Verify test data and consider redundancy.';
-      if (statusEl) {
-        statusEl.className = 'badge badge-warn';
-        statusEl.textContent = 'Marginal';
-      }
-    } else {
-      qualityClass = 'supply-poor';
-      qualityText = '<strong class="text-red">Inadequate Supply</strong><br>Strongly indicates need for fire pump. Confirm hydrant test location and consider supply improvements.';
-      if (statusEl) {
-        statusEl.className = 'badge badge-bad';
-        statusEl.textContent = 'Pump Required';
-      }
+    if (statusEl) {
+      statusEl.className = cls.badge;
+      statusEl.textContent = cls.label;
     }
-
     if (qualityBox) {
-      qualityBox.className = 'p-box ' + qualityClass;
+      qualityBox.className = 'p-box ' + cls.qualityClass;
       qualityBox.style.padding = '0.75rem';
       qualityBox.style.borderRadius = '0.75rem';
       qualityBox.style.border = '1px solid';
       qualityBox.style.fontSize = '0.75rem';
-      qualityBox.innerHTML = qualityText;
+      qualityBox.innerHTML =
+        cls.qualityText +
+        '<br><span class="tiny">Supply curve: P = P<sub>s</sub> − ΔP×(Q/Q<sub>test</sub>)<sup>' +
+        SUPPLY_EXPONENT +
+        '</sup> (aligned with Flow Test / Sprinkler apps).</span>';
+    }
+
+    if (window.calculatedData) {
+      window.calculatedData.availablePSI = availablePSI;
+      window.calculatedData.netPumpPSI = netPumpPressure;
+      window.calculatedData.supplyStatus = cls.status;
+      window.calculatedData.supplyExponent = SUPPLY_EXPONENT;
     }
 
     if (!silent) {
@@ -1225,6 +1489,62 @@
   }
 
   function showDisclaimer() {
+    showModal(
+      'Important Disclaimer',
+      `<p>This tool assists qualified Fire Protection Engineers with <strong>preliminary</strong> pump sizing using system hydraulic results, hydrant flow test data, and NFPA 20 / UFC 3-600-01 criteria.</p>
+       <p>Final selection requires manufacturer-certified curves, complete hydraulic calculations, site-specific water supply verification, and AHJ approval. Hydrant flow test interpolation is approximate.</p>
+       <p>All calculations run locally in your browser. Project inputs may be saved in this device's browser storage only.</p>`
+    );
+  }
+
+  function showHelpGuide() {
+    showModal(
+      'Fire Pump Sizer — Help / Input Guide',
+      `
+      <p><strong>Purpose:</strong> Preliminary fire pump duty, driver, curve check, and room plan from system demand and optional hydrant test. <strong>Path:</strong> Flow Test → Sprinkler Estimator → <b>Fire Pump Sizer</b> → Tank Sizer.</p>
+      <p><strong>Save Report</strong> downloads HTML + JSON. <strong>Copy Results</strong> copies text summary.</p>
+
+      <h3 style="margin:1rem 0 0.35rem;font-size:0.95rem;color:#1e3a8a">Primary duty</h3>
+      <ul style="margin:0;padding-left:1.15rem">
+        <li><strong>Required Flow at Pump:</strong> System demand GPM (from hydraulics or Sprinkler Estimator).</li>
+        <li><strong>System Demand Pressure:</strong> Required pressure at pump discharge (psi).</li>
+        <li><strong>Duration Required:</strong> Minutes of water supply (for documentation / tank path). Imported with sprinkler capture.</li>
+        <li><strong>Import Sprinkler Demand:</strong> Loads last Capture for Pump Sizer handoff (flow, pressure, duration, hydrant test, N^1.85 available PSI / supply status).</li>
+        <li><strong>Capture for Tank:</strong> Saves flow × duration to Fire Tank Sizer (or Capture &amp; Open Tank).</li>
+        <li><strong>Use Simplified Demand:</strong> Overwrites flow/pressure from the optional density-area calculator below.</li>
+      </ul>
+
+      <h3 style="margin:1rem 0 0.35rem;font-size:0.95rem;color:#1e3a8a">Hydrant flow test (optional)</h3>
+      <ul style="margin:0;padding-left:1.15rem">
+        <li><strong>Static / test flow / residual:</strong> Estimates available pressure at design flow and net pump pressure (approx. curve method).</li>
+        <li>For full NFPA 291 N^1.85 documentation, use the Flow Test Report app first, then apply demand in Sprinkler Estimator.</li>
+      </ul>
+
+      <h3 style="margin:1rem 0 0.35rem;font-size:0.95rem;color:#1e3a8a">Proposed pump &amp; drivers</h3>
+      <ul style="margin:0;padding-left:1.15rem">
+        <li><strong>Rated GPM / PSI:</strong> Proposed pump rating for NFPA 20 test-point / curve checks.</li>
+        <li><strong>Electric:</strong> Voltage, estimated motor HP, FLA, breaker guidance.</li>
+        <li><strong>Diesel:</strong> Engine HP estimate, runtime, fuel tank volume (feeds room plan fuel/dike sketch).</li>
+      </ul>
+
+      <h3 style="margin:1rem 0 0.35rem;font-size:0.95rem;color:#1e3a8a">UFC mode &amp; scenarios</h3>
+      <ul style="margin:0;padding-left:1.15rem">
+        <li><strong>UFC 3-600-01 ON:</strong> Notes emphasize DoD criteria (redundancy, diesel fuel duration, etc.).</li>
+        <li><strong>UFC OFF:</strong> Core NFPA 20 framing only.</li>
+        <li><strong>Load DoD Example:</strong> Fills a hangar-scale sample project for demos.</li>
+        <li><strong>Room plan:</strong> Preliminary plan view with clearances; diesel adds fuel tank + dike zone.</li>
+      </ul>
+
+      <h3 style="margin:1rem 0 0.35rem;font-size:0.95rem;color:#1e3a8a">Limitations</h3>
+      <ul style="margin:0;padding-left:1.15rem">
+        <li>Not a manufacturer curve fit, not a sealed design, not a substitute for complete hydraulics.</li>
+        <li>Next step for storage volume: Fire Tank Sizer (flow × duration + safety factors).</li>
+      </ul>
+      `
+    );
+  }
+
+  function showModal(title, bodyHtml) {
     const existing = document.querySelector('.modal-backdrop');
     if (existing) existing.remove();
 
@@ -1233,18 +1553,16 @@
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-modal', 'true');
     modal.innerHTML = `
-      <div class="modal">
+      <div class="modal" style="max-width:40rem;max-height:85vh;overflow:auto">
         <div class="modal-head">
-          <h2>Important Disclaimer</h2>
+          <h2>${title}</h2>
           <button type="button" class="modal-close" aria-label="Close">×</button>
         </div>
         <div class="modal-body">
-          <p>This tool assists qualified Fire Protection Engineers with <strong>preliminary</strong> pump sizing using system hydraulic results, hydrant flow test data, and NFPA 20 / UFC 3-600-01 criteria.</p>
-          <p>Final selection requires manufacturer-certified curves, complete hydraulic calculations, site-specific water supply verification, and AHJ approval. Hydrant flow test interpolation is approximate.</p>
-          <p>All calculations run locally in your browser. Project inputs may be saved in this device's browser storage only.</p>
+          ${bodyHtml}
         </div>
         <div class="modal-foot">
-          <button type="button" class="btn btn-primary modal-ok">Understood</button>
+          <button type="button" class="btn btn-primary modal-ok">Close</button>
         </div>
       </div>
     `;
@@ -1253,6 +1571,92 @@
     modal.querySelector('.modal-ok').addEventListener('click', close);
     modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
     document.body.appendChild(modal);
+  }
+
+  function downloadFile(filename, content, mime) {
+    const blob = new Blob([content], { type: mime || 'text/html;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    }, 400);
+  }
+
+  function saveReportFiles() {
+    calculateAll();
+    const data = window.calculatedData || {};
+    const driver = getDriverType();
+    const proj = ($('projectName')?.value || 'fire-pump').replace(/[^\w\-]+/g, '_').slice(0, 40) || 'fire-pump';
+    const esc = (s) =>
+      String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    const logoHtml =
+      window.FireToolshedLogo && window.FireToolshedLogo.reportHeaderHtml
+        ? window.FireToolshedLogo.reportHeaderHtml({ maxHeight: 56 })
+        : '';
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Fire Pump Report — ${esc($('projectName')?.value || 'Report')}</title>
+<style>body{font-family:system-ui,sans-serif;max-width:860px;margin:24px auto;padding:0 16px;color:#0f172a;line-height:1.45}h1{font-size:1.35rem}h2{font-size:1.05rem;margin-top:1.2rem}.muted{color:#64748b;font-size:0.85rem}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #e2e8f0;padding:0.4rem;text-align:left}.box{border:1px solid #e2e8f0;border-radius:12px;padding:0.85rem;margin:0.75rem 0}</style></head><body>
+${logoHtml}
+<h1>Fire Pump Sizer — Preliminary Report</h1>
+<p class="muted">Fire Toolshed · Fire Pump Sizer v${APP_VERSION} · ${new Date().toLocaleString()}</p>
+<p><b>Project:</b> ${esc($('projectName')?.value || '—')}<br>
+<b>UFC mode:</b> ${ufcMode ? 'ON' : 'OFF'} · <b>Driver:</b> ${esc(driver)}</p>
+<div class="box">
+<b>System demand</b><br>
+Flow: ${Math.round(data.systemFlow || 0)} GPM<br>
+Pressure: ${(data.systemPSI || 0).toFixed(1)} PSI<br>
+Duration: ${esc($('systemDuration')?.value || '—')} min
+</div>
+<div class="box">
+<b>Hydrant test</b><br>
+Static ${esc($('hydrantStatic')?.value)} PSI · Test flow ${esc($('hydrantFlow')?.value)} GPM @ ${esc($('hydrantResidual')?.value)} PSI residual<br>
+Available at design flow: ${esc($('availableAtFlow')?.textContent || '—')}<br>
+Net pump pressure: ${esc($('netPumpPressure')?.textContent || '—')}
+</div>
+<div class="box">
+<b>Proposed pump</b><br>
+Rated ${esc(data.ratedGPM)} GPM @ ${esc(data.ratedPSI)} PSI<br>
+${
+  driver === 'electric'
+    ? `Motor HP: ${esc($('motorHP')?.textContent)} · FLA: ${esc($('fla')?.textContent)} · Breaker: ${esc($('breaker')?.textContent)}`
+    : `Engine HP: ${esc($('dieselHP')?.textContent)} · Fuel tank: ${esc($('fuelTank')?.textContent)}`
+}
+</div>
+<p><b>Verification:</b> ${esc($('verificationStatus')?.innerText || '—')}</p>
+<p class="muted">Preliminary tool only — not a substitute for manufacturer curves, stamped design, or AHJ approval. Next: Fire Tank Sizer for storage volume.</p>
+</body></html>`;
+    downloadFile(proj + '_pump-report.html', html);
+    downloadFile(
+      proj + '_pump-data.json',
+      JSON.stringify(
+        {
+          version: APP_VERSION,
+          savedAt: new Date().toISOString(),
+          projectName: $('projectName')?.value || '',
+          ufcMode,
+          systemFlow: $('systemFlow')?.value,
+          systemPressure: $('systemPressure')?.value,
+          systemDuration: $('systemDuration')?.value,
+          hydrantStatic: $('hydrantStatic')?.value,
+          hydrantFlow: $('hydrantFlow')?.value,
+          hydrantResidual: $('hydrantResidual')?.value,
+          ratedGPM: $('ratedGPM')?.value,
+          ratedPSI: $('ratedPSI')?.value,
+          driverType: driver,
+          calculatedData: data,
+        },
+        null,
+        2
+      ),
+      'application/json'
+    );
+    toast('Saved HTML report + JSON data files');
   }
 
   function updateOnlineStatus() {
@@ -1319,10 +1723,16 @@
     $('ufcToggle')?.addEventListener('change', toggleUFC);
     $('hazardSelect')?.addEventListener('change', updateHazardSelection);
     $('btnSimplified')?.addEventListener('click', useSimplifiedDemand);
+    $('btnImportSprinkler')?.addEventListener('click', importSprinklerDemand);
+    $('btnCaptureTank')?.addEventListener('click', () => captureForTankSizer(false));
+    $('btnCaptureTankOpen')?.addEventListener('click', () => captureForTankSizer(true));
     $('btnSupply')?.addEventListener('click', () => calculateSupplyCurve(false));
     $('btnRecalc')?.addEventListener('click', calculateAll);
     $('btnDoD')?.addEventListener('click', loadDoDExample);
     $('btnDisclaimer')?.addEventListener('click', showDisclaimer);
+    $('btnHelp')?.addEventListener('click', showHelpGuide);
+    $('btnSaveReport')?.addEventListener('click', saveReportFiles);
+    $('btnSaveReportFooter')?.addEventListener('click', saveReportFiles);
     $('btnCopy')?.addEventListener('click', copyResults);
     $('btnReset')?.addEventListener('click', () => {
       if (confirm('Reset all inputs and clear saved project data on this device?')) resetApp();
@@ -1364,9 +1774,27 @@
     updateOnlineStatus();
     updateCodeNotes();
     updateSimplifiedPreview();
+    updateSprinklerHandoffBanner();
+    if (window.FireToolshedShell) {
+      window.FireToolshedShell.mount({ step: 'pump', base: '..' });
+    }
+    if (window.FireToolshedLogo) {
+      window.FireToolshedLogo.bindControls({
+        selectId: 'reportLogoSource',
+        fileId: 'reportLogoFile',
+        previewId: 'reportLogoPreview',
+        fileWrapId: 'reportLogoFileWrap',
+      });
+    }
     calculateAll();
     switchTab(0);
     registerServiceWorker();
+
+    // Auto-prompt if a fresh sprinkler capture exists and duty fields still look like defaults
+    const handoff = readSprinklerHandoff();
+    if (handoff && !restored) {
+      // soft banner only — user clicks Import
+    }
 
     console.log(`[Fire Pump Sizer] v${APP_VERSION} ready · chart=${chartAvailable} · restored=${restored}`);
   }
@@ -1376,6 +1804,8 @@
     version: APP_VERSION,
     calculateAll,
     loadDoDExample,
+    importSprinklerDemand,
+    captureForTankSizer,
     switchTab,
     calculateSupplyCurve,
     copyResults,
