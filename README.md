@@ -16,6 +16,7 @@ Browser-based engineering calculators for team use. Hosted with **GitHub Pages**
 
 | Tool | Path |
 |------|------|
+| [Occupant Load & Egress Capacity](./occupant-egress/) | IBC occupant load factors, egress width capacity, travel-distance checks |
 | [Concrete Fire Rating Thickness](./concrete-fire-rating/) | Min. concrete / CMU thickness for 1–4 hr FRR (IBC / ACI 216.1 material tables) |
 | [Smoke Exhaust Scenario Lab](./smoke-exhaust-lab/app/) | Beta smoke exhaust scenarios (team testing package) |
 

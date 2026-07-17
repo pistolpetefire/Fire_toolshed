@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Occupant load and egress capacity — choose IBC or NFPA 101 path, then calculate load, egress width capacity, and travel checks.">
+  <title>Occupant Load &amp; Egress Capacity · Fire Toolshed</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Fire Toolshed · Life safety</p>
+        <h1>Occupant Load &amp; Egress Capacity</h1>
+        <p class="version" id="appVersion">Version 1.1.0</p>
+        <p class="lead" id="headerLead">
+          Choose a code path, then calculate <strong>occupant load</strong>, <strong>egress capacity</strong>, and travel-distance checks.
+        </p>
+      </div>
+      <div class="top-actions no-print" id="workActions">
+        <button type="button" id="btnChangePath" class="ghost">Change code path</button>
+        <button type="button" id="btnPrintPdf" class="primary">Print to PDF</button>
+        <button type="button" id="btnSave">Save report</button>
+        <a class="btn-link" href="../">Portal</a>
+        <button type="button" id="btnReset" class="ghost">Reset</button>
+      </div>
+    </header>
+
+    <!-- Path selection (start) -->
+    <section class="path-pick no-print" id="pathPick" aria-label="Select code path">
+      <h2>Select code path</h2>
+      <p class="hint" style="margin-top:0">Each path uses that code’s common occupant-load factors, capacity width factors, and simplified travel limits. Confirm the edition adopted by the AHJ.</p>
+      <div class="path-grid">
+        <button type="button" class="path-card" id="pickIbc" data-path="ibc">
+          <span class="path-badge">Path 1</span>
+          <strong>IBC</strong>
+          <span class="path-desc">International Building Code — Table 1004.5 load factors, §1005 egress capacity, Chapter 10 travel limits (simplified by occupancy group).</span>
+          <span class="path-go">Start IBC path →</span>
+        </button>
+        <button type="button" class="path-card" id="pickNfpa" data-path="nfpa101">
+          <span class="path-badge">Path 2</span>
+          <strong>NFPA 101</strong>
+          <span class="path-desc">Life Safety Code — Table 7.3.1.2 load factors, §7.3.3 capacity factors, occupancy-chapter travel limits (simplified).</span>
+          <span class="path-go">Start NFPA 101 path →</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Workbench (after path chosen) -->
+    <div id="workbench" class="hidden">
+    <div class="path-banner no-print" id="pathBanner" role="status"></div>
+
+    <section class="metrics" aria-label="Results summary">
+      <div class="metric">
+        <div class="label">Total occupant load</div>
+        <div class="value" id="mLoad">0</div>
+        <div class="unit">persons</div>
+      </div>
+      <div class="metric">
+        <div class="label">Egress capacity</div>
+        <div class="value" id="mCap">0</div>
+        <div class="unit">persons</div>
+      </div>
+      <div class="metric">
+        <div class="label">Margin</div>
+        <div class="value" id="mMargin">0</div>
+        <div class="unit">persons</div>
+      </div>
+      <div class="metric metric-status">
+        <div class="label">Capacity check</div>
+        <div class="value status" id="mStatus">—</div>
+        <div class="unit" id="mStatusSub">Enter spaces &amp; exits</div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <div>
+        <section class="panel">
+          <h2>Project</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="projectName">Project name</label>
+              <input id="projectName" type="text" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="buildingArea">Building / story / suite</label>
+              <input id="buildingArea" type="text" placeholder="e.g. Level 2 · Bldg 2401" />
+            </div>
+            <div class="field">
+              <label for="sprinklered">Building sprinklered (NFPA 13)</label>
+              <select id="sprinklered">
+                <option value="yes" selected>Yes — reduced width factors</option>
+                <option value="no">No — unreduced width factors</option>
+              </select>
+              <span class="sub" id="sprinklerHint">Capacity factors update with code path and this setting.</span>
+            </div>
+            <div class="field">
+              <label for="occupancyGroup" id="occupancyGroupLabel">Primary occupancy (travel limits)</label>
+              <select id="occupancyGroup"></select>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="reportLogoSource">Report logo</label>
+              <select id="reportLogoSource">
+                <option value="benham">Benham</option>
+                <option value="haskell">Haskell</option>
+                <option value="upload">Upload image…</option>
+              </select>
+              <div id="reportLogoFileWrap" class="hidden" style="margin-top:0.4rem">
+                <input id="reportLogoFile" type="file" accept="image/*" />
+              </div>
+              <div id="reportLogoPreview" style="margin-top:0.4rem"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>1 · Spaces — occupant load</h2>
+            <button type="button" id="btnAddSpace" class="ghost sm">+ Add space</button>
+          </div>
+          <p class="hint">Load = floor area ÷ load factor (sf/person), or enter a fixed occupant count. Factors from IBC Table 1004.5 (common uses).</p>
+          <div class="table-wrap">
+            <table class="data" id="spaceTable">
+              <thead>
+                <tr>
+                  <th>Space / room</th>
+                  <th>Use (load factor)</th>
+                  <th class="num">Area (sf)</th>
+                  <th class="num">Fixed OL</th>
+                  <th class="num">OL</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="spaceBody"></tbody>
+            </table>
+          </div>
+          <p class="hint" id="spaceTotalHint"></p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>2 · Means of egress components</h2>
+            <button type="button" id="btnAddEgress" class="ghost sm">+ Add component</button>
+          </div>
+          <p class="hint">Capacity = clear width (inches) ÷ factor (in/person). Multiple doors/stairs sum. Use clear width (door leaf clear opening, not nominal).</p>
+          <div class="table-wrap">
+            <table class="data" id="egressTable">
+              <thead>
+                <tr>
+                  <th>ID / location</th>
+                  <th>Type</th>
+                  <th class="num">Clear width (in)</th>
+                  <th class="num">Qty</th>
+                  <th class="num">Factor</th>
+                  <th class="num">Capacity</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="egressBody"></tbody>
+            </table>
+          </div>
+          <p class="hint" id="egressTotalHint"></p>
+        </section>
+
+        <section class="panel">
+          <h2>3 · Travel distance check (optional)</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="travelActual">Measured / design travel distance</label>
+              <div class="row">
+                <input id="travelActual" type="number" min="0" step="1" placeholder="ft" />
+                <span class="suffix">ft</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="commonPathActual">Common path of travel</label>
+              <div class="row">
+                <input id="commonPathActual" type="number" min="0" step="1" placeholder="ft" />
+                <span class="suffix">ft</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="deadEndActual">Dead-end corridor length</label>
+              <div class="row">
+                <input id="deadEndActual" type="number" min="0" step="1" placeholder="ft" />
+                <span class="suffix">ft</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Allowable (from occupancy + sprinklers)</label>
+              <div class="allow-box" id="allowBox">—</div>
+            </div>
+          </div>
+          <div id="travelResult" class="callout info" style="margin-top:0.75rem"></div>
+        </section>
+      </div>
+
+      <div>
+        <section class="panel sticky">
+          <h2>Summary</h2>
+          <div id="summaryBox" class="summary"></div>
+          <h3 class="subhead">Capacity factors in use</h3>
+          <div id="factorBox" class="callout info"></div>
+          <h3 class="subhead">Notes</h3>
+          <ul class="notes">
+            <li>Preliminary only — confirm IBC/NFPA 101 edition adopted by the AHJ.</li>
+            <li>Doors: use clear width; minimum clear widths and door swings are separate code checks.</li>
+            <li>Stairs: capacity is for the stair width serving the story; stair geometry (riser/tread) not checked here.</li>
+            <li>Multiple stories, horizontal exits, and smokeproof enclosures need additional analysis.</li>
+            <li>Assembly concentrated seating and fixed seating may use seats/count instead of area.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+    </div><!-- /workbench -->
+
+    <section class="print-package panel" id="printPackage">
+      <div id="reportLogoPrint"></div>
+      <div id="printBody"></div>
+    </section>
+
+    <footer class="site-foot no-print">
+      Occupant Load &amp; Egress Capacity · Fire Toolshed · Not a substitute for stamped life-safety drawings or AHJ approval.
+      <a href="../">Portal</a>
+    </footer>
+  </div>
+
+  <script src="../shared/report-logo.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
