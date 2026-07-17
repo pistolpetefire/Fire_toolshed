@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Minimum concrete and concrete masonry thickness for 1–4 hour fire-resistance ratings per IBC / ACI 216.1 calculated methods.">
+  <title>Concrete Fire Rating Thickness · Fire Toolshed</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Fire Toolshed</p>
+        <h1>Concrete Fire Rating Thickness</h1>
+        <p class="version" id="appVersion">Version 1.0.0</p>
+        <p class="lead">
+          Minimum <strong>equivalent thickness</strong> of concrete materials for
+          <strong>1-, 2-, 3-, and 4-hour</strong> fire-resistance ratings using
+          IBC calculated fire resistance and ACI/TMS 216.1 tables (ASTM E119 heat-transmission basis).
+        </p>
+      </div>
+      <div class="top-actions no-print">
+        <button type="button" id="btnPrintPdf" class="primary">Print to PDF</button>
+        <button type="button" id="btnSave">Save report</button>
+        <a class="btn-link" href="../">Portal</a>
+        <button type="button" id="btnReset" class="ghost">Reset</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div>
+        <section class="panel">
+          <h2>Assembly &amp; material</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="assemblyType">Assembly type</label>
+              <select id="assemblyType"></select>
+            </div>
+            <div class="field">
+              <label for="materialId">Material makeup</label>
+              <select id="materialId"></select>
+              <span class="sub" id="materialHint"></span>
+            </div>
+            <div class="field">
+              <label for="ratingHr">Required fire-resistance rating</label>
+              <select id="ratingHr">
+                <option value="1">1 hour</option>
+                <option value="2" selected>2 hours</option>
+                <option value="3">3 hours</option>
+                <option value="4">4 hours</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="checkThickness">Your thickness (optional check)</label>
+              <div class="row">
+                <input id="checkThickness" type="number" min="0" step="0.1" placeholder="e.g. 6.0" />
+                <span class="suffix">in</span>
+              </div>
+              <span class="sub">Leave blank to only show required minimum.</span>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="projectName">Project name (optional)</label>
+              <input id="projectName" type="text" autocomplete="off" />
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="reportLogoSource">Report logo</label>
+              <select id="reportLogoSource">
+                <option value="benham">Benham</option>
+                <option value="haskell">Haskell</option>
+                <option value="upload">Upload image…</option>
+              </select>
+              <div id="reportLogoFileWrap" class="hidden" style="margin-top:0.5rem">
+                <input id="reportLogoFile" type="file" accept="image/*" />
+              </div>
+              <div id="reportLogoPreview" style="margin-top:0.5rem"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Basis &amp; notes</h2>
+          <div id="basisBox" class="callout info"></div>
+          <ul class="notes" id="notesList"></ul>
+        </section>
+      </div>
+
+      <div>
+        <section class="panel result-panel">
+          <h2>Required thickness</h2>
+          <div class="metrics">
+            <div class="metric">
+              <div class="label">Minimum equivalent thickness</div>
+              <div class="value" id="metricIn">—</div>
+              <div class="unit">inches</div>
+            </div>
+            <div class="metric">
+              <div class="label">Metric</div>
+              <div class="value" id="metricMm">—</div>
+              <div class="unit">mm</div>
+            </div>
+            <div class="metric">
+              <div class="label">Rating</div>
+              <div class="value" id="metricRating">—</div>
+              <div class="unit">hours</div>
+            </div>
+          </div>
+          <div id="checkResult" class="callout info" style="margin-top:0.85rem"></div>
+          <h3 style="margin:1rem 0 0.5rem;font-size:0.95rem">All ratings for this material</h3>
+          <table class="data" id="ratingTable">
+            <thead>
+              <tr>
+                <th>Rating</th>
+                <th class="num">Min. Te (in)</th>
+                <th class="num">Min. Te (mm)</th>
+              </tr>
+            </thead>
+            <tbody id="ratingTableBody"></tbody>
+          </table>
+          <p class="sub" id="sourceLine" style="margin-top:0.75rem"></p>
+        </section>
+      </div>
+    </div>
+
+    <section class="print-package panel" id="printPackage">
+      <div id="reportLogoPrint"></div>
+      <div id="printBody"></div>
+    </section>
+
+    <footer class="site-foot no-print">
+      Concrete Fire Rating Thickness · Fire Toolshed · Preliminary calculated method only.
+      Confirm against the adopted IBC edition, ACI/TMS 216.1, listed assemblies, and AHJ.
+      <a href="../">Portal</a>
+    </footer>
+  </div>
+
+  <script src="../shared/report-logo.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
