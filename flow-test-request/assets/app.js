@@ -304,6 +304,22 @@
     );
   }
 
+  /** Close popup after print dialog finishes (print OK or Cancel). */
+  function printScriptCloseOnDone() {
+    return (
+      "window.onload=function(){" +
+      "var done=false;" +
+      "function closeMe(){if(done)return;done=true;try{window.close();}catch(e){}}" +
+      "window.addEventListener('afterprint',closeMe);" +
+      "setTimeout(function(){" +
+      "try{window.focus();window.print();}catch(e){}" +
+      // print() returns after dialog closes (save or cancel); close popup and return to app
+      "setTimeout(closeMe,50);" +
+      "},250);" +
+      "};"
+    );
+  }
+
   function buildPrintableHtml(m) {
     var title = "Flow Test Request — " + (m.projectName || "Request");
     var body = packageHtml(m, { includeLogo: true });
@@ -317,7 +333,7 @@
       "</style></head><body>" +
       body +
       "<script>" +
-      "window.onload=function(){setTimeout(function(){window.focus();window.print();},250);};" +
+      printScriptCloseOnDone() +
       "<\/script></body></html>"
     );
   }
@@ -325,6 +341,7 @@
   /**
    * Open a clean document and invoke the browser print dialog.
    * User chooses "Microsoft Print to PDF" / "Save as PDF" as the destination.
+   * Popup closes when print finishes or is cancelled.
    */
   function printToPdf() {
     render();
@@ -332,7 +349,7 @@
     var html = buildPrintableHtml(m);
     var w = window.open("", "_blank");
     if (!w) {
-      // Popup blocked — fall back to on-page print
+      // Popup blocked — fall back to on-page print (stays in app)
       toast("Popup blocked — using page print. Choose Save as PDF / Microsoft Print to PDF.");
       setTimeout(function () {
         window.print();
@@ -342,7 +359,15 @@
     w.document.open();
     w.document.write(html);
     w.document.close();
-    toast("Print dialog: choose Save as PDF (or Microsoft Print to PDF)");
+    // Ensure opener refocuses when popup closes
+    try {
+      w.addEventListener("beforeunload", function () {
+        try {
+          window.focus();
+        } catch (e) { /* ignore */ }
+      });
+    } catch (e) { /* ignore */ }
+    toast("Print dialog: choose Save as PDF — Cancel closes and returns here");
   }
 
   function printPage() {

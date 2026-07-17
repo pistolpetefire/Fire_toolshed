@@ -552,12 +552,24 @@
   function printToPdf() {
     render();
     var r = resultModel();
+    var printBoot =
+      "window.onload=function(){" +
+      "var done=false;" +
+      "function closeMe(){if(done)return;done=true;try{window.close();}catch(e){}}" +
+      "window.addEventListener('afterprint',closeMe);" +
+      "setTimeout(function(){" +
+      "try{window.focus();window.print();}catch(e){}" +
+      "setTimeout(closeMe,50);" +
+      "},250);" +
+      "};";
     var html =
       "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Concrete Fire Rating</title><style>" +
       printDocumentCss() +
       "</style></head><body>" +
       packageHtml(r, true) +
-      "<script>window.onload=function(){setTimeout(function(){window.focus();window.print();},250);};<\/script></body></html>";
+      "<script>" +
+      printBoot +
+      "<\/script></body></html>";
     var w = window.open("", "_blank");
     if (!w) {
       toast("Popup blocked — use browser Print and choose Save as PDF");
@@ -567,7 +579,14 @@
     w.document.open();
     w.document.write(html);
     w.document.close();
-    toast("Print dialog: choose Save as PDF / Microsoft Print to PDF");
+    try {
+      w.addEventListener("beforeunload", function () {
+        try {
+          window.focus();
+        } catch (e) { /* ignore */ }
+      });
+    } catch (e) { /* ignore */ }
+    toast("Print dialog: choose Save as PDF — Cancel closes and returns here");
   }
 
   function saveReport() {
