@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#1e3a8a">
-  <meta name="description" content="Stock hydrant flow test request form — NFPA 291 procedures for 2½-inch outlets, suppression or fire-flow purpose. Military base and civilian project fields.">
+  <meta name="description" content="Stock hydrant flow test request form — NFPA 291 procedures for 2½-inch outlets, suppression or fire-flow purpose.">
   <title>Flow Test Request · Fire Toolshed</title>
   <link rel="stylesheet" href="../shared/water-path-shell.css">
   <link rel="stylesheet" href="./assets/styles.css">
@@ -15,19 +15,14 @@
   <div class="shell">
     <header class="top">
       <div>
-        <p class="eyebrow">Fire Toolshed</p>
         <h1>Flow Test Request</h1>
-        <p class="version" id="appVersion">Version 1.0.0</p>
-        <p class="hint" style="margin-top:0.4rem;max-width:40rem">
-          Stock request package for a hydrant flow test using <strong>2½-inch outlets only</strong>,
-          procedures aligned with <strong>NFPA 291</strong>. Choose suppression supply or fire-flow purpose.
-        </p>
       </div>
       <div class="top-actions no-print">
-        <button type="button" id="btnPrint" class="primary">Print / Clean package</button>
-        <button type="button" id="btnSave">Save HTML request</button>
-        <button type="button" id="btnCopy" class="ghost">Copy request text</button>
-        <a class="btn-link" href="../flow-test-report/">Open Flow Test Report →</a>
+        <button type="button" id="btnPrintPdf" class="primary" title="Opens a clean request page, then print dialog — choose Save as PDF / Microsoft Print to PDF">Print to PDF</button>
+        <button type="button" id="btnPrint" class="ghost" title="Print this page package">Print</button>
+        <button type="button" id="btnSave">Save HTML</button>
+        <button type="button" id="btnCopy" class="ghost">Copy text</button>
+        <a class="btn-link" href="../flow-test-report/">Flow Test Report →</a>
         <button type="button" id="btnReset" class="ghost">Reset</button>
       </div>
     </header>
@@ -43,53 +38,36 @@
                 <option value="suppressionSupply" selected>1. Suppression purpose — fire protection system water supply</option>
                 <option value="fireFlow">2. Fire flow — hydrant capacity / fire-flow rating</option>
               </select>
-              <span class="sub" id="purposeHint">Selects the stock procedure set and objective language on the request package.</span>
             </div>
           </div>
-          <div class="callout info" id="purposeCallout" style="margin-top:0.75rem"></div>
         </section>
 
         <section class="panel">
           <h2>2 · Project / location</h2>
-          <p class="hint">Use building number on base when a street address is not used. City/state <em>or</em> military base name is enough for location.</p>
           <div class="field-grid two">
             <div class="field">
               <label for="projectName">Project name</label>
-              <input id="projectName" type="text" autocomplete="off" placeholder="e.g. Hangar 4 sprinkler upgrade" />
+              <input id="projectName" type="text" autocomplete="off" />
             </div>
             <div class="field">
               <label for="requestedDate">Date of requested test</label>
               <input id="requestedDate" type="date" />
             </div>
             <div class="field">
-              <label for="buildingOrAddress">Address or building number (on-base)</label>
-              <input id="buildingOrAddress" type="text" placeholder="e.g. Bldg 2401 / 123 Main St" autocomplete="street-address" />
+              <label for="buildingOrAddress">Address or building number</label>
+              <input id="buildingOrAddress" type="text" autocomplete="street-address" />
             </div>
             <div class="field">
-              <label for="cityStateOrBase">Project city, state <em>or</em> military base name</label>
-              <input id="cityStateOrBase" type="text" placeholder="e.g. Tinker AFB, OK · or Oklahoma City, OK" />
+              <label for="cityStateOrBase">City, state or military base name</label>
+              <input id="cityStateOrBase" type="text" />
             </div>
             <div class="field">
               <label for="requestedBy">Requested by</label>
-              <input id="requestedBy" type="text" autocomplete="name" placeholder="Name / firm / office" />
+              <input id="requestedBy" type="text" autocomplete="name" />
             </div>
             <div class="field">
               <label for="contactInfo">Contact (phone / email)</label>
-              <input id="contactInfo" type="text" autocomplete="email" placeholder="Duty phone or email" />
-            </div>
-            <div class="field" style="grid-column:1/-1">
-              <label for="reportLogoSource">Report logo</label>
-              <select id="reportLogoSource">
-                <option value="benham">Benham</option>
-                <option value="haskell">Haskell</option>
-                <option value="upload">Upload image…</option>
-              </select>
-              <span class="sub">Shared with other Fire Toolshed water-path tools.</span>
-              <div id="reportLogoFileWrap" class="hidden" style="margin-top:0.5rem">
-                <label for="reportLogoFile" class="sub" style="display:block;margin-bottom:0.25rem">Choose logo image</label>
-                <input id="reportLogoFile" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp,image/*" />
-              </div>
-              <div id="reportLogoPreview" style="margin-top:0.5rem;min-height:2rem"></div>
+              <input id="contactInfo" type="text" autocomplete="email" />
             </div>
           </div>
         </section>
@@ -99,29 +77,24 @@
           <div class="field-grid two">
             <div class="field">
               <label for="residualHydrant">Proposed residual (gauge) hydrant ID</label>
-              <input id="residualHydrant" type="text" placeholder="e.g. FH-12 / R-hydrant at Bldg 2401" />
+              <input id="residualHydrant" type="text" />
             </div>
             <div class="field">
               <label for="flowHydrants">Proposed flow hydrant ID(s)</label>
-              <input id="flowHydrants" type="text" placeholder="e.g. FH-14, FH-15 (2½″ butts)" />
+              <input id="flowHydrants" type="text" />
             </div>
             <div class="field">
-              <label for="numOutlets">Number of 2½″ outlets to flow (plan)</label>
+              <label for="numOutlets">Number of 2½″ outlets to flow</label>
               <select id="numOutlets">
                 <option value="1">1 × 2½″ outlet</option>
-                <option value="2" selected>2 × 2½″ outlets (preferred when drop is light)</option>
+                <option value="2" selected>2 × 2½″ outlets</option>
                 <option value="3">3 × 2½″ outlets</option>
                 <option value="4">4 × 2½″ outlets</option>
               </select>
-              <span class="sub">This request is limited to <strong>2½-inch outlets only</strong> (no pumper outlet in the stock procedure).</span>
-            </div>
-            <div class="field">
-              <label for="preferredWindow">Preferred time window (optional)</label>
-              <input id="preferredWindow" type="text" placeholder="e.g. 0700–1100, week of 12 Aug" />
             </div>
             <div class="field" style="grid-column:1/-1">
               <label for="hydrantReasons">Reasons for selecting these hydrants</label>
-              <textarea id="hydrantReasons" rows="3" placeholder="e.g. Closest residual to system connection; flow hydrants on same main; representative of supply to Bldg 2401; avoids construction traffic; AHJ / base fire preferred locations…"></textarea>
+              <textarea id="hydrantReasons" rows="3"></textarea>
             </div>
           </div>
         </section>
@@ -130,13 +103,8 @@
           <h2>4 · Jurisdiction / unique requirements</h2>
           <div class="field-grid two">
             <div class="field" style="grid-column:1/-1">
-              <label for="jurisdictionAsk">Request for any unique requirements of the jurisdiction / base</label>
-              <textarea id="jurisdictionAsk" rows="4" placeholder="Please identify any unique requirements for this jurisdiction or installation, for example: required observers (base fire, CE, water shop); advance notice / dig permit / road control; allowed discharge locations; residual floor policy; gauge calibration documentation; concurrent ordinary demand constraints; test hours; PPE / escort; or preferred data sheet format."></textarea>
-              <span class="sub">Leave blank to include the stock ask on the printed package (recommended).</span>
-            </div>
-            <div class="field" style="grid-column:1/-1">
-              <label for="additionalNotes">Additional notes (optional)</label>
-              <textarea id="additionalNotes" rows="2" placeholder="Access, traffic control, discharge path, concurrent construction, etc."></textarea>
+              <label for="jurisdictionAsk">Unique requirements of the jurisdiction / base</label>
+              <textarea id="jurisdictionAsk" rows="4"></textarea>
             </div>
           </div>
         </section>
@@ -144,34 +112,21 @@
 
       <div>
         <section class="panel sticky-preview no-print">
-          <h2>Live package preview</h2>
-          <p class="hint">Print or Save for the formal request. Preview updates as you type.</p>
+          <h2>Package preview</h2>
           <div id="livePreview" class="preview-box"></div>
-        </section>
-
-        <section class="panel no-print">
-          <h2>Outlet limitation</h2>
-          <p class="hint" style="margin:0">
-            Stock procedures in this package apply to flowing <strong>2½-inch hydrant outlets only</strong>
-            (typical hose outlets). Pumper outlets are intentionally excluded from this request template.
-            If a pumper-outlet test is required by the AHJ or base, note it under jurisdiction requirements
-            and confirm equipment / coefficients separately.
-          </p>
         </section>
       </div>
     </div>
 
-    <!-- Print package -->
+    <!-- Print package (hidden on screen layout; used for page print) -->
     <section class="print-package panel" id="printPackage">
       <div id="reportLogoPrint"></div>
       <div id="printBody"></div>
     </section>
 
     <footer class="site-foot no-print">
-      Flow Test Request · Fire Toolshed · NFPA 291 guidance package ·
-      Not a substitute for the adopted edition of NFPA 291, UFC, or installation instruction.
-      After the test is complete, enter results in the
-      <a href="../flow-test-report/">Flow Test Report</a>.
+      Flow Test Request · Fire Toolshed ·
+      <a href="../flow-test-report/">Flow Test Report</a>
     </footer>
   </div>
 

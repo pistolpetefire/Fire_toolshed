@@ -4,7 +4,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.0.0";
+  var APP_VERSION = "1.0.3";
   var STORAGE_KEY = "flow-test-request:v1";
 
   var DEFAULT_JURISDICTION =
@@ -69,10 +69,8 @@
       residualHydrant: "",
       flowHydrants: "",
       numOutlets: "2",
-      preferredWindow: "",
       hydrantReasons: "",
       jurisdictionAsk: "",
-      additionalNotes: "",
     };
   }
 
@@ -101,63 +99,6 @@
     };
   }
 
-  /**
-   * Stock NFPA 291-aligned procedures limited to 2½″ outlets.
-   * Citations are guidance references used across this toolshed (4.3–4.7, 4.11).
-   */
-  function procedureSections(purpose) {
-    var meta = purposeMeta(purpose);
-    var commonSetup = [
-      "Coordinate with the water purveyor / base water shop and fire protection authority having jurisdiction (AHJ) before flowing water.",
-      "Limit flowing outlets on this request to 2½-inch hydrant hose outlets only (do not use the pumper outlet under this stock procedure unless the AHJ explicitly redirects the test).",
-      "Equipment (typical): residual pressure gauge (often 0–200 psi class), pitot gauge (often 0–50/60 psi), pitot tube / blade, and outlet caps/diffusers as needed for safe discharge.",
-      "Verify pressure gauges are calibrated within the last 12 months (or more frequently if heavily used), per NFPA 291 gauge-calibration practice. Record gauge IDs and calibration dates on the data sheet.",
-      "Preferred layout: one residual (gauge) hydrant and one or more separate flow hydrants on the same supply, consistent with NFPA 291 multi-hydrant layout guidance (see Fig. 4.3.4 style practice). Identify residual R and flow F1…Fn on a sketch.",
-      "Confirm ordinary system demand and any unusual demand conditions on the day of test; note them on the data sheet.",
-    ];
-
-    var fieldSteps = [
-      "At the residual hydrant: install the residual gauge; bleed air from the hydrant barrel before taking the static reading (NFPA 291 4.5.2–4.5.3 practice).",
-      "Record static pressure with no test discharge (all test flow outlets closed).",
-      "Open flow hydrants one at a time (4.5.6). Flow long enough to clear debris before taking readings (4.5.7).",
-      "With dry-barrel hydrants, ensure the stem is fully open while flowing; with wet-barrel hydrants, ensure the outlet valve is wide open while flowing (4.6.8–4.6.9).",
-      "Measure discharge from each open 2½-inch outlet with a pitot. Place the pitot orifice approximately one-half the outlet diameter into the stream and square to the outlet face (4.6.3–4.6.4).",
-      "Prefer pitot pressures in the 10–30 psi band when practical (4.6.6); change tip/orifice or number of open 2½-inch outlets if readings are outside a clean range.",
-      "Apply the outlet discharge coefficient C from the outlet geometry (smooth & rounded ≈ 0.90, square & sharp ≈ 0.80, projecting ≈ 0.70; flow tube ≈ 0.95 when used) per NFPA 291 Fig. 4.7.1 practice. Compute Q = 29.83 × C × d² × √P for each 2½-inch outlet (d = 2.5 in) and sum total test flow.",
-      "Read pitot pressure(s) and residual pressure simultaneously on a common signal (4.5.8). Use portable radios if crews are separated (4.4.3).",
-      "Target a residual pressure drop of at least about 25% of static for a reliable theoretical curve (NFPA 291 4.3.6 practice). Open additional 2½-inch outlets (still no pumper under this request) if the drop is insufficient and it is safe/authorized to do so.",
-      "Record: static (psi), residual (psi), pitot (psi) per outlet, outlet diameter (2.5 in), C, computed gpm per outlet, total gpm, time, weather, hydrant IDs, main size if known, and operators.",
-      "Shut hydrants down slowly, one at a time (4.5.10). Restore caps and leave the system in a ready condition.",
-    ];
-
-    var purposeSteps =
-      purpose === "fireFlow"
-        ? [
-            "Primary objective: fire-flow / hydrant capacity. Maintain residual during the flowing test at or above the rating residual when practical (often about 20 psi residual policy); capacity at the rating residual may still be computed by N^1.85 methods if residual during the test differs.",
-            "Report estimated available flow at the rating residual and hydrant classification (Class AA / A / B / C) when required by the AHJ or base standard.",
-            "Round reported capacity in accordance with the installation’s practice (this toolshed uses nearest 50 gpm below 1,000 gpm and nearest 100 gpm at/above 1,000 gpm unless the AHJ specifies otherwise).",
-          ]
-        : [
-            "Primary objective: fire protection system water supply. Build the supply relationship between residual pressure and flow using the N^1.85 method for design handoff.",
-            "Do not require a sprinkler system demand value in the field for this request; the design team will overlay system demand later.",
-            "If residual during the test approaches or falls below the installation’s minimum residual policy, stop increasing flow and record the limiting condition.",
-          ];
-
-    var dataSheet = [
-      "Complete an NFPA 291-style data sheet (4.11 practice): project/location, date/time, purpose, residual and flow hydrant IDs, gauge calibration dates, static/residual/pitot, total flow, layout notes, and signatures of residual and pitot operators / witnesses.",
-      "Provide a simple sketch of residual vs flow hydrants relative to the building or system connection when practical.",
-      "Return results to the requestor for entry into the Flow Test Report tool (supply curve / capacity package).",
-    ];
-
-    return {
-      meta: meta,
-      commonSetup: commonSetup,
-      fieldSteps: fieldSteps,
-      purposeSteps: purposeSteps,
-      dataSheet: dataSheet,
-    };
-  }
-
   function readForm() {
     state.testPurpose =
       $("testPurpose") && $("testPurpose").value === "fireFlow"
@@ -175,14 +116,10 @@
       ($("residualHydrant") && $("residualHydrant").value.trim()) || "";
     state.flowHydrants = ($("flowHydrants") && $("flowHydrants").value.trim()) || "";
     state.numOutlets = ($("numOutlets") && $("numOutlets").value) || "2";
-    state.preferredWindow =
-      ($("preferredWindow") && $("preferredWindow").value.trim()) || "";
     state.hydrantReasons =
       ($("hydrantReasons") && $("hydrantReasons").value.trim()) || "";
     state.jurisdictionAsk =
       ($("jurisdictionAsk") && $("jurisdictionAsk").value.trim()) || "";
-    state.additionalNotes =
-      ($("additionalNotes") && $("additionalNotes").value.trim()) || "";
   }
 
   function writeForm() {
@@ -196,10 +133,8 @@
     if ($("residualHydrant")) $("residualHydrant").value = state.residualHydrant;
     if ($("flowHydrants")) $("flowHydrants").value = state.flowHydrants;
     if ($("numOutlets")) $("numOutlets").value = state.numOutlets;
-    if ($("preferredWindow")) $("preferredWindow").value = state.preferredWindow;
     if ($("hydrantReasons")) $("hydrantReasons").value = state.hydrantReasons;
     if ($("jurisdictionAsk")) $("jurisdictionAsk").value = state.jurisdictionAsk;
-    if ($("additionalNotes")) $("additionalNotes").value = state.additionalNotes;
   }
 
   function saveState() {
@@ -217,25 +152,12 @@
     } catch (_) { /* ignore */ }
   }
 
-  function listHtml(items) {
-    return (
-      "<ol>" +
-      items
-        .map(function (t) {
-          return "<li>" + escapeHtml(t) + "</li>";
-        })
-        .join("") +
-      "</ol>"
-    );
-  }
-
   function packageModel() {
     readForm();
     var projectName = sharedProjectName(state.projectName);
     if (projectName) state.projectName = projectName;
-    var proc = procedureSections(state.testPurpose);
-    var jurisdiction =
-      state.jurisdictionAsk || DEFAULT_JURISDICTION;
+    var purpose = purposeMeta(state.testPurpose);
+    var jurisdiction = state.jurisdictionAsk || DEFAULT_JURISDICTION;
     return {
       projectName: projectName || state.projectName || "—",
       requestedDate: state.requestedDate || "—",
@@ -246,15 +168,9 @@
       residualHydrant: state.residualHydrant || "—",
       flowHydrants: state.flowHydrants || "—",
       numOutlets: state.numOutlets || "2",
-      preferredWindow: state.preferredWindow || "—",
       hydrantReasons: state.hydrantReasons || "—",
       jurisdictionAsk: jurisdiction,
-      additionalNotes: state.additionalNotes || "",
-      purpose: proc.meta,
-      commonSetup: proc.commonSetup,
-      fieldSteps: proc.fieldSteps,
-      purposeSteps: proc.purposeSteps,
-      dataSheet: proc.dataSheet,
+      purpose: purpose,
     };
   }
 
@@ -267,21 +183,10 @@
     return (
       logo +
       "<h1>Hydrant Flow Test Request</h1>" +
-      '<p class="meta">Fire Toolshed · Flow Test Request v' +
-      APP_VERSION +
-      " · NFPA 291 guidance · 2½-inch outlets only · Generated " +
-      escapeHtml(new Date().toLocaleString()) +
-      "</p>" +
       "<h2>1. Purpose</h2>" +
       "<p><strong>" +
       escapeHtml(m.purpose.label) +
       "</strong></p>" +
-      "<p>" +
-      escapeHtml(m.purpose.objective) +
-      "</p>" +
-      "<p><strong>Requested deliverable:</strong> " +
-      escapeHtml(m.purpose.deliverable) +
-      "</p>" +
       "<h2>2. Project / location</h2>" +
       "<p><strong>Project name:</strong> " +
       escapeHtml(m.projectName) +
@@ -295,8 +200,6 @@
       escapeHtml(m.requestedBy) +
       "<br><strong>Contact:</strong> " +
       escapeHtml(m.contactInfo) +
-      "<br><strong>Preferred window:</strong> " +
-      escapeHtml(m.preferredWindow) +
       "</p>" +
       "<h2>3. Proposed hydrants</h2>" +
       "<p><strong>Residual (gauge) hydrant:</strong> " +
@@ -312,60 +215,17 @@
       "<h2>4. Unique jurisdiction / installation requirements</h2>" +
       "<p>" +
       escapeHtml(m.jurisdictionAsk).replace(/\n/g, "<br>") +
-      "</p>" +
-      (m.additionalNotes
-        ? "<p><strong>Additional notes:</strong><br>" +
-          escapeHtml(m.additionalNotes).replace(/\n/g, "<br>") +
-          "</p>"
-        : "") +
-      "<h2>5. Stock procedures — 2½-inch outlets only (NFPA 291)</h2>" +
-      "<p>Perform the hydrant flow test in general accordance with NFPA 291 recommended practice. " +
-      "This request authorizes / requests flowing of <strong>2½-inch outlets only</strong>.</p>" +
-      "<h3>5.1 Preparation</h3>" +
-      listHtml(m.commonSetup) +
-      "<h3>5.2 Field procedure</h3>" +
-      listHtml(m.fieldSteps) +
-      "<h3>5.3 Purpose-specific emphasis (" +
-      escapeHtml(m.purpose.short) +
-      ")</h3>" +
-      listHtml(m.purposeSteps) +
-      "<h3>5.4 Data sheet &amp; return of results</h3>" +
-      listHtml(m.dataSheet) +
-      "<h2>6. Limitations</h2>" +
-      "<ul>" +
-      "<li>Guidance package only — follow the adopted edition of NFPA 291, UFC / installation instructions, and AHJ direction if they differ.</li>" +
-      "<li>Pumper-outlet testing is outside this stock 2½-inch procedure unless the AHJ redirects the test in writing.</li>" +
-      "<li>Not a final hydraulic calculation of the fire protection system.</li>" +
-      "</ul>"
+      "</p>"
     );
   }
 
   function packagePlainText(m) {
-    function block(title, items) {
-      return (
-        title +
-        "\n" +
-        items
-          .map(function (t, i) {
-            return "  " + (i + 1) + ". " + t;
-          })
-          .join("\n") +
-        "\n"
-      );
-    }
     return (
-      "HYDRANT FLOW TEST REQUEST\n" +
-      "Fire Toolshed · Flow Test Request v" +
-      APP_VERSION +
-      " · NFPA 291 · 2½-inch outlets only\n\n" +
-      "PURPOSE\n" +
+      "HYDRANT FLOW TEST REQUEST\n\n" +
+      "1. PURPOSE\n" +
       m.purpose.label +
-      "\n" +
-      m.purpose.objective +
-      "\nDeliverable: " +
-      m.purpose.deliverable +
       "\n\n" +
-      "PROJECT / LOCATION\n" +
+      "2. PROJECT / LOCATION\n" +
       "Project name: " +
       m.projectName +
       "\nDate of requested test: " +
@@ -378,10 +238,8 @@
       m.requestedBy +
       "\nContact: " +
       m.contactInfo +
-      "\nPreferred window: " +
-      m.preferredWindow +
       "\n\n" +
-      "HYDRANTS\n" +
+      "3. PROPOSED HYDRANTS\n" +
       "Residual: " +
       m.residualHydrant +
       "\nFlow: " +
@@ -391,48 +249,19 @@
       "\nReasons for selecting hydrants:\n" +
       m.hydrantReasons +
       "\n\n" +
-      "JURISDICTION / UNIQUE REQUIREMENTS\n" +
+      "4. UNIQUE JURISDICTION / INSTALLATION REQUIREMENTS\n" +
       m.jurisdictionAsk +
-      "\n" +
-      (m.additionalNotes ? "\nAdditional notes:\n" + m.additionalNotes + "\n" : "") +
-      "\n" +
-      block("PREPARATION (2½″ only)", m.commonSetup) +
-      "\n" +
-      block("FIELD PROCEDURE", m.fieldSteps) +
-      "\n" +
-      block("PURPOSE EMPHASIS — " + m.purpose.short, m.purposeSteps) +
-      "\n" +
-      block("DATA SHEET & RETURN", m.dataSheet)
+      "\n"
     );
-  }
-
-  function updatePurposeUi() {
-    var meta = purposeMeta(state.testPurpose);
-    var hint = $("purposeHint");
-    var callout = $("purposeCallout");
-    if (hint) {
-      hint.textContent =
-        state.testPurpose === "fireFlow"
-          ? "Fire-flow package emphasizes capacity at the rating residual and hydrant class, using 2½″ outlets only."
-          : "Suppression package emphasizes the N^1.85 supply curve for system design handoff, using 2½″ outlets only.";
-    }
-    if (callout) {
-      callout.className = "callout info";
-      callout.innerHTML =
-        "<strong>" +
-        escapeHtml(meta.short) +
-        ".</strong> " +
-        escapeHtml(meta.objective);
-    }
   }
 
   function render() {
     readForm();
-    updatePurposeUi();
     var m = packageModel();
     var html = packageHtml(m, { includeLogo: false });
     if ($("livePreview")) $("livePreview").innerHTML = html;
     if ($("printBody")) $("printBody").innerHTML = html;
+    // Logo still on printed/PDF package from shared Toolshed setting (no form UI)
     if ($("reportLogoPrint") && window.FireToolshedLogo) {
       $("reportLogoPrint").innerHTML = window.FireToolshedLogo.reportHeaderHtml({
         maxHeight: 52,
@@ -454,18 +283,85 @@
     }, 400);
   }
 
+  /** Standalone document CSS for print / Save as PDF window */
+  function printDocumentCss() {
+    return (
+      "@page{size:letter;margin:0.6in 0.65in}" +
+      "html,body{margin:0;padding:0;background:#fff;color:#0f172a;" +
+      "font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.45}" +
+      "body{padding:0 0.15in}" +
+      "h1{font-size:1.35rem;margin:0 0 0.35rem;page-break-after:avoid}" +
+      "h2{font-size:1.05rem;margin:0.95rem 0 0.35rem;page-break-after:avoid}" +
+      "h3{font-size:0.95rem;margin:0.75rem 0 0.3rem;page-break-after:avoid}" +
+      "p{margin:0.35rem 0}" +
+      ".meta{color:#64748b;font-size:0.85rem;margin:0 0 0.75rem}" +
+      "ol,ul{padding-left:1.25rem;margin:0.35rem 0 0.5rem;page-break-inside:avoid}" +
+      "li{margin:0.28rem 0;page-break-inside:avoid}" +
+      "img{max-height:52px;max-width:220px;object-fit:contain}" +
+      ".report-logo{margin:0 0 0.85rem;padding-bottom:0.65rem;border-bottom:1px solid #e2e8f0;" +
+      "display:flex;align-items:center;justify-content:space-between;gap:1rem}" +
+      "@media print{body{padding:0}}"
+    );
+  }
+
+  function buildPrintableHtml(m) {
+    var title = "Flow Test Request — " + (m.projectName || "Request");
+    var body = packageHtml(m, { includeLogo: true });
+    return (
+      "<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'>" +
+      "<meta name='viewport' content='width=device-width, initial-scale=1'>" +
+      "<title>" +
+      escapeHtml(title) +
+      "</title><style>" +
+      printDocumentCss() +
+      "</style></head><body>" +
+      body +
+      "<script>" +
+      "window.onload=function(){setTimeout(function(){window.focus();window.print();},250);};" +
+      "<\/script></body></html>"
+    );
+  }
+
+  /**
+   * Open a clean document and invoke the browser print dialog.
+   * User chooses "Microsoft Print to PDF" / "Save as PDF" as the destination.
+   */
+  function printToPdf() {
+    render();
+    var m = packageModel();
+    var html = buildPrintableHtml(m);
+    var w = window.open("", "_blank");
+    if (!w) {
+      // Popup blocked — fall back to on-page print
+      toast("Popup blocked — using page print. Choose Save as PDF / Microsoft Print to PDF.");
+      setTimeout(function () {
+        window.print();
+      }, 200);
+      return;
+    }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    toast("Print dialog: choose Save as PDF (or Microsoft Print to PDF)");
+  }
+
+  function printPage() {
+    render();
+    toast("Print dialog: choose Save as PDF / Microsoft Print to PDF if you want a PDF file");
+    setTimeout(function () {
+      window.print();
+    }, 200);
+  }
+
   function saveHtml() {
     var m = packageModel();
     var name =
       (m.projectName || "flow-test-request").replace(/[^\w\-]+/g, "_").slice(0, 40) ||
       "flow-test-request";
-    var body = packageHtml(m, { includeLogo: true });
-    var html =
-      "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Flow Test Request — " +
-      escapeHtml(m.projectName) +
-      "</title><style>body{font-family:system-ui,sans-serif;max-width:800px;margin:24px auto;padding:0 16px;color:#0f172a;line-height:1.45}h1{font-size:1.4rem}h2{font-size:1.05rem;margin-top:1.25rem}h3{font-size:0.95rem;margin-top:0.85rem}.meta{color:#64748b;font-size:0.85rem}ol,ul{padding-left:1.25rem}li{margin:0.3rem 0}</style></head><body>" +
-      body +
-      "</body></html>";
+    var html = buildPrintableHtml(m).replace(
+      /<script>[\s\S]*?<\/script>/i,
+      ""
+    );
     downloadFile(name + "_flow-test-request.html", html);
     downloadFile(
       name + "_flow-test-request.json",
@@ -509,13 +405,8 @@
       el.addEventListener("input", render);
       el.addEventListener("change", render);
     });
-    $("btnPrint") &&
-      $("btnPrint").addEventListener("click", function () {
-        render();
-        setTimeout(function () {
-          window.print();
-        }, 150);
-      });
+    $("btnPrintPdf") && $("btnPrintPdf").addEventListener("click", printToPdf);
+    $("btnPrint") && $("btnPrint").addEventListener("click", printPage);
     $("btnSave") && $("btnSave").addEventListener("click", saveHtml);
     $("btnCopy") && $("btnCopy").addEventListener("click", copyText);
     $("btnReset") &&
@@ -546,16 +437,6 @@
     }
     writeForm();
     bind();
-    if ($("appVersion")) $("appVersion").textContent = "Version " + APP_VERSION;
-    if (window.FireToolshedLogo) {
-      window.FireToolshedLogo.bindControls({
-        selectId: "reportLogoSource",
-        fileId: "reportLogoFile",
-        previewId: "reportLogoPreview",
-        fileWrapId: "reportLogoFileWrap",
-        onChange: render,
-      });
-    }
     render();
   }
 

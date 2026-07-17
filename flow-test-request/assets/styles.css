@@ -170,7 +170,7 @@ a.btn-link {
 
 .hidden { display: none !important; }
 
-/* Print package */
+/* Print package (on-page preview + print target) */
 .print-package {
   margin-top: 1.25rem;
 }
@@ -181,22 +181,36 @@ a.btn-link {
 }
 
 @media print {
-  body { background: #fff; }
+  @page {
+    size: letter;
+    margin: 0.6in 0.65in;
+  }
+  html, body {
+    background: #fff !important;
+    color: #0f172a !important;
+  }
   .no-print,
   .wps-root,
+  .top,
   .top-actions,
+  .layout,
   .sticky-preview,
-  .site-foot { display: none !important; }
-  .shell { max-width: none; padding: 0; }
-  .layout { display: block; }
-  .panel { display: none; }
+  .site-foot,
+  #waterPathShell { display: none !important; }
+  .shell { max-width: none; padding: 0; margin: 0; }
+  .panel { display: none !important; }
   .print-package {
     display: block !important;
-    border: none;
-    padding: 0;
-    margin: 0;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
-  .print-package h1 { font-size: 1.35rem; margin: 0 0 0.35rem; }
-  .print-package h2 { font-size: 1.05rem; margin: 1rem 0 0.4rem; page-break-after: avoid; }
+  .print-package h1 { font-size: 1.35rem; margin: 0 0 0.35rem; page-break-after: avoid; }
+  .print-package h2 { font-size: 1.05rem; margin: 0.9rem 0 0.35rem; page-break-after: avoid; }
+  .print-package h3 { font-size: 0.95rem; margin: 0.7rem 0 0.3rem; page-break-after: avoid; }
   .print-package ol, .print-package ul { page-break-inside: avoid; }
+  .print-package li { page-break-inside: avoid; }
+  .print-package .meta { color: #64748b; font-size: 0.85rem; }
 }
