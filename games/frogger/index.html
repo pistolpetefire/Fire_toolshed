@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a1628">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="Frogger-inspired browser arcade — Fire Toolshed Games. Fan tribute for phone, tablet, and desktop.">
+  <title>Frogger · Fire Toolshed Games</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      user-select: none;
+    }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: #0a1628;
+      font-family: 'Press Start 2P', ui-monospace, Consolas, monospace;
+      color: #fff;
+    }
+    #app {
+      display: flex; flex-direction: column;
+      width: 100%; height: 100%;
+      padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+    }
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.5rem; padding: 6px 10px;
+      background: #061018; border-bottom: 2px solid #1e3a5f;
+      flex-shrink: 0; z-index: 40;
+    }
+    .top-bar a { color: #7dd3fc; text-decoration: none; font-size: 8px; font-weight: 700; }
+    .top-bar a:hover { color: #fde047; }
+    .top-bar .brand { color: #64748b; font-size: 7px; text-align: center; }
+    .icon-btn {
+      min-width: 36px; min-height: 36px; border: 2px solid #334155;
+      border-radius: 8px; background: #0f172a; color: #fff;
+      font-family: inherit; font-size: 10px; cursor: pointer; padding: 0 8px;
+    }
+    .icon-btn.on { border-color: #fde047; color: #fde047; }
+    .hidden { display: none !important; }
+
+    #stage {
+      flex: 1 1 auto; min-height: 160px; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      background: #020617; overflow: hidden;
+    }
+    canvas#game {
+      display: block; background: #000;
+      image-rendering: pixelated; image-rendering: crisp-edges;
+      box-shadow: 0 0 0 2px #1e293b;
+      max-width: 100%; max-height: 100%;
+    }
+
+    #hud {
+      position: absolute; left: 0; right: 0; top: 0;
+      padding: 6px 8px; pointer-events: none; z-index: 5;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent);
+      font-size: 8px; display: flex; justify-content: space-between; gap: 8px;
+      text-shadow: 1px 1px 0 #000;
+    }
+    #hud .hi { color: #fde047; }
+
+    #controls {
+      flex-shrink: 0; background: #061018; border-top: 2px solid #1e3a5f;
+      padding: 10px 8px calc(12px + env(safe-area-inset-bottom, 0px));
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .dpad {
+      display: grid; grid-template-columns: 64px 64px 64px; grid-template-rows: 52px 52px 52px;
+      gap: 4px; place-items: center;
+    }
+    .btn {
+      width: 60px; height: 48px; border: 3px solid #475569; border-radius: 10px;
+      background: linear-gradient(145deg, #1e293b, #0f172a); color: #e2e8f0;
+      font-family: inherit; font-size: 9px; cursor: pointer;
+      box-shadow: 0 4px 0 #000; display: flex; align-items: center; justify-content: center;
+    }
+    .btn:active, .btn.pressed { transform: translateY(3px); box-shadow: 0 1px 0 #000; }
+    .btn.up { grid-column: 2; grid-row: 1; border-color: #22c55e; }
+    .btn.left { grid-column: 1; grid-row: 2; border-color: #38bdf8; }
+    .btn.down { grid-column: 2; grid-row: 2; border-color: #a78bfa; }
+    .btn.right { grid-column: 3; grid-row: 2; border-color: #f472b6; }
+    .kbd-hint { font-size: 7px; color: #64748b; text-align: center; line-height: 1.5; }
+    kbd {
+      display: inline-block; padding: 1px 4px; border: 1px solid #475569;
+      border-radius: 3px; background: #0f172a; color: #cbd5e1; font-family: inherit; font-size: 7px;
+    }
+
+    .screen {
+      position: absolute; inset: 0; z-index: 30;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(6, 16, 24, 0.96); padding: 20px; text-align: center;
+    }
+    .title {
+      font-size: clamp(16px, 4.5vw, 26px); color: #4ade80;
+      text-shadow: 3px 3px 0 #14532d, 5px 5px 0 #000; margin-bottom: 8px; line-height: 1.35;
+    }
+    .sub { font-size: 8px; color: #94a3b8; margin-bottom: 20px; line-height: 1.5; }
+    .menu-btn {
+      background: linear-gradient(145deg, #15803d, #14532d); border: 3px solid #4ade80;
+      color: #fff; font-family: inherit; font-size: 11px; padding: 14px 28px; margin: 6px;
+      border-radius: 8px; cursor: pointer; box-shadow: 0 5px 0 #000;
+    }
+    .menu-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #000; }
+    .menu-btn.alt { background: linear-gradient(145deg, #1d4ed8, #1e3a8a); border-color: #60a5fa; }
+    .menu-btn.ghost { background: linear-gradient(145deg, #334155, #1e293b); border-color: #64748b; font-size: 10px; }
+    .howto {
+      font-size: 8px; line-height: 1.75; text-align: left; max-width: 320px; margin: 12px 0 18px;
+      color: #e2e8f0;
+    }
+    .credits { position: absolute; bottom: 12px; font-size: 7px; color: #475569; line-height: 1.5; }
+    .credits a { color: #64748b; }
+    .msg { font-size: 10px; line-height: 1.6; margin: 12px 0; text-shadow: 2px 2px 0 #000; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="top-bar">
+      <a href="../">← Games</a>
+      <span class="brand">FIRE TOOLSHED · GAMES</span>
+      <button type="button" class="icon-btn" id="btn-mute" title="Mute" aria-label="Mute">🔊</button>
+    </div>
+
+    <div id="stage">
+      <canvas id="game" width="336" height="364" aria-label="Frogger game board"></canvas>
+      <div id="hud" class="hidden">
+        <div>1-UP<br><span id="score">00000</span></div>
+        <div class="hi">HI<br><span id="hiscore">00000</span></div>
+        <div>TIME<br><span id="timebar">████████</span></div>
+        <div>LIVES<br><span id="lives">🐸🐸🐸</span></div>
+      </div>
+
+      <div id="title-screen" class="screen">
+        <div class="title">FROGGER</div>
+        <div class="sub">ARCADE / NES INSPIRED · FAN TRIBUTE</div>
+        <button type="button" class="menu-btn" id="btn-start">START</button>
+        <button type="button" class="menu-btn alt" id="btn-howto">HOW TO PLAY</button>
+        <div class="kbd-hint" style="margin-top:14px">
+          Move with <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> or on-screen pad
+        </div>
+        <div class="credits">
+          Fan remake · Not affiliated with Konami / Sega / Nintendo<br>
+          <a href="../../">Portal</a> · High score saves in this browser
+        </div>
+      </div>
+
+      <div id="howto-screen" class="screen hidden">
+        <div class="title" style="font-size:14px">HOW TO PLAY</div>
+        <div class="howto">
+          <p>• Hop from the bottom sidewalk to a home pad at the top</p>
+          <p>• <b>ROAD</b> — avoid cars (touch = splat)</p>
+          <p>• <b>RIVER</b> — ride logs &amp; turtles; open water = splash</p>
+          <p>• Fill all 5 homes to clear a level</p>
+          <p>• Timer runs out = lose a life</p>
+          <p>• Score: forward hops, homes, time bonus</p>
+        </div>
+        <button type="button" class="menu-btn ghost" id="btn-back">BACK</button>
+      </div>
+
+      <div id="result-screen" class="screen hidden">
+        <div class="title" id="result-title" style="font-size:16px">GAME OVER</div>
+        <div class="msg" id="result-msg"></div>
+        <button type="button" class="menu-btn" id="btn-retry">PLAY AGAIN</button>
+        <button type="button" class="menu-btn ghost" id="btn-menu">MAIN MENU</button>
+      </div>
+    </div>
+
+    <div id="controls" class="hidden">
+      <div class="dpad">
+        <button type="button" class="btn up" data-dir="up" aria-label="Up">▲</button>
+        <button type="button" class="btn left" data-dir="left" aria-label="Left">◀</button>
+        <button type="button" class="btn down" data-dir="down" aria-label="Down">▼</button>
+        <button type="button" class="btn right" data-dir="right" aria-label="Right">▶</button>
+      </div>
+      <div class="kbd-hint">Arrow keys · swipe-friendly pad · M mute</div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  const STORAGE = 'fireToolshed.games.frogger.v1';
+  const COLS = 14;
+  const ROWS = 13;
+  const TILE = 24;
+  const W = COLS * TILE; // 336
+  const H = ROWS * TILE + 52; // bank for status strip drawn on canvas too
+
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  canvas.width = W;
+  canvas.height = ROWS * TILE;
+
+  let muted = false;
+  let audioCtx = null;
+  let mode = 'title'; // title | play | result
+  let loopOn = false;
+  let lastT = 0;
+
+  // Row types from top (0) to bottom (12)
+  // 0 home, 1-5 river, 6 median, 7-11 road, 12 start
+  const ROW = {
+    HOME: 0,
+    RIVER_END: 5,
+    MEDIAN: 6,
+    ROAD_START: 7,
+    ROAD_END: 11,
+    START: 12,
+  };
+
+  let hiScore = 0;
+  let score = 0;
+  let lives = 3;
+  let level = 1;
+  let timeLeft = 30;
+  let homes = [false, false, false, false, false];
+  let frog = null;
+  let entities = []; // movers
+  let messages = [];
+  let freeze = 0; // brief freeze after death/home
+
+  function loadHi() {
+    try {
+      const d = JSON.parse(localStorage.getItem(STORAGE) || '{}');
+      if (typeof d.hiScore === 'number') hiScore = d.hiScore;
+      if (d.muted) muted = true;
+    } catch (_) {}
+  }
+  function saveHi() {
+    try {
+      localStorage.setItem(STORAGE, JSON.stringify({ hiScore, muted, t: Date.now() }));
+    } catch (_) {}
+  }
+
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(function () {});
+  }
+  function beep(f, d, type, vol) {
+    if (!audioCtx || muted) return;
+    try {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type || 'square';
+      o.frequency.value = f;
+      g.gain.value = vol == null ? 0.08 : vol;
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start();
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d);
+      o.stop(audioCtx.currentTime + d + 0.02);
+    } catch (_) {}
+  }
+  function sfxHop() { beep(420, 0.05, 'square', 0.06); }
+  function sfxHome() { beep(660, 0.08); setTimeout(function () { beep(880, 0.12); }, 70); }
+  function sfxDie() { beep(120, 0.2, 'sawtooth', 0.1); }
+  function sfxLevel() { beep(520, 0.08); setTimeout(function () { beep(700, 0.1); }, 80); setTimeout(function () { beep(900, 0.15); }, 160); }
+
+  function padScore(n) {
+    return String(Math.max(0, n | 0)).padStart(5, '0');
+  }
+
+  function updateHud() {
+    document.getElementById('score').textContent = padScore(score);
+    document.getElementById('hiscore').textContent = padScore(hiScore);
+    const bars = Math.max(0, Math.ceil((timeLeft / 30) * 8));
+    document.getElementById('timebar').textContent = '█'.repeat(bars) + '░'.repeat(8 - bars);
+    document.getElementById('lives').textContent = '🐸'.repeat(Math.max(0, lives)) || '—';
+  }
+
+  /** 5 home pad columns (integer grid) */
+  const HOME_COLS = [1, 4, 7, 10, 12];
+  function homeCenters() {
+    return HOME_COLS.slice();
+  }
+
+  function spawnLane(row, kind, speed, lengths, gaps, color) {
+    // place movers along a lane
+    let x = -4;
+    const items = [];
+    while (x < COLS + 6) {
+      const len = lengths[Math.floor(Math.random() * lengths.length)];
+      items.push({
+        row: row,
+        x: x,
+        w: len,
+        speed: speed,
+        kind: kind, // car | log | turtle
+        color: color,
+        dive: kind === 'turtle' ? 0 : null,
+        diveTimer: kind === 'turtle' ? 180 + Math.random() * 200 : 0,
+      });
+      x += len + gaps[Math.floor(Math.random() * gaps.length)];
+    }
+    return items;
+  }
+
+  function buildLevel() {
+    entities = [];
+    const spd = 0.025 + level * 0.006;
+    // River (rows 1-5) — top to bottom alternate directions
+    entities = entities.concat(spawnLane(1, 'log', spd * 0.9, [3, 4, 5], [2, 3], '#8B4513'));
+    entities = entities.concat(spawnLane(2, 'turtle', -spd * 1.1, [2, 3], [2, 3], '#2d6a4f'));
+    entities = entities.concat(spawnLane(3, 'log', spd * 1.2, [2, 3, 4], [3, 4], '#a0522d'));
+    entities = entities.concat(spawnLane(4, 'turtle', -spd * 0.85, [3], [2, 3], '#40916c'));
+    entities = entities.concat(spawnLane(5, 'log', spd * 1.0, [4, 5], [2, 3], '#6b3e26'));
+    // Road (rows 7-11)
+    entities = entities.concat(spawnLane(7, 'car', -spd * 1.3, [2], [3, 4, 5], '#ef4444'));
+    entities = entities.concat(spawnLane(8, 'car', spd * 0.9, [2], [4, 5], '#f59e0b'));
+    entities = entities.concat(spawnLane(9, 'car', -spd * 1.5, [2], [3, 4], '#3b82f6'));
+    entities = entities.concat(spawnLane(10, 'car', spd * 1.1, [2], [4, 6], '#a855f7'));
+    entities = entities.concat(spawnLane(11, 'car', -spd * 0.7, [2], [5, 6], '#ec4899'));
+  }
+
+  function resetFrog() {
+    frog = {
+      col: 7,
+      row: ROW.START,
+      hopCd: 0,
+      riding: null,
+      alive: true,
+      anim: 0,
+    };
+    timeLeft = Math.max(18, 32 - level * 1.5);
+    freeze = 0;
+  }
+
+  function startGame() {
+    score = 0;
+    lives = 3;
+    level = 1;
+    homes = [false, false, false, false, false];
+    buildLevel();
+    resetFrog();
+    mode = 'play';
+    showPlayUi(true);
+    updateHud();
+    lastT = performance.now();
+    if (!loopOn) {
+      loopOn = true;
+      requestAnimationFrame(loop);
+    }
+  }
+
+  function showPlayUi(on) {
+    document.getElementById('title-screen').classList.toggle('hidden', on);
+    document.getElementById('howto-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.add('hidden');
+    document.getElementById('hud').classList.toggle('hidden', !on);
+    document.getElementById('controls').classList.toggle('hidden', !on);
+    resizeCanvas();
+  }
+
+  function showTitle() {
+    mode = 'title';
+    document.getElementById('title-screen').classList.remove('hidden');
+    document.getElementById('howto-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.add('hidden');
+    document.getElementById('hud').classList.add('hidden');
+    document.getElementById('controls').classList.add('hidden');
+  }
+
+  function gameOver(wonLevel) {
+    if (score > hiScore) {
+      hiScore = score;
+      saveHi();
+    }
+    mode = 'result';
+    document.getElementById('controls').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+    const title = document.getElementById('result-title');
+    const msg = document.getElementById('result-msg');
+    if (wonLevel) {
+      title.textContent = 'LEVEL CLEAR!';
+      title.style.color = '#4ade80';
+      msg.innerHTML = 'Score ' + padScore(score) + '<br>Get ready for level ' + level;
+    } else {
+      title.textContent = 'GAME OVER';
+      title.style.color = '#f87171';
+      msg.innerHTML = 'Score ' + padScore(score) + '<br>High ' + padScore(hiScore);
+    }
+    updateHud();
+  }
+
+  function tryHop(dir) {
+    if (mode !== 'play' || !frog || !frog.alive || freeze > 0 || frog.hopCd > 0) return;
+    let dc = 0, dr = 0;
+    if (dir === 'up') dr = -1;
+    if (dir === 'down') dr = 1;
+    if (dir === 'left') dc = -1;
+    if (dir === 'right') dc = 1;
+    const nc = frog.col + dc;
+    const nr = frog.row + dr;
+    if (nc < 0 || nc >= COLS || nr < 0 || nr >= ROWS) return;
+    // can't hop into filled home wrong pad handled later
+    frog.col = nc;
+    frog.row = nr;
+    frog.hopCd = 8;
+    frog.anim = 6;
+    frog.riding = null;
+    sfxHop();
+    if (dr < 0) {
+      score += 10;
+      if (score > hiScore) { hiScore = score; saveHi(); }
+    }
+    updateHud();
+    checkTile();
+  }
+
+  function onHome() {
+    const centers = homeCenters();
+    let pad = -1;
+    for (let i = 0; i < centers.length; i++) {
+      if (frog.col === centers[i] || frog.col === centers[i] + 1) {
+        pad = i;
+        break;
+      }
+    }
+    if (pad < 0) {
+      kill('bush');
+      return;
+    }
+    if (homes[pad]) {
+      kill('occupied');
+      return;
+    }
+    frog.col = centers[pad];
+    homes[pad] = true;
+    const bonus = Math.floor(timeLeft * 10) + 50;
+    score += 50 + bonus;
+    if (score > hiScore) { hiScore = score; saveHi(); }
+    sfxHome();
+    updateHud();
+    if (homes.every(Boolean)) {
+      score += 200 * level;
+      level++;
+      sfxLevel();
+      homes = [false, false, false, false, false];
+      buildLevel();
+      freeze = 40;
+      resetFrog();
+      updateHud();
+    } else {
+      freeze = 25;
+      resetFrog();
+    }
+  }
+
+  function kill(why) {
+    if (!frog.alive) return;
+    frog.alive = false;
+    sfxDie();
+    lives--;
+    updateHud();
+    freeze = 35;
+    setTimeout(function () {
+      if (lives <= 0) {
+        gameOver(false);
+      } else {
+        resetFrog();
+        updateHud();
+      }
+    }, 450);
+  }
+
+  function checkTile() {
+    if (!frog || !frog.alive) return;
+    const r = frog.row;
+    const c = frog.col;
+
+    if (r === ROW.HOME) {
+      onHome();
+      return;
+    }
+
+    // road collision
+    if (r >= ROW.ROAD_START && r <= ROW.ROAD_END) {
+      for (let i = 0; i < entities.length; i++) {
+        const e = entities[i];
+        if (e.row !== r || e.kind !== 'car') continue;
+        if (c + 0.7 > e.x && c < e.x + e.w - 0.15) {
+          kill('car');
+          return;
+        }
+      }
+    }
+
+    // river
+    if (r >= 1 && r <= ROW.RIVER_END) {
+      let onPlatform = false;
+      frog.riding = null;
+      for (let i = 0; i < entities.length; i++) {
+        const e = entities[i];
+        if (e.row !== r) continue;
+        if (e.kind === 'car') continue;
+        if (e.kind === 'turtle' && e.dive > 0.55) continue; // submerged
+        if (c + 0.65 > e.x && c < e.x + e.w - 0.1) {
+          onPlatform = true;
+          frog.riding = e;
+          break;
+        }
+      }
+      if (!onPlatform) kill('drown');
+    }
+  }
+
+  function update(dt) {
+    if (mode !== 'play') return;
+    if (freeze > 0) {
+      freeze--;
+      return;
+    }
+    if (!frog || !frog.alive) return;
+
+    timeLeft -= dt;
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      kill('time');
+      return;
+    }
+
+    // move entities
+    for (let i = 0; i < entities.length; i++) {
+      const e = entities[i];
+      e.x += e.speed * 60 * dt;
+      // wrap
+      if (e.speed > 0 && e.x > COLS + 2) e.x = -e.w - 1;
+      if (e.speed < 0 && e.x + e.w < -2) e.x = COLS + 1;
+      if (e.kind === 'turtle') {
+        e.diveTimer -= 60 * dt;
+        if (e.diveTimer <= 0) {
+          e.dive = (e.dive || 0) + 0.02;
+          if (e.dive > 1.2) {
+            e.dive = 0;
+            e.diveTimer = 200 + Math.random() * 180;
+          }
+        }
+      }
+    }
+
+    // ride log/turtle
+    if (frog.riding) {
+      frog.col += frog.riding.speed * 60 * dt;
+      if (frog.col < -0.2 || frog.col > COLS - 0.8) {
+        kill('edge');
+        return;
+      }
+    }
+
+    if (frog.hopCd > 0) frog.hopCd--;
+    if (frog.anim > 0) frog.anim--;
+
+    // continuous collision while standing
+    checkTile();
+    updateHud();
+  }
+
+  // ——— drawing ———
+  function draw() {
+    // bands
+    for (let r = 0; r < ROWS; r++) {
+      let color = '#1a1a1a';
+      if (r === ROW.HOME) color = '#14532d';
+      else if (r >= 1 && r <= ROW.RIVER_END) color = '#0c4a6e';
+      else if (r === ROW.MEDIAN) color = '#3f3f46';
+      else if (r >= ROW.ROAD_START && r <= ROW.ROAD_END) color = '#18181b';
+      else if (r === ROW.START) color = '#3f3f46';
+      ctx.fillStyle = color;
+      ctx.fillRect(0, r * TILE, W, TILE);
+    }
+
+    // home bushes + pads
+    const centers = homeCenters();
+    for (let i = 0; i < COLS; i++) {
+      // foliage between pads
+      ctx.fillStyle = '#166534';
+      ctx.fillRect(i * TILE, 0, TILE, TILE);
+    }
+    for (let i = 0; i < centers.length; i++) {
+      const cx = centers[i] * TILE;
+      ctx.fillStyle = homes[i] ? '#14532d' : '#0f172a';
+      ctx.fillRect(cx, 2, TILE * 2 - 2, TILE - 4);
+      ctx.strokeStyle = '#4ade80';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(cx + 1, 3, TILE * 2 - 4, TILE - 6);
+      if (homes[i]) {
+        drawFrogSprite(cx + TILE, TILE * 0.5, 0.75, true);
+      }
+    }
+
+    // road lines
+    ctx.strokeStyle = '#facc15';
+    ctx.setLineDash([6, 8]);
+    ctx.lineWidth = 1;
+    for (let r = ROW.ROAD_START; r < ROW.ROAD_END; r++) {
+      const y = (r + 1) * TILE;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // entities
+    for (let i = 0; i < entities.length; i++) {
+      drawEntity(entities[i]);
+    }
+
+    // frog
+    if (frog && frog.alive) {
+      const fx = frog.col * TILE + TILE / 2;
+      const fy = frog.row * TILE + TILE / 2;
+      const sc = frog.anim > 0 ? 1.1 : 1;
+      drawFrogSprite(fx, fy, sc, false);
+    } else if (frog && !frog.alive) {
+      ctx.fillStyle = '#f87171';
+      ctx.font = '10px "Press Start 2P"';
+      ctx.textAlign = 'center';
+      ctx.fillText('X', frog.col * TILE + TILE / 2, frog.row * TILE + TILE / 2 + 4);
+    }
+
+    // level label
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillRect(W - 70, ROWS * TILE - 18, 66, 14);
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '8px "Press Start 2P"';
+    ctx.textAlign = 'right';
+    ctx.fillText('LV' + level, W - 6, ROWS * TILE - 6);
+  }
+
+  function drawEntity(e) {
+    const y = e.row * TILE + 3;
+    const h = TILE - 6;
+    const x = e.x * TILE;
+    const w = e.w * TILE;
+    if (e.kind === 'car') {
+      ctx.fillStyle = e.color;
+      roundRect(x, y + 2, w - 2, h - 4, 4);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillRect(x + 4, y + 5, 6, 4);
+      ctx.fillRect(x + w - 12, y + 5, 6, 4);
+      // wheels
+      ctx.fillStyle = '#111';
+      ctx.fillRect(x + 3, y + h - 6, 5, 3);
+      ctx.fillRect(x + w - 10, y + h - 6, 5, 3);
+    } else if (e.kind === 'log') {
+      ctx.fillStyle = e.color;
+      roundRect(x, y + 4, w - 2, h - 8, 6);
+      ctx.fillStyle = 'rgba(0,0,0,0.25)';
+      for (let i = 0; i < e.w; i++) {
+        ctx.fillRect(x + i * TILE + 6, y + 6, 2, h - 12);
+      }
+    } else if (e.kind === 'turtle') {
+      const dive = e.dive || 0;
+      if (dive > 0.9) return;
+      const alpha = 1 - Math.min(1, dive);
+      ctx.globalAlpha = alpha;
+      const n = Math.max(1, Math.floor(e.w));
+      for (let i = 0; i < n; i++) {
+        const tx = x + i * TILE + 4;
+        ctx.fillStyle = e.color;
+        ctx.beginPath();
+        ctx.ellipse(tx + 8, y + h / 2, 9, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#86efac';
+        ctx.beginPath();
+        ctx.arc(tx + 8, y + h / 2 - 1, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawFrogSprite(cx, cy, scale, home) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(scale, scale);
+    // body
+    ctx.fillStyle = home ? '#86efac' : '#4ade80';
+    ctx.beginPath();
+    ctx.ellipse(0, 1, 8, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // head
+    ctx.beginPath();
+    ctx.ellipse(0, -5, 6, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // eyes
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(-5, -9, 4, 4);
+    ctx.fillRect(1, -9, 4, 4);
+    ctx.fillStyle = '#14532d';
+    ctx.fillRect(-4, -8, 2, 2);
+    ctx.fillRect(2, -8, 2, 2);
+    // legs
+    ctx.fillStyle = home ? '#4ade80' : '#22c55e';
+    ctx.fillRect(-10, 2, 5, 3);
+    ctx.fillRect(5, 2, 5, 3);
+    ctx.fillRect(-8, 6, 4, 3);
+    ctx.fillRect(4, 6, 4, 3);
+    ctx.restore();
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function loop(t) {
+    if (!loopOn) return;
+    const dt = Math.min(0.05, (t - lastT) / 1000 || 0.016);
+    lastT = t;
+    if (mode === 'play') update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  function resizeCanvas() {
+    const stage = document.getElementById('stage');
+    if (!stage) return;
+    const maxW = Math.max(160, stage.clientWidth || window.innerWidth);
+    const maxH = Math.max(140, stage.clientHeight || window.innerHeight * 0.5);
+    const scale = Math.min(maxW / canvas.width, maxH / canvas.height, 3);
+    const w = Math.floor(canvas.width * scale);
+    const h = Math.floor(canvas.height * scale);
+    canvas.style.width = Math.max(1, w) + 'px';
+    canvas.style.height = Math.max(1, h) + 'px';
+  }
+
+  // input
+  window.addEventListener('keydown', function (e) {
+    if (e.repeat) return;
+    if (e.code === 'KeyM') {
+      muted = !muted;
+      document.getElementById('btn-mute').textContent = muted ? '🔇' : '🔊';
+      document.getElementById('btn-mute').classList.toggle('on', muted);
+      saveHi();
+      return;
+    }
+    if (mode !== 'play') return;
+    const map = {
+      ArrowUp: 'up', KeyW: 'up',
+      ArrowDown: 'down', KeyS: 'down',
+      ArrowLeft: 'left', KeyA: 'left',
+      ArrowRight: 'right', KeyD: 'right',
+    };
+    if (map[e.code]) {
+      e.preventDefault();
+      initAudio();
+      tryHop(map[e.code]);
+    }
+  });
+
+  document.querySelectorAll('.btn[data-dir]').forEach(function (btn) {
+    const dir = btn.getAttribute('data-dir');
+    const go = function (ev) {
+      ev.preventDefault();
+      initAudio();
+      btn.classList.add('pressed');
+      tryHop(dir);
+    };
+    const end = function (ev) {
+      ev.preventDefault();
+      btn.classList.remove('pressed');
+    };
+    btn.addEventListener('touchstart', go, { passive: false });
+    btn.addEventListener('touchend', end, { passive: false });
+    btn.addEventListener('mousedown', go);
+    btn.addEventListener('mouseup', end);
+    btn.addEventListener('mouseleave', end);
+  });
+
+  document.getElementById('btn-start').onclick = function () {
+    initAudio();
+    startGame();
+  };
+  document.getElementById('btn-howto').onclick = function () {
+    document.getElementById('title-screen').classList.add('hidden');
+    document.getElementById('howto-screen').classList.remove('hidden');
+  };
+  document.getElementById('btn-back').onclick = function () {
+    document.getElementById('howto-screen').classList.add('hidden');
+    document.getElementById('title-screen').classList.remove('hidden');
+  };
+  document.getElementById('btn-retry').onclick = function () {
+    initAudio();
+    startGame();
+  };
+  document.getElementById('btn-menu').onclick = function () {
+    showTitle();
+    draw();
+  };
+  document.getElementById('btn-mute').onclick = function () {
+    muted = !muted;
+    this.textContent = muted ? '🔇' : '🔊';
+    this.classList.toggle('on', muted);
+    saveHi();
+    if (!muted) initAudio();
+  };
+
+  window.addEventListener('resize', resizeCanvas);
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(resizeCanvas).observe(document.getElementById('stage'));
+  }
+
+  loadHi();
+  document.getElementById('btn-mute').textContent = muted ? '🔇' : '🔊';
+  updateHud();
+  showTitle();
+  resizeCanvas();
+  // idle draw for title underlay
+  buildLevel();
+  draw();
+  loopOn = true;
+  requestAnimationFrame(loop);
+
+  document.body.addEventListener('touchmove', function (e) {
+    if (e.target.closest('#controls') || e.target.closest('.top-bar')) return;
+    e.preventDefault();
+  }, { passive: false });
+})();
+</script>
+</body>
+</html>
