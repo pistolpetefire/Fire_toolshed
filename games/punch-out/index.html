@@ -75,21 +75,32 @@
   .icon-btn.on { border-color: #f1c40f; color: #f1c40f; }
   
   #canvas-wrap {
-    flex: 1;
+    flex: 1 1 auto;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #000;
-    min-height: 0;
+    background: #0d0d18;
+    min-height: 180px;
+    width: 100%;
+    overflow: hidden;
   }
   
-  canvas {
+  canvas#gameCanvas {
     display: block;
+    width: min(100%, 720px);
+    height: auto;
     max-width: 100%;
     max-height: 100%;
+    background: #1a1a2e;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+    box-shadow: 0 0 0 2px #222;
+  }
+
+  /* Generic hide (menus + fight chrome) */
+  .hidden {
+    display: none !important;
   }
   
   /* HUD Overlay */
@@ -546,17 +557,36 @@ const STORAGE_KEY = 'fireToolshed.games.punchOut.v1';
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Scale canvas for retina
+// Fit canvas CSS size into #canvas-wrap (drawing buffer stays 400×320)
 function resizeCanvas() {
   const wrap = document.getElementById('canvas-wrap');
-  const maxW = wrap.clientWidth;
-  const maxH = wrap.clientHeight;
-  const scale = Math.min(maxW / 400, maxH / 320);
-  canvas.style.width = (400 * scale) + 'px';
-  canvas.style.height = (320 * scale) + 'px';
+  if (!wrap || !canvas) return;
+  // Prefer measured wrap; fall back so we never size to 0 (black screen)
+  let maxW = wrap.clientWidth || wrap.offsetWidth || window.innerWidth || 400;
+  let maxH = wrap.clientHeight || wrap.offsetHeight || Math.floor(window.innerHeight * 0.55) || 320;
+  maxW = Math.max(maxW, 160);
+  maxH = Math.max(maxH, 140);
+  const scale = Math.min(maxW / 400, maxH / 320, 2.5);
+  const w = Math.max(1, Math.floor(400 * scale));
+  const h = Math.max(1, Math.floor(320 * scale));
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+}
+function resizeCanvasSoon() {
+  resizeCanvas();
+  requestAnimationFrame(() => {
+    resizeCanvas();
+    // one more after layout settles (controls shown, etc.)
+    requestAnimationFrame(resizeCanvas);
+  });
 }
 window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+window.addEventListener('orientationchange', () => setTimeout(resizeCanvasSoon, 120));
+if (typeof ResizeObserver !== 'undefined') {
+  const wrap = document.getElementById('canvas-wrap');
+  if (wrap) new ResizeObserver(() => resizeCanvas()).observe(wrap);
+}
+resizeCanvasSoon();
 
 // ========== AUDIO (simple Web Audio beeps) ==========
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -889,9 +919,14 @@ function startFight(fighterIndex) {
   if (pov) pov.classList.remove('show');
   sfxBell();
   lastTime = performance.now();
+  // Size canvas after controls/HUD are visible (avoids 0-height black arena)
+  resizeCanvasSoon();
   // Always (re)start loop for a new fight
   loopRunning = true;
-  requestAnimationFrame(gameLoop);
+  requestAnimationFrame(function fightFrame(ts) {
+    resizeCanvas();
+    gameLoop(ts);
+  });
 }
 
 function updateHUD() {
@@ -1276,7 +1311,9 @@ function updateParticles() {
 
 // ========== DRAWING ==========
 function draw() {
-  // Clear
+  if (!ctx) return;
+  // Clear (logical 400×320 buffer)
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = '#1a1a2e';
   ctx.fillRect(0, 0, 400, 320);
   
