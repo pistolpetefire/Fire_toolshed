@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Deflagration vent sizing for rooms and process equipment per NFPA 68 — dust and gas. IBC/IFC explosion control context.">
+  <title>Deflagration Vent Sizing · Fire Toolshed</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Fire Toolshed · Explosion protection</p>
+        <h1>Deflagration Vent Sizing</h1>
+        <p class="version" id="appVersion">Version 1.1.1</p>
+        <p class="lead">
+          Preliminary <strong>room</strong> and process-equipment deflagration vent area using
+          <strong>NFPA 68</strong>. Most common use: <strong>room vent sizing</strong> for dust or gas/vapor.
+          IBC/IFC may require explosion control by reference to NFPA 68/69/652.
+        </p>
+      </div>
+      <div class="top-actions no-print">
+        <button type="button" id="btnHelp" class="ghost" title="Help for every input and option">Help / Guide</button>
+        <button type="button" id="btnPrintPdf" class="primary">Print to PDF</button>
+        <button type="button" id="btnSave">Save report</button>
+        <a class="btn-link" href="../">Portal</a>
+        <button type="button" id="btnReset" class="ghost">Reset</button>
+      </div>
+    </header>
+
+    <section class="path-pick no-print" id="pathPick">
+      <h2>Select application</h2>
+      <p class="hint" style="margin:0">
+        <strong>Room vent sizing</strong> is the recommended starting path for buildings and interior spaces.
+        Process equipment is for vessels, collectors, bins, and silos.
+      </p>
+      <div class="path-grid path-grid-3">
+        <button type="button" class="path-card path-card-featured" id="pickRoomDust" data-path="room_dust">
+          <span class="path-badge">Most common</span>
+          <strong>Room — combustible dust</strong>
+          <span class="path-desc">Building / room dimensions (L×W×H), construction strength presets, K<sub>St</sub>, wall/roof vents. NFPA 68 dust method for enclosures.</span>
+          <span class="path-go">Start room (dust) →</span>
+        </button>
+        <button type="button" class="path-card" id="pickRoomGas" data-path="room_gas">
+          <span class="path-badge">Room</span>
+          <strong>Room — gas / vapor</strong>
+          <span class="path-desc">Room dimensions with K<sub>G</sub> gas/vapor correlation. Use for enclosed process rooms with flammable gas/vapor hazard.</span>
+          <span class="path-go">Start room (gas) →</span>
+        </button>
+        <button type="button" class="path-card" id="pickProcess" data-path="process_dust">
+          <span class="path-badge">Process</span>
+          <strong>Process equipment — dust</strong>
+          <span class="path-desc">Collectors, bins, silos, vessels — enter volume and L/D (or L &amp; D). Dirty-side volume for baghouses.</span>
+          <span class="path-go">Start process (dust) →</span>
+        </button>
+        <button type="button" class="path-card" id="pickGas" data-path="process_gas">
+          <span class="path-badge">Process</span>
+          <strong>Process equipment — gas / vapor</strong>
+          <span class="path-desc">Vessels and equipment with flammable gas/vapor (K<sub>G</sub>). Compact correlation; verify elongated cases in full NFPA 68.</span>
+          <span class="path-go">Start process (gas) →</span>
+        </button>
+      </div>
+    </section>
+
+    <div id="workbench" class="hidden">
+      <div class="path-banner no-print" id="pathBanner"></div>
+
+      <section class="metrics" aria-label="Results">
+        <div class="metric">
+          <div class="label">Required vent area A<sub>v</sub></div>
+          <div class="value" id="mAv">—</div>
+          <div class="unit" id="mAvUnit">m²</div>
+        </div>
+        <div class="metric">
+          <div class="label">Geometric area</div>
+          <div class="value" id="mAeff">—</div>
+          <div class="unit" id="mAeffUnit">m² (÷ efficiency)</div>
+        </div>
+        <div class="metric">
+          <div class="label" id="mGeomLabel">L/D</div>
+          <div class="value" id="mLD">—</div>
+          <div class="unit" id="mLDNote">compact</div>
+        </div>
+        <div class="metric metric-status">
+          <div class="label">Checks</div>
+          <div class="value status" id="mStatus">—</div>
+          <div class="unit" id="mStatusSub">Enter inputs</div>
+        </div>
+      </section>
+
+      <div class="layout">
+        <div>
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Project &amp; units</h2>
+              <button type="button" id="btnChangePath" class="ghost sm">Change application</button>
+            </div>
+            <div class="field-grid two">
+              <div class="field">
+                <label for="projectName" id="labelProject">Project / room / equipment</label>
+                <input id="projectName" type="text" placeholder="e.g. Packaging Room 2 · Bldg 12" />
+              </div>
+              <div class="field">
+                <label for="units">Units</label>
+                <select id="units">
+                  <option value="us" selected>US customary (ft, ft², ft³, psi g)</option>
+                  <option value="si">SI (m, m², m³, bar g)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="reportLogoSource">Report logo</label>
+                <select id="reportLogoSource">
+                  <option value="benham">Benham</option>
+                  <option value="haskell">Haskell</option>
+                  <option value="upload">Upload image…</option>
+                </select>
+                <div id="reportLogoFileWrap" class="hidden" style="margin-top:0.35rem">
+                  <input id="reportLogoFile" type="file" accept="image/*" />
+                </div>
+                <div id="reportLogoPreview" style="margin-top:0.35rem"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ROOM GEOMETRY -->
+          <section class="panel" id="panelRoomGeom">
+            <h2>Room geometry</h2>
+            <p class="hint" id="roomGeomHint">Enter room length, width, and height. Volume and L/D are calculated automatically.</p>
+            <div class="field-grid two">
+              <div class="field">
+                <label for="roomL">Room length <span class="u-len"></span></label>
+                <input id="roomL" type="number" min="0" step="any" value="40" />
+              </div>
+              <div class="field">
+                <label for="roomW">Room width <span class="u-len"></span></label>
+                <input id="roomW" type="number" min="0" step="any" value="30" />
+              </div>
+              <div class="field">
+                <label for="roomH">Room height <span class="u-len"></span></label>
+                <input id="roomH" type="number" min="0" step="any" value="12" />
+              </div>
+              <div class="field">
+                <label for="fillFrac">Deflagrable fill fraction</label>
+                <input id="fillFrac" type="number" min="0.05" max="1" step="0.05" value="1.0" />
+                <span class="sub">1.0 = full room volume. Use &lt;1 only when a documented partial-volume dust/gas cloud is justified (large rooms).</span>
+              </div>
+              <div class="field">
+                <label>Calculated room volume</label>
+                <div class="readonly-box" id="roomVolDisplay">—</div>
+              </div>
+              <div class="field">
+                <label>Calculated L/D (from dimensions)</label>
+                <div class="readonly-box" id="roomLDDisplay">—</div>
+                <span class="sub">L = longest room dimension; D from cross-section perpendicular to L (NFPA 68 style).</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- PROCESS GEOMETRY -->
+          <section class="panel hidden" id="panelProcessGeom">
+            <h2>Equipment geometry</h2>
+            <div class="field-grid two">
+              <div class="field">
+                <label for="volume">Enclosure volume V <span class="u-vol"></span></label>
+                <input id="volume" type="number" min="0" step="any" value="350" />
+                <span class="sub" id="volumeHint">Dirty volume for dust collectors when applicable.</span>
+              </div>
+              <div class="field">
+                <label for="ldRatio">Length-to-diameter ratio L/D</label>
+                <input id="ldRatio" type="number" min="0.1" step="0.1" value="1.5" />
+                <span class="sub">L/D ≤ 2 compact · 2–6 elongated · &gt;6 special methods.</span>
+              </div>
+              <div class="field">
+                <label for="length">Length L (optional) <span class="u-len"></span></label>
+                <input id="length" type="number" min="0" step="any" placeholder="optional" />
+              </div>
+              <div class="field">
+                <label for="diameter">Hydraulic diameter D (optional) <span class="u-len"></span></label>
+                <input id="diameter" type="number" min="0" step="any" placeholder="optional" />
+              </div>
+            </div>
+          </section>
+
+          <!-- ROOM STRUCTURE PRESETS -->
+          <section class="panel" id="panelRoomStruct">
+            <h2>Room construction &amp; vent placement</h2>
+            <div class="field-grid two">
+              <div class="field">
+                <label for="construction">Building / room construction (sets default P<sub>red</sub>)</label>
+                <select id="construction">
+                  <option value="light_metal" selected>Light metal / panel building (low strength)</option>
+                  <option value="masonry">Masonry / tilt-up (moderate)</option>
+                  <option value="concrete">Reinforced concrete (higher strength)</option>
+                  <option value="custom">Custom — enter P<sub>red</sub> / strength manually</option>
+                </select>
+                <span class="sub" id="constructionHint">Presets suggest typical reduced pressures for rooms — verify with structural engineer.</span>
+              </div>
+              <div class="field">
+                <label for="ventLocation">Primary vent location</label>
+                <select id="ventLocation">
+                  <option value="wall" selected>Exterior wall(s)</option>
+                  <option value="roof">Roof</option>
+                  <option value="both">Walls and roof</option>
+                </select>
+                <span class="sub">Affects guidance only — discharge must not endanger people or adjacent structures.</span>
+              </div>
+              <div class="field">
+                <label for="wallAreaAvail">Available wall/roof vent area (optional) <span class="u-area"></span></label>
+                <input id="wallAreaAvail" type="number" min="0" step="any" placeholder="optional" />
+                <span class="sub">Compare to required geometric area (e.g. blow-out panels, lightweight wall).</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>Deflagration &amp; vent parameters</h2>
+            <div class="field-grid two">
+              <div class="field" id="fieldKst">
+                <label for="kst">K<sub>St</sub> (dust deflagration index)</label>
+                <input id="kst" type="number" min="0" step="any" value="150" />
+                <span class="sub">bar·m/s from dust testing. St1 ≤200, St2 ≤300, St3 &gt;300.</span>
+              </div>
+              <div class="field hidden" id="fieldKg">
+                <label for="kg">K<sub>G</sub> (gas deflagration index)</label>
+                <input id="kg" type="number" min="0" step="any" value="100" />
+                <span class="sub">bar·m/s. Use tested/documented values for the mixture.</span>
+              </div>
+              <div class="field">
+                <label for="pstat">P<sub>stat</sub> — vent static activation <span class="u-p"></span></label>
+                <input id="pstat" type="number" min="0" step="any" value="0.5" />
+                <span class="sub">Opening pressure of vent panels (gauge). Room panels often ~0.5–1.5 psi.</span>
+              </div>
+              <div class="field">
+                <label for="pred">P<sub>red</sub> — reduced explosion pressure <span class="u-p"></span></label>
+                <input id="pred" type="number" min="0" step="any" value="1.5" />
+                <span class="sub">Max pressure the room/enclosure is allowed to see. Lower for weak buildings → more vent area.</span>
+              </div>
+              <div class="field">
+                <label for="pmax">Allowable enclosure pressure <span class="u-p"></span> (optional)</label>
+                <input id="pmax" type="number" min="0" step="any" placeholder="structural allowable" />
+                <span class="sub">From structural assessment. P<sub>red</sub> must stay below this.</span>
+              </div>
+              <div class="field">
+                <label for="efficiency">Vent efficiency E<sub>f</sub></label>
+                <input id="efficiency" type="number" min="0.1" max="1" step="0.05" value="1.0" />
+                <span class="sub">1.0 = free vent. Hinged panels / constraints reduce E<sub>f</sub> (need more area).</span>
+              </div>
+              <div class="field">
+                <label for="panelArea">Panel free area each (optional) <span class="u-area"></span></label>
+                <input id="panelArea" type="number" min="0" step="any" placeholder="optional" />
+              </div>
+              <div class="field">
+                <label for="notes">Notes</label>
+                <input id="notes" type="text" placeholder="Dust type, occupancy, outdoor discharge path…" />
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div>
+          <section class="panel sticky">
+            <h2>Results</h2>
+            <div id="resultBox" class="result-box"></div>
+            <div id="checkBox" class="callout info" style="margin-top:0.75rem"></div>
+            <h3 class="subhead">Code context</h3>
+            <ul class="notes">
+              <li><strong>NFPA 68</strong> — deflagration vent sizing (rooms &amp; equipment).</li>
+              <li><strong>NFPA 69</strong> — prevention / isolation alternatives.</li>
+              <li><strong>NFPA 652 / 654</strong> — dust hazard analysis; may require room venting.</li>
+              <li><strong>IBC / IFC</strong> — explosion control for applicable high-hazard / process conditions.</li>
+            </ul>
+            <h3 class="subhead">Limitations</h3>
+            <ul class="notes" id="limitNotes">
+              <li>Preliminary only — confirm NFPA 68 edition and structural allowable pressure.</li>
+              <li>Vent fireball / blast path must not endanger people or adjacent buildings.</li>
+              <li>Not a substitute for DHA, structural PE, or listed system design.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <section class="print-package panel" id="printPackage">
+      <div id="reportLogoPrint"></div>
+      <div id="printBody"></div>
+    </section>
+
+    <footer class="site-foot no-print">
+      Deflagration Vent Sizing · Fire Toolshed · Room &amp; process · NFPA 68 ·
+      <a href="../">Portal</a>
+      · <button type="button" id="btnHelpFoot" class="linkish">Help / Guide</button>
+    </footer>
+  </div>
+
+  <div id="helpModal" class="modal hidden" aria-hidden="true" role="dialog" aria-labelledby="helpTitle">
+    <div class="modal-backdrop" id="helpBackdrop"></div>
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h2 id="helpTitle">Deflagration Vent Sizing — Help / Input Guide</h2>
+        <button type="button" id="helpClose" class="ghost">Close</button>
+      </div>
+      <div class="modal-body">
+        <p class="help-intro">
+          This tool sizes <strong>deflagration vents</strong> so explosion pressure is limited to a reduced value
+          (<em>P<sub>red</sub></em>) the room or equipment can survive. Primary basis: <strong>NFPA 68</strong>
+          (Explosion Protection by Deflagration Venting). <strong>IBC / IFC</strong> often require explosion control
+          and reference NFPA 68 / 69 / 652.
+        </p>
+        <p class="help-intro">
+          <strong>Most common use: room vent sizing.</strong> Pick
+          <em>Room — combustible dust</em> (or room gas), enter L×W×H and a construction preset, then K<sub>St</sub> / K<sub>G</sub>.
+          Process-equipment paths are for vessels, collectors, bins, and silos.
+        </p>
+
+        <h3>Quick start — room (dust)</h3>
+        <ol>
+          <li>Choose <strong>Room — combustible dust</strong>.</li>
+          <li>Set units (US ft/psi is default for rooms).</li>
+          <li>Enter room <strong>length, width, height</strong> (interior clear).</li>
+          <li>Pick <strong>construction</strong> (sets starting P<sub>stat</sub>, P<sub>red</sub>, allowable pressure).</li>
+          <li>Enter <strong>K<sub>St</sub></strong> from dust testing; adjust P<sub>stat</sub>/P<sub>red</sub> if needed.</li>
+          <li>Optional: available wall/roof vent area and panel size.</li>
+          <li>Read required free area A<sub>v</sub> and geometric area (after efficiency). Print/Save for the package.</li>
+        </ol>
+
+        <h3>1 · Application paths (start screen)</h3>
+        <dl class="help-dl">
+          <dt>Room — combustible dust (most common)</dt>
+          <dd>
+            Buildings and interior rooms with combustible dust (packaging, milling, recycling, wood, food, etc.).
+            Geometry is from <strong>L×W×H</strong>; volume and L/D are calculated. Construction presets seed room-strength pressures.
+            Standards context: NFPA 68 + dust hazard analysis (NFPA 652/654); IBC/IFC may require explosion control.
+          </dd>
+          <dt>Room — gas / vapor</dt>
+          <dd>
+            Same room geometry workflow, but fuel is flammable gas/vapor using <strong>K<sub>G</sub></strong>.
+            Confirm concentration, ignition scenario, and NFPA 68 gas chapter applicability.
+          </dd>
+          <dt>Process equipment — dust</dt>
+          <dd>
+            Baghouses, bins, silos, mills, vessels. Enter free volume and L/D (or L and D).
+            For dust collectors use <strong>dirty-side volume</strong> that can participate in the deflagration.
+          </dd>
+          <dt>Process equipment — gas / vapor</dt>
+          <dd>Process vessels with gas/vapor hazard (K<sub>G</sub>). Compact gas correlation; elongated cases need full NFPA 68 treatment.</dd>
+          <dt>Change application</dt>
+          <dd>Returns to the path chooser to switch room ↔ process or dust ↔ gas.</dd>
+        </dl>
+
+        <h3>2 · Project &amp; units</h3>
+        <dl class="help-dl">
+          <dt>Project / room name (or equipment tag)</dt>
+          <dd>Label on reports (e.g. Packaging Room 2, BH-1). Shown on Print/Save output.</dd>
+          <dt>Units — US customary (default for rooms)</dt>
+          <dd>Length <strong>ft</strong>, area <strong>ft²</strong>, volume <strong>ft³</strong>, pressure <strong>psi gauge</strong>. Converted to SI for equations; results shown in US units.</dd>
+          <dt>Units — SI</dt>
+          <dd>Length <strong>m</strong>, area <strong>m²</strong>, volume <strong>m³</strong>, pressure <strong>bar gauge</strong>.</dd>
+          <dt>Report logo</dt>
+          <dd>Benham / Haskell placeholder or upload. Shared across Fire Toolshed tools; appears on PDF/HTML reports.</dd>
+        </dl>
+
+        <h3>3 · Room geometry (room paths only)</h3>
+        <dl class="help-dl">
+          <dt>Room length / width / height</dt>
+          <dd>
+            Interior clear dimensions of the vented room. Geometric volume <strong>V = L × W × H</strong>.
+            Floor area = L × W (shown in results).
+          </dd>
+          <dt>How L/D is calculated for rooms</dt>
+          <dd>
+            <ul>
+              <li><strong>L</strong> = longest of L, W, H (longest flame-path dimension).</li>
+              <li>Cross-section area A = V ÷ L.</li>
+              <li><strong>D<sub>eq</sub></strong> = 2 × √(A / π) (equivalent diameter of that cross-section).</li>
+              <li><strong>L/D</strong> = L ÷ D<sub>eq</sub>.</li>
+            </ul>
+            <ul>
+              <li>L/D ≤ 2 → compact dust formula.</li>
+              <li>2 &lt; L/D ≤ 6 → elongated multiplier (more vent area).</li>
+              <li>L/D &gt; 6 → outside simple method; tool warns — use full NFPA 68 / specialist analysis.</li>
+            </ul>
+          </dd>
+          <dt>Calculated room volume / L/D (read-only)</dt>
+          <dd>Live display of geometric V (and V_eff if fill &lt; 1) and L/D with L and D<sub>eq</sub> for checking inputs.</dd>
+          <dt>Deflagrable fill fraction</dt>
+          <dd>
+            Fraction of room volume used as <strong>V_eff</strong> in the vent equation (default <strong>1.0</strong> = full room).
+            Values below 1.0 imply a partial-volume dust/gas cloud. Only reduce with documented justification
+            (NFPA 68 partial-volume methods). Lower fill reduces calculated vent area — do not reduce casually.
+          </dd>
+        </dl>
+
+        <h3>4 · Room construction &amp; vent placement (room paths only)</h3>
+        <dl class="help-dl">
+          <dt>Building / room construction</dt>
+          <dd>
+            Preset starting points for pressures (US psi g). Switching a preset overwrites P<sub>stat</sub>, P<sub>red</sub>, and allowable pressure
+            (unless you use Custom and type values yourself). Always verify with a structural engineer.
+            <ul>
+              <li><strong>Light metal / panel</strong> — P<sub>stat</sub> ≈ 0.5 psi, P<sub>red</sub> ≈ 1.5 psi, allowable ≈ 2.5 psi. Weak rooms → large vents.</li>
+              <li><strong>Masonry / tilt-up</strong> — ≈ 0.75 / 2.5 / 4.0 psi.</li>
+              <li><strong>Reinforced concrete</strong> — ≈ 1.0 / 3.5 / 6.0 psi. Higher strength may allow higher P<sub>red</sub> (smaller vents).</li>
+              <li><strong>Custom</strong> — enter all pressures manually; preset does not override.</li>
+            </ul>
+          </dd>
+          <dt>Primary vent location</dt>
+          <dd>
+            Exterior wall(s), roof, or both. Affects design notes and discharge planning only (not a separate formula).
+            Discharge must not endanger people, exits, or adjacent buildings (fireball / blast / flame jet).
+          </dd>
+          <dt>Available wall/roof vent area (optional)</dt>
+          <dd>
+            How much exterior wall or roof area can actually be used for blow-out panels or lightweight cladding.
+            The app compares this to <strong>required geometric area</strong> and flags if the available area is short.
+          </dd>
+        </dl>
+
+        <h3>5 · Process equipment geometry (process paths only)</h3>
+        <dl class="help-dl">
+          <dt>Enclosure volume V</dt>
+          <dd>Free volume of the protected equipment. Dust collectors: dirty-side volume that can explode (not necessarily clean-air volume).</dd>
+          <dt>L/D</dt>
+          <dd>Shape factor for vessels. ≤2 compact; 2–6 elongated multiplier; &gt;6 special methods required.</dd>
+          <dt>Length L / hydraulic diameter D</dt>
+          <dd>Optional. If both are entered, L/D is set automatically as L ÷ D. For non-circular sections, D is often hydraulic diameter 4A/P.</dd>
+        </dl>
+
+        <h3>6 · Deflagration &amp; vent parameters</h3>
+        <dl class="help-dl">
+          <dt>K<sub>St</sub> (dust paths)</dt>
+          <dd>
+            Dust deflagration index (bar·m/s) from closed-vessel testing (e.g. ASTM E1226 / ISO 6184).
+            Higher K<sub>St</sub> → more violent explosion → more vent area.
+            Classes shown for reference: St 1 ≤ 200, St 2 ≤ 300, St 3 &gt; 300. Prefer project-specific test data.
+          </dd>
+          <dt>K<sub>G</sub> (gas paths)</dt>
+          <dd>
+            Gas/vapor deflagration index (bar·m/s). Depends on composition and concentration.
+            Order-of-magnitude examples only (methane ≈ 55, propane ≈ 100, hydrogen ≈ 550) — do not design from examples alone.
+          </dd>
+          <dt>P<sub>stat</sub> — vent static activation</dt>
+          <dd>
+            Gauge pressure at which the vent panel opens (manufacturer rating).
+            Room panels often about 0.5–1.5 psi g. Higher P<sub>stat</sub> can increase required vent area.
+          </dd>
+          <dt>P<sub>red</sub> — reduced explosion pressure</dt>
+          <dd>
+            Maximum pressure allowed in the room/equipment during a vented deflagration.
+            <strong>Lower P<sub>red</sub> (weak rooms) requires more vent area.</strong>
+            Must be greater than P<sub>stat</sub> and less than structural allowable pressure.
+          </dd>
+          <dt>Allowable enclosure pressure (optional)</dt>
+          <dd>
+            Structural limit from engineering assessment. Tool errors if P<sub>red</sub> exceeds this; warns if P<sub>red</sub> is above about ⅔ of this value
+            (common NFPA 68 discussion of strength limits — confirm for the project).
+          </dd>
+          <dt>Vent efficiency E<sub>f</sub></dt>
+          <dd>
+            Fraction of geometric opening that acts as free vent (0.1–1.0). 1.0 = ideal free vent.
+            Hinged panels, frames, screens, and covers reduce E<sub>f</sub>.
+            <strong>Geometric area ≈ A<sub>v</sub> ÷ E<sub>f</sub></strong>. Ducted vents need additional NFPA 68 corrections (not fully modeled).
+          </dd>
+          <dt>Panel free area each (optional)</dt>
+          <dd>If one panel’s free area is known, estimates how many panels are needed (ceil of geometric area ÷ panel size).</dd>
+          <dt>Notes</dt>
+          <dd>Fuel, DHA reference, occupancy, outdoor discharge path, adjacent exposures — printed on the report.</dd>
+        </dl>
+
+        <h3>7 · Results explained</h3>
+        <dl class="help-dl">
+          <dt>Required free vent area A<sub>v</sub></dt>
+          <dd>Calculated effective vent area from the NFPA 68-style equation for the path and L/D regime.</dd>
+          <dt>Geometric area (with efficiency)</dt>
+          <dd>Physical opening area to install: A<sub>v</sub> ÷ E<sub>f</sub>. What you typically specify for panels or blow-out wall area.</dd>
+          <dt>Room L/D · regime</dt>
+          <dd>Shape regime: compact vs elongated (and room vs process labeling).</dd>
+          <dt>Wall/roof area check</dt>
+          <dd>If available vent area was entered, shows whether it meets the geometric requirement.</dd>
+          <dt>Checks — OK / CHECK / ERROR</dt>
+          <dd>
+            <strong>OK</strong> — calculation completed without hard errors (still use engineering judgment).
+            <strong>CHECK</strong> — completed with warnings (envelope, fill, strength, wall area, etc.).
+            <strong>ERROR</strong> — invalid inputs (e.g. missing dimensions, P<sub>red</sub> ≤ P<sub>stat</sub>, Pred above strength).
+          </dd>
+        </dl>
+
+        <h3>8 · Buttons</h3>
+        <dl class="help-dl">
+          <dt>Help / Guide</dt>
+          <dd>This document. Available from the header and footer (including on the path chooser). Esc or backdrop closes it.</dd>
+          <dt>Print to PDF</dt>
+          <dd>Opens a clean report, then the print dialog. Choose Save as PDF / Microsoft Print to PDF. Cancel or finish closes the popup and returns here.</dd>
+          <dt>Save report</dt>
+          <dd>Downloads an HTML report of the current inputs and results.</dd>
+          <dt>Change application</dt>
+          <dd>Return to the path chooser (room vs process, dust vs gas).</dd>
+          <dt>Reset</dt>
+          <dd>Clears saved form data and returns to the path chooser.</dd>
+        </dl>
+
+        <h3>9 · Standards (what this is / is not)</h3>
+        <ul>
+          <li><strong>NFPA 68</strong> — primary standard for deflagration vent sizing (rooms and equipment).</li>
+          <li><strong>NFPA 69</strong> — explosion prevention, isolation, suppression (not sized here).</li>
+          <li><strong>NFPA 652 / 654</strong> — dust hazard analysis; may require room or equipment protection.</li>
+          <li><strong>IBC / IFC</strong> — building/fire codes that can require explosion control by reference to NFPA methods.</li>
+        </ul>
+        <p class="help-intro">
+          <strong>Not a substitute for:</strong> dust hazard analysis (DHA), structural PE sign-off on allowable pressure,
+          listed vent assembly design, full ducted-vent or panel-inertia methods, hybrid dust–gas mixtures,
+          or consequence analysis of the outdoor fireball/blast. Confirm the adopted NFPA 68 edition and AHJ requirements.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/report-logo.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>

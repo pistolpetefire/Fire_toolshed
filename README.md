@@ -16,8 +16,9 @@ Browser-based engineering calculators for team use. Hosted with **GitHub Pages**
 
 | Tool | Path |
 |------|------|
-| [Occupant Load & Egress Capacity](./occupant-egress/) | IBC occupant load factors, egress width capacity, travel-distance checks |
+| [Occupant Load & Egress Capacity](./occupant-egress/) | IBC / NFPA 101 paths — load factors, egress width capacity, travel checks |
 | [Concrete Fire Rating Thickness](./concrete-fire-rating/) | Min. concrete / CMU thickness for 1–4 hr FRR (IBC / ACI 216.1 material tables) |
+| [Deflagration Vent Sizing](./deflagration-vent/) | NFPA 68 dust & gas vent area; IBC/IFC explosion-control context |
 | [Smoke Exhaust Scenario Lab](./smoke-exhaust-lab/app/) | Beta smoke exhaust scenarios (team testing package) |
 
 ## Local test
