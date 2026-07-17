@@ -14,7 +14,7 @@
       <div>
         <p class="eyebrow">Fire Toolshed · Life safety / code analysis</p>
         <h1>IBC / IFC Hazard Impacts</h1>
-        <p class="version" id="appVersion">Version 1.2.0</p>
+        <p class="version" id="appVersion">Version 1.3.0</p>
         <p class="lead">
           Select code edition, <strong>MAQ path</strong> (Group H vs control areas), <strong>H occupancy</strong> (IBC Ch. 3), and material hazard classes —
           or <strong>upload an HMIS / inventory spreadsheet</strong> to assess materials and populate the form.
@@ -159,14 +159,38 @@
 
         <section class="panel">
           <h2>3 · H occupancy (IBC Chapter 3)</h2>
-          <p class="hint">Select all Group H classifications that apply to the area of analysis. Multiple groups are merged; the strictest applicable construction item is kept and all triggering hazards are listed.</p>
+          <p class="hint">Select all Group H classifications that apply to the area of analysis. Multiple groups are merged; all triggering hazards and process conditions are listed under <strong>Driven by</strong>.</p>
           <div id="hSuggestBar" class="suggest-bar hidden" aria-live="polite"></div>
           <div class="check-grid" id="hGroupGrid"></div>
+          <div class="h-process" style="margin-top:0.9rem">
+            <h3 class="subhead-inline">H-1 / H-2 process condition (IBC 307)</h3>
+            <p class="hint">
+              Per IBC Group H-1 / H-2 definitions, note whether storage or use is
+              <strong>open to atmosphere</strong> (open system) and/or the system is
+              <strong>under pressure</strong> (closed system under pressure).
+              These conditions appear in the requirements <strong>Driven by</strong> column.
+            </p>
+            <div class="check-grid">
+              <label class="check-item">
+                <input type="checkbox" id="openToAtmosphere" />
+                <span>Storage / use <strong>open to atmosphere</strong> (open system)
+                  <span class="meta">IBC 307 — open use/storage; Class I liquids open to atmosphere often support H-2.</span>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="underPressure" />
+                <span>System <strong>under pressure</strong> (closed system under pressure)
+                  <span class="meta">IBC 307 — closed systems under pressure; Class I under pressure often support H-2 vs closed atmospheric → often H-3.</span>
+                </span>
+              </label>
+            </div>
+            <div id="hProcessNote" class="callout info hidden" style="margin-top:0.65rem"></div>
+          </div>
         </section>
 
         <section class="panel">
           <h2>4 · Material / hazard types (IFC Ch. 50+ classes)</h2>
-          <p class="hint">Select all hazardous material categories present (or expected). These map to IFC chapters and reinforce H-group mitigations. Suggested H groups appear above when hazards imply Chapter 3 classifications. Same requirement driven by multiple hazards is listed once with all drivers.</p>
+          <p class="hint">Select all hazardous material categories present (or expected). Use specific <strong>Flammable liquid Class IA, IB, or IC</strong> when known from SDS/HMIS — the Driven-by column will name that class. Same requirement driven by multiple hazards is listed once with all drivers.</p>
           <div class="check-grid" id="hazardGrid"></div>
           <div class="field" style="margin-top:0.85rem">
             <label class="check-item">
@@ -221,7 +245,7 @@
               <th>Requirement / mitigation</th>
               <th>Category</th>
               <th>Code anchors</th>
-              <th>Driven by (hazard / H group)</th>
+              <th>Driven by (hazard class / H group / process)</th>
               <th>Cost</th>
             </tr>
           </thead>
@@ -390,12 +414,20 @@
             IBC Chapter 3 classifications for the analysis area.
             <ul>
               <li><strong>H-1</strong> — detonation (e.g. explosives, severe unstable / organic peroxide classes).</li>
-              <li><strong>H-2</strong> — deflagration / accelerated burning (flammable gas, open Class I use, certain dusts, etc.).</li>
-              <li><strong>H-3</strong> — materials that readily support combustion / physical hazard (combustibles, many oxidizers, aerosols…).</li>
+              <li><strong>H-2</strong> — deflagration / accelerated burning (flammable gas, Class I liquids open to atmosphere or under pressure, certain dusts, etc.).</li>
+              <li><strong>H-3</strong> — materials that readily support combustion / physical hazard (combustibles, many oxidizers, Class I in closed systems not under pressure, aerosols…).</li>
               <li><strong>H-4</strong> — health hazard (highly toxic, toxic, corrosives above H thresholds).</li>
               <li><strong>H-5</strong> — semiconductor HPM fabrication.</li>
             </ul>
             Multiple groups are allowed; requirements are <strong>unioned</strong>. Import can apply or merge suggested H from hazard maps.
+          </dd>
+
+          <dt>Open to atmosphere / under pressure (H-1 / H-2 process condition)</dt>
+          <dd>
+            Checkboxes under H occupancy for IBC 307 context:
+            <strong>open to atmosphere</strong> (open system) and/or <strong>under pressure</strong> (closed system under pressure).
+            When set, these labels appear in the requirements <strong>Driven by</strong> column on H-1/H-2 and Class I liquid rows.
+            They do not auto-select H-2 vs H-3 — that remains an engineering judgment with MAQ and system details.
           </dd>
 
           <dt>Suggested H from hazards</dt>
@@ -406,7 +438,9 @@
 
           <dt>Material / hazard types</dt>
           <dd>
-            IFC class families (Ch. 50+). Check everything present <em>or planned</em>. Same mitigation from several hazards appears once with every driver listed.
+            IFC class families (Ch. 50+). Check everything present <em>or planned</em>.
+            For flammable liquids, prefer specific <strong>Class IA, IB, or IC</strong> (not the generic Class I) so the Driven-by column matches SDS/HMIS (e.g. methanol → Class IB).
+            Same mitigation from several hazards appears once with every driver listed.
             Hazard selection works on <em>both</em> MAQ paths; on the control-area path it is the primary driver set (plus high-piled).
           </dd>
 
@@ -428,7 +462,7 @@
           <li><strong>Requirement</strong> — mitigation in plain language + short design note.</li>
           <li><strong>Category</strong> — construction, separation, explosion, mechanical, fire protection, or operational.</li>
           <li><strong>Code anchors</strong> — starting sections, not a complete citation tree. Open the adopted book.</li>
-          <li><strong>Driven by</strong> — which H group(s), hazard label(s), or “High-piled storage” triggered the row. Multiple drivers mean one shared requirement.</li>
+          <li><strong>Driven by</strong> — which H group(s), hazard class label(s) (e.g. <em>Flammable liquid Class IB</em>), process conditions (open to atmosphere / under pressure), or “High-piled storage” triggered the row. Multiple drivers mean one shared requirement.</li>
           <li><strong>HIGH COST</strong> — typical capital/program cost drivers for early budgeting; not a dollar estimate.</li>
         </ul>
         <p class="help-note">

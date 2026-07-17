@@ -11,10 +11,18 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.2.0";
+  var APP_VERSION = "1.3.0";
   var STORAGE_KEY = "ibcIfcHazard.v1";
   /** Last HMIS assessment (not persisted) */
   var lastImport = null;
+
+  /** Class I flammable liquid family — drivers show IA / IB / IC specifically */
+  var CLASS_I_FAMILY = [
+    "class_ia_liquid",
+    "class_ib_liquid",
+    "class_ic_liquid",
+    "class_i_liquid",
+  ];
 
   /** IBC Chapter 3 H occupancy groups */
   var H_GROUPS = [
@@ -56,7 +64,34 @@
     { id: "flammable_gas", label: "Flammable gases", ifc: "IFC 58", mapsH: ["H-2"] },
     { id: "flammable_cryogen", label: "Flammable cryogenic fluids", ifc: "IFC 58", mapsH: ["H-2"] },
     { id: "lpg", label: "LP-gas", ifc: "IFC 61", mapsH: ["H-2"] },
-    { id: "class_i_liquid", label: "Flammable liquids (Class I)", ifc: "IFC 57", mapsH: ["H-2", "H-3"] },
+    {
+      id: "class_ia_liquid",
+      label: "Flammable liquid Class IA",
+      ifc: "IFC 57",
+      mapsH: ["H-2", "H-3"],
+      blurb: "FP < 73°F and BP < 100°F (IFC). Open system or under pressure often → H-2.",
+    },
+    {
+      id: "class_ib_liquid",
+      label: "Flammable liquid Class IB",
+      ifc: "IFC 57",
+      mapsH: ["H-2", "H-3"],
+      blurb: "FP < 73°F and BP ≥ 100°F (e.g. methanol, many solvents). Open / under pressure often → H-2.",
+    },
+    {
+      id: "class_ic_liquid",
+      label: "Flammable liquid Class IC",
+      ifc: "IFC 57",
+      mapsH: ["H-2", "H-3"],
+      blurb: "FP ≥ 73°F and < 100°F. Confirm open system vs closed under pressure for H-2 vs H-3.",
+    },
+    {
+      id: "class_i_liquid",
+      label: "Flammable liquids Class I (unspecified IA/IB/IC)",
+      ifc: "IFC 57",
+      mapsH: ["H-2", "H-3"],
+      blurb: "Use only when IA/IB/IC is unknown — prefer specific Class IA, IB, or IC when known from SDS/HMIS.",
+    },
     { id: "class_ii_iii_liquid", label: "Combustible liquids (Class II / III)", ifc: "IFC 57", mapsH: ["H-3"] },
     { id: "aerosols", label: "Aerosol products (Level 2/3)", ifc: "IFC 51", mapsH: ["H-3"] },
     { id: "flammable_solid", label: "Flammable solids", ifc: "IFC 59", mapsH: ["H-3"] },
@@ -568,6 +603,9 @@
       pathMode: "group_h",
       hGroups: [],
       hazards: [],
+      /** IBC 307 H-1/H-2 process context */
+      openToAtmosphere: false,
+      underPressure: false,
       highPiled: false,
       filterCost: "all",
       filterCat: "all",
@@ -639,6 +677,40 @@
     state.hGroups.sort();
   }
 
+  function hazardLabel(id) {
+    var haz = HAZARDS.find(function (x) {
+      return x.id === id;
+    });
+    return haz ? haz.label : id;
+  }
+
+  /**
+   * Resolve whenHaz entry against selected hazards.
+   * whenHaz "class_i_liquid" matches any Class IA / IB / IC / unspecified Class I selection
+   * so drivers list the specific subclass(es) checked (e.g. Flammable liquid Class IB).
+   */
+  function matchingHazardDrivers(whenHz) {
+    var out = [];
+    if (whenHz === "class_i_liquid") {
+      CLASS_I_FAMILY.forEach(function (id) {
+        if (state.hazards.indexOf(id) >= 0) out.push(hazardLabel(id));
+      });
+      return out;
+    }
+    if (state.hazards.indexOf(whenHz) >= 0) out.push(hazardLabel(whenHz));
+    return out;
+  }
+
+  function hasClassISelected() {
+    return CLASS_I_FAMILY.some(function (id) {
+      return state.hazards.indexOf(id) >= 0;
+    });
+  }
+
+  function hasH1orH2() {
+    return state.hGroups.indexOf("H-1") >= 0 || state.hGroups.indexOf("H-2") >= 0;
+  }
+
   function reqApplies(req) {
     if (req.editions && req.editions.indexOf(state.edition) < 0) return false;
     var controlAreaPath = state.pathMode === "control_area";
@@ -651,16 +723,23 @@
     }
     if (req.whenHaz && req.whenHaz.length) {
       req.whenHaz.forEach(function (hz) {
-        if (state.hazards.indexOf(hz) >= 0) {
-          var haz = HAZARDS.find(function (x) {
-            return x.id === hz;
-          });
-          drivers.push(haz ? haz.label : hz);
-        }
+        matchingHazardDrivers(hz).forEach(function (lab) {
+          drivers.push(lab);
+        });
       });
     }
     if (req.whenHighPiled && state.highPiled) {
       drivers.push("High-piled storage");
+    }
+    // IBC 307 open system / under pressure — show on rows driven by H-1/H-2 or Class I liquids
+    var classIOnRow =
+      req.whenHaz &&
+      req.whenHaz.indexOf("class_i_liquid") >= 0 &&
+      matchingHazardDrivers("class_i_liquid").length > 0;
+    var h1h2OnRow = drivers.indexOf("H-1") >= 0 || drivers.indexOf("H-2") >= 0;
+    if (drivers.length && (h1h2OnRow || classIOnRow || (hasH1orH2() && !controlAreaPath))) {
+      if (state.openToAtmosphere) drivers.push("Open to atmosphere");
+      if (state.underPressure) drivers.push("Under pressure");
     }
     var needsH = !controlAreaPath && req.whenH && req.whenH.length;
     var needsHaz = req.whenHaz && req.whenHaz.length;
@@ -799,6 +878,7 @@
           (h.mapsH && h.mapsH.length
             ? " · often " + h.mapsH.join("/")
             : "") +
+          (h.blurb ? " · " + escapeHtml(h.blurb) : "") +
           "</span></span></label>"
         );
       }).join("");
@@ -818,10 +898,31 @@
     if ($("facility")) $("facility").value = state.facility;
     if ($("sprinklered")) $("sprinklered").value = state.sprinklered;
     if ($("highPiled")) $("highPiled").checked = !!state.highPiled;
+    if ($("openToAtmosphere")) $("openToAtmosphere").checked = !!state.openToAtmosphere;
+    if ($("underPressure")) $("underPressure").checked = !!state.underPressure;
     if ($("filterCost")) $("filterCost").value = state.filterCost;
     if ($("filterCat")) $("filterCat").value = state.filterCat;
     if ($("pathGroupH")) $("pathGroupH").checked = state.pathMode !== "control_area";
     if ($("pathControlArea")) $("pathControlArea").checked = state.pathMode === "control_area";
+    if ($("hProcessNote")) {
+      if (hasH1orH2() || hasClassISelected()) {
+        if (!state.openToAtmosphere && !state.underPressure) {
+          $("hProcessNote").className = "callout warn";
+          $("hProcessNote").textContent =
+            "H-1 / H-2 context: select whether storage/use is open to atmosphere and/or under pressure (IBC 307). Class I liquids in open systems or closed systems under pressure commonly support Group H-2; closed systems not under pressure may align with H-3 — confirm with the designer of record.";
+          $("hProcessNote").classList.remove("hidden");
+        } else {
+          $("hProcessNote").className = "callout info";
+          $("hProcessNote").textContent =
+            (state.openToAtmosphere ? "Open to atmosphere selected. " : "") +
+            (state.underPressure ? "Under pressure selected. " : "") +
+            "These conditions appear in the Driven-by column for H-1/H-2 and Class I liquid rows (IBC 307).";
+          $("hProcessNote").classList.remove("hidden");
+        }
+      } else {
+        $("hProcessNote").classList.add("hidden");
+      }
+    }
 
     var rows = analyze();
     var highCount = rows.filter(function (r) {
@@ -866,6 +967,12 @@
         "</strong></div>" +
         '<div class="row"><span>High-piled</span><strong>' +
         (state.highPiled ? "Yes" : "No") +
+        "</strong></div>" +
+        '<div class="row"><span>Open to atmosphere</span><strong>' +
+        (state.openToAtmosphere ? "Yes" : "No") +
+        "</strong></div>" +
+        '<div class="row"><span>Under pressure</span><strong>' +
+        (state.underPressure ? "Yes" : "No") +
         "</strong></div>" +
         '<div class="row"><span>Requirements shown</span><strong>' +
         rows.length +
@@ -1001,6 +1108,10 @@
       state.hazards.length +
       " selected · High-piled: " +
       (state.highPiled ? "Yes" : "No") +
+      " · Open to atmosphere: " +
+      (state.openToAtmosphere ? "Yes" : "No") +
+      " · Under pressure: " +
+      (state.underPressure ? "Yes" : "No") +
       "</p>" +
       "<p style='font-size:0.88rem'>" +
       escapeHtml(EDITION_NOTES[state.edition] || "") +
@@ -1350,6 +1461,8 @@
       if (t.id === "facility") state.facility = t.value.trim();
       if (t.id === "sprinklered") state.sprinklered = t.value;
       if (t.id === "highPiled") state.highPiled = !!t.checked;
+      if (t.id === "openToAtmosphere") state.openToAtmosphere = !!t.checked;
+      if (t.id === "underPressure") state.underPressure = !!t.checked;
       if (t.id === "filterCost") state.filterCost = t.value;
       if (t.id === "filterCat") state.filterCat = t.value;
       if (t.name === "pathMode" && t.checked) {

@@ -85,6 +85,25 @@ function unique(arr) {
   return out;
 }
 
+const CLASS_I_FAMILY = [
+  "class_ia_liquid",
+  "class_ib_liquid",
+  "class_ic_liquid",
+  "class_i_liquid",
+];
+
+function hazardLabel(id) {
+  const haz = HAZARDS.find((x) => x.id === id);
+  return haz ? haz.label : id;
+}
+
+function matchingHazardDrivers(state, whenHz) {
+  if (whenHz === "class_i_liquid") {
+    return CLASS_I_FAMILY.filter((id) => state.hazards.includes(id)).map(hazardLabel);
+  }
+  return state.hazards.includes(whenHz) ? [hazardLabel(whenHz)] : [];
+}
+
 function analyze(state) {
   const controlAreaPath = state.pathMode === "control_area";
   const rows = [];
@@ -98,13 +117,20 @@ function analyze(state) {
     }
     if (req.whenHaz) {
       req.whenHaz.forEach((hz) => {
-        if (state.hazards.includes(hz)) {
-          const haz = HAZARDS.find((x) => x.id === hz);
-          drivers.push(haz ? haz.label : hz);
-        }
+        matchingHazardDrivers(state, hz).forEach((lab) => drivers.push(lab));
       });
     }
     if (req.whenHighPiled && state.highPiled) drivers.push("High-piled storage");
+    const classIOnRow =
+      req.whenHaz &&
+      req.whenHaz.includes("class_i_liquid") &&
+      matchingHazardDrivers(state, "class_i_liquid").length > 0;
+    const h1h2OnRow = drivers.includes("H-1") || drivers.includes("H-2");
+    const hasH1H2 = state.hGroups.includes("H-1") || state.hGroups.includes("H-2");
+    if (drivers.length && (h1h2OnRow || classIOnRow || (hasH1H2 && !controlAreaPath))) {
+      if (state.openToAtmosphere) drivers.push("Open to atmosphere");
+      if (state.underPressure) drivers.push("Under pressure");
+    }
     const needsH = !controlAreaPath && req.whenH && req.whenH.length;
     const needsHaz = req.whenHaz && req.whenHaz.length;
     const needsHp = !!req.whenHighPiled;
@@ -153,10 +179,11 @@ const SCENARIOS = [
     name: "H-2 flammable gas + Class I liquids",
     edition: "2021",
     hGroups: ["H-2"],
-    hazards: ["flammable_gas", "class_i_liquid"],
+    hazards: ["flammable_gas", "class_ib_liquid"],
     highPiled: false,
     expectIds: ["explosion_control", "hazardous_exhaust", "spill_control_secondary", "roof_class_a"],
     expectMultiDriver: true,
+    expectDriverText: ["Flammable liquid Class IB"],
   },
   {
     name: "H-3 combustible liquids + oxidizers",
@@ -187,10 +214,12 @@ const SCENARIOS = [
     name: "Multi-group H-2 + H-3 + aerosols",
     edition: "2021",
     hGroups: ["H-2", "H-3"],
-    hazards: ["aerosols", "class_i_liquid"],
+    hazards: ["aerosols", "class_ia_liquid"],
     highPiled: false,
+    openToAtmosphere: true,
     expectIds: ["aerosol_level23", "special_suppression", "fire_wall_or_barrier_h"],
     expectMerged: true,
+    expectDriverText: ["Flammable liquid Class IA", "Open to atmosphere"],
   },
   {
     name: "High-piled only (no H)",
@@ -213,18 +242,20 @@ const SCENARIOS = [
     name: "Full stack H-2/H-4 + dust + high-piled + filter high-cost",
     edition: "2024",
     hGroups: ["H-2", "H-4"],
-    hazards: ["class_i_liquid", "highly_toxic", "combustible_dust", "flammable_gas"],
+    hazards: ["class_ic_liquid", "highly_toxic", "combustible_dust", "flammable_gas"],
     highPiled: true,
+    underPressure: true,
     filterCost: "high",
     expectMin: 8,
     allHighCost: true,
+    expectDriverText: ["Flammable liquid Class IC", "Under pressure"],
   },
   {
     name: "Control-area path: Class I + oxidizer (no H construction)",
     edition: "2021",
     pathMode: "control_area",
     hGroups: ["H-2", "H-3"],
-    hazards: ["class_i_liquid", "oxidizer"],
+    hazards: ["class_ib_liquid", "oxidizer"],
     highPiled: false,
     expectIds: ["control_areas_414", "spill_control_secondary", "incompatible_separation"],
     rejectIds: ["type_construction_h", "roof_class_a", "fire_wall_or_barrier_h"],
@@ -266,6 +297,8 @@ function run() {
       hGroups: sc.hGroups || [],
       hazards: sc.hazards || [],
       highPiled: !!sc.highPiled,
+      openToAtmosphere: !!sc.openToAtmosphere,
+      underPressure: !!sc.underPressure,
       filterCost: sc.filterCost || "all",
       filterCat: sc.filterCat || "all",
     };
@@ -286,6 +319,12 @@ function run() {
     if (sc.expectIds) {
       sc.expectIds.forEach((id) => {
         ok(cycle, `has ${id}`, ids.includes(id));
+      });
+    }
+    if (sc.expectDriverText) {
+      const allDrivers = rows.flatMap((r) => r.drivers);
+      sc.expectDriverText.forEach((txt) => {
+        ok(cycle, `driver has "${txt}"`, allDrivers.includes(txt), allDrivers.slice(0, 12).join("; "));
       });
     }
     if (sc.rejectIds) {

@@ -87,7 +87,14 @@ a.btn-link {
   padding: 1rem 1.1rem;
 }
 .panel h2 { margin: 0 0 0.65rem; font-size: 1.05rem; }
+.subhead-inline {
+  margin: 0 0 0.35rem;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--ink);
+}
 .hint { color: var(--muted); font-size: 0.85rem; margin: 0 0 0.75rem; }
+.h-process .check-grid { margin-top: 0.35rem; }
 .sticky { position: sticky; top: 0.5rem; }
 
 .field-grid.two {

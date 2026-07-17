@@ -13,7 +13,19 @@
     { re: /oxidizing\s*gas/i, id: "oxidizing_gas" },
     { re: /\boxidizer\b|\boxidiz(?:er|ing)\b/i, id: "oxidizer" },
     {
-      re: /flammable\s*liquids?\s*(class\s*)?i[abc]?\b|flammable\s*liquid\s*class\s*i\b|class\s*i[abc]\s*flammable/i,
+      re: /flammable\s*liquids?\s*(class\s*)?ia\b|flammable\s*liquids?\s*ia\b|class\s*ia\s*flammable/i,
+      id: "class_ia_liquid",
+    },
+    {
+      re: /flammable\s*liquids?\s*(class\s*)?ib\b|flammable\s*liquids?\s*ib\b|class\s*ib\s*flammable/i,
+      id: "class_ib_liquid",
+    },
+    {
+      re: /flammable\s*liquids?\s*(class\s*)?ic\b|flammable\s*liquids?\s*ic\b|class\s*ic\s*flammable/i,
+      id: "class_ic_liquid",
+    },
+    {
+      re: /flammable\s*liquids?\s*(class\s*)?i\b|flammable\s*liquid\s*class\s*i\b|class\s*i\s*flammable/i,
       id: "class_i_liquid",
     },
     {

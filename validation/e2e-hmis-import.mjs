@@ -33,7 +33,10 @@ const SAMPLE =
 
 const HAZARDS = [
   { id: "explosives", label: "Explosives", mapsH: ["H-1"] },
-  { id: "class_i_liquid", label: "Flammable liquids (Class I)", mapsH: ["H-2", "H-3"] },
+  { id: "class_ia_liquid", label: "Flammable liquid Class IA", mapsH: ["H-2", "H-3"] },
+  { id: "class_ib_liquid", label: "Flammable liquid Class IB", mapsH: ["H-2", "H-3"] },
+  { id: "class_ic_liquid", label: "Flammable liquid Class IC", mapsH: ["H-2", "H-3"] },
+  { id: "class_i_liquid", label: "Flammable liquids Class I (unspecified)", mapsH: ["H-2", "H-3"] },
   { id: "oxidizer", label: "Oxidizers", mapsH: ["H-2", "H-3"] },
   { id: "organic_peroxide", label: "Organic peroxides", mapsH: ["H-1", "H-2", "H-3"] },
   { id: "corrosive", label: "Corrosive", mapsH: ["H-4"] },
@@ -76,7 +79,8 @@ console.log("Project:", result.projectName);
 console.log("Unmatched:", result.unmatched?.length);
 
 ok("material count >= 3", result.materialCount >= 3, String(result.materialCount));
-ok("has class_i_liquid", result.hazardIds.includes("class_i_liquid"));
+ok("has class_ib_liquid", result.hazardIds.includes("class_ib_liquid"), result.hazardIds.join(","));
+ok("not generic class_i only for methanol", !result.hazardIds.includes("class_i_liquid") || result.hazardIds.includes("class_ib_liquid"));
 ok("has oxidizer", result.hazardIds.includes("oxidizer"));
 ok("has organic_peroxide", result.hazardIds.includes("organic_peroxide"), result.hazardIds.join(","));
 ok("has corrosive", result.hazardIds.includes("corrosive"), result.hazardIds.join(","));
@@ -88,8 +92,16 @@ ok("project mentions Echo or ADM", /echo|adm/i.test(result.projectName || ""), r
 
 // Keyword unit checks
 ok(
-  "keyword IB",
-  HmisImport.classifyHazardText("FLAMMABLE LIQUID CLASS IB").includes("class_i_liquid")
+  "keyword IB → class_ib",
+  HmisImport.classifyHazardText("FLAMMABLE LIQUID CLASS IB").includes("class_ib_liquid")
+);
+ok(
+  "keyword IA → class_ia",
+  HmisImport.classifyHazardText("FLAMMABLE LIQUIDS IA").includes("class_ia_liquid")
+);
+ok(
+  "keyword IC → class_ic",
+  HmisImport.classifyHazardText("FLAMMABLE LIQUID CLASS IC").includes("class_ic_liquid")
 );
 ok(
   "keyword class 2 oxidizer",
@@ -114,7 +126,7 @@ const csvResult = HmisImport.assessWorkbook(
   { hazardCatalog: HAZARDS }
 );
 ok("csv ok", csvResult.ok);
-ok("csv class_i", csvResult.hazardIds.includes("class_i_liquid"));
+ok("csv class_ia", csvResult.hazardIds.includes("class_ia_liquid"), csvResult.hazardIds.join(","));
 ok("csv corrosive", csvResult.hazardIds.includes("corrosive"));
 
 console.log("\n=== SUMMARY ===");
