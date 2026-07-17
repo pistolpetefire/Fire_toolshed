@@ -10,5 +10,6 @@ node_modules/
 # Generated e2e artifacts
 validation/e2e-out/
 validation/e2e-hazard-out/
+validation/e2e-logo-out/
 validation/_hmis_xlsx_extract/
 

@@ -11,17 +11,24 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.3.0";
+  var APP_VERSION = "1.4.0";
   var STORAGE_KEY = "ibcIfcHazard.v1";
   /** Last HMIS assessment (not persisted) */
   var lastImport = null;
 
-  /** Class I flammable liquid family — drivers show IA / IB / IC specifically */
+  /** IFC 57 Class I flammable liquids — drivers show IA / IB / IC + Class I */
   var CLASS_I_FAMILY = [
     "class_ia_liquid",
     "class_ib_liquid",
     "class_ic_liquid",
     "class_i_liquid",
+  ];
+  /** IFC 57 Class II / III combustible liquids */
+  var CLASS_II_III_FAMILY = [
+    "class_ii_liquid",
+    "class_iiia_liquid",
+    "class_iiib_liquid",
+    "class_ii_iii_liquid",
   ];
 
   /** IBC Chapter 3 H occupancy groups */
@@ -66,33 +73,76 @@
     { id: "lpg", label: "LP-gas", ifc: "IFC 61", mapsH: ["H-2"] },
     {
       id: "class_ia_liquid",
-      label: "Flammable liquid Class IA",
+      label: "IFC 57 Class I — Flammable liquid IA",
       ifc: "IFC 57",
+      ifc57Class: "I",
+      liquidSubclass: "IA",
       mapsH: ["H-2", "H-3"],
-      blurb: "FP < 73°F and BP < 100°F (IFC). Open system or under pressure often → H-2.",
+      blurb: "IFC Ch. 57 Class I (flammable). FP < 73°F and BP < 100°F. Open system or under pressure often → H-2.",
     },
     {
       id: "class_ib_liquid",
-      label: "Flammable liquid Class IB",
+      label: "IFC 57 Class I — Flammable liquid IB",
       ifc: "IFC 57",
+      ifc57Class: "I",
+      liquidSubclass: "IB",
       mapsH: ["H-2", "H-3"],
-      blurb: "FP < 73°F and BP ≥ 100°F (e.g. methanol, many solvents). Open / under pressure often → H-2.",
+      blurb: "IFC Ch. 57 Class I (flammable). FP < 73°F and BP ≥ 100°F (e.g. methanol). Open / under pressure often → H-2.",
     },
     {
       id: "class_ic_liquid",
-      label: "Flammable liquid Class IC",
+      label: "IFC 57 Class I — Flammable liquid IC",
       ifc: "IFC 57",
+      ifc57Class: "I",
+      liquidSubclass: "IC",
       mapsH: ["H-2", "H-3"],
-      blurb: "FP ≥ 73°F and < 100°F. Confirm open system vs closed under pressure for H-2 vs H-3.",
+      blurb: "IFC Ch. 57 Class I (flammable). FP ≥ 73°F and < 100°F. Confirm open system vs under pressure for H-2 vs H-3.",
     },
     {
       id: "class_i_liquid",
-      label: "Flammable liquids Class I (unspecified IA/IB/IC)",
+      label: "IFC 57 Class I — Flammable liquid (IA/IB/IC unspecified)",
       ifc: "IFC 57",
+      ifc57Class: "I",
+      liquidSubclass: "",
       mapsH: ["H-2", "H-3"],
-      blurb: "Use only when IA/IB/IC is unknown — prefer specific Class IA, IB, or IC when known from SDS/HMIS.",
+      blurb: "IFC Ch. 57 Class I — use only when IA/IB/IC is unknown. Prefer specific subclass from SDS/HMIS.",
     },
-    { id: "class_ii_iii_liquid", label: "Combustible liquids (Class II / III)", ifc: "IFC 57", mapsH: ["H-3"] },
+    {
+      id: "class_ii_liquid",
+      label: "IFC 57 Class II — Combustible liquid",
+      ifc: "IFC 57",
+      ifc57Class: "II",
+      liquidSubclass: "II",
+      mapsH: ["H-3"],
+      blurb: "IFC Ch. 57 Class II combustible liquid (FP ≥ 100°F and < 140°F). HMIS/MAQ tables often list this separately from Class I.",
+    },
+    {
+      id: "class_iiia_liquid",
+      label: "IFC 57 Class IIIA — Combustible liquid",
+      ifc: "IFC 57",
+      ifc57Class: "IIIA",
+      liquidSubclass: "IIIA",
+      mapsH: ["H-3"],
+      blurb: "IFC Ch. 57 Class IIIA combustible (FP ≥ 140°F and < 200°F).",
+    },
+    {
+      id: "class_iiib_liquid",
+      label: "IFC 57 Class IIIB — Combustible liquid",
+      ifc: "IFC 57",
+      ifc57Class: "IIIB",
+      liquidSubclass: "IIIB",
+      mapsH: ["H-3"],
+      blurb: "IFC Ch. 57 Class IIIB combustible (FP ≥ 200°F). Often large MAQ; confirm IFC 57 and occupancy.",
+    },
+    {
+      id: "class_ii_iii_liquid",
+      label: "IFC 57 Class II/III — Combustible liquid (unspecified)",
+      ifc: "IFC 57",
+      ifc57Class: "II/III",
+      liquidSubclass: "",
+      mapsH: ["H-3"],
+      blurb: "Use when Class II vs IIIA/IIIB is unknown. Prefer specific Class II / IIIA / IIIB from HMIS.",
+    },
     { id: "aerosols", label: "Aerosol products (Level 2/3)", ifc: "IFC 51", mapsH: ["H-3"] },
     { id: "flammable_solid", label: "Flammable solids", ifc: "IFC 59", mapsH: ["H-3"] },
     { id: "oxidizer", label: "Oxidizers (solid/liquid)", ifc: "IFC 63", mapsH: ["H-2", "H-3"] },
@@ -686,13 +736,20 @@
 
   /**
    * Resolve whenHaz entry against selected hazards.
-   * whenHaz "class_i_liquid" matches any Class IA / IB / IC / unspecified Class I selection
-   * so drivers list the specific subclass(es) checked (e.g. Flammable liquid Class IB).
+   * whenHaz "class_i_liquid" → any IFC 57 Class I (IA/IB/IC) selection
+   * whenHaz "class_ii_iii_liquid" → any IFC 57 Class II / III selection
+   * Drivers list the specific IFC 57 Class I or II/III identifier checked.
    */
   function matchingHazardDrivers(whenHz) {
     var out = [];
     if (whenHz === "class_i_liquid") {
       CLASS_I_FAMILY.forEach(function (id) {
+        if (state.hazards.indexOf(id) >= 0) out.push(hazardLabel(id));
+      });
+      return out;
+    }
+    if (whenHz === "class_ii_iii_liquid") {
+      CLASS_II_III_FAMILY.forEach(function (id) {
         if (state.hazards.indexOf(id) >= 0) out.push(hazardLabel(id));
       });
       return out;

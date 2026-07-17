@@ -33,10 +33,13 @@ const SAMPLE =
 
 const HAZARDS = [
   { id: "explosives", label: "Explosives", mapsH: ["H-1"] },
-  { id: "class_ia_liquid", label: "Flammable liquid Class IA", mapsH: ["H-2", "H-3"] },
-  { id: "class_ib_liquid", label: "Flammable liquid Class IB", mapsH: ["H-2", "H-3"] },
-  { id: "class_ic_liquid", label: "Flammable liquid Class IC", mapsH: ["H-2", "H-3"] },
-  { id: "class_i_liquid", label: "Flammable liquids Class I (unspecified)", mapsH: ["H-2", "H-3"] },
+  { id: "class_ia_liquid", label: "IFC 57 Class I — Flammable liquid IA", mapsH: ["H-2", "H-3"] },
+  { id: "class_ib_liquid", label: "IFC 57 Class I — Flammable liquid IB", mapsH: ["H-2", "H-3"] },
+  { id: "class_ic_liquid", label: "IFC 57 Class I — Flammable liquid IC", mapsH: ["H-2", "H-3"] },
+  { id: "class_i_liquid", label: "IFC 57 Class I — Flammable liquid (unspecified)", mapsH: ["H-2", "H-3"] },
+  { id: "class_ii_liquid", label: "IFC 57 Class II — Combustible liquid", mapsH: ["H-3"] },
+  { id: "class_iiia_liquid", label: "IFC 57 Class IIIA — Combustible liquid", mapsH: ["H-3"] },
+  { id: "class_iiib_liquid", label: "IFC 57 Class IIIB — Combustible liquid", mapsH: ["H-3"] },
   { id: "oxidizer", label: "Oxidizers", mapsH: ["H-2", "H-3"] },
   { id: "organic_peroxide", label: "Organic peroxides", mapsH: ["H-1", "H-2", "H-3"] },
   { id: "corrosive", label: "Corrosive", mapsH: ["H-4"] },
@@ -102,6 +105,14 @@ ok(
 ok(
   "keyword IC → class_ic",
   HmisImport.classifyHazardText("FLAMMABLE LIQUID CLASS IC").includes("class_ic_liquid")
+);
+ok(
+  "keyword Class II combustible → class_ii",
+  HmisImport.classifyHazardText("COMBUSTIBLE LIQUID CLASS II").includes("class_ii_liquid")
+);
+ok(
+  "keyword IFC 57 Class I IB identifier",
+  HmisImport.classifyHazardText("IFC 57 Class I — Flammable liquid IB").includes("class_ib_liquid")
 );
 ok(
   "keyword class 2 oxidizer",

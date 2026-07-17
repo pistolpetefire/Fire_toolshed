@@ -462,6 +462,15 @@
     }
     writeForm();
     bind();
+    if (window.FireToolshedLogo) {
+      window.FireToolshedLogo.bindControls({
+        selectId: "reportLogoSource",
+        fileId: "reportLogoFile",
+        previewId: "reportLogoPreview",
+        fileWrapId: "reportLogoFileWrap",
+        onChange: render,
+      });
+    }
     render();
   }
 

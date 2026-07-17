@@ -91,6 +91,12 @@ const CLASS_I_FAMILY = [
   "class_ic_liquid",
   "class_i_liquid",
 ];
+const CLASS_II_III_FAMILY = [
+  "class_ii_liquid",
+  "class_iiia_liquid",
+  "class_iiib_liquid",
+  "class_ii_iii_liquid",
+];
 
 function hazardLabel(id) {
   const haz = HAZARDS.find((x) => x.id === id);
@@ -100,6 +106,9 @@ function hazardLabel(id) {
 function matchingHazardDrivers(state, whenHz) {
   if (whenHz === "class_i_liquid") {
     return CLASS_I_FAMILY.filter((id) => state.hazards.includes(id)).map(hazardLabel);
+  }
+  if (whenHz === "class_ii_iii_liquid") {
+    return CLASS_II_III_FAMILY.filter((id) => state.hazards.includes(id)).map(hazardLabel);
   }
   return state.hazards.includes(whenHz) ? [hazardLabel(whenHz)] : [];
 }
@@ -183,15 +192,16 @@ const SCENARIOS = [
     highPiled: false,
     expectIds: ["explosion_control", "hazardous_exhaust", "spill_control_secondary", "roof_class_a"],
     expectMultiDriver: true,
-    expectDriverText: ["Flammable liquid Class IB"],
+    expectDriverText: ["IFC 57 Class I — Flammable liquid IB"],
   },
   {
     name: "H-3 combustible liquids + oxidizers",
     edition: "2018",
     hGroups: ["H-3"],
-    hazards: ["class_ii_iii_liquid", "oxidizer"],
+    hazards: ["class_ii_liquid", "oxidizer"],
     highPiled: false,
     expectIds: ["incompatible_separation", "control_areas_414", "nfpa13_required"],
+    expectDriverText: ["IFC 57 Class II — Combustible liquid"],
   },
   {
     name: "H-4 highly toxic + corrosive",
@@ -219,7 +229,7 @@ const SCENARIOS = [
     openToAtmosphere: true,
     expectIds: ["aerosol_level23", "special_suppression", "fire_wall_or_barrier_h"],
     expectMerged: true,
-    expectDriverText: ["Flammable liquid Class IA", "Open to atmosphere"],
+    expectDriverText: ["IFC 57 Class I — Flammable liquid IA", "Open to atmosphere"],
   },
   {
     name: "High-piled only (no H)",
@@ -248,7 +258,7 @@ const SCENARIOS = [
     filterCost: "high",
     expectMin: 8,
     allHighCost: true,
-    expectDriverText: ["Flammable liquid Class IC", "Under pressure"],
+    expectDriverText: ["IFC 57 Class I — Flammable liquid IC", "Under pressure"],
   },
   {
     name: "Control-area path: Class I + oxidizer (no H construction)",

@@ -14,7 +14,7 @@
       <div>
         <p class="eyebrow">Fire Toolshed · Life safety / code analysis</p>
         <h1>IBC / IFC Hazard Impacts</h1>
-        <p class="version" id="appVersion">Version 1.3.0</p>
+        <p class="version" id="appVersion">Version 1.4.0</p>
         <p class="lead">
           Select code edition, <strong>MAQ path</strong> (Group H vs control areas), <strong>H occupancy</strong> (IBC Ch. 3), and material hazard classes —
           or <strong>upload an HMIS / inventory spreadsheet</strong> to assess materials and populate the form.
@@ -121,7 +121,8 @@
               <label for="reportLogoSource">Report logo</label>
               <select id="reportLogoSource">
                 <option value="benham">Benham</option>
-                <option value="haskell">Haskell</option>
+                <option value="meadhunt">MeadHunt JV</option>
+                <option value="haskell">Haskell (by state)</option>
                 <option value="upload">Upload image…</option>
               </select>
               <div id="reportLogoFileWrap" class="hidden" style="margin-top:0.35rem">
@@ -190,7 +191,7 @@
 
         <section class="panel">
           <h2>4 · Material / hazard types (IFC Ch. 50+ classes)</h2>
-          <p class="hint">Select all hazardous material categories present (or expected). Use specific <strong>Flammable liquid Class IA, IB, or IC</strong> when known from SDS/HMIS — the Driven-by column will name that class. Same requirement driven by multiple hazards is listed once with all drivers.</p>
+          <p class="hint">Select all hazardous material categories present (or expected). For liquids, use <strong>IFC 57 Class I</strong> (flammable IA/IB/IC) or <strong>IFC 57 Class II / IIIA / IIIB</strong> (combustible) so the Driven-by column matches HMIS/MAQ tables and IFC Ch. 57. Same requirement driven by multiple hazards is listed once with all drivers.</p>
           <div class="check-grid" id="hazardGrid"></div>
           <div class="field" style="margin-top:0.85rem">
             <label class="check-item">
@@ -439,9 +440,14 @@
           <dt>Material / hazard types</dt>
           <dd>
             IFC class families (Ch. 50+). Check everything present <em>or planned</em>.
-            For flammable liquids, prefer specific <strong>Class IA, IB, or IC</strong> (not the generic Class I) so the Driven-by column matches SDS/HMIS (e.g. methanol → Class IB).
+            For liquids under <strong>IFC Chapter 57</strong>, pick the Ch. 57 class used in HMIS/MAQ sheets:
+            <ul>
+              <li><strong>IFC 57 Class I</strong> — flammable liquids, with subclass <strong>IA / IB / IC</strong> when known (Driven by shows e.g. “IFC 57 Class I — Flammable liquid IB”).</li>
+              <li><strong>IFC 57 Class II</strong> — combustible liquids (FP band for Class II).</li>
+              <li><strong>IFC 57 Class IIIA / IIIB</strong> — higher flash-point combustibles.</li>
+            </ul>
+            HMIS import maps classification text (and “IFC 57 Class …” identifiers if present in the sheet) to these IDs.
             Same mitigation from several hazards appears once with every driver listed.
-            Hazard selection works on <em>both</em> MAQ paths; on the control-area path it is the primary driver set (plus high-piled).
           </dd>
 
           <dt>High-piled combustible storage</dt>
@@ -462,7 +468,7 @@
           <li><strong>Requirement</strong> — mitigation in plain language + short design note.</li>
           <li><strong>Category</strong> — construction, separation, explosion, mechanical, fire protection, or operational.</li>
           <li><strong>Code anchors</strong> — starting sections, not a complete citation tree. Open the adopted book.</li>
-          <li><strong>Driven by</strong> — which H group(s), hazard class label(s) (e.g. <em>Flammable liquid Class IB</em>), process conditions (open to atmosphere / under pressure), or “High-piled storage” triggered the row. Multiple drivers mean one shared requirement.</li>
+          <li><strong>Driven by</strong> — which H group(s), hazard label(s) including <em>IFC 57 Class I or II/III</em> liquid identifiers (e.g. “IFC 57 Class I — Flammable liquid IB”), process conditions (open to atmosphere / under pressure), or “High-piled storage”. Multiple drivers mean one shared requirement.</li>
           <li><strong>HIGH COST</strong> — typical capital/program cost drivers for early budgeting; not a dollar estimate.</li>
         </ul>
         <p class="help-note">

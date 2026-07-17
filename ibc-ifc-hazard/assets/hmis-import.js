@@ -12,24 +12,38 @@
     { re: /class\s*[1-4]\s*oxidizer|oxidizer\s*class\s*[1-4]/i, id: "oxidizer" },
     { re: /oxidizing\s*gas/i, id: "oxidizing_gas" },
     { re: /\boxidizer\b|\boxidiz(?:er|ing)\b/i, id: "oxidizer" },
+    /* IFC 57 Class I (flammable) — IA / IB / IC before generic Class I */
     {
-      re: /flammable\s*liquids?\s*(class\s*)?ia\b|flammable\s*liquids?\s*ia\b|class\s*ia\s*flammable/i,
+      re: /flammable\s*liquids?\s*(class\s*)?ia\b|flammable\s*liquids?\s*ia\b|class\s*ia\s*flammable|ifc\s*57\s*class\s*i\s*[—\-–]?\s*(flammable\s*)?liquid\s*ia/i,
       id: "class_ia_liquid",
     },
     {
-      re: /flammable\s*liquids?\s*(class\s*)?ib\b|flammable\s*liquids?\s*ib\b|class\s*ib\s*flammable/i,
+      re: /flammable\s*liquids?\s*(class\s*)?ib\b|flammable\s*liquids?\s*ib\b|class\s*ib\s*flammable|ifc\s*57\s*class\s*i\s*[—\-–]?\s*(flammable\s*)?liquid\s*ib/i,
       id: "class_ib_liquid",
     },
     {
-      re: /flammable\s*liquids?\s*(class\s*)?ic\b|flammable\s*liquids?\s*ic\b|class\s*ic\s*flammable/i,
+      re: /flammable\s*liquids?\s*(class\s*)?ic\b|flammable\s*liquids?\s*ic\b|class\s*ic\s*flammable|ifc\s*57\s*class\s*i\s*[—\-–]?\s*(flammable\s*)?liquid\s*ic/i,
       id: "class_ic_liquid",
     },
     {
-      re: /flammable\s*liquids?\s*(class\s*)?i\b|flammable\s*liquid\s*class\s*i\b|class\s*i\s*flammable/i,
+      re: /flammable\s*liquids?\s*(class\s*)?i\b|flammable\s*liquid\s*class\s*i\b|class\s*i\s*flammable|ifc\s*57\s*class\s*i\b/i,
       id: "class_i_liquid",
     },
+    /* IFC 57 Class II / III (combustible) — IIIA/IIIB/II before generic II/III */
     {
-      re: /combustible\s*liquids?\s*(class\s*)?ii+i?[ab]?|class\s*ii+i?[ab]?\s*combustible|combustible\s*liquid\s*class\s*ii/i,
+      re: /combustible\s*liquids?\s*(class\s*)?iiia\b|class\s*iiia\b|ifc\s*57\s*class\s*iiia/i,
+      id: "class_iiia_liquid",
+    },
+    {
+      re: /combustible\s*liquids?\s*(class\s*)?iiib\b|class\s*iiib\b|ifc\s*57\s*class\s*iiib/i,
+      id: "class_iiib_liquid",
+    },
+    {
+      re: /combustible\s*liquids?\s*(class\s*)?ii\b|class\s*ii\b(?!\s*i)|flammable\s*liquids?\s*ii\b|ifc\s*57\s*class\s*ii\b(?!\s*i)/i,
+      id: "class_ii_liquid",
+    },
+    {
+      re: /combustible\s*liquids?\s*(class\s*)?iii\b|class\s*iii\b|combustible\s*liquid\s*class\s*ii+i?/i,
       id: "class_ii_iii_liquid",
     },
     { re: /flammable\s*gas(?:es)?/i, id: "flammable_gas" },
