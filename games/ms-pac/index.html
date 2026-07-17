@@ -25,15 +25,36 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050510;color:#fff;f
 #c{display:block;position:relative;z-index:2;background:#000;image-rendering:pixelated;image-rendering:crisp-edges;
   box-shadow:0 0 0 2px #a5b4fc,0 0 0 5px #312e81,0 0 40px rgba(129,140,248,.35),0 16px 48px rgba(0,0,0,.75);
   border-radius:2px}
-#pad{flex-shrink:0;background:#0a0a18;border-top:2px solid #312e81;padding:10px 8px calc(12px + env(safe-area-inset-bottom,0));display:none;flex-direction:column;align-items:center;gap:6px}
+#pad{flex-shrink:0;background:linear-gradient(180deg,#0c0c1e,#0a0a18);border-top:2px solid #312e81;padding:12px 8px calc(14px + env(safe-area-inset-bottom,0));display:none;flex-direction:column;align-items:center;gap:8px}
 #pad.show{display:flex}
-.dpad{display:grid;grid-template-columns:64px 64px 64px;grid-template-rows:52px 52px;gap:5px;place-items:center}
-.db{width:60px;height:48px;border-radius:12px;border:3px solid #475569;cursor:pointer;background:linear-gradient(160deg,#1e293b,#0f172a);color:#e2e8f0;font:inherit;font-size:14px;box-shadow:0 4px 0 #000}
-.db:active,.db.on{transform:translateY(3px);box-shadow:0 1px 0 #000}
-.db.u{grid-column:2;grid-row:1;border-color:#f9a8d4;color:#f9a8d4}
-.db.l{grid-column:1;grid-row:2;border-color:#38bdf8;color:#38bdf8}
-.db.d{grid-column:2;grid-row:2;border-color:#c084fc;color:#c084fc}
-.db.r{grid-column:3;grid-row:2;border-color:#fde047;color:#fde047}
+.joy-wrap{position:relative;width:148px;height:148px;touch-action:none;flex-shrink:0}
+.joy-base{position:absolute;inset:0;border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 42%,#1e293b 0%,#0f172a 55%,#020617 100%);
+  border:3px solid #475569;
+  box-shadow:inset 0 4px 12px rgba(0,0,0,.55),0 0 0 2px #1e1b4b,0 8px 24px rgba(0,0,0,.45);
+}
+.joy-base::before{content:"";position:absolute;inset:18px;border-radius:50%;border:2px dashed rgba(148,163,184,.25);pointer-events:none}
+.joy-cross{position:absolute;inset:0;pointer-events:none}
+.joy-cross::before,.joy-cross::after{content:"";position:absolute;background:rgba(148,163,184,.12);border-radius:2px}
+.joy-cross::before{left:50%;top:14%;bottom:14%;width:2px;margin-left:-1px}
+.joy-cross::after{top:50%;left:14%;right:14%;height:2px;margin-top:-1px}
+.joy-dir{position:absolute;font-size:9px;color:rgba(148,163,184,.45);pointer-events:none;line-height:1}
+.joy-dir.u{top:8px;left:50%;transform:translateX(-50%);color:rgba(249,168,212,.5)}
+.joy-dir.d{bottom:8px;left:50%;transform:translateX(-50%);color:rgba(192,132,252,.5)}
+.joy-dir.l{left:10px;top:50%;transform:translateY(-50%);color:rgba(56,189,248,.5)}
+.joy-dir.r{right:10px;top:50%;transform:translateY(-50%);color:rgba(253,224,71,.5)}
+.joy-stick{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f9a8d4 0%,#db2777 42%,#9d174d 78%,#4c0519 100%);
+  border:3px solid #fce7f3;
+  box-shadow:0 4px 0 #4c0519,0 6px 16px rgba(219,39,119,.45),inset 0 2px 4px rgba(255,255,255,.35);
+  cursor:grab;touch-action:none;z-index:2;
+  transition:box-shadow .12s ease;
+}
+.joy-stick:active,.joy-stick.dragging{cursor:grabbing;box-shadow:0 2px 0 #4c0519,0 0 22px rgba(244,114,182,.7),inset 0 2px 4px rgba(255,255,255,.4)}
+.joy-stick::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#fff 0%,#fce7f3 40%,#f9a8d4 100%);
+  box-shadow:0 0 8px rgba(255,255,255,.5);opacity:.9}
 .hint{font-size:7px;color:#64748b;text-align:center;line-height:1.5}
 .ov{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;background:linear-gradient(180deg,rgba(10,10,30,.97),rgba(5,5,16,.98))}
 .ov.hide{display:none!important}
@@ -63,7 +84,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050510;color:#fff;f
       <div class="sub">FAN TRIBUTE · ARCADE INSPIRED</div>
       <button type="button" class="mb" id="startBtn">START</button>
       <button type="button" class="mb alt" id="howBtn">HOW TO PLAY</button>
-      <div class="hint" style="margin-top:12px">Arrows / WASD or pad · M mute</div>
+      <div class="hint" style="margin-top:12px">Arrows / WASD or drag joystick · M mute</div>
       <div class="foot">Not affiliated with Bandai Namco / Midway / Nintendo<br><a href="../../">Portal</a></div>
     </div>
     <div id="how" class="ov hide">
@@ -74,6 +95,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050510;color:#fff;f
         <p>• Avoid ghosts unless they are blue</p>
         <p>• Side tunnels wrap around</p>
         <p>• Extra life at 10,000</p>
+        <p>• Drag the joystick tip up / down / left / right</p>
       </div>
       <button type="button" class="mb ghost" id="backBtn">BACK</button>
     </div>
@@ -85,13 +107,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050510;color:#fff;f
     </div>
   </div>
   <div id="pad">
-    <div class="dpad">
-      <button type="button" class="db u" data-d="U">▲</button>
-      <button type="button" class="db l" data-d="L">◀</button>
-      <button type="button" class="db d" data-d="D">▼</button>
-      <button type="button" class="db r" data-d="R">▶</button>
+    <div class="joy-wrap" id="joyWrap" aria-label="Joystick">
+      <div class="joy-base">
+        <div class="joy-cross"></div>
+        <span class="joy-dir u">▲</span>
+        <span class="joy-dir d">▼</span>
+        <span class="joy-dir l">◀</span>
+        <span class="joy-dir r">▶</span>
+      </div>
+      <div class="joy-stick" id="joyStick" role="slider" aria-label="Move joystick tip"></div>
     </div>
-    <div class="hint">Hold a direction — turns at intersections</div>
+    <div class="hint">Drag the tip — up / down / left / right</div>
   </div>
 </div>
 <script src="./game.js"></script>

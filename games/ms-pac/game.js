@@ -1104,24 +1104,134 @@
     }
   });
 
-  document.querySelectorAll(".db[data-d]").forEach(function (btn) {
-    var d = btn.getAttribute("data-d");
-    function go(ev) {
-      ev.preventDefault();
+  // Virtual joystick — drag the tip; maps to U/D/L/R
+  (function initJoystick() {
+    var wrap = document.getElementById("joyWrap");
+    var stick = document.getElementById("joyStick");
+    if (!wrap || !stick || typeof wrap.addEventListener !== "function") return;
+    if (!stick.style) stick.style = {};
+
+    var active = false;
+    var maxR = 42; // px tip travel from center
+    var dead = 14; // px deadzone
+    var pointerId = null;
+
+    function centerOf() {
+      if (typeof wrap.getBoundingClientRect === "function") {
+        var r = wrap.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      }
+      return { x: 74, y: 74 };
+    }
+
+    function highlight(dir) {
+      if (typeof wrap.querySelectorAll !== "function") return;
+      var labels = wrap.querySelectorAll(".joy-dir");
+      for (var i = 0; i < labels.length; i++) {
+        var el = labels[i];
+        var cl = el.classList;
+        var on =
+          (dir === "U" && cl.contains("u")) ||
+          (dir === "D" && cl.contains("d")) ||
+          (dir === "L" && cl.contains("l")) ||
+          (dir === "R" && cl.contains("r"));
+        if (!el.style) el.style = {};
+        el.style.color = on
+          ? dir === "U"
+            ? "#f9a8d4"
+            : dir === "D"
+              ? "#c084fc"
+              : dir === "L"
+                ? "#38bdf8"
+                : "#fde047"
+          : "";
+        el.style.opacity = on ? "1" : "";
+      }
+    }
+
+    function setTip(dx, dy) {
+      var len = Math.sqrt(dx * dx + dy * dy);
+      if (len > maxR && len > 0) {
+        dx = (dx / len) * maxR;
+        dy = (dy / len) * maxR;
+        len = maxR;
+      }
+      stick.style.transform = "translate(" + dx + "px," + dy + "px)";
+
+      if (len < dead) return; // keep last want while in deadzone (arcade sticky)
+
+      // 4-way only: dominant axis
+      var dir;
+      if (Math.abs(dx) >= Math.abs(dy)) dir = dx < 0 ? "L" : "R";
+      else dir = dy < 0 ? "U" : "D";
+      setWant(dir);
+      highlight(dir);
+    }
+
+    function resetTip() {
+      stick.style.transform = "translate(0px,0px)";
+      stick.classList.remove("dragging");
+      if (typeof wrap.querySelectorAll === "function") {
+        var labels = wrap.querySelectorAll(".joy-dir");
+        for (var i = 0; i < labels.length; i++) {
+          if (!labels[i].style) labels[i].style = {};
+          labels[i].style.color = "";
+          labels[i].style.opacity = "";
+        }
+      }
+    }
+
+    function onDown(clientX, clientY, id) {
+      active = true;
+      pointerId = id;
+      stick.classList.add("dragging");
       sndInit();
-      btn.classList.add("on");
-      setWant(d);
+      var c = centerOf();
+      setTip(clientX - c.x, clientY - c.y);
     }
-    function up(ev) {
-      ev.preventDefault();
-      btn.classList.remove("on");
+
+    function onMove(clientX, clientY) {
+      if (!active) return;
+      var c = centerOf();
+      setTip(clientX - c.x, clientY - c.y);
     }
-    btn.addEventListener("touchstart", go, { passive: false });
-    btn.addEventListener("touchend", up, { passive: false });
-    btn.addEventListener("mousedown", go);
-    btn.addEventListener("mouseup", up);
-    btn.addEventListener("mouseleave", up);
-  });
+
+    function onUp() {
+      if (!active) return;
+      active = false;
+      pointerId = null;
+      resetTip();
+      // Direction stays latched (want) so pac keeps that intent at intersections
+    }
+
+    wrap.addEventListener(
+      "pointerdown",
+      function (e) {
+        e.preventDefault();
+        try {
+          if (typeof wrap.setPointerCapture === "function") wrap.setPointerCapture(e.pointerId);
+        } catch (err) {}
+        onDown(e.clientX, e.clientY, e.pointerId);
+      },
+      { passive: false }
+    );
+    wrap.addEventListener(
+      "pointermove",
+      function (e) {
+        if (!active || (pointerId !== null && e.pointerId !== pointerId)) return;
+        e.preventDefault();
+        onMove(e.clientX, e.clientY);
+      },
+      { passive: false }
+    );
+    function endPtr(e) {
+      if (pointerId !== null && e.pointerId !== pointerId) return;
+      onUp();
+    }
+    wrap.addEventListener("pointerup", endPtr);
+    wrap.addEventListener("pointercancel", endPtr);
+    wrap.addEventListener("lostpointercapture", endPtr);
+  })();
 
   document.getElementById("startBtn").onclick = function () {
     sndInit();
