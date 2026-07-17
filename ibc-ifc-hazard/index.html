@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="IBC/IFC hazard impacts — H occupancy and hazardous materials construction requirements, mitigations by hazard, 2015–2024 editions.">
+  <title>IBC / IFC Hazard Impacts · Fire Toolshed</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Fire Toolshed · Life safety / code analysis</p>
+        <h1>IBC / IFC Hazard Impacts</h1>
+        <p class="version" id="appVersion">Version 1.2.0</p>
+        <p class="lead">
+          Select code edition, <strong>MAQ path</strong> (Group H vs control areas), <strong>H occupancy</strong> (IBC Ch. 3), and material hazard classes —
+          or <strong>upload an HMIS / inventory spreadsheet</strong> to assess materials and populate the form.
+          The app lists <strong>construction &amp; mitigation requirements</strong> from IBC 414 / 415 / 315 and IFC Ch. 50+,
+          and shows <strong>which hazard drove each item</strong> — including high-cost construction flags.
+        </p>
+      </div>
+      <div class="top-actions no-print">
+        <button type="button" id="btnHelp" class="ghost">Help / Guide</button>
+        <button type="button" id="btnPrintPdf" class="primary">Print to PDF</button>
+        <button type="button" id="btnSave">Save report</button>
+        <a class="btn-link" href="../">Portal</a>
+        <button type="button" id="btnReset" class="ghost">Reset</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div>
+        <section class="panel no-print" id="importPanel">
+          <h2>0 · Import HMIS inventory</h2>
+          <p class="hint">
+            Upload a hazardous materials inventory (<strong>.xlsx</strong> or <strong>.csv</strong>).
+            The app finds product rows and <strong>HAZARD CLASSIFICATION</strong> text, maps them to IFC hazard families,
+            suggests H groups, and can set MAQ path when a MAQ EXCEEDED column is present. Review before applying — not a full MAQ calculation.
+          </p>
+          <div class="import-row">
+            <label class="file-btn" for="hmisFile">
+              <input type="file" id="hmisFile" accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" />
+              Choose spreadsheet…
+            </label>
+            <span class="import-file-name" id="hmisFileName">No file selected</span>
+          </div>
+          <div id="importStatus" class="import-status hidden" role="status"></div>
+          <div id="importReview" class="import-review hidden">
+            <h3 class="import-review-title">Assessment preview</h3>
+            <div id="importSummary" class="import-summary"></div>
+            <div class="field-grid two" style="margin-top:0.75rem">
+              <div class="field">
+                <label for="importPathChoice">MAQ path on apply</label>
+                <select id="importPathChoice">
+                  <option value="suggested">Use suggested path</option>
+                  <option value="group_h">Force Group H (above MAQ)</option>
+                  <option value="control_area">Force control areas only</option>
+                  <option value="keep">Keep current form path</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="importHChoice">H groups on apply</label>
+                <select id="importHChoice">
+                  <option value="apply">Apply suggested H groups</option>
+                  <option value="merge">Merge with current H selection</option>
+                  <option value="skip">Do not change H groups</option>
+                </select>
+              </div>
+            </div>
+            <label class="check-item" style="margin-top:0.65rem">
+              <input type="checkbox" id="importReplaceHazards" checked />
+              <span>Replace hazard types with import matches (unchecked = merge with current)</span>
+            </label>
+            <div class="import-actions">
+              <button type="button" id="btnImportApply" class="primary">Apply to form</button>
+              <button type="button" id="btnImportDismiss" class="ghost">Dismiss</button>
+            </div>
+            <details class="import-details">
+              <summary>Materials &amp; matches</summary>
+              <div id="importMaterials" class="import-materials"></div>
+            </details>
+            <details class="import-details">
+              <summary>Unmatched classifications</summary>
+              <div id="importUnmatched" class="import-unmatched"></div>
+            </details>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>1 · Code edition &amp; project</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="edition">IBC / IFC edition</label>
+              <select id="edition">
+                <option value="2015">2015 IBC / IFC</option>
+                <option value="2018">2018 IBC / IFC</option>
+                <option value="2021" selected>2021 IBC / IFC</option>
+                <option value="2024">2024 IBC / IFC</option>
+              </select>
+              <span class="sub">Requirements matrix is edition-aware; footnotes note significant differences. Confirm adopted local amendments.</span>
+            </div>
+            <div class="field">
+              <label for="projectName">Project name</label>
+              <input id="projectName" type="text" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="facility">Building / suite / process area</label>
+              <input id="facility" type="text" />
+            </div>
+            <div class="field">
+              <label for="sprinklered">Building sprinklered (NFPA 13)</label>
+              <select id="sprinklered">
+                <option value="yes" selected>Yes</option>
+                <option value="no">No / unknown</option>
+              </select>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="reportLogoSource">Report logo</label>
+              <select id="reportLogoSource">
+                <option value="benham">Benham</option>
+                <option value="haskell">Haskell</option>
+                <option value="upload">Upload image…</option>
+              </select>
+              <div id="reportLogoFileWrap" class="hidden" style="margin-top:0.35rem">
+                <input id="reportLogoFile" type="file" accept="image/*" />
+              </div>
+              <div id="reportLogoPreview" style="margin-top:0.35rem"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>2 · MAQ path (control area vs Group H)</h2>
+          <p class="hint">
+            Preliminary screening only — not a full MAQ calculation. Choose whether materials are expected
+            <strong>above MAQ → Group H</strong>, or managed in <strong>control areas at/under MAQ</strong>.
+          </p>
+          <div class="path-mode" role="radiogroup" aria-label="MAQ path">
+            <label class="path-card">
+              <input type="radio" name="pathMode" id="pathGroupH" value="group_h" checked />
+              <span class="path-card-body">
+                <strong>Above MAQ → Group H path</strong>
+                <span class="meta">Full H-1…H-5 construction &amp; systems matrix (IBC 414/415). Use when the area is (or will be) classified Group H.</span>
+              </span>
+            </label>
+            <label class="path-card">
+              <input type="radio" name="pathMode" id="pathControlArea" value="control_area" />
+              <span class="path-card-body">
+                <strong>Control areas only (at / under MAQ)</strong>
+                <span class="meta">Suppress pure H-occupancy construction. Emphasize §414 control areas, separation, spill/exhaust, and IFC Ch. 50+ material controls — useful for “can we avoid H?” screening.</span>
+              </span>
+            </label>
+          </div>
+          <div id="pathModeNote" class="callout info" style="margin-top:0.75rem"></div>
+        </section>
+
+        <section class="panel">
+          <h2>3 · H occupancy (IBC Chapter 3)</h2>
+          <p class="hint">Select all Group H classifications that apply to the area of analysis. Multiple groups are merged; the strictest applicable construction item is kept and all triggering hazards are listed.</p>
+          <div id="hSuggestBar" class="suggest-bar hidden" aria-live="polite"></div>
+          <div class="check-grid" id="hGroupGrid"></div>
+        </section>
+
+        <section class="panel">
+          <h2>4 · Material / hazard types (IFC Ch. 50+ classes)</h2>
+          <p class="hint">Select all hazardous material categories present (or expected). These map to IFC chapters and reinforce H-group mitigations. Suggested H groups appear above when hazards imply Chapter 3 classifications. Same requirement driven by multiple hazards is listed once with all drivers.</p>
+          <div class="check-grid" id="hazardGrid"></div>
+          <div class="field" style="margin-top:0.85rem">
+            <label class="check-item">
+              <input type="checkbox" id="highPiled" />
+              High-piled combustible storage present (IBC/IFC high-piled / IBC §315 context)
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>5 · Optional scope filters</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="filterCost">Show</label>
+              <select id="filterCost">
+                <option value="all" selected>All requirements</option>
+                <option value="high">High-cost construction only</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="filterCat">Category focus</label>
+              <select id="filterCat">
+                <option value="all" selected>All categories</option>
+                <option value="construction">Construction / fire resistance</option>
+                <option value="separation">Separation / control areas</option>
+                <option value="explosion">Explosion / deflagration</option>
+                <option value="mechanical">Mechanical / exhaust / spill</option>
+                <option value="fire_protection">Fire protection systems</option>
+                <option value="operational">Operational / IFC use controls</option>
+              </select>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div>
+        <section class="panel sticky">
+          <h2>Analysis summary</h2>
+          <div id="summaryBox" class="summary"></div>
+          <div id="editionNote" class="callout info" style="margin-top:0.75rem"></div>
+        </section>
+      </div>
+    </div>
+
+    <section class="panel results-panel">
+      <h2>Required mitigations &amp; construction impacts</h2>
+      <p class="hint" id="resultCount">Select H groups and/or hazard types to generate requirements.</p>
+      <div class="table-wrap">
+        <table class="data" id="reqTable">
+          <thead>
+            <tr>
+              <th>Requirement / mitigation</th>
+              <th>Category</th>
+              <th>Code anchors</th>
+              <th>Driven by (hazard / H group)</th>
+              <th>Cost</th>
+            </tr>
+          </thead>
+          <tbody id="reqBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="print-package panel" id="printPackage">
+      <div id="reportLogoPrint"></div>
+      <div id="printBody"></div>
+    </section>
+
+    <footer class="site-foot no-print">
+      IBC / IFC Hazard Impacts · Fire Toolshed · Preliminary code matrix only · Confirm adopted edition &amp; local amendments ·
+      <a href="../">Portal</a>
+    </footer>
+  </div>
+
+  <div id="helpModal" class="modal hidden" aria-hidden="true" role="dialog" aria-labelledby="helpTitle">
+    <div class="modal-backdrop" id="helpBackdrop"></div>
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h2 id="helpTitle">IBC / IFC Hazard Impacts — Help / Guide</h2>
+        <button type="button" id="helpClose" class="ghost">Close</button>
+      </div>
+      <div class="modal-body">
+        <p class="help-intro">
+          <strong>What this is:</strong> a preliminary <em>requirements checklist</em> for areas with Group H and/or hazardous materials.
+          It unions construction and systems items commonly driven by
+          <strong>IBC Ch. 3 (H-1…H-5)</strong>, <strong>§414 / §415</strong>, high-piled context (<strong>§315 / IFC 32</strong>),
+          and <strong>IFC Ch. 50+</strong> material chapters.
+          You can fill selections manually or <strong>import an HMIS inventory</strong> spreadsheet to seed the form.
+        </p>
+        <p class="help-intro">
+          <strong>What this is not:</strong> an MAQ calculator, SDS validator, control-area floor plan tool, or AHJ determination.
+          Quantities, separations, and local amendments decide occupancy — this tool maps <em>your stated path and hazard set</em> to typical mitigations.
+        </p>
+
+        <h3>Recommended workflow</h3>
+        <ol class="help-steps">
+          <li><strong>Import (optional)</strong> — §0 · upload HMIS <code>.xlsx</code> / <code>.csv</code> → review assessment → <strong>Apply to form</strong>. Always re-check every box after apply.</li>
+          <li><strong>Edition</strong> — match the adopted IBC/IFC pair (2015–2024). Import may detect a year from the file; confirm it.</li>
+          <li><strong>MAQ path</strong> — Group H (above MAQ) vs control areas only. This choice changes which drivers fire.</li>
+          <li><strong>Hazards</strong> — every IFC material family present or planned (import seeds these from classification text).</li>
+          <li><strong>H groups</strong> — confirm Chapter 3 classifications; use suggested chips if anything is still unchecked.</li>
+          <li><strong>High-piled</strong> — only if storage meets high-piled criteria (not set by import).</li>
+          <li><strong>Filters</strong> — optional high-cost only or single category.</li>
+          <li><strong>Table + report</strong> — review drivers; Print to PDF or Save HTML for design meetings.</li>
+        </ol>
+
+        <h3>Import HMIS inventory</h3>
+        <p>
+          Section <strong>0 · Import HMIS inventory</strong> reads a materials list in the browser and proposes form values.
+          Nothing is sent to a server.
+        </p>
+        <h4 class="help-h4">What to upload</h4>
+        <ul>
+          <li><strong>.xlsx</strong> (preferred) or <strong>.csv</strong> export of an HMIS / hazmat inventory.</li>
+          <li>Must include a header row with <strong>HAZARD CLASSIFICATION</strong> (or close aliases: Hazard Class, Classification, IFC Class).</li>
+          <li>Strongly recommended: <strong>PRODUCT NAME</strong>. Optional: Component, CAS, Concentration, Storage location, Container size, Stored quantity, Product code.</li>
+          <li>Workbooks may include extra sheets. The app prefers inventory-like sheet names (SDS, HMIS, inventory, materials) and ignores pure notes sheets when possible.</li>
+        </ul>
+        <h4 class="help-h4">How assessment works</h4>
+        <ol>
+          <li>Finds the inventory header and groups multi-row products (one product name + component lines, as in typical HMIS layouts).</li>
+          <li>Collects every non-blank <strong>hazard classification</strong> string on those rows.</li>
+          <li><strong>Keyword-matches</strong> each string to IFC hazard families used by this app (e.g. “FLAMMABLE LIQUID CLASS IB” → flammable liquids Class I; “CLASS 2 OXIDIZER” → oxidizer; “ORGANIC PEROXIDE CLASS IV” → organic peroxides; “CORROSIVE CAT 1A” → corrosive).</li>
+          <li>Unions matched families → hazard checkboxes; maps each family to Chapter 3 <strong>suggested H groups</strong>.</li>
+          <li>If a <strong>MAQ TABLES</strong>-style sheet has <strong>MAQ EXCEEDED</strong> = YES / NO / TBD, suggests a MAQ path (see table below).</li>
+          <li>May fill <strong>project name</strong>, <strong>facility</strong> hints, and <strong>edition</strong> when found in titles or MAQ references (e.g. “2024 IFC”).</li>
+        </ol>
+        <table class="help-table">
+          <thead>
+            <tr>
+              <th>MAQ EXCEEDED in file</th>
+              <th>Suggested path</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Any <strong>YES</strong></td>
+              <td>Group H (above MAQ)</td>
+              <td>High — still confirm quantities and control areas.</td>
+            </tr>
+            <tr>
+              <td>All <strong>NO</strong></td>
+              <td>Control areas only</td>
+              <td>High — still confirm MAQ tables and separations.</td>
+            </tr>
+            <tr>
+              <td><strong>TBD</strong> / missing</td>
+              <td>Group H (conservative default)</td>
+              <td>Low — engineer must decide; import does not calculate MAQs.</td>
+            </tr>
+          </tbody>
+        </table>
+        <h4 class="help-h4">Review panel &amp; apply options</h4>
+        <dl class="help-dl">
+          <dt>Assessment preview</dt>
+          <dd>File name, inventory sheet, material count, matched hazards, suggested H, suggested path + note, edition/project if detected, unmatched line count.</dd>
+          <dt>Materials &amp; matches</dt>
+          <dd>Expandable list: each product, raw classification text, mapped hazard families, container/location when present.</dd>
+          <dt>Unmatched classifications</dt>
+          <dd>Lines that did not keyword-match. Add those hazards manually after apply, or fix the spreadsheet wording and re-import.</dd>
+          <dt>MAQ path on apply</dt>
+          <dd>
+            <strong>Use suggested</strong> · <strong>Force Group H</strong> · <strong>Force control areas only</strong> · <strong>Keep current form path</strong>.
+          </dd>
+          <dt>H groups on apply</dt>
+          <dd>
+            <strong>Apply suggested</strong> (replace H selection) · <strong>Merge with current</strong> · <strong>Do not change H groups</strong>.
+          </dd>
+          <dt>Replace hazard types</dt>
+          <dd>Checked (default): form hazards become exactly the import set. Unchecked: import hazards are merged into whatever is already checked.</dd>
+          <dt>Apply to form</dt>
+          <dd>Writes project/facility/edition (when found), path (per option), hazards, and H groups (per option). Does <em>not</em> set high-piled, sprinklered, logo, or filters. You can re-upload to reassess; <strong>Dismiss</strong> clears the preview only.</dd>
+        </dl>
+        <p class="help-note">
+          Import is a screening aid. After apply, walk H groups, path, and the results table against SDS data and a real MAQ/control-area study before design or permit.
+        </p>
+
+        <h3>MAQ path — choose deliberately</h3>
+        <table class="help-table">
+          <thead>
+            <tr>
+              <th>Path</th>
+              <th>When to use</th>
+              <th>What the matrix does</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Group H<br>(above MAQ)</strong></td>
+              <td>Area is classified (or expected to be) H-1…H-5. Materials exceed MAQ and control-area strategy is not the design intent.</td>
+              <td>H-group checkboxes <em>and</em> hazards drive the list. Includes full H construction packages: type of construction, roof Class A, fire walls/barriers, H systems.</td>
+            </tr>
+            <tr>
+              <td><strong>Control areas<br>(at / under MAQ)</strong></td>
+              <td>Screening “can we stay out of Group H?” or design intent is control areas with quantities managed under MAQ.</td>
+              <td><strong>H-group construction drivers are off.</strong> Only selected hazards and high-piled fire items. Emphasizes §414 control areas, separation, spill/exhaust, IFC use controls. H checkboxes are ignored as drivers (suggestions still help if you flip path later).</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="help-note">
+          Neither path computes MAQ tables or number of control areas by story. That remains a code study with IFC Table 5003.1.1(1)/(2) (or edition equivalent) and IBC 414.
+        </p>
+
+        <h3>Inputs — field guide</h3>
+        <dl class="help-dl">
+          <dt>IBC / IFC edition</dt>
+          <dd>Select the code year your project adopts. Core H definitions and 414/415 structure are stable across 2015–2024; always re-check tables and local amendments. Import may set this when a year appears in the workbook (e.g. MAQ sheet cite).</dd>
+
+          <dt>Project name / area</dt>
+          <dd>Labels the print package. Prefer a specific suite, process bay, or warehouse zone. Import may fill project from HMIS title text and facility from storage location / title hints (template leftovers in a file should be overwritten).</dd>
+
+          <dt>Building sprinklered</dt>
+          <dd>Context for the report and for items that assume NFPA 13. Not changed by import. Unsprinklered buildings need extra AHJ scrutiny on H and high-piled paths.</dd>
+
+          <dt>Report logo</dt>
+          <dd>Benham, Haskell, or upload — appears on Print / Save packages only.</dd>
+
+          <dt>H occupancy (H-1 … H-5)</dt>
+          <dd>
+            IBC Chapter 3 classifications for the analysis area.
+            <ul>
+              <li><strong>H-1</strong> — detonation (e.g. explosives, severe unstable / organic peroxide classes).</li>
+              <li><strong>H-2</strong> — deflagration / accelerated burning (flammable gas, open Class I use, certain dusts, etc.).</li>
+              <li><strong>H-3</strong> — materials that readily support combustion / physical hazard (combustibles, many oxidizers, aerosols…).</li>
+              <li><strong>H-4</strong> — health hazard (highly toxic, toxic, corrosives above H thresholds).</li>
+              <li><strong>H-5</strong> — semiconductor HPM fabrication.</li>
+            </ul>
+            Multiple groups are allowed; requirements are <strong>unioned</strong>. Import can apply or merge suggested H from hazard maps.
+          </dd>
+
+          <dt>Suggested H from hazards</dt>
+          <dd>
+            Each hazard type carries a Chapter 3 map (shown as “often H-x” under the hazard). Unchecked mapped groups appear as chips and highlighted cards.
+            <strong>Apply one</strong> or <strong>Apply all</strong> after manual edits; import may already have applied them depending on the H option you chose.
+          </dd>
+
+          <dt>Material / hazard types</dt>
+          <dd>
+            IFC class families (Ch. 50+). Check everything present <em>or planned</em>. Same mitigation from several hazards appears once with every driver listed.
+            Hazard selection works on <em>both</em> MAQ paths; on the control-area path it is the primary driver set (plus high-piled).
+          </dd>
+
+          <dt>High-piled combustible storage</dt>
+          <dd>
+            When storage height/commodity meets high-piled criteria (IFC 32 / IBC §315 context). Adds high-piled and smoke/heat-vent style items even with no H group.
+            Not set by HMIS import. Commodity class and ESFR depth are not modeled.
+          </dd>
+
+          <dt>Filters (Show / Category)</dt>
+          <dd>
+            <strong>High-cost construction only</strong> keeps budget drivers (walls, roof class, explosion control, specialized exhaust, containment, full H packages).
+            Category focus narrows to construction, separation, explosion, mechanical, fire protection, or operational/IFC controls.
+          </dd>
+        </dl>
+
+        <h3>Reading the results table</h3>
+        <ul>
+          <li><strong>Requirement</strong> — mitigation in plain language + short design note.</li>
+          <li><strong>Category</strong> — construction, separation, explosion, mechanical, fire protection, or operational.</li>
+          <li><strong>Code anchors</strong> — starting sections, not a complete citation tree. Open the adopted book.</li>
+          <li><strong>Driven by</strong> — which H group(s), hazard label(s), or “High-piled storage” triggered the row. Multiple drivers mean one shared requirement.</li>
+          <li><strong>HIGH COST</strong> — typical capital/program cost drivers for early budgeting; not a dollar estimate.</li>
+        </ul>
+        <p class="help-note">
+          Summary panel shows edition, MAQ path, selected H, H mapped from hazards, hazard count, high-piled, and high-cost tally.
+          If the control-area path shows zero rows, select hazards or high-piled — H checkboxes alone do not drive that path.
+        </p>
+
+        <h3>Merging rules (multi-hazard)</h3>
+        <ul>
+          <li>Requirements are the <strong>union</strong> of all matching triggers.</li>
+          <li>Duplicate IDs collapse to one row; all drivers are listed.</li>
+          <li>There is no silent “severity wins and deletes lesser rows” pass — if two different construction items both match, both appear.</li>
+        </ul>
+
+        <h3>Outputs</h3>
+        <ul>
+          <li><strong>Print to PDF</strong> — opens a print dialog; choose Save as PDF. Cancel returns here.</li>
+          <li><strong>Save report</strong> — downloads a standalone HTML package (logo + matrix) for email or archive.</li>
+          <li><strong>Reset</strong> — clears saved selections and dismisses any import preview for this tool only.</li>
+        </ul>
+
+        <h3>Limitations — do not skip</h3>
+        <ul class="help-limits">
+          <li>No MAQ arithmetic, no control-area count by floor, no outdoor tank farm separation distances calculated.</li>
+          <li>HMIS import uses <strong>keyword matching</strong> on classification text only — it does not compute MAQs from gallons/pounds, parse full SDS sections, or prove occupancy.</li>
+          <li>Unmatched or unusual classification wording will not light hazards until you add them manually or reword the sheet.</li>
+          <li>Edition differences are footnotes, not a full 2015↔2024 delta set for every table.</li>
+          <li>Local amendments, risk engineering, and AHJ policy override this matrix.</li>
+          <li>Explosion control rows point to NFPA 68/69 (and related Toolshed tools) — they do not size vents.</li>
+          <li>Always verify against the adopted code text and the designer of record before design or permit.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/xlsx.full.min.js"></script>
+  <script src="../shared/report-logo.js"></script>
+  <script src="./assets/hmis-import.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
