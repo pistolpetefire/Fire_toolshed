@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a1a">
+<meta name="description" content="Ms. Pac-Man inspired maze — Fire Toolshed Games fan tribute">
+<title>Ms. Pac Maze · Fire Toolshed Games</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none}
+html,body{width:100%;height:100%;overflow:hidden;background:#050510;color:#fff;font-family:'Press Start 2P',ui-monospace,monospace}
+#app{display:flex;flex-direction:column;width:100%;height:100%;padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;background:#0a0a18;border-bottom:2px solid #312e81;flex-shrink:0;z-index:20}
+.bar a{color:#f9a8d4;font-size:8px;text-decoration:none;font-weight:700}
+.brand{color:#64748b;font-size:7px}
+.icon{min-width:36px;min-height:36px;border:2px solid #334155;border-radius:8px;background:#0f172a;color:#fff;font:inherit;font-size:12px;cursor:pointer}
+.icon.on{border-color:#fde047;color:#fde047}
+#stage{flex:1 1 auto;min-height:220px;display:flex;align-items:center;justify-content:center;position:relative;background:
+  radial-gradient(ellipse 80% 60% at 50% 35%,#1a1a3e 0%,transparent 55%),
+  radial-gradient(ellipse at 20% 80%,rgba(219,39,119,.12),transparent 40%),
+  radial-gradient(ellipse at 80% 20%,rgba(99,102,241,.14),transparent 45%),
+  #050510;overflow:hidden}
+#stage::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);z-index:1}
+#c{display:block;position:relative;z-index:2;background:#000;image-rendering:pixelated;image-rendering:crisp-edges;
+  box-shadow:0 0 0 2px #a5b4fc,0 0 0 5px #312e81,0 0 40px rgba(129,140,248,.35),0 16px 48px rgba(0,0,0,.75);
+  border-radius:2px}
+#pad{flex-shrink:0;background:#0a0a18;border-top:2px solid #312e81;padding:10px 8px calc(12px + env(safe-area-inset-bottom,0));display:none;flex-direction:column;align-items:center;gap:6px}
+#pad.show{display:flex}
+.dpad{display:grid;grid-template-columns:64px 64px 64px;grid-template-rows:52px 52px;gap:5px;place-items:center}
+.db{width:60px;height:48px;border-radius:12px;border:3px solid #475569;cursor:pointer;background:linear-gradient(160deg,#1e293b,#0f172a);color:#e2e8f0;font:inherit;font-size:14px;box-shadow:0 4px 0 #000}
+.db:active,.db.on{transform:translateY(3px);box-shadow:0 1px 0 #000}
+.db.u{grid-column:2;grid-row:1;border-color:#f9a8d4;color:#f9a8d4}
+.db.l{grid-column:1;grid-row:2;border-color:#38bdf8;color:#38bdf8}
+.db.d{grid-column:2;grid-row:2;border-color:#c084fc;color:#c084fc}
+.db.r{grid-column:3;grid-row:2;border-color:#fde047;color:#fde047}
+.hint{font-size:7px;color:#64748b;text-align:center;line-height:1.5}
+.ov{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;background:linear-gradient(180deg,rgba(10,10,30,.97),rgba(5,5,16,.98))}
+.ov.hide{display:none!important}
+.title{font-size:clamp(14px,4.2vw,24px);color:#f9a8d4;text-shadow:0 0 20px rgba(244,114,182,.55),3px 3px 0 #9d174d,5px 5px 0 #000;margin-bottom:8px;line-height:1.35;letter-spacing:0.04em}
+.sub{font-size:8px;color:#94a3b8;margin-bottom:16px;line-height:1.55}
+.mb{font:inherit;font-size:11px;color:#fff;padding:14px 26px;margin:6px;border-radius:8px;cursor:pointer;border:3px solid #f9a8d4;background:linear-gradient(160deg,#f472b6,#db2777 40%,#9d174d);box-shadow:0 5px 0 #4c0519,0 0 24px rgba(244,114,182,.35)}
+.mb:active{transform:translateY(3px);box-shadow:0 2px 0 #4c0519}
+.mb.alt{border-color:#7dd3fc;background:linear-gradient(160deg,#38bdf8,#0ea5e9 40%,#0369a1);box-shadow:0 5px 0 #0c4a6e,0 0 20px rgba(56,189,248,.3)}
+.mb.ghost{border-color:#64748b;background:linear-gradient(160deg,#334155,#1e293b);box-shadow:0 5px 0 #0f172a;font-size:10px}
+.howto{font-size:8px;line-height:1.8;text-align:left;max-width:320px;margin:10px 0 16px;color:#e2e8f0}
+.msg{font-size:10px;line-height:1.65;margin:12px 0;text-shadow:2px 2px 0 #000}
+.foot{position:absolute;bottom:12px;font-size:7px;color:#475569;line-height:1.5}
+.foot a{color:#64748b}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="bar">
+    <a href="../">← Games</a>
+    <span class="brand">FIRE TOOLSHED · GAMES</span>
+    <button type="button" class="icon" id="muteBtn">🔊</button>
+  </div>
+  <div id="stage">
+    <canvas id="c" width="304" height="364"></canvas>
+    <div id="title" class="ov">
+      <div class="title">MS. PAC<br>MAZE</div>
+      <div class="sub">FAN TRIBUTE · ARCADE INSPIRED</div>
+      <button type="button" class="mb" id="startBtn">START</button>
+      <button type="button" class="mb alt" id="howBtn">HOW TO PLAY</button>
+      <div class="hint" style="margin-top:12px">Arrows / WASD or pad · M mute</div>
+      <div class="foot">Not affiliated with Bandai Namco / Midway / Nintendo<br><a href="../../">Portal</a></div>
+    </div>
+    <div id="how" class="ov hide">
+      <div class="title" style="font-size:14px">HOW TO PLAY</div>
+      <div class="howto">
+        <p>• Eat all pellets to clear the maze</p>
+        <p>• Big pellets scare ghosts — eat them for points</p>
+        <p>• Avoid ghosts unless they are blue</p>
+        <p>• Side tunnels wrap around</p>
+        <p>• Extra life at 10,000</p>
+      </div>
+      <button type="button" class="mb ghost" id="backBtn">BACK</button>
+    </div>
+    <div id="end" class="ov hide">
+      <div class="title" id="endTitle" style="font-size:16px">GAME OVER</div>
+      <div class="msg" id="endMsg"></div>
+      <button type="button" class="mb" id="againBtn">PLAY AGAIN</button>
+      <button type="button" class="mb ghost" id="menuBtn">MAIN MENU</button>
+    </div>
+  </div>
+  <div id="pad">
+    <div class="dpad">
+      <button type="button" class="db u" data-d="U">▲</button>
+      <button type="button" class="db l" data-d="L">◀</button>
+      <button type="button" class="db d" data-d="D">▼</button>
+      <button type="button" class="db r" data-d="R">▶</button>
+    </div>
+    <div class="hint">Hold a direction — turns at intersections</div>
+  </div>
+</div>
+<script src="./game.js"></script>
+</body>
+</html>
