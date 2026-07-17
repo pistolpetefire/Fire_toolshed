@@ -832,14 +832,24 @@ function buildFighterList() {
 // ========== GAME FLOW ==========
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-  document.getElementById('hud').classList.add('hidden');
-  document.getElementById('controls').classList.add('hidden');
+  // id === 'none' or missing → hide all menus only (fight mode)
+  if (id && id !== 'none') {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('hidden');
+  }
+  const hud = document.getElementById('hud');
+  const controls = document.getElementById('controls');
+  if (hud) hud.classList.add('hidden');
+  if (controls) controls.classList.add('hidden');
 }
 
 function startFight(fighterIndex) {
   currentFighter = fighterIndex;
   const f = FIGHTERS[fighterIndex];
+  if (!f) {
+    console.error('Invalid fighter index', fighterIndex);
+    return;
+  }
   
   mac = {
     hp: 100, maxHp: 100,
@@ -853,7 +863,7 @@ function startFight(fighterIndex) {
   opp = {
     hp: f.maxHp, maxHp: f.maxHp,
     state: 'idle', stateTimer: 0,
-    currentPattern: null, patternTimer: 0,
+    currentPattern: null, patternTimer: 30, // short delay before first attack
     phase: 'idle', stunTimer: 0,
     knockdowns: 0, dialogue: '', dialogueTimer: 0
   };
@@ -863,17 +873,13 @@ function startFight(fighterIndex) {
   fightOver = false;
   particles = [];
   shake = 0;
+  frame = 0;
   
   document.getElementById('opp-name').textContent = f.name;
   updateHUD();
   
-  showScreen('none'); // hide all screens
-  document.getElementById('title-screen').classList.add('hidden');
-  document.getElementById('select-screen').classList.add('hidden');
-  document.getElementById('howto-screen').classList.add('hidden');
-  document.getElementById('between-round').classList.add('hidden');
-  document.getElementById('result-screen').classList.add('hidden');
-  
+  // Hide all menu screens; show fight chrome
+  showScreen('none');
   document.getElementById('hud').classList.remove('hidden');
   document.getElementById('controls').classList.remove('hidden');
   
@@ -883,10 +889,9 @@ function startFight(fighterIndex) {
   if (pov) pov.classList.remove('show');
   sfxBell();
   lastTime = performance.now();
-  if (!loopRunning) {
-    loopRunning = true;
-    requestAnimationFrame(gameLoop);
-  }
+  // Always (re)start loop for a new fight
+  loopRunning = true;
+  requestAnimationFrame(gameLoop);
 }
 
 function updateHUD() {
@@ -1594,16 +1599,26 @@ if (muteBtn) {
   muteBtn.classList.toggle('on', muted);
   muteBtn.onclick = () => { initAudio(); toggleMute(); };
 }
-document.getElementById('btn-pause')?.addEventListener('click', () => {
-  initAudio();
-  togglePause();
-});
-document.getElementById('btn-resume')?.addEventListener('click', () => {
-  if (paused) togglePause();
-});
-document.getElementById('btn-dismiss-orient')?.addEventListener('click', () => {
-  document.getElementById('orient-tip')?.classList.add('dismissed');
-});
+const pauseBtn = document.getElementById('btn-pause');
+if (pauseBtn) {
+  pauseBtn.addEventListener('click', () => {
+    initAudio();
+    togglePause();
+  });
+}
+const resumeBtn = document.getElementById('btn-resume');
+if (resumeBtn) {
+  resumeBtn.addEventListener('click', () => {
+    if (paused) togglePause();
+  });
+}
+const dismissOrient = document.getElementById('btn-dismiss-orient');
+if (dismissOrient) {
+  dismissOrient.addEventListener('click', () => {
+    const tip = document.getElementById('orient-tip');
+    if (tip) tip.classList.add('dismissed');
+  });
+}
 
 // Prevent scrolling / bounce on iOS
 document.body.addEventListener('touchmove', e => {
