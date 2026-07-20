@@ -5,6 +5,7 @@ import { HubHome } from './pages/HubHome';
 import { HubNotFound } from './pages/HubNotFound';
 import { ComingSoon } from './pages/ComingSoon';
 import OcccBioApApp from '../apps/occc-bio-ap/src/App';
+import { getRouterBasename } from './routerBase';
 
 /**
  * Study Buddy — multi-class study hub
@@ -13,26 +14,21 @@ import OcccBioApApp from '../apps/occc-bio-ap/src/App';
  * Class apps: /classes/<slug>/*
  * Placeholders: /coming-soon/<slug>
  *
- * Adding a class:
- * 1. apps/<slug>/meta.ts + src/App.tsx
- * 2. catalog.ts entry
- * 3. <Route path="/classes/<slug>/*" element={<YourApp />} />
+ * On GitHub Pages, BrowserRouter basename is /Fire_toolshed
+ * (from Vite base). In-app paths stay root-relative ("/classes/...").
  */
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={getRouterBasename()}>
       <ScrollToTop />
       <Routes>
-        {/* Hub */}
         <Route element={<HubLayout />}>
           <Route index element={<HubHome />} />
           <Route path="coming-soon/:slug" element={<ComingSoon />} />
         </Route>
 
-        {/* Class apps (isolated folders under apps/) */}
         <Route path="/classes/occc-bio-ap/*" element={<OcccBioApApp />} />
 
-        {/* Hub 404 */}
         <Route element={<HubLayout />}>
           <Route path="*" element={<HubNotFound />} />
         </Route>

@@ -11,7 +11,27 @@ study-buddy/
   package.json
 ```
 
-## Run
+## Live link (GitHub Pages)
+
+**Share this URL:**
+
+### https://pistolpetefire.github.io/Fire_toolshed/
+
+| Screen | Link |
+|--------|------|
+| Study Buddy hub | https://pistolpetefire.github.io/Fire_toolshed/ |
+| Anatomy Hub | https://pistolpetefire.github.io/Fire_toolshed/classes/occc-bio-ap |
+
+Deploy is automatic via GitHub Actions (`.github/workflows/deploy-study-buddy.yml`) on every push to `main` that touches `study-buddy/`.
+
+**One-time setup** (repo owner):
+
+1. Open [repo Settings → Pages](https://github.com/pistolpetefire/Fire_toolshed/settings/pages)
+2. Under **Build and deployment → Source**, choose **GitHub Actions**
+3. Wait for the **Deploy Study Buddy** workflow to finish (Actions tab)
+4. Open the live link above
+
+## Run locally
 
 ```bash
 cd study-buddy

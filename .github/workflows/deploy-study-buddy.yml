@@ -1,0 +1,69 @@
+# Deploy Study Buddy to GitHub Pages
+# Live URL: https://pistolpetefire.github.io/Fire_toolshed/
+#
+# One-time setup in the GitHub repo:
+#   Settings → Pages → Build and deployment → Source: GitHub Actions
+
+name: Deploy Study Buddy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'study-buddy/**'
+      - '.github/workflows/deploy-study-buddy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-study-buddy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: study-buddy/package-lock.json
+
+      - name: Install dependencies
+        working-directory: study-buddy
+        run: npm ci
+
+      - name: Build for GitHub Pages
+        working-directory: study-buddy
+        env:
+          # Must match the GitHub repo name (case-sensitive)
+          VITE_BASE_PATH: /Fire_toolshed/
+        run: npm run build
+
+      # SPA deep links (refresh on /classes/...) need 404.html → index.html
+      - name: SPA fallback for GitHub Pages
+        run: cp study-buddy/dist/index.html study-buddy/dist/404.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: study-buddy/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
