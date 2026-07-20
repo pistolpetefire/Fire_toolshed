@@ -14,6 +14,8 @@ export const skeletalConfig: DiagramConfig = {
   imageHeight: 841.89,
   maxWidthClass: 'max-w-lg',
   backgroundImage: 'skeleton-front.png',
+  // Quizzes: same geometry without bone name callouts
+  quizBackgroundImage: 'quiz/skeleton-front-unlabeled.svg',
   renderStyle: 'hotspot',
   credit: DIAGRAM_CREDITS.skeletal,
   regions: skeletonHotspots as DiagramConfig['regions'],
@@ -33,6 +35,8 @@ export const muscularConfig: DiagramConfig = {
   viewBox: '40 10 560 1095',
   maxWidthClass: 'max-w-md',
   backgroundImage: 'muscles-anterior.png',
+  // Anterior plate is already unlabeled (figure only)
+  quizBackgroundImage: 'muscles-anterior.png',
   renderStyle: 'hotspot',
   credit: DIAGRAM_CREDITS.muscular,
   /**
@@ -71,6 +75,8 @@ export const cardiovascularConfig: DiagramConfig = {
   imageHeight: 492,
   maxWidthClass: 'max-w-md',
   backgroundImage: 'heart.png',
+  // Quizzes: SVG with chamber/vessel text stripped (stretched into same hotspot space)
+  quizBackgroundImage: 'quiz/heart-unlabeled.svg',
   renderStyle: 'hotspot',
   credit: DIAGRAM_CREDITS.cardiovascular,
   regions: [
@@ -102,6 +108,7 @@ export const digestiveConfig: DiagramConfig = {
   imageHeight: 821,
   maxWidthClass: 'max-w-md',
   backgroundImage: 'digestive.svg',
+  quizBackgroundImage: 'quiz/digestive-unlabeled.svg',
   renderStyle: 'hotspot',
   credit: DIAGRAM_CREDITS.digestive,
   regions: [
@@ -130,6 +137,7 @@ export const respiratoryConfig: DiagramConfig = {
   imageHeight: 1023,
   maxWidthClass: 'max-w-lg',
   backgroundImage: 'respiratory.png',
+  quizBackgroundImage: 'quiz/respiratory-unlabeled.svg',
   renderStyle: 'hotspot',
   credit: {
     title: 'Respiratory system complete',
@@ -163,6 +171,7 @@ export const nervousConfig: DiagramConfig = {
   imageHeight: 2108,
   maxWidthClass: 'max-w-md',
   backgroundImage: 'nervous-unlabeled.png',
+  quizBackgroundImage: 'nervous-unlabeled.png',
   renderStyle: 'hotspot',
   credit: {
     title: 'Nervous system diagram (unlabeled)',
@@ -198,6 +207,8 @@ export const endocrineConfig: DiagramConfig = {
   imageHeight: 421,
   maxWidthClass: 'max-w-sm',
   backgroundImage: 'endocrine-illu-pd.png',
+  // PD plate has callout labels; quizzes use English SVG with text stripped
+  quizBackgroundImage: 'quiz/endocrine-english-unlabeled.svg',
   renderStyle: 'hotspot',
   credit: {
     title: 'Major endocrine glands',
@@ -228,6 +239,7 @@ export const urinaryConfig: DiagramConfig = {
   imageHeight: 670,
   maxWidthClass: 'max-w-sm',
   backgroundImage: 'urinary.svg',
+  quizBackgroundImage: 'quiz/urinary-unlabeled.svg',
   renderStyle: 'hotspot',
   credit: {
     title: 'Urinary system (numbered)',
@@ -260,6 +272,7 @@ export const integumentaryConfig: DiagramConfig = {
   imageHeight: 285.99769,
   maxWidthClass: 'max-w-2xl',
   backgroundImage: 'integumentary-skin.svg',
+  quizBackgroundImage: 'quiz/integumentary-skin-unlabeled.svg',
   renderStyle: 'hotspot',
   credit: {
     title: 'Human skin structure',
@@ -289,6 +302,7 @@ export const lymphaticConfig: DiagramConfig = {
   imageHeight: 900,
   maxWidthClass: 'max-w-sm',
   backgroundImage: 'lymphatic-te.svg',
+  quizBackgroundImage: 'quiz/lymphatic-te-unlabeled.svg',
   renderStyle: 'hotspot',
   credit: {
     title: 'Lymphatic system diagram',
@@ -317,6 +331,7 @@ export const reproductiveConfig: DiagramConfig = {
   imageHeight: 289,
   maxWidthClass: 'max-w-3xl',
   backgroundImage: 'reproductive-mf.svg',
+  quizBackgroundImage: 'quiz/reproductive-mf-unlabeled.svg',
   renderStyle: 'hotspot',
   credit: {
     title: 'Male and female anatomy',

@@ -14,6 +14,11 @@ export interface InteractiveDiagramProps {
   compact?: boolean;
   stickySelect?: boolean;
   className?: string;
+  /**
+   * Quiz mode: use unlabeled plate when available, hide hover name tooltips,
+   * and use a non-spoiling hint so answers are not obvious from the diagram.
+   */
+  quizMode?: boolean;
 }
 
 function styleClasses(style: DiagramRenderStyle | undefined, hasImage: boolean) {
@@ -67,13 +72,21 @@ export function InteractiveDiagram({
   compact = false,
   stickySelect = false,
   className = '',
+  quizMode = false,
 }: InteractiveDiagramProps) {
   const [internalSelected, setInternalSelected] = useState<string | null>(null);
   const selectedId = controlledSelected !== undefined ? controlledSelected : internalSelected;
   const selected = selectedId ? getStructureById(selectedId) ?? null : null;
-  const hasImage = Boolean(config.backgroundImage);
+  const plateFile =
+    quizMode && config.quizBackgroundImage
+      ? config.quizBackgroundImage
+      : config.backgroundImage;
+  const hasImage = Boolean(plateFile);
   const palette = { ...styleClasses(config.renderStyle, hasImage), ...config.palette };
-  const bgSrc = config.backgroundImage ? diagramUrl(config.backgroundImage) : null;
+  const bgSrc = plateFile ? diagramUrl(plateFile) : null;
+  const hint = quizMode
+    ? 'Unlabeled plate — use anatomy knowledge (no name labels on the figure)'
+    : config.hint;
 
   const handleClick = (regionId: string) => {
     const next = !stickySelect && regionId === selectedId ? null : regionId;
@@ -99,7 +112,7 @@ export function InteractiveDiagram({
   return (
     <div className={`flex flex-col gap-4 ${compact ? '' : 'lg:flex-row'} ${className}`}>
       <div className="card flex-1 overflow-hidden p-2 sm:p-4">
-        <p className="mb-2 px-2 text-center text-xs text-slate-500 dark:text-slate-400">{config.hint}</p>
+        <p className="mb-2 px-2 text-center text-xs text-slate-500 dark:text-slate-400">{hint}</p>
         <svg
           viewBox={config.viewBox}
           className={`mx-auto w-full select-none ${config.maxWidthClass ?? 'max-w-sm'}`}
@@ -170,7 +183,8 @@ export function InteractiveDiagram({
                 strokeLinecap="round"
                 onClick={() => handleClick(region.id)}
               >
-                <title>{region.label}</title>
+                {/* Hover titles spoil quiz answers — only show when studying */}
+                {!quizMode && <title>{region.label}</title>}
               </path>
             );
           })}

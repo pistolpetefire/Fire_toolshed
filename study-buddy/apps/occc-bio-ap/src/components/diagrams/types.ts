@@ -25,6 +25,11 @@ export interface DiagramConfig {
   /** Open-license plate under hotspots (filename in /public/diagrams/) */
   backgroundImage?: string;
   /**
+   * Unlabeled plate for quizzes (no baked-in structure names).
+   * Prefer this when quizMode is on so answers are not obvious from labels.
+   */
+  quizBackgroundImage?: string;
+  /**
    * Full pixel size of the background image (required for cropping via viewBox).
    * Hotspot coordinates are in this same coordinate space.
    * If omitted, image is stretched to the viewBox size (OK when viewBox = full image).

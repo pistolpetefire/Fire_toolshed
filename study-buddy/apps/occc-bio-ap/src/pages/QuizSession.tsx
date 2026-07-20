@@ -446,6 +446,7 @@ function LabelView({
             systemId={q.systemId}
             compact
             stickySelect
+            quizMode
             selectedId={
               mode === 'select-name' ? q.structureId : revealed ? q.structureId : selected
             }

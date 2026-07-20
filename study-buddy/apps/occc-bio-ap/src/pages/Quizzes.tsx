@@ -22,7 +22,7 @@ const QUIZ_TYPES: {
     type: 'diagram-labeling',
     title: 'Diagram Labeling',
     description:
-      'Interactive SVG quizzes: name the highlighted structure, or click the correct region on skeletal, muscular, and heart diagrams.',
+      'Name the highlighted structure or click the region — unlabeled plates so answers are not written on the figure.',
     icon: Tag,
     color: 'bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300',
   },
