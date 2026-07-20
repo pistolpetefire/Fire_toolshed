@@ -56,7 +56,7 @@ export function SystemsList() {
       <header>
         <h1 className="page-title">Body Systems</h1>
         <p className="page-subtitle">
-          Organized for OCCC Human A&amp;P (BIO 1314 / BIO 1414). Open a system for overview, key structures, and study tools.
+          Personal A&amp;P I path (BIO 1314 / BIO 1414) — overview, sharper diagrams, study tips, and key structures. Foundations, chemistry, cells, tissues, and blood are on the Dashboard unit path.
         </p>
       </header>
 

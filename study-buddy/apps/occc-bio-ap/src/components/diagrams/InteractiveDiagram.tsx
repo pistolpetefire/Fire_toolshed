@@ -1,33 +1,62 @@
 import { useState } from 'react';
-import { X, Info } from 'lucide-react';
+import { X, Info, ExternalLink } from 'lucide-react';
 import { getStructureById } from '../../data/structures';
 import type { Structure } from '../../types';
-import type { DiagramConfig } from './types';
+import type { DiagramConfig, DiagramRenderStyle } from './types';
+import { diagramUrl } from './diagramAssets';
 
 export interface InteractiveDiagramProps {
   config: DiagramConfig;
   onSelect?: (structure: Structure | null, regionId: string | null) => void;
-  /** Controlled selection (region/structure id) */
   selectedId?: string | null;
   highlightIds?: string[];
-  /** Dim non-highlighted regions (quiz identify mode) */
   dimOthers?: boolean;
-  /** When true, hide the detail side panel */
   compact?: boolean;
-  /** Disable toggle-off on re-click (useful in quizzes) */
   stickySelect?: boolean;
   className?: string;
 }
 
-const DEFAULT_PALETTE = {
-  selected: 'fill-brand-500 stroke-brand-700 dark:fill-brand-400 dark:stroke-brand-200',
-  highlight: 'fill-amber-400 stroke-amber-600',
-  idle: 'fill-slate-300 stroke-slate-400 hover:fill-brand-300 dark:fill-slate-600 dark:stroke-slate-500 dark:hover:fill-brand-700',
-};
+function styleClasses(style: DiagramRenderStyle | undefined, hasImage: boolean) {
+  if (style === 'hotspot' || hasImage) {
+    return {
+      // Tight highlight: modest fill so size reads as the structure, not a huge wash
+      selected: 'fill-sky-500/35 stroke-sky-700 dark:fill-sky-400/30 dark:stroke-sky-200',
+      highlight: 'fill-amber-400/40 stroke-amber-700 dark:fill-amber-300/35 dark:stroke-amber-200',
+      // Subtle idle outline so clickable targets are discoverable without looking oversized
+      idle: 'fill-sky-400/0 stroke-sky-600/0 hover:fill-sky-400/20 hover:stroke-sky-500/70 dark:hover:fill-sky-300/15',
+    };
+  }
+  switch (style) {
+    case 'bone':
+      return {
+        selected: 'fill-sky-500 stroke-sky-800 dark:fill-sky-400 dark:stroke-sky-100',
+        highlight: 'fill-amber-300 stroke-amber-700',
+        idle: 'stroke-[#7a6240] dark:stroke-[#4a3a28]',
+      };
+    case 'muscle':
+      return {
+        selected: 'fill-rose-500 stroke-rose-800',
+        highlight: 'fill-amber-300 stroke-amber-700',
+        idle: 'fill-rose-300 stroke-rose-700 hover:fill-rose-200',
+      };
+    case 'organ':
+      return {
+        selected: 'fill-red-500 stroke-red-900',
+        highlight: 'fill-amber-300 stroke-amber-700',
+        idle: 'fill-red-300 stroke-red-800 hover:fill-red-200',
+      };
+    default:
+      return {
+        selected: 'fill-brand-500 stroke-brand-700',
+        highlight: 'fill-amber-400 stroke-amber-600',
+        idle: 'fill-slate-300 stroke-slate-500 hover:fill-brand-200',
+      };
+  }
+}
 
 /**
- * Reusable interactive SVG diagram shell.
- * Used by skeletal, muscular, cardiovascular diagrams and diagram quizzes.
+ * Interactive diagram: open-license plate + clickable hotspots (preferred),
+ * or pure SVG shapes when no background image is set.
  */
 export function InteractiveDiagram({
   config,
@@ -42,16 +71,14 @@ export function InteractiveDiagram({
   const [internalSelected, setInternalSelected] = useState<string | null>(null);
   const selectedId = controlledSelected !== undefined ? controlledSelected : internalSelected;
   const selected = selectedId ? getStructureById(selectedId) ?? null : null;
-  const palette = { ...DEFAULT_PALETTE, ...config.palette };
+  const hasImage = Boolean(config.backgroundImage);
+  const palette = { ...styleClasses(config.renderStyle, hasImage), ...config.palette };
+  const bgSrc = config.backgroundImage ? diagramUrl(config.backgroundImage) : null;
 
   const handleClick = (regionId: string) => {
-    const next =
-      !stickySelect && regionId === selectedId ? null : regionId;
-    if (controlledSelected === undefined) {
-      setInternalSelected(next);
-    }
+    const next = !stickySelect && regionId === selectedId ? null : regionId;
+    if (controlledSelected === undefined) setInternalSelected(next);
     const structure = next ? getStructureById(next) ?? null : null;
-    // Even if structure missing from atlas, still report region id via synthetic minimal structure
     if (next && !structure) {
       onSelect?.(
         {
@@ -79,7 +106,44 @@ export function InteractiveDiagram({
           role="img"
           aria-label={config.ariaLabel}
         >
-          {config.backdrop && (
+          <defs>
+            <linearGradient id="boneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#fffaf0" />
+              <stop offset="45%" stopColor="#f0e2c8" />
+              <stop offset="100%" stopColor="#d4c0a0" />
+            </linearGradient>
+          </defs>
+
+          {bgSrc && (() => {
+            // Draw image at its full pixel size; viewBox may crop (e.g. anterior-only muscles).
+            // Hotspot coordinates must use the same space as imageWidth × imageHeight.
+            const parts = config.viewBox.trim().split(/[\s,]+/).map(Number);
+            const vbW = parts[2] || 1;
+            const vbH = parts[3] || 1;
+            const imgW = config.imageWidth ?? vbW;
+            const imgH = config.imageHeight ?? vbH;
+            return (
+              <image
+                href={bgSrc}
+                x={0}
+                y={0}
+                width={imgW}
+                height={imgH}
+                preserveAspectRatio="none"
+              />
+            );
+          })()}
+
+          {!bgSrc &&
+            config.decor?.map((layer, i) => (
+              <path
+                key={`decor-${i}`}
+                d={layer.d}
+                className={layer.className ?? 'fill-slate-100 dark:fill-slate-800/50'}
+              />
+            ))}
+
+          {!bgSrc && config.backdrop && (
             <path d={config.backdrop} className="fill-slate-100 dark:fill-slate-800/60" />
           )}
 
@@ -90,14 +154,20 @@ export function InteractiveDiagram({
             let cls = palette.idle;
             if (isSelected) cls = palette.selected;
             else if (isHighlight) cls = palette.highlight;
-            if (dimmed) cls += ' opacity-25 pointer-events-none';
+            if (dimmed) cls += ' opacity-20 pointer-events-none';
+
+            const useBoneFill =
+              !hasImage && config.renderStyle === 'bone' && !isSelected && !isHighlight;
 
             return (
               <path
                 key={region.id}
                 d={region.d}
                 className={`cursor-pointer transition-all duration-150 ${cls}`}
-                strokeWidth={isSelected || isHighlight ? 2 : 1}
+                fill={useBoneFill ? 'url(#boneGrad)' : undefined}
+                strokeWidth={isSelected || isHighlight ? 2.5 : hasImage ? 1.5 : 1.35}
+                strokeLinejoin="round"
+                strokeLinecap="round"
                 onClick={() => handleClick(region.id)}
               >
                 <title>{region.label}</title>
@@ -105,6 +175,26 @@ export function InteractiveDiagram({
             );
           })}
         </svg>
+
+        {config.credit && (
+          <p className="mt-2 px-1 text-[10px] leading-snug text-slate-400 dark:text-slate-500">
+            <span className="font-medium text-slate-500 dark:text-slate-400">{config.credit.title}.</span>{' '}
+            {config.credit.credit}
+            {config.credit.sourceUrl && (
+              <>
+                {' · '}
+                <a
+                  href={config.credit.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-0.5 text-brand-600 hover:underline dark:text-brand-400"
+                >
+                  Source <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+              </>
+            )}
+          </p>
+        )}
       </div>
 
       {!compact && (
@@ -131,7 +221,6 @@ export function InteractiveDiagram({
                   <X className="h-4 w-4" />
                 </button>
               </div>
-
               <div className="space-y-4 text-sm">
                 <div>
                   <p className="mb-1 font-semibold text-slate-700 dark:text-slate-200">Function</p>
@@ -150,7 +239,7 @@ export function InteractiveDiagram({
                 {selected.clinicalNote && (
                   <div className="rounded-xl bg-amber-50 p-3 dark:bg-amber-950/40">
                     <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-amber-800 dark:text-amber-300">
-                      <Info className="h-3.5 w-3.5" /> Clinical note
+                      <Info className="h-3.5 w-3.5" /> Clinical / nursing note
                     </p>
                     <p className="text-xs leading-relaxed text-amber-900 dark:text-amber-200">
                       {selected.clinicalNote}
@@ -165,7 +254,9 @@ export function InteractiveDiagram({
                 <Info className="h-6 w-6 text-slate-400" />
               </div>
               <p className="mt-3 text-sm font-medium">No structure selected</p>
-              <p className="mt-1 text-xs">Click a highlighted region to learn more.</p>
+              <p className="mt-1 text-xs">
+                Hover or click a highlighted region on the open-license anatomical plate.
+              </p>
             </div>
           )}
         </aside>

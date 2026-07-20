@@ -1,9 +1,10 @@
 import type { BodySystem } from '../types';
 
 /**
- * Body systems aligned with OCCC Human A&P curriculum (BIO 1314 / BIO 1414).
- * To add a new system: append an entry here, then add structures in structures.ts
- * and optional flashcards/quiz items in their data files.
+ * Body systems for Personal A&P I (BIO 1314 / BIO 1414) — nursing prep path.
+ * Unit order follows the student syllabus (Integumentary → Skeletal → … → Reproductive).
+ * Foundations / chemistry / cells / tissues / blood are covered in course units on the dashboard.
+ * To add a new system: append here + structures.ts + optional flashcards/quizzes.
  */
 export const bodySystems: BodySystem[] = [
   {
@@ -13,7 +14,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Bones, joints, and cartilages that support the body and protect organs.',
     overview:
       'The skeletal system provides structural support, protects vital organs, enables movement with muscles, stores minerals (especially calcium and phosphate), and houses hematopoietic tissue in bone marrow. Adult humans have 206 bones organized into axial and appendicular divisions. BIO 1314 typically covers bone tissue, classification of bones, the axial skeleton, and major joints; BIO 1414 revisits pathology and clinical correlations.',
-    courseRelevance: 'BIO 1314 core unit — bone histology, axial & appendicular skeleton, articulations.',
+    courseRelevance: 'Syllabus Unit 6 — bones, joints, bone cells, remodeling, calcium, fractures.',
     color: 'sky',
     icon: 'Bone',
     keyStructures: [
@@ -54,7 +55,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Skeletal, cardiac, and smooth muscle that produce movement and heat.',
     overview:
       'Muscle tissue converts chemical energy into mechanical work. Skeletal muscle is voluntary and striated; cardiac muscle is involuntary, striated, and intercalated; smooth muscle is involuntary and non-striated. Key concepts include the sliding filament theory, neuromuscular junction, motor units, and major muscle groups by region.',
-    courseRelevance: 'BIO 1314 — muscle tissue, naming, major superficial muscles; BIO 1414 — clinical applications.',
+    courseRelevance: 'Syllabus Unit 7 — muscle anatomy, contraction, ATP, motor units, major muscles.',
     color: 'rose',
     icon: 'Dumbbell',
     keyStructures: [

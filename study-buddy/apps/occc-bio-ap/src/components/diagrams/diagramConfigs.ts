@@ -1,101 +1,323 @@
 import type { DiagramConfig } from './types';
 import type { SystemId } from '../../types';
+import { DIAGRAM_CREDITS } from './diagramAssets';
+import skeletonHotspots from './skeletonHotspots.json';
 
-/** Skeletal — anterior overview */
+/** Skeleton — verified good (SVG-path-derived hotspots). Leave as-is. */
 export const skeletalConfig: DiagramConfig = {
   title: 'Skeletal system',
-  ariaLabel: 'Interactive human skeleton diagram',
-  hint: 'Click a bone region to inspect it',
-  viewBox: '0 0 280 510',
-  backdrop: 'M140 255 m-70 0 a70 180 0 1 0 140 0 a70 180 0 1 0 -140 0',
-  regions: [
-    { id: 'skull', label: 'Skull', d: 'M140 28 c-22 0-36 18-36 40 0 14 6 26 16 34 l4 8 h32 l4-8 c10-8 16-20 16-34 0-22-14-40-36-40z' },
-    { id: 'mandible', label: 'Mandible', d: 'M124 100 h32 c2 8-2 14-16 16 s-18-8-16-16z' },
-    { id: 'cervical-vertebrae', label: 'Cervical spine', d: 'M134 118 h12 v28 h-12z' },
-    { id: 'clavicle', label: 'Clavicle', d: 'M88 148 h40 v8 h-40z M152 148 h40 v8 h-40z' },
-    { id: 'sternum', label: 'Sternum', d: 'M132 156 h16 v56 h-16z' },
-    { id: 'ribs', label: 'Ribs', d: 'M98 160 c-8 12-10 28-8 44 l14 4 c-2-14 0-28 6-40z M182 160 c8 12 10 28 8 44 l-14 4 c2-14 0-28-6-40z M100 175 h80 v6 h-80z M102 190 h76 v5 h-76z M104 204 h72 v5 h-72z' },
-    { id: 'scapula', label: 'Scapula', d: 'M78 155 l18 8 v36 l-20-10z M184 155 l18-8 -2 34 -16 10z' },
-    { id: 'humerus', label: 'Humerus', d: 'M68 175 h16 v70 h-16z M196 175 h16 v70 h-16z' },
-    { id: 'radius', label: 'Radius', d: 'M64 250 h10 v55 h-10z M206 250 h10 v55 h-10z' },
-    { id: 'ulna', label: 'Ulna', d: 'M76 250 h10 v55 h-10z M194 250 h10 v55 h-10z' },
-    { id: 'carpals', label: 'Carpals', d: 'M60 308 h30 v12 h-30z M190 308 h30 v12 h-30z' },
-    { id: 'metacarpals', label: 'Metacarpals', d: 'M58 322 h34 v16 h-34z M188 322 h34 v16 h-34z' },
-    { id: 'phalanges-hand', label: 'Hand phalanges', d: 'M56 340 h38 v18 h-38z M186 340 h38 v18 h-38z' },
-    { id: 'thoracic-vertebrae', label: 'Thoracic spine', d: 'M134 148 h12 v50 h-12z' },
-    { id: 'lumbar-vertebrae', label: 'Lumbar spine', d: 'M134 200 h12 v40 h-12z' },
-    { id: 'pelvis', label: 'Pelvis', d: 'M108 240 c0 0 8 28 32 28 s32-28 32-28 l-8 36 h-48z' },
-    { id: 'femur', label: 'Femur', d: 'M118 280 h16 v80 h-16z M146 280 h16 v80 h-16z' },
-    { id: 'patella', label: 'Patella', d: 'M120 362 h12 v14 h-12z M148 362 h12 v14 h-12z' },
-    { id: 'tibia', label: 'Tibia', d: 'M120 380 h12 v70 h-12z M148 380 h12 v70 h-12z' },
-    { id: 'fibula', label: 'Fibula', d: 'M110 385 h8 v60 h-8z M162 385 h8 v60 h-8z' },
-    { id: 'tarsals', label: 'Tarsals', d: 'M108 455 h28 v14 h-28z M144 455 h28 v14 h-28z' },
-    { id: 'metatarsals', label: 'Metatarsals', d: 'M106 470 h32 v12 h-32z M142 470 h32 v12 h-32z' },
-    { id: 'phalanges-foot', label: 'Foot phalanges', d: 'M104 484 h36 v12 h-36z M140 484 h36 v12 h-36z' },
-  ],
+  ariaLabel: 'Interactive skeleton — LadyofHats public-domain plate',
+  hint: 'Click directly on a bone — hotspots match the plate geometry',
+  viewBox: '0 0 435.687 841.89',
+  // PNG is a uniform scale of the SVG; stretch into SVG user space (hotspots are SVG units)
+  imageWidth: 435.687,
+  imageHeight: 841.89,
+  maxWidthClass: 'max-w-lg',
+  backgroundImage: 'skeleton-front.png',
+  renderStyle: 'hotspot',
+  credit: DIAGRAM_CREDITS.skeletal,
+  regions: skeletonHotspots as DiagramConfig['regions'],
 };
 
-/** Muscular — major superficial groups (anterior + a few posterior markers) */
+/**
+ * Muscles — pre-cropped ANTERIOR plate (left half of dual front/back PNG).
+ * Using a dedicated file (not viewBox crop) so the front figure always shows.
+ * Source dual plate: 1280×1115; anterior half: 640×1115.
+ */
 export const muscularConfig: DiagramConfig = {
   title: 'Muscular system',
-  ariaLabel: 'Interactive major muscle groups diagram',
-  hint: 'Click a muscle group to inspect it',
-  viewBox: '0 0 280 510',
-  backdrop: 'M140 255 m-72 0 a72 185 0 1 0 144 0 a72 185 0 1 0 -144 0',
-  palette: {
-    selected: 'fill-rose-500 stroke-rose-700 dark:fill-rose-400 dark:stroke-rose-200',
-    highlight: 'fill-amber-400 stroke-amber-600',
-    idle: 'fill-rose-200 stroke-rose-300 hover:fill-rose-300 dark:fill-rose-900 dark:stroke-rose-700 dark:hover:fill-rose-800',
-  },
+  ariaLabel: 'Interactive muscle plate — anterior figure',
+  hint: 'Click a muscle on the anterior (front) figure',
+  imageWidth: 640,
+  imageHeight: 1115,
+  viewBox: '40 10 560 1095',
+  maxWidthClass: 'max-w-md',
+  backgroundImage: 'muscles-anterior.png',
+  renderStyle: 'hotspot',
+  credit: DIAGRAM_CREDITS.muscular,
+  /**
+   * Hotspots in anterior-plate pixel space (same as original left half of dual plate).
+   * Figure center ≈ x 320–400. Large regions first; small last.
+   */
   regions: [
-    { id: 'sternocleidomastoid', label: 'Sternocleidomastoid', d: 'M128 95 l-8 40 10 4 8-38z M152 95 l8 40 -10 4 -8-38z' },
-    { id: 'trapezius', label: 'Trapezius', d: 'M110 120 l30 8 30-8 -10 40 h-40z' },
-    { id: 'deltoid', label: 'Deltoid', d: 'M72 150 l22 8 4 36 -24 6z M186 150 l22-8 -4 44 -22-6z' },
-    { id: 'pectoralis-major', label: 'Pectoralis major', d: 'M100 165 h36 v40 h-36z M144 165 h36 v40 h-36z' },
-    { id: 'latissimus-dorsi', label: 'Latissimus dorsi', d: 'M88 200 l20 8 4 50 -28 10z M172 208 l20-8 4 58 -28-10z' },
-    { id: 'biceps-brachii', label: 'Biceps brachii', d: 'M68 195 h16 v50 h-16z M196 195 h16 v50 h-16z' },
-    { id: 'triceps-brachii', label: 'Triceps brachii', d: 'M56 200 h10 v48 h-10z M214 200 h10 v48 h-10z' },
-    { id: 'rectus-abdominis', label: 'Rectus abdominis', d: 'M124 210 h32 v70 h-32z' },
-    { id: 'external-oblique', label: 'External oblique', d: 'M98 215 l24 8 v55 l-28 6z M158 223 l24-8 v63 l-28-6z' },
-    { id: 'diaphragm', label: 'Diaphragm', d: 'M100 195 h80 v12 c-20 14-60 14-80 0z' },
-    { id: 'gluteus-maximus', label: 'Gluteus maximus', d: 'M108 285 h28 v36 h-28z M144 285 h28 v36 h-28z' },
-    { id: 'quadriceps-femoris', label: 'Quadriceps femoris', d: 'M118 325 h18 v70 h-18z M144 325 h18 v70 h-18z' },
-    { id: 'hamstrings', label: 'Hamstrings', d: 'M108 330 h8 v65 h-8z M164 330 h8 v65 h-8z' },
-    { id: 'gastrocnemius', label: 'Gastrocnemius', d: 'M118 410 h16 v55 h-16z M146 410 h16 v55 h-16z' },
-    { id: 'tibialis-anterior', label: 'Tibialis anterior', d: 'M112 415 h6 v50 h-6z M162 415 h6 v50 h-6z' },
+    { id: 'quadriceps-femoris', label: 'Quadriceps femoris', d: 'M250 630 h70 v195 h-70z M355 630 h70 v195 h-70z' },
+    { id: 'hamstrings', label: 'Hamstrings (medial thigh)', d: 'M220 645 h38 v175 h-38z M435 645 h38 v175 h-38z' },
+    { id: 'gastrocnemius', label: 'Gastrocnemius', d: 'M265 845 h60 v135 h-60z M355 845 h60 v135 h-60z' },
+    { id: 'tibialis-anterior', label: 'Tibialis anterior', d: 'M245 860 h28 v140 h-28z M405 860 h28 v140 h-28z' },
+    { id: 'gluteus-maximus', label: 'Gluteal region', d: 'M265 555 h145 v68 h-145z' },
+    { id: 'rectus-abdominis', label: 'Rectus abdominis', d: 'M295 375 h78 v160 h-78z' },
+    { id: 'external-oblique', label: 'External oblique', d: 'M230 380 h65 v145 h-65z M385 380 h65 v145 h-65z' },
+    { id: 'pectoralis-major', label: 'Pectoralis major', d: 'M250 265 h170 v95 h-170z' },
+    { id: 'latissimus-dorsi', label: 'Latissimus dorsi (lateral)', d: 'M200 320 h50 v100 h-50z M440 320 h50 v100 h-50z' },
+    { id: 'diaphragm', label: 'Diaphragm', d: 'M255 350 h160 v28 h-160z' },
+    { id: 'deltoid', label: 'Deltoid', d: 'M170 245 h68 v100 h-68z M445 245 h68 v100 h-68z' },
+    { id: 'biceps-brachii', label: 'Biceps brachii', d: 'M155 350 h52 v140 h-52z M475 350 h52 v140 h-52z' },
+    { id: 'triceps-brachii', label: 'Triceps brachii', d: 'M128 360 h32 v130 h-32z M520 360 h32 v130 h-32z' },
+    { id: 'trapezius', label: 'Trapezius', d: 'M265 190 h140 v60 h-140z' },
+    { id: 'sternocleidomastoid', label: 'Sternocleidomastoid', d: 'M290 150 h42 v68 h-42z M350 150 h42 v68 h-42z' },
   ],
 };
 
 /**
- * Cardiovascular — schematic heart + great vessels
- * Region ids match atlas structure ids.
+ * Heart plate — PNG 500×492 (Wapcaplet section).
+ * QA cycle: chambers match labels; vessels on named structures.
  */
 export const cardiovascularConfig: DiagramConfig = {
   title: 'Cardiovascular system',
-  ariaLabel: 'Interactive heart and great vessels diagram',
-  hint: 'Click a chamber or vessel to inspect it',
-  viewBox: '0 0 320 360',
+  ariaLabel: 'Interactive heart diagram',
+  hint: 'Click a chamber or vessel — sizes match the plate labels',
+  viewBox: '0 0 500 492',
+  imageWidth: 500,
+  imageHeight: 492,
   maxWidthClass: 'max-w-md',
-  palette: {
-    selected: 'fill-red-500 stroke-red-800 dark:fill-red-400 dark:stroke-red-200',
-    highlight: 'fill-amber-400 stroke-amber-600',
-    idle: 'fill-red-200 stroke-red-300 hover:fill-red-300 dark:fill-red-950 dark:stroke-red-700 dark:hover:fill-red-900',
+  backgroundImage: 'heart.png',
+  renderStyle: 'hotspot',
+  credit: DIAGRAM_CREDITS.cardiovascular,
+  regions: [
+    // Large chambers first (paint order still works; click uses topmost path later in list for small targets)
+    { id: 'left-ventricle', label: 'Left ventricle', d: 'M275 255 h145 v155 h-145z' },
+    { id: 'right-ventricle', label: 'Right ventricle', d: 'M145 290 h145 v130 h-145z' },
+    { id: 'right-atrium', label: 'Right atrium', d: 'M95 175 h140 v115 h-140z' },
+    { id: 'left-atrium', label: 'Left atrium', d: 'M285 155 h130 v100 h-130z' },
+    { id: 'aorta', label: 'Aorta', d: 'M205 25 h105 v95 h-105z' },
+    { id: 'pulmonary-artery', label: 'Pulmonary trunk', d: 'M295 95 h120 v55 h-120z' },
+    { id: 'vena-cava', label: 'Venae cavae', d: 'M95 45 h60 v100 h-60z M175 400 h70 v60 h-70z' },
+    { id: 'pulmonary-vein', label: 'Pulmonary veins', d: 'M35 195 h75 v45 h-75z M400 175 h80 v50 h-80z' },
+    { id: 'coronary-arteries', label: 'Coronary arteries', d: 'M230 245 h75 v32 h-75z' },
+    { id: 'carotid-artery', label: 'Carotid arteries', d: 'M225 2 h55 v28 h-55z' },
+    { id: 'heart', label: 'Heart (overview)', d: 'M200 445 h120 v40 h-120z' },
+  ],
+};
+
+/**
+ * Digestive — Digestive_system_diagram_en.svg (581×821).
+ * QA: hotspots on organ bodies, not side label boxes.
+ */
+export const digestiveConfig: DiagramConfig = {
+  title: 'Digestive system',
+  ariaLabel: 'Interactive digestive system diagram',
+  hint: 'Click an organ on the digestive plate',
+  viewBox: '0 0 581 821',
+  imageWidth: 581,
+  imageHeight: 821,
+  maxWidthClass: 'max-w-md',
+  backgroundImage: 'digestive.svg',
+  renderStyle: 'hotspot',
+  credit: DIAGRAM_CREDITS.digestive,
+  regions: [
+    { id: 'mouth', label: 'Mouth / oral cavity', d: 'M240 48 h85 v65 h-85z' },
+    { id: 'esophagus', label: 'Esophagus', d: 'M278 120 h28 v200 h-28z' },
+    // Organs sit mid–lower on this plate (head/neck occupy upper ~1/3)
+    { id: 'liver', label: 'Liver', d: 'M150 385 h155 v100 h-155z' },
+    { id: 'stomach', label: 'Stomach', d: 'M310 400 h140 v105 h-140z' },
+    { id: 'gallbladder', label: 'Gallbladder', d: 'M265 445 h36 v38 h-36z' },
+    { id: 'pancreas', label: 'Pancreas', d: 'M255 485 h155 v45 h-155z' },
+    { id: 'small-intestine', label: 'Small intestine', d: 'M200 530 h195 v140 h-195z' },
+    { id: 'large-intestine', label: 'Large intestine', d: 'M155 500 h48 v200 h-48z M390 505 h48 v185 h-48z M175 670 h230 v55 h-230z' },
+  ],
+};
+
+/**
+ * Respiratory — LadyofHats PD plate as PNG (960×1023) for reliable pixel hotspots.
+ * (SVG coords were drifting vs rendered labels in QA overlays.)
+ */
+export const respiratoryConfig: DiagramConfig = {
+  title: 'Respiratory system',
+  ariaLabel: 'Interactive respiratory system plate',
+  hint: 'Click an airway or lung structure on the plate',
+  viewBox: '0 0 960 1023',
+  imageWidth: 960,
+  imageHeight: 1023,
+  maxWidthClass: 'max-w-lg',
+  backgroundImage: 'respiratory.png',
+  renderStyle: 'hotspot',
+  credit: {
+    title: 'Respiratory system complete',
+    credit: 'LadyofHats / Wikimedia Commons — Public Domain',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:Respiratory_system_complete_en.svg',
   },
   regions: [
-    // Great vessels (top)
-    { id: 'aorta', label: 'Aorta', d: 'M155 30 h20 v55 c0 12-8 18-20 18 s-20-6-20-18 V50 h20z M135 48 h60 v12 h-60z' },
-    { id: 'pulmonary-artery', label: 'Pulmonary trunk', d: 'M120 70 h80 v14 h-80z M115 78 h14 v28 h-14z M191 78 h14 v28 h-14z' },
-    { id: 'vena-cava', label: 'Venae cavae', d: 'M175 20 h16 v55 h-16z M175 200 h16 v70 h-16z' },
-    { id: 'pulmonary-vein', label: 'Pulmonary veins', d: 'M95 115 h30 v12 h-30z M195 115 h30 v12 h-30z M95 135 h28 v10 h-28z M197 135 h28 v10 h-28z' },
-    { id: 'carotid-artery', label: 'Carotid arteries', d: 'M148 18 h10 v28 h-10z M162 18 h10 v28 h-10z' },
-    // Heart chambers
-    { id: 'right-atrium', label: 'Right atrium', d: 'M175 95 h55 v55 h-55z' },
-    { id: 'right-ventricle', label: 'Right ventricle', d: 'M170 155 h60 v70 h-60z' },
-    { id: 'left-atrium', label: 'Left atrium', d: 'M90 95 h55 v55 h-55z' },
-    { id: 'left-ventricle', label: 'Left ventricle', d: 'M90 155 h60 v80 h-60z' },
-    { id: 'coronary-arteries', label: 'Coronary arteries', d: 'M145 150 h30 v8 h-30z M140 158 c-20 20-15 45 5 55 l8-10 c-12-8-14-28 2-40z M180 158 c20 20 15 45-5 55 l-8-10 c12-8 14-28-2-40z' },
-    // Whole heart outline reference (clickable as "heart")
-    { id: 'heart', label: 'Heart (overview)', d: 'M160 280 c-40-20-70 10-55 50 20 40 55 50 55 50 s35-10 55-50 c15-40-15-70-55-50z' },
+    { id: 'nasal-cavity', label: 'Nasal cavity', d: 'M300 70 h160 v110 h-160z' },
+    { id: 'pharynx', label: 'Pharynx', d: 'M340 185 h100 v70 h-100z' },
+    { id: 'larynx', label: 'Larynx', d: 'M350 255 h90 v70 h-90z' },
+    { id: 'trachea', label: 'Trachea', d: 'M400 330 h70 v150 h-70z' },
+    { id: 'bronchi', label: 'Bronchi', d: 'M320 470 h100 v70 h-100z M480 470 h100 v70 h-100z' },
+    { id: 'lungs', label: 'Lungs', d: 'M140 480 h230 v280 h-230z M500 480 h230 v280 h-230z' },
+    { id: 'alveoli', label: 'Alveoli', d: 'M620 80 h280 v220 h-280z' },
+    { id: 'diaphragm', label: 'Diaphragm', d: 'M160 760 h560 v120 h-560z' },
+  ],
+};
+
+export const nervousConfig: DiagramConfig = {
+  title: 'Nervous system',
+  ariaLabel: 'Interactive CNS diagram',
+  hint: 'Click a CNS region',
+  viewBox: '0 0 360 520',
+  maxWidthClass: 'max-w-sm',
+  renderStyle: 'organ',
+  credit: {
+    title: 'CNS schematic',
+    credit: 'Study Buddy educational SVG for A&P I Unit 8',
+  },
+  regions: [
+    { id: 'cerebrum', label: 'Cerebrum', d: 'M120 40 c-40 10-60 50-55 95 5 40 35 70 75 75 h80 c40-5 70-35 75-75 5-45-15-85-55-95 -20-5-45-5-65 0z' },
+    { id: 'cerebellum', label: 'Cerebellum', d: 'M200 160 c-25 5-40 25-35 50 5 20 25 35 50 35 s45-15 50-35 c5-25-10-45-35-50z' },
+    { id: 'brainstem', label: 'Brainstem', d: 'M165 175 h30 v55 h-30z' },
+    { id: 'thalamus', label: 'Thalamus', d: 'M155 130 h50 v30 h-50z' },
+    { id: 'hypothalamus', label: 'Hypothalamus', d: 'M160 155 h40 v22 h-40z' },
+    { id: 'spinal-cord', label: 'Spinal cord', d: 'M172 230 h16 v250 h-16z' },
+    { id: 'cranial-nerves', label: 'Cranial nerves', d: 'M100 100 h40 v80 h-40z M220 100 h40 v80 h-40z' },
+    { id: 'peripheral-nerves', label: 'Peripheral nerves', d: 'M130 280 h20 v120 h-20z M210 280 h20 v120 h-20z' },
+  ],
+};
+
+/**
+ * Endocrine — PD Illu plate (clear labeled body map, easier hotspot QA).
+ * English SVG kept on disk as alternate (endocrine-english.svg).
+ * 317×421
+ */
+export const endocrineConfig: DiagramConfig = {
+  title: 'Endocrine system',
+  ariaLabel: 'Interactive endocrine glands diagram',
+  hint: 'Click a gland on the labeled plate',
+  viewBox: '0 0 317 421',
+  imageWidth: 317,
+  imageHeight: 421,
+  maxWidthClass: 'max-w-sm',
+  backgroundImage: 'endocrine-illu-pd.png',
+  renderStyle: 'hotspot',
+  credit: {
+    title: 'Major endocrine glands',
+    credit: 'US gov SEER-derived Illu_endocrine_system_New.png — Public Domain',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:Illu_endocrine_system_New.png',
+  },
+  regions: [
+    { id: 'pineal', label: 'Pineal gland', d: 'M175 48 h40 v24 h-40z' },
+    { id: 'pituitary', label: 'Pituitary gland', d: 'M130 72 h45 v28 h-45z' },
+    { id: 'thyroid', label: 'Thyroid gland', d: 'M135 115 h55 v38 h-55z' },
+    { id: 'parathyroid', label: 'Parathyroid', d: 'M140 125 h20 v18 h-20z M165 125 h20 v18 h-20z' },
+    { id: 'adrenal', label: 'Adrenal gland', d: 'M115 230 h70 v38 h-70z' },
+    { id: 'pancreas-endocrine', label: 'Pancreas (islets)', d: 'M145 250 h70 v35 h-70z' },
+    { id: 'gonads', label: 'Gonads', d: 'M195 300 h50 v35 h-50z M130 345 h45 v45 h-45z' },
+  ],
+};
+
+/**
+ * Urinary — Urinary_system.svg (510×670 numbered).
+ * QA: kidneys/adrenals upper; ureters yellow tubes; bladder bottom yellow; urethra below.
+ */
+export const urinaryConfig: DiagramConfig = {
+  title: 'Urinary system',
+  ariaLabel: 'Interactive urinary system diagram',
+  hint: 'Click a numbered structure on the urinary plate',
+  viewBox: '0 0 510 670',
+  imageWidth: 510,
+  imageHeight: 670,
+  maxWidthClass: 'max-w-sm',
+  backgroundImage: 'urinary.svg',
+  renderStyle: 'hotspot',
+  credit: {
+    title: 'Urinary system (numbered)',
+    credit: 'Jordi March i Nogué / Wikimedia Commons — CC BY-SA 3.0',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:Urinary_system.svg',
+  },
+  regions: [
+    { id: 'kidney', label: 'Kidney', d: 'M85 95 h110 v140 h-110z M310 90 h110 v140 h-110z' },
+    { id: 'nephron', label: 'Nephron / renal pelvis', d: 'M145 145 h45 v50 h-45z M335 140 h50 v55 h-50z' },
+    { id: 'ureter', label: 'Ureter', d: 'M155 240 h28 v220 h-28z M335 235 h28 v225 h-28z' },
+    { id: 'bladder', label: 'Urinary bladder', d: 'M205 520 h100 v85 h-100z' },
+    { id: 'urethra', label: 'Urethra', d: 'M235 600 h40 v55 h-40z' },
+    { id: 'adrenal', label: 'Adrenal gland', d: 'M115 70 h55 v32 h-55z M340 65 h55 v32 h-55z' },
+  ],
+};
+
+// Also set skeleton image size for consistency (proportional PNG of SVG)
+// (skeletalConfig already uses SVG user units matching the plate)
+
+/**
+ * Integumentary — Human_skin_structure.svg cross-section.
+ * Layers: epidermis (top band) → dermis → hypodermis; appendages in dermis.
+ */
+export const integumentaryConfig: DiagramConfig = {
+  title: 'Integumentary system',
+  ariaLabel: 'Interactive skin structure plate',
+  hint: 'Click a skin layer or appendage on the plate',
+  viewBox: '0 0 408.37225 285.99769',
+  imageWidth: 408.37225,
+  imageHeight: 285.99769,
+  maxWidthClass: 'max-w-2xl',
+  backgroundImage: 'integumentary-skin.svg',
+  renderStyle: 'hotspot',
+  credit: {
+    title: 'Human skin structure',
+    credit: 'Wikimedia Commons Human_skin_structure.svg — CC BY-SA',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:Human_skin_structure.svg',
+  },
+  regions: [
+    { id: 'epidermis', label: 'Epidermis', d: 'M15 5 h280 v42 h-280z' },
+    { id: 'dermis', label: 'Dermis', d: 'M15 48 h280 v115 h-280z' },
+    { id: 'hypodermis', label: 'Hypodermis (subcutis)', d: 'M15 163 h280 v100 h-280z' },
+    { id: 'hair-follicle', label: 'Hair follicle', d: 'M175 35 h32 v145 h-32z' },
+    { id: 'sebaceous-glands', label: 'Sebaceous gland', d: 'M145 85 h40 v35 h-40z' },
+    { id: 'sweat-glands', label: 'Sweat gland', d: 'M255 130 h55 v55 h-55z' },
+  ],
+};
+
+/**
+ * Lymphatic — TE-Lymphatic_system_diagram.svg (417.5×900).
+ * QA: tonsil on neck node; thymus mid-chest; spleen dark organ; vessels network.
+ */
+export const lymphaticConfig: DiagramConfig = {
+  title: 'Lymphatic & immune system',
+  ariaLabel: 'Interactive lymphatic system plate',
+  hint: 'Click a lymphoid organ on the labeled plate',
+  viewBox: '0 0 417.5 900',
+  imageWidth: 417.5,
+  imageHeight: 900,
+  maxWidthClass: 'max-w-sm',
+  backgroundImage: 'lymphatic-te.svg',
+  renderStyle: 'hotspot',
+  credit: {
+    title: 'Lymphatic system diagram',
+    credit: 'The Emirr / Wikimedia Commons — CC BY 3.0',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:TE-Lymphatic_system_diagram.svg',
+  },
+  regions: [
+    { id: 'tonsils', label: 'Tonsils', d: 'M200 115 h55 v40 h-55z' },
+    { id: 'thymus', label: 'Thymus', d: 'M175 185 h95 v85 h-95z' },
+    { id: 'lymph-nodes', label: 'Lymph nodes', d: 'M95 250 h40 v35 h-40z M285 250 h40 v35 h-40z M100 400 h38 v32 h-38z M290 400 h38 v32 h-38z M115 620 h40 v35 h-40z' },
+    { id: 'spleen', label: 'Spleen', d: 'M205 350 h55 v55 h-55z' },
+    { id: 'lymph-vessels', label: 'Lymph vessels', d: 'M185 280 h35 v320 h-35z' },
+  ],
+};
+
+/**
+ * Reproductive — Male_and_female_anatomy.svg (620×289).
+ * Male left lateral; female right lateral.
+ */
+export const reproductiveConfig: DiagramConfig = {
+  title: 'Reproductive system',
+  ariaLabel: 'Interactive male and female reproductive plate',
+  hint: 'Click a structure — male left, female right (lateral views)',
+  viewBox: '0 0 620 289',
+  imageWidth: 620,
+  imageHeight: 289,
+  maxWidthClass: 'max-w-3xl',
+  backgroundImage: 'reproductive-mf.svg',
+  renderStyle: 'hotspot',
+  credit: {
+    title: 'Male and female anatomy',
+    credit: 'Tsaitgaist / Wikimedia Commons — CC BY-SA 3.0',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:Male_and_female_anatomy.svg',
+  },
+  regions: [
+    // Female right
+    { id: 'ovaries', label: 'Ovary', d: 'M500 85 h45 v40 h-45z' },
+    { id: 'fallopian-tubes', label: 'Uterine tube', d: 'M470 55 h80 v35 h-80z' },
+    { id: 'uterus', label: 'Uterus', d: 'M445 105 h75 v75 h-75z' },
+    // Male left
+    { id: 'testes', label: 'Testis', d: 'M70 200 h55 v50 h-55z' },
+    { id: 'prostate', label: 'Prostate', d: 'M115 125 h50 v40 h-50z' },
   ],
 };
 
@@ -103,13 +325,20 @@ export const DIAGRAM_BY_SYSTEM: Partial<Record<SystemId, DiagramConfig>> = {
   skeletal: skeletalConfig,
   muscular: muscularConfig,
   cardiovascular: cardiovascularConfig,
+  digestive: digestiveConfig,
+  respiratory: respiratoryConfig,
+  nervous: nervousConfig,
+  endocrine: endocrineConfig,
+  urinary: urinaryConfig,
+  integumentary: integumentaryConfig,
+  lymphatic: lymphaticConfig,
+  reproductive: reproductiveConfig,
 };
 
 export function getDiagramConfig(systemId: string): DiagramConfig | undefined {
   return DIAGRAM_BY_SYSTEM[systemId as SystemId];
 }
 
-/** Region ids available for interactive quizzes per system */
 export function getQuizableRegionIds(systemId: SystemId): string[] {
   const cfg = DIAGRAM_BY_SYSTEM[systemId];
   return cfg ? cfg.regions.map((r) => r.id) : [];

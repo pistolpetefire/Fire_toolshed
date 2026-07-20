@@ -6,7 +6,7 @@ Class app inside **Study Buddy**.
 |--|--|
 | **Mount path** | `/classes/occc-bio-ap` |
 | **School** | Oklahoma City Community College |
-| **Courses** | BIO 1314, BIO 1414 — Human Anatomy & Physiology |
+| **Courses** | Personal A&P I path · BIO 1314 / BIO 1414 · nursing prep |
 | **Storage key** | `study-buddy:occc-bio-ap:progress-v1` |
 
 ## Features

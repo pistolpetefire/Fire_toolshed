@@ -1,0 +1,117 @@
+[
+  {
+    "id": "ribs",
+    "label": "Ribs",
+    "d": "M121.8 153.6 h162.6 v112.4 h-162.6z"
+  },
+  {
+    "id": "pelvis",
+    "label": "Pelvic girdle",
+    "d": "M127.8 317.9 h150.6 v98.5 h-150.6z"
+  },
+  {
+    "id": "skull",
+    "label": "Skull",
+    "d": "M164.9 17.9 h75.8 v111 h-75.8z"
+  },
+  {
+    "id": "femur",
+    "label": "Femur",
+    "d": "M203.4 374.7 h79.5 v221.5 h-79.5z M120.1 374.7 h79.5 v221.5 h-79.5z"
+  },
+  {
+    "id": "humerus",
+    "label": "Humerus",
+    "d": "M270.6 160.8 h59.7 v154.6 h-59.7z M64.5 163.9 h72.5 v148.9 h-72.5z"
+  },
+  {
+    "id": "tibia",
+    "label": "Tibia",
+    "d": "M198 585.5 h53.1 v186.3 h-53.1z M150 586.5 h51.2 v185.5 h-51.2z"
+  },
+  {
+    "id": "fibula",
+    "label": "Fibula",
+    "d": "M221.8 599 h30.8 v166.1 h-30.8z M148.6 600.6 h28.1 v166.3 h-28.1z"
+  },
+  {
+    "id": "thoracic-vertebrae",
+    "label": "Thoracic vertebrae",
+    "d": "M188.6 136.5 h27.1 v151.6 h-27.1z"
+  },
+  {
+    "id": "lumbar-vertebrae",
+    "label": "Lumbar vertebrae",
+    "d": "M177.5 279 h50.1 v81.2 h-50.1z"
+  },
+  {
+    "id": "scapula",
+    "label": "Scapula",
+    "d": "M107.8 141.9 h95.3 v88.1 h-95.3z M203.1 141.9 h95.3 v88.1 h-95.3z"
+  },
+  {
+    "id": "radius",
+    "label": "Radius",
+    "d": "M313.9 299.9 h52.6 v113 h-52.6z M61.8 301.1 h34.2 v119.8 h-34.2z"
+  },
+  {
+    "id": "ulna",
+    "label": "Ulna",
+    "d": "M300.5 304.2 h48.7 v109.1 h-48.7z M60.1 301.7 h37.2 v119.7 h-37.2z"
+  },
+  {
+    "id": "clavicle",
+    "label": "Clavicle",
+    "d": "M209 140.1 h78.7 v23.6 h-78.7z M122.2 139.1 h78.3 v25.7 h-78.3z"
+  },
+  {
+    "id": "sternum",
+    "label": "Sternum",
+    "d": "M190.2 170.7 h26.4 v76.5 h-26.4z"
+  },
+  {
+    "id": "mandible",
+    "label": "Mandible",
+    "d": "M166 78.7 h70.8 v50.2 h-70.8z"
+  },
+  {
+    "id": "cervical-vertebrae",
+    "label": "Cervical vertebrae",
+    "d": "M181 87.5 h44.7 v62.5 h-44.7z"
+  },
+  {
+    "id": "carpals",
+    "label": "Carpals",
+    "d": "M334.3 403.2 h34.9 v24.7 h-34.9z M61.9 410.5 h35.1 v23.9 h-35.1z"
+  },
+  {
+    "id": "metacarpals",
+    "label": "Metacarpals",
+    "d": "M335.8 409.5 h52.6 v42.7 h-52.6z M58.5 420.3 h51.1 v41 h-51.1z"
+  },
+  {
+    "id": "phalanges-hand",
+    "label": "Phalanges (hand)",
+    "d": "M338.9 413.4 h67.6 v74.5 h-67.6z M56.6 431.6 h65.3 v67.9 h-65.3z"
+  },
+  {
+    "id": "patella",
+    "label": "Patella",
+    "d": "M212.6 577 h32.4 v33.1 h-32.4z M155.6 577 h32.4 v33.1 h-32.4z"
+  },
+  {
+    "id": "tarsals",
+    "label": "Tarsals",
+    "d": "M199.4 754.1 h44.9 v40.6 h-44.9z M153.9 754.4 h44.8 v38.4 h-44.8z"
+  },
+  {
+    "id": "metatarsals",
+    "label": "Metatarsals",
+    "d": "M208 771.5 h50.8 v38.2 h-50.8z M140.3 771.8 h50.6 v36.1 h-50.6z"
+  },
+  {
+    "id": "phalanges-foot",
+    "label": "Phalanges (foot)",
+    "d": "M226.4 790 h45.5 v34.8 h-45.5z M128.1 790.5 h45.4 v32.3 h-45.4z"
+  }
+]

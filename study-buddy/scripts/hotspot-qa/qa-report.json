@@ -1,0 +1,396 @@
+{
+  "cycles": [
+    {
+      "cycle": 1,
+      "passed": 11,
+      "failed": 0,
+      "details": {
+        "skeletal": "PASS",
+        "muscular": "PASS",
+        "cardiovascular": "PASS",
+        "digestive": "PASS",
+        "respiratory": "PASS",
+        "nervous": "PASS",
+        "endocrine": "PASS",
+        "urinary": "PASS",
+        "integumentary": "PASS",
+        "lymphatic": "PASS",
+        "reproductive": "PASS"
+      }
+    },
+    {
+      "cycle": 2,
+      "passed": 11,
+      "failed": 0,
+      "details": {
+        "skeletal": "PASS",
+        "muscular": "PASS",
+        "cardiovascular": "PASS",
+        "digestive": "PASS",
+        "respiratory": "PASS",
+        "nervous": "PASS",
+        "endocrine": "PASS",
+        "urinary": "PASS",
+        "integumentary": "PASS",
+        "lymphatic": "PASS",
+        "reproductive": "PASS"
+      }
+    },
+    {
+      "cycle": 3,
+      "passed": 11,
+      "failed": 0,
+      "details": {
+        "skeletal": "PASS",
+        "muscular": "PASS",
+        "cardiovascular": "PASS",
+        "digestive": "PASS",
+        "respiratory": "PASS",
+        "nervous": "PASS",
+        "endocrine": "PASS",
+        "urinary": "PASS",
+        "integumentary": "PASS",
+        "lymphatic": "PASS",
+        "reproductive": "PASS"
+      }
+    },
+    {
+      "cycle": 4,
+      "passed": 11,
+      "failed": 0,
+      "details": {
+        "skeletal": "PASS",
+        "muscular": "PASS",
+        "cardiovascular": "PASS",
+        "digestive": "PASS",
+        "respiratory": "PASS",
+        "nervous": "PASS",
+        "endocrine": "PASS",
+        "urinary": "PASS",
+        "integumentary": "PASS",
+        "lymphatic": "PASS",
+        "reproductive": "PASS"
+      }
+    },
+    {
+      "cycle": 5,
+      "passed": 11,
+      "failed": 0,
+      "details": {
+        "skeletal": "PASS",
+        "muscular": "PASS",
+        "cardiovascular": "PASS",
+        "digestive": "PASS",
+        "respiratory": "PASS",
+        "nervous": "PASS",
+        "endocrine": "PASS",
+        "urinary": "PASS",
+        "integumentary": "PASS",
+        "lymphatic": "PASS",
+        "reproductive": "PASS"
+      }
+    }
+  ],
+  "systems": {
+    "skeletal": {
+      "ok": true,
+      "regions": 23,
+      "file": "skeleton-front.png",
+      "viewBox": [
+        0,
+        0,
+        435.687,
+        841.89
+      ],
+      "imageSize": [
+        435.687,
+        841.89
+      ],
+      "issues": [],
+      "regionIds": [
+        "ribs",
+        "pelvis",
+        "skull",
+        "femur",
+        "humerus",
+        "tibia",
+        "fibula",
+        "thoracic-vertebrae",
+        "lumbar-vertebrae",
+        "scapula",
+        "radius",
+        "ulna",
+        "clavicle",
+        "sternum",
+        "mandible",
+        "cervical-vertebrae",
+        "carpals",
+        "metacarpals",
+        "phalanges-hand",
+        "patella",
+        "tarsals",
+        "metatarsals",
+        "phalanges-foot"
+      ]
+    },
+    "muscular": {
+      "ok": true,
+      "regions": 15,
+      "file": "muscles-anterior.png",
+      "viewBox": [
+        40,
+        10,
+        560,
+        1095
+      ],
+      "imageSize": [
+        640,
+        1115
+      ],
+      "issues": [],
+      "regionIds": [
+        "quadriceps-femoris",
+        "hamstrings",
+        "gastrocnemius",
+        "tibialis-anterior",
+        "gluteus-maximus",
+        "rectus-abdominis",
+        "external-oblique",
+        "pectoralis-major",
+        "latissimus-dorsi",
+        "diaphragm",
+        "deltoid",
+        "biceps-brachii",
+        "triceps-brachii",
+        "trapezius",
+        "sternocleidomastoid"
+      ]
+    },
+    "cardiovascular": {
+      "ok": true,
+      "regions": 11,
+      "file": "heart.png",
+      "viewBox": [
+        0,
+        0,
+        500,
+        492
+      ],
+      "imageSize": [
+        500,
+        492
+      ],
+      "issues": [],
+      "regionIds": [
+        "left-ventricle",
+        "right-ventricle",
+        "right-atrium",
+        "left-atrium",
+        "aorta",
+        "pulmonary-artery",
+        "vena-cava",
+        "pulmonary-vein",
+        "coronary-arteries",
+        "carotid-artery",
+        "heart"
+      ]
+    },
+    "digestive": {
+      "ok": true,
+      "regions": 8,
+      "file": "digestive.svg",
+      "viewBox": [
+        0,
+        0,
+        581,
+        821
+      ],
+      "imageSize": [
+        581,
+        821
+      ],
+      "issues": [],
+      "regionIds": [
+        "mouth",
+        "esophagus",
+        "liver",
+        "stomach",
+        "gallbladder",
+        "pancreas",
+        "small-intestine",
+        "large-intestine"
+      ]
+    },
+    "respiratory": {
+      "ok": true,
+      "regions": 8,
+      "file": "respiratory.png",
+      "viewBox": [
+        0,
+        0,
+        960,
+        1023
+      ],
+      "imageSize": [
+        960,
+        1023
+      ],
+      "issues": [],
+      "regionIds": [
+        "nasal-cavity",
+        "pharynx",
+        "larynx",
+        "trachea",
+        "bronchi",
+        "lungs",
+        "alveoli",
+        "diaphragm"
+      ]
+    },
+    "nervous": {
+      "ok": true,
+      "regions": 8,
+      "file": null,
+      "viewBox": [
+        0,
+        0,
+        360,
+        520
+      ],
+      "imageSize": [
+        360,
+        520
+      ],
+      "issues": [],
+      "regionIds": [
+        "cerebrum",
+        "cerebellum",
+        "brainstem",
+        "thalamus",
+        "hypothalamus",
+        "spinal-cord",
+        "cranial-nerves",
+        "peripheral-nerves"
+      ]
+    },
+    "endocrine": {
+      "ok": true,
+      "regions": 7,
+      "file": "endocrine-illu-pd.png",
+      "viewBox": [
+        0,
+        0,
+        317,
+        421
+      ],
+      "imageSize": [
+        317,
+        421
+      ],
+      "issues": [],
+      "regionIds": [
+        "pineal",
+        "pituitary",
+        "thyroid",
+        "parathyroid",
+        "adrenal",
+        "pancreas-endocrine",
+        "gonads"
+      ]
+    },
+    "urinary": {
+      "ok": true,
+      "regions": 6,
+      "file": "urinary.svg",
+      "viewBox": [
+        0,
+        0,
+        510,
+        670
+      ],
+      "imageSize": [
+        510,
+        670
+      ],
+      "issues": [],
+      "regionIds": [
+        "kidney",
+        "nephron",
+        "ureter",
+        "bladder",
+        "urethra",
+        "adrenal"
+      ]
+    },
+    "integumentary": {
+      "ok": true,
+      "regions": 6,
+      "file": "integumentary-skin.svg",
+      "viewBox": [
+        0,
+        0,
+        408.37225,
+        285.99769
+      ],
+      "imageSize": [
+        408.37225,
+        285.99769
+      ],
+      "issues": [],
+      "regionIds": [
+        "epidermis",
+        "dermis",
+        "hypodermis",
+        "hair-follicle",
+        "sebaceous-glands",
+        "sweat-glands"
+      ]
+    },
+    "lymphatic": {
+      "ok": true,
+      "regions": 5,
+      "file": "lymphatic-te.svg",
+      "viewBox": [
+        0,
+        0,
+        417.5,
+        900
+      ],
+      "imageSize": [
+        417.5,
+        900
+      ],
+      "issues": [],
+      "regionIds": [
+        "tonsils",
+        "thymus",
+        "lymph-nodes",
+        "spleen",
+        "lymph-vessels"
+      ]
+    },
+    "reproductive": {
+      "ok": true,
+      "regions": 5,
+      "file": "reproductive-mf.svg",
+      "viewBox": [
+        0,
+        0,
+        620,
+        289
+      ],
+      "imageSize": [
+        620,
+        289
+      ],
+      "issues": [],
+      "regionIds": [
+        "ovaries",
+        "fallopian-tubes",
+        "uterus",
+        "testes",
+        "prostate"
+      ]
+    }
+  }
+}

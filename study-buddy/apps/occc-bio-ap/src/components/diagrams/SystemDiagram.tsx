@@ -1,7 +1,5 @@
 import type { Structure, SystemId } from '../../types';
-import { SkeletalDiagram } from './SkeletalDiagram';
-import { MuscularDiagram } from './MuscularDiagram';
-import { CardiovascularDiagram } from './CardiovascularDiagram';
+import { InteractiveDiagram, type InteractiveDiagramProps } from './InteractiveDiagram';
 import { getDiagramConfig } from './diagramConfigs';
 
 interface SystemDiagramProps {
@@ -14,18 +12,14 @@ interface SystemDiagramProps {
   stickySelect?: boolean;
 }
 
-/** Renders the interactive diagram for a system, if one exists. */
-export function SystemDiagram({ systemId, ...rest }: SystemDiagramProps) {
-  switch (systemId) {
-    case 'skeletal':
-      return <SkeletalDiagram {...rest} />;
-    case 'muscular':
-      return <MuscularDiagram {...rest} />;
-    case 'cardiovascular':
-      return <CardiovascularDiagram {...rest} />;
-    default:
-      return null;
-  }
+/** Renders the interactive diagram for a system, if one exists in the catalog. */
+export function SystemDiagram({ systemId, onSelect, ...rest }: SystemDiagramProps) {
+  const config = getDiagramConfig(systemId);
+  if (!config) return null;
+
+  const handle: InteractiveDiagramProps['onSelect'] = (structure) => onSelect?.(structure);
+
+  return <InteractiveDiagram config={config} onSelect={handle} {...rest} />;
 }
 
 export function hasInteractiveDiagram(systemId: string): boolean {

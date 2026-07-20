@@ -90,7 +90,7 @@ export function Layout() {
           </div>
           <div>
             <div className="font-display text-sm font-bold leading-tight">Anatomy Hub</div>
-            <div className="text-[11px] text-slate-500">BIO 1314 · BIO 1414 · OCCC</div>
+            <div className="text-[11px] text-slate-500">A&amp;P I · BIO 1314/1414 · OCCC</div>
           </div>
         </div>
         {nav}

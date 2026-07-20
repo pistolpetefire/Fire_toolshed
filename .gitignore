@@ -1,15 +1,54 @@
+﻿# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
 Thumbs.db
-*.log
-.vscode/
-.idea/
-node_modules/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Env
 .env
 .env.*
+!.env.example
 
-# Generated e2e artifacts
+# Generated e2e / validation artifacts
 validation/e2e-out/
 validation/e2e-hazard-out/
 validation/e2e-logo-out/
 validation/_hmis_xlsx_extract/
 
+# Local QA screenshots (regenerable)
+study-buddy/scripts/hotspot-qa/shots/
+study-buddy/scripts/hotspot-qa/*.html
+
+# Root accidental Vite scaffold (Fire Tools lives in its own tree)
+/package.json
+/package-lock.json
+/vite.config.ts
+/tsconfig.json
+/tsconfig.node.json
+/postcss.config.js
+/tailwind.config.js
+/public/
+/src/
+/scripts/
+/test-results.json
+/test-results-25.json
