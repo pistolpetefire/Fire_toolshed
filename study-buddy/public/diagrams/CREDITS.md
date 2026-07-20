@@ -16,6 +16,7 @@ Procured for Study Buddy Anatomy Hub from free / open-license sources listed by 
 | `endocrine-english.svg` | [Endocrine English.svg](https://commons.wikimedia.org/wiki/File:Endocrine_English.svg) | **Best option (in use)** — CC BY-SA |
 | `endocrine-illu-pd.png` | [Illu endocrine system New.png](https://commons.wikimedia.org/wiki/File:Illu_endocrine_system_New.png) | **Alt (PD)** — US gov SEER-derived, public domain |
 | `respiratory.png` / `.svg` | [Respiratory system complete en.svg](https://commons.wikimedia.org/wiki/File:Respiratory_system_complete_en.svg) | LadyofHats — **Public Domain** |
+| `nervous-unlabeled.svg` / `.png` | [Nervous system diagram unlabeled.svg](https://commons.wikimedia.org/wiki/File:Nervous_system_diagram_unlabeled.svg) | Medium69 / Jmarchn — **CC BY-SA 4.0** (in use; unlabeled for quizzes) |
 | `integumentary-skin.svg` | [Human skin structure.svg](https://commons.wikimedia.org/wiki/File:Human_skin_structure.svg) | **In use** — CC BY-SA |
 | `lymphatic-te.svg` | [TE-Lymphatic system diagram.svg](https://commons.wikimedia.org/wiki/File:TE-Lymphatic_system_diagram.svg) | The Emirr — **CC BY 3.0** (in use) |
 | `reproductive-mf.svg` | [Male and female anatomy.svg](https://commons.wikimedia.org/wiki/File:Male_and_female_anatomy.svg) | Tsaitgaist — **CC BY-SA 3.0** (in use) |

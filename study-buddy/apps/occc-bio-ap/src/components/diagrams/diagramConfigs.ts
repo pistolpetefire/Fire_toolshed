@@ -148,26 +148,39 @@ export const respiratoryConfig: DiagramConfig = {
   ],
 };
 
+/**
+ * Nervous — unlabeled full-body plate (user-recommended, quiz-friendly).
+ * Medium69 / Jmarchn — CC BY-SA 4.0.
+ * PNG render 960×2108 of Nervous_system_diagram_unlabeled.svg.
+ * Lateral/oblique figure: brain top, yellow spinal cord midline, blue PNS.
+ */
 export const nervousConfig: DiagramConfig = {
   title: 'Nervous system',
-  ariaLabel: 'Interactive CNS diagram',
-  hint: 'Click a CNS region',
-  viewBox: '0 0 360 520',
-  maxWidthClass: 'max-w-sm',
-  renderStyle: 'organ',
+  ariaLabel: 'Interactive unlabeled nervous system plate',
+  hint: 'Click brain, cord, or nerve regions on the unlabeled plate',
+  viewBox: '0 0 960 2108',
+  imageWidth: 960,
+  imageHeight: 2108,
+  maxWidthClass: 'max-w-md',
+  backgroundImage: 'nervous-unlabeled.png',
+  renderStyle: 'hotspot',
   credit: {
-    title: 'CNS schematic',
-    credit: 'Study Buddy educational SVG for A&P I Unit 8',
+    title: 'Nervous system diagram (unlabeled)',
+    credit: 'Medium69 / Jmarchn / Wikimedia Commons — CC BY-SA 4.0',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:Nervous_system_diagram_unlabeled.svg',
   },
   regions: [
-    { id: 'cerebrum', label: 'Cerebrum', d: 'M120 40 c-40 10-60 50-55 95 5 40 35 70 75 75 h80 c40-5 70-35 75-75 5-45-15-85-55-95 -20-5-45-5-65 0z' },
-    { id: 'cerebellum', label: 'Cerebellum', d: 'M200 160 c-25 5-40 25-35 50 5 20 25 35 50 35 s45-15 50-35 c5-25-10-45-35-50z' },
-    { id: 'brainstem', label: 'Brainstem', d: 'M165 175 h30 v55 h-30z' },
-    { id: 'thalamus', label: 'Thalamus', d: 'M155 130 h50 v30 h-50z' },
-    { id: 'hypothalamus', label: 'Hypothalamus', d: 'M160 155 h40 v22 h-40z' },
-    { id: 'spinal-cord', label: 'Spinal cord', d: 'M172 230 h16 v250 h-16z' },
-    { id: 'cranial-nerves', label: 'Cranial nerves', d: 'M100 100 h40 v80 h-40z M220 100 h40 v80 h-40z' },
-    { id: 'peripheral-nerves', label: 'Peripheral nerves', d: 'M130 280 h20 v120 h-20z M210 280 h20 v120 h-20z' },
+    // Large first; finer CNS targets last so they win click hit-testing
+    { id: 'peripheral-nerves', label: 'Peripheral nerves', d: 'M100 360 h210 v540 h-210z M650 360 h210 v540 h-210z M270 1160 h190 v640 h-190z M500 1160 h190 v640 h-190z' },
+    { id: 'spinal-cord', label: 'Spinal cord', d: 'M450 270 h60 v800 h-60z' },
+    { id: 'cerebrum', label: 'Cerebrum', d: 'M365 28 h240 v155 h-240z' },
+    // Cerebellum = posterior-inferior tan mass of brain (right of midline in this view)
+    { id: 'cerebellum', label: 'Cerebellum', d: 'M490 118 h105 v85 h-105z' },
+    { id: 'brainstem', label: 'Brainstem', d: 'M450 185 h65 v90 h-65z' },
+    { id: 'thalamus', label: 'Thalamus', d: 'M455 150 h55 v40 h-55z' },
+    { id: 'hypothalamus', label: 'Hypothalamus', d: 'M458 185 h48 v32 h-48z' },
+    // Blue nerve roots near base of skull / upper neck
+    { id: 'cranial-nerves', label: 'Cranial nerves', d: 'M325 150 h100 v110 h-100z M555 150 h100 v110 h-100z' },
   ],
 };
 

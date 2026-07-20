@@ -133,7 +133,7 @@ export function Dashboard() {
               to={p('/flashcards')}
               icon={<Layers className="h-5 w-5" />}
               title={dueCards > 0 ? `Review ${dueCards} due card${dueCards === 1 ? '' : 's'}` : 'Study flashcards'}
-              desc="Spaced repetition for skeletal & muscular"
+              desc="200+ cards — foundations through reproductive (SRS)"
               color="bg-violet-50 text-violet-700 dark:bg-violet-950/50 dark:text-violet-300"
               badge={dueCards > 0 ? 'Due' : undefined}
             />

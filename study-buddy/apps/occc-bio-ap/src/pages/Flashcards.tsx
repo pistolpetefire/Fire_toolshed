@@ -1,18 +1,22 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Layers, Plus, RotateCcw, Check, X, Zap, Trash2, Keyboard } from 'lucide-react';
-import { builtInFlashcards } from '../data/flashcards';
+import {
+  builtInFlashcards,
+  FLASHCARD_TOPIC_LABELS,
+  FLASHCARD_TOPIC_ORDER,
+} from '../data/flashcards';
 import { useProgressContext } from '../context/ProgressContext';
 import { isDue, reviewCard } from '../lib/srs';
 import { recordStudyDay } from '../lib/progress';
-import type { Flashcard, SRSRating, SystemId } from '../types';
+import type { Flashcard, FlashcardTopicId, SRSRating } from '../types';
 
 export function Flashcards() {
   const { progress, updateProgress } = useProgressContext();
   const [params, setParams] = useSearchParams();
   const dueOnly = params.get('due') === '1';
 
-  const [systemFilter, setSystemFilter] = useState<SystemId | 'all' | 'custom'>('all');
+  const [systemFilter, setSystemFilter] = useState<FlashcardTopicId | 'all' | 'custom'>('all');
   const [showAdd, setShowAdd] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const [index, setIndex] = useState(0);
@@ -82,7 +86,7 @@ export function Flashcards() {
     [card, deck.length, updateProgress]
   );
 
-  const addCustom = (front: string, back: string, systemId: SystemId) => {
+  const addCustom = (front: string, back: string, systemId: FlashcardTopicId) => {
     const newCard: Flashcard = {
       id: `custom-${Date.now()}`,
       front,
@@ -164,7 +168,8 @@ export function Flashcards() {
         <div>
           <h1 className="page-title">Flashcards</h1>
           <p className="page-subtitle">
-            Spaced repetition for Skeletal &amp; Muscular systems. Rate cards Hard / Good / Easy to schedule reviews.
+            {builtInFlashcards.length}+ built-in cards across A&amp;P I (foundations → reproductive). Rate Hard / Good /
+            Easy for spaced repetition.
           </p>
         </div>
         <button type="button" className="btn-primary" onClick={() => setShowAdd(true)}>
@@ -175,9 +180,14 @@ export function Flashcards() {
       <div className="flex flex-wrap items-center gap-2">
         {(
           [
-            ['all', 'All cards'],
-            ['skeletal', 'Skeletal'],
-            ['muscular', 'Muscular'],
+            ['all', `All (${builtInFlashcards.length + progress.customCards.length})`],
+            ...FLASHCARD_TOPIC_ORDER.map(
+              (id) =>
+                [
+                  id,
+                  `${FLASHCARD_TOPIC_LABELS[id]} (${builtInFlashcards.filter((c) => c.systemId === id).length})`,
+                ] as const
+            ),
             ['custom', 'My cards'],
           ] as const
         ).map(([id, label]) => (
@@ -346,11 +356,11 @@ function AddCardModal({
   onSave,
 }: {
   onClose: () => void;
-  onSave: (front: string, back: string, systemId: SystemId) => void;
+  onSave: (front: string, back: string, systemId: FlashcardTopicId) => void;
 }) {
   const [front, setFront] = useState('');
   const [back, setBack] = useState('');
-  const [systemId, setSystemId] = useState<SystemId>('skeletal');
+  const [systemId, setSystemId] = useState<FlashcardTopicId>('skeletal');
 
   useEffect(() => {
     const onEsc = (e: KeyboardEvent) => {
@@ -389,19 +399,17 @@ function AddCardModal({
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">System</label>
-            <select className="input" value={systemId} onChange={(e) => setSystemId(e.target.value as SystemId)}>
-              <option value="skeletal">Skeletal</option>
-              <option value="muscular">Muscular</option>
-              <option value="nervous">Nervous</option>
-              <option value="cardiovascular">Cardiovascular</option>
-              <option value="respiratory">Respiratory</option>
-              <option value="digestive">Digestive</option>
-              <option value="endocrine">Endocrine</option>
-              <option value="urinary">Urinary</option>
-              <option value="integumentary">Integumentary</option>
-              <option value="lymphatic">Lymphatic</option>
-              <option value="reproductive">Reproductive</option>
+            <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">Topic</label>
+            <select
+              className="input"
+              value={systemId}
+              onChange={(e) => setSystemId(e.target.value as FlashcardTopicId)}
+            >
+              {FLASHCARD_TOPIC_ORDER.map((id) => (
+                <option key={id} value={id}>
+                  {FLASHCARD_TOPIC_LABELS[id]}
+                </option>
+              ))}
             </select>
           </div>
         </div>

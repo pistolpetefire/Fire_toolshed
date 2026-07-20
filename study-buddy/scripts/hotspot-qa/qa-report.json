@@ -250,27 +250,27 @@
     "nervous": {
       "ok": true,
       "regions": 8,
-      "file": null,
+      "file": "nervous-unlabeled.png",
       "viewBox": [
         0,
         0,
-        360,
-        520
+        960,
+        2108
       ],
       "imageSize": [
-        360,
-        520
+        960,
+        2108
       ],
       "issues": [],
       "regionIds": [
+        "peripheral-nerves",
+        "spinal-cord",
         "cerebrum",
         "cerebellum",
         "brainstem",
         "thalamus",
         "hypothalamus",
-        "spinal-cord",
-        "cranial-nerves",
-        "peripheral-nerves"
+        "cranial-nerves"
       ]
     },
     "endocrine": {

@@ -13,6 +13,15 @@ export type SystemId =
   | 'lymphatic'
   | 'reproductive';
 
+/** Topics for flashcards — body systems plus early A&P I units without a system page */
+export type FlashcardTopicId =
+  | SystemId
+  | 'foundations'
+  | 'chemistry'
+  | 'cells'
+  | 'tissues'
+  | 'blood';
+
 export interface BodySystem {
   id: SystemId;
   name: string;
@@ -45,7 +54,8 @@ export interface Flashcard {
   id: string;
   front: string;
   back: string;
-  systemId: SystemId;
+  /** Body system or foundation unit topic */
+  systemId: FlashcardTopicId;
   tags: string[];
   /** true when created by the user */
   custom?: boolean;
