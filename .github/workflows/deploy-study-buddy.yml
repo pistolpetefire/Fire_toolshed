@@ -1,17 +1,17 @@
-# Deploy Study Buddy to GitHub Pages
-# Live URL: https://pistolpetefire.github.io/Fire_toolshed/
+# Deploy Fire Toolshed + Study Buddy together on GitHub Pages
 #
-# One-time setup in the GitHub repo:
-#   Settings → Pages → Build and deployment → Source: GitHub Actions
+# Live URLs (repo: pistolpetefire/Fire_toolshed):
+#   Fire tools portal:  https://pistolpetefire.github.io/Fire_toolshed/
+#   Study Buddy hub:    https://pistolpetefire.github.io/Fire_toolshed/study-buddy/
+#   Anatomy app:        https://pistolpetefire.github.io/Fire_toolshed/study-buddy/classes/occc-bio-ap
+#
+# One-time: Settings → Pages → Source: GitHub Actions
 
-name: Deploy Study Buddy
+name: Deploy GitHub Pages
 
 on:
   push:
     branches: [main]
-    paths:
-      - 'study-buddy/**'
-      - '.github/workflows/deploy-study-buddy.yml'
   workflow_dispatch:
 
 permissions:
@@ -20,7 +20,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages-study-buddy
+  group: pages-site
   cancel-in-progress: true
 
 jobs:
@@ -37,25 +37,62 @@ jobs:
           cache: npm
           cache-dependency-path: study-buddy/package-lock.json
 
-      - name: Install dependencies
+      - name: Install Study Buddy dependencies
         working-directory: study-buddy
         run: npm ci
 
-      - name: Build for GitHub Pages
+      - name: Build Study Buddy (subpath on Pages)
         working-directory: study-buddy
         env:
-          # Must match the GitHub repo name (case-sensitive)
-          VITE_BASE_PATH: /Fire_toolshed/
+          # Nested under /Fire_toolshed/study-buddy/ so fire tools keep the site root
+          VITE_BASE_PATH: /Fire_toolshed/study-buddy/
         run: npm run build
 
-      # SPA deep links (refresh on /classes/...) need 404.html → index.html
-      - name: SPA fallback for GitHub Pages
+      - name: SPA fallback for Study Buddy deep links
         run: cp study-buddy/dist/index.html study-buddy/dist/404.html
+
+      - name: Assemble combined site (fire tools + Study Buddy)
+        run: |
+          set -euo pipefail
+          rm -rf site
+          mkdir -p site
+
+          # Copy fire-tool static apps + portal (exclude Study Buddy source & build noise)
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='node_modules/' \
+            --exclude='study-buddy/' \
+            --exclude='validation/' \
+            --exclude='dist/' \
+            --exclude='scripts/' \
+            --exclude='src/' \
+            --exclude='public/' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='tsconfig.json' \
+            --exclude='tsconfig.node.json' \
+            --exclude='vite.config.ts' \
+            --exclude='postcss.config.js' \
+            --exclude='tailwind.config.js' \
+            --exclude='test-results*.json' \
+            --exclude='STUDY-BUDDY.md' \
+            --exclude='.gitignore' \
+            ./ site/
+
+          # Mount built Study Buddy SPA at /study-buddy/
+          mkdir -p site/study-buddy
+          cp -a study-buddy/dist/. site/study-buddy/
+
+          echo "Site tree (top level):"
+          ls -la site
+          echo "Study Buddy:"
+          ls -la site/study-buddy | head
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: study-buddy/dist
+          path: site
 
   deploy:
     needs: build

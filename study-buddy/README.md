@@ -11,25 +11,19 @@ study-buddy/
   package.json
 ```
 
-## Live link (GitHub Pages)
+## Live links (GitHub Pages — shared with Fire Tools)
 
-**Share this URL:**
+Fire tools and Study Buddy run on the **same** GitHub Pages site:
 
-### https://pistolpetefire.github.io/Fire_toolshed/
+| App | Link |
+|-----|------|
+| **Fire tools portal** | https://pistolpetefire.github.io/Fire_toolshed/ |
+| **Study Buddy hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/ |
+| **Anatomy Hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/classes/occc-bio-ap |
 
-| Screen | Link |
-|--------|------|
-| Study Buddy hub | https://pistolpetefire.github.io/Fire_toolshed/ |
-| Anatomy Hub | https://pistolpetefire.github.io/Fire_toolshed/classes/occc-bio-ap |
+Deploy workflow builds Study Buddy into `/study-buddy/` and keeps all fire tool folders at the site root.
 
-Deploy is automatic via GitHub Actions (`.github/workflows/deploy-study-buddy.yml`) on every push to `main` that touches `study-buddy/`.
-
-**One-time setup** (repo owner):
-
-1. Open [repo Settings → Pages](https://github.com/pistolpetefire/Fire_toolshed/settings/pages)
-2. Under **Build and deployment → Source**, choose **GitHub Actions**
-3. Wait for the **Deploy Study Buddy** workflow to finish (Actions tab)
-4. Open the live link above
+**One-time setup:** [Settings → Pages](https://github.com/pistolpetefire/Fire_toolshed/settings/pages) → Source: **GitHub Actions**.
 
 ## Run locally
 

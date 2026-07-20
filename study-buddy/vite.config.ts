@@ -2,11 +2,12 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 /**
- * GitHub Pages (project site) needs the repo name as base:
- *   https://pistolpetefire.github.io/Fire_toolshed/
- * Local dev keeps base at "/".
+ * GitHub Pages layout (both groups live on the same site):
+ *   Fire tools portal → https://pistolpetefire.github.io/Fire_toolshed/
+ *   Study Buddy SPA   → https://pistolpetefire.github.io/Fire_toolshed/study-buddy/
  *
- * Set via: VITE_BASE_PATH=/Fire_toolshed/ npm run build
+ * Local dev keeps base at "/".
+ * CI sets: VITE_BASE_PATH=/Fire_toolshed/study-buddy/
  */
 const base = process.env.VITE_BASE_PATH || '/';
 

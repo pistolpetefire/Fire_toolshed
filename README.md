@@ -1,6 +1,21 @@
-# Engineering Tools
+# Engineering Tools (Fire Toolshed)
 
-Browser-based engineering calculators for team use. Hosted with **GitHub Pages**.
+Browser-based engineering calculators for team use. Hosted with **GitHub Pages**, alongside **Study Buddy** (class study apps).
+
+## Live web apps (share these)
+
+| App | Live URL |
+|-----|----------|
+| **Fire tools portal** | https://pistolpetefire.github.io/Fire_toolshed/ |
+| **Study Buddy** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/ |
+| **Anatomy Hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/classes/occc-bio-ap |
+| Fire Pump Sizer | https://pistolpetefire.github.io/Fire_toolshed/fire-pump-sizer/ |
+
+Both groups deploy together via GitHub Actions (`.github/workflows/deploy-study-buddy.yml`).
+
+**One-time Pages setup:** [Settings → Pages](https://github.com/pistolpetefire/Fire_toolshed/settings/pages) → Source: **GitHub Actions**.
+
+Details: [STUDY-BUDDY.md](./STUDY-BUDDY.md)
 
 ## Water supply tool path
 
