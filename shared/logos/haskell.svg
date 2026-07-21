@@ -1,7 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 72" role="img" aria-label="Haskell">
-  <rect width="280" height="72" rx="8" fill="#1a3a2a"/>
-  <circle cx="28" cy="36" r="14" fill="none" stroke="#6bbf8a" stroke-width="3"/>
-  <path d="M22 36h12M28 30v12" stroke="#6bbf8a" stroke-width="2.5" stroke-linecap="round"/>
-  <text x="52" y="46" font-family="system-ui, -apple-system, sans-serif" font-size="30" font-weight="700" fill="#ffffff" letter-spacing="0.02em">HASKELL</text>
-  <text x="52" y="62" font-family="system-ui, sans-serif" font-size="9" fill="#94a3b8" letter-spacing="0.12em">PLACEHOLDER LOGO</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Haskell">
+  <!-- Brand diamond mark: #0069AA + solid white H -->
+  <path fill="#0069AA" d="M50 0L100 50 50 100 0 50z"/>
+  <path fill="#FFFFFF" d="M30 27h12.5v17.5h15V27H70v46H57.5V55.5h-15V73H30z"/>
 </svg>

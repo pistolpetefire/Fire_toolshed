@@ -4,6 +4,7 @@
  * Benham: shared/logos/benham.png (embedded data URL).
  * MeadHunt JV: shared/logos/meadhunt-jv.png (embedded data URL).
  * Haskell: entity lockup by US state (business card cheat sheet 06/27/2025).
+ * Diamond mark is brand-style vector (#0069AA + solid white H) for sharp print.
  */
 (function (global) {
   "use strict";
@@ -188,30 +189,37 @@
    * Wordmark lockup approximating business-card logos:
    * blue diamond mark + HASKELL + entity tagline.
    */
+  /**
+   * Wordmark lockup: official blue diamond H mark + HASKELL + entity tagline.
+   * Crisp vector diamond (brand blue #0069AA + solid white H) — not the old stroke/pixel approximation.
+   */
   function haskellLogoDataUrl(entity) {
     entity = entity || HASKELL_ENTITIES.aei;
     var tag = escapeXml(entity.tagline || "");
     var aria = escapeXml("Haskell — " + (entity.name || ""));
     // Wider canvas for longer taglines (e.g. P.A., INC.)
-    var w = Math.max(340, 90 + Math.ceil(tag.length * 6.4));
+    var w = Math.max(360, 100 + Math.ceil(tag.length * 6.6));
+    // Diamond mark in a 64×64 tile; pure vector for sharp print at any size
+    var mark =
+      '<g transform="translate(4,4)">' +
+      '<path fill="#0069AA" d="M32 0L64 32 32 64 0 32z"/>' +
+      // Solid white H (axis-aligned; proportions match brand graphic)
+      '<path fill="#FFFFFF" d="M19.2 17.3h8v11.2h9.6V17.3h8v29.4h-8V35.5h-9.6v11.2h-8z"/>' +
+      "</g>";
     var svg =
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' +
       w +
       ' 72" role="img" aria-label="' +
       aria +
       '">' +
-      // Diamond mark with stylized H (report lockup; not a pixel-perfect brand file)
-      '<polygon points="36,6 62,36 36,66 10,36" fill="#0b3d91"/>' +
-      '<polygon points="36,14 54,36 36,58 18,36" fill="#1a5bb8"/>' +
-      '<path d="M27 26 v20 M45 26 v20 M27 36 h18" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="square"/>' +
-      '<text x="74" y="38" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="28" font-weight="900" fill="#0f172a" letter-spacing="0.06em">HASKELL</text>' +
-      '<text x="74" y="56" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="600" fill="#0a7cac">' +
+      mark +
+      '<text x="78" y="38" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="28" font-weight="900" fill="#0f172a" letter-spacing="0.06em">HASKELL</text>' +
+      '<text x="78" y="56" font-family="Arial, Helvetica, sans-serif" font-size="10.5" font-weight="600" fill="#0069AA">' +
       tag +
       "</text>" +
       "</svg>";
     return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
   }
-
   function escapeXml(s) {
     return String(s == null ? "" : s)
       .replace(/&/g, "&amp;")
