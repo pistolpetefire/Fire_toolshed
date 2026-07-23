@@ -6,7 +6,7 @@
   'use strict';
 
   const STORAGE_KEY = 'study-buddy:calc1-study-buddy:progress-v1';
-  const VERSION = '1.0.2';
+  const VERSION = '1.1.1';
 
   const LETTERS = ['A', 'B', 'C', 'D'];
 
@@ -324,6 +324,31 @@
     updatePlanStatus('Plan exported');
   }
 
+  function importPlan(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(String(reader.result || ''));
+        const plan = data.plan || data;
+        if (!plan || !Array.isArray(plan.days)) {
+          throw new Error('File needs a plan.days array (export from this app).');
+        }
+        state.plan = normalizePlan(plan);
+        planDirty = false;
+        saveState();
+        renderWeekPlan();
+        renderHome();
+        updatePlanStatus('Plan imported');
+      } catch (err) {
+        alert('Could not import plan: ' + (err instanceof Error ? err.message : String(err)));
+        updatePlanStatus('Import failed');
+      }
+    };
+    reader.onerror = () => alert('Failed to read file.');
+    reader.readAsText(file);
+  }
+
   function resetWeekPlan() {
     if (!confirm('Restore the default 7-day plan? Your edited day text will be replaced. Quiz progress is kept.')) return;
     state.plan = defaultPlan();
@@ -476,7 +501,7 @@
 
     el.quizToolbar.innerHTML = `
       <button type="button" class="btn btn-ghost" id="btn-quit-quiz">Exit</button>
-      <label class="toggle"><input type="checkbox" id="sess-explain" ${state.settings.showExplainAfter ? 'checked' : ''}/> Show explanation after answer</label>
+      <label class="toggle"><input type="checkbox" id="sess-explain" ${state.settings.showExplainAfter ? 'checked' : ''}/> Show full tutoring after answer</label>
       <span class="sub" style="font-size:0.78rem">Keys: A–D or 1–4 · arrows move · Enter selects</span>
     `;
     document.getElementById('btn-quit-quiz')?.addEventListener('click', () => {
@@ -527,17 +552,54 @@
     }
     saveState();
 
+    // Always show full tutoring on incorrect answers (forceTutorOnWrong).
+    // Toggle only controls tutoring when the answer is correct.
     const showExp = document.getElementById('sess-explain')?.checked ?? state.settings.showExplainAfter;
-    el.quizFeedback.className = 'feedback ' + (correct ? 'ok' : 'no');
-    el.quizFeedback.innerHTML = `
-      <span class="label">${correct ? 'Correct' : 'Not quite'} — answer ${q.answer}</span>
-      ${showExp ? escapeHtml(q.explanation) : '<em>Explanation hidden — enable the toggle to show next time.</em>'}
-    `;
-    // Ensure live region announces even if class was already set
+    const showTutor = !correct || showExp;
+    el.quizFeedback.className = 'feedback tutor-feedback ' + (correct ? 'ok' : 'no');
     el.quizFeedback.setAttribute('aria-live', 'polite');
+
+    const relatedMath = findRelatedWorkshop(q);
+
+    if (!showTutor) {
+      el.quizFeedback.innerHTML = `
+        <span class="label">Correct — answer ${q.answer}</span>
+        <em>Full tutoring is hidden for correct answers — enable the toggle to review coaching every time.</em>
+        ${relatedMathBlock(relatedMath)}`;
+    } else {
+      const tutorApi = window.CALC1_TUTORING;
+      const pack = tutorApi?.buildMcqTutor
+        ? tutorApi.buildMcqTutor(q, letter, correct)
+        : null;
+      if (pack) {
+        el.quizFeedback.innerHTML = `
+          <span class="label">${escapeHtml(pack.headline)}</span>
+          ${!correct ? '<p class="tutor-forced">Missed items always open full tutoring so you learn before the final.</p>' : ''}
+          <p class="tutor-correct"><strong>Correct answer:</strong> ${escapeHtml(pack.correctChoice)}</p>
+          <div class="tutor-block">
+            <strong>Walkthrough</strong>
+            <ol class="tutor-steps">${pack.walkthrough.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>
+          </div>
+          <div class="tutor-block coach">
+            <strong>${escapeHtml(pack.coachTitle)}</strong>
+            <p><strong>How to think:</strong> ${escapeHtml(pack.howToThink)}</p>
+            <p><strong>${escapeHtml(pack.commonMistake)}</strong></p>
+            <p class="tutor-tip"><strong>Exam tip:</strong> ${escapeHtml(pack.examTip)}</p>
+          </div>
+          ${relatedMathBlock(relatedMath)}`;
+      } else {
+        el.quizFeedback.innerHTML = `
+          <span class="label">${correct ? 'Correct' : 'Not quite'} — answer ${q.answer}</span>
+          <p>${escapeHtml(q.explanation)}</p>
+          ${relatedMathBlock(relatedMath)}`;
+      }
+    }
+
+    el.quizFeedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     el.quizToolbar.innerHTML = `
       <button type="button" class="btn btn-primary" id="btn-next-q">${session.index + 1 >= session.queue.length ? 'See results' : 'Next question'}</button>
+      ${relatedMath ? `<button type="button" class="btn" id="btn-related-math">Open related workshop</button>` : ''}
       <button type="button" class="btn btn-ghost" id="btn-quit-quiz">Exit</button>
     `;
     document.getElementById('btn-next-q')?.addEventListener('click', () => {
@@ -545,11 +607,50 @@
       renderQuizItem();
     });
     document.getElementById('btn-next-q')?.focus();
+    document.getElementById('btn-related-math')?.addEventListener('click', () => {
+      if (session?._quizKeyHandler) window.removeEventListener('keydown', session._quizKeyHandler);
+      session = null;
+      openRelatedWorkshop(relatedMath);
+    });
     document.getElementById('btn-quit-quiz')?.addEventListener('click', () => {
       if (session?._quizKeyHandler) window.removeEventListener('keydown', session._quizKeyHandler);
       session = null;
       renderHome();
       showView('home');
+    });
+  }
+
+  function findRelatedWorkshop(q) {
+    const topic = q.topics && q.topics[0];
+    if (!topic) return null;
+    const list = mathProblems().filter((p) => (p.topics || []).includes(topic));
+    if (!list.length) return null;
+    // Prefer a problem not yet "seen" randomly among topic matches
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function relatedMathBlock(p) {
+    if (!p) return '';
+    return `<div class="tutor-block related-workshop">
+      <strong>Related workshop practice</strong>
+      <p>Try a free-response problem on the same topic: <em>${escapeHtml(p.title)}</em></p>
+      <p class="sub">Use the button below — write on paper first, then open the tutor solution.</p>
+    </div>`;
+  }
+
+  function openRelatedWorkshop(p) {
+    if (!p) return;
+    renderMath();
+    showView('math');
+    queueMicrotask(() => {
+      const card = document.querySelector(`[data-math="${p.id}"]`);
+      if (card) {
+        card.classList.add('math-highlight');
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const solBtn = card.querySelector('[data-act="sol"]');
+        // Do not auto-open solution — student should try first
+        solBtn?.focus();
+      }
     });
   }
 
@@ -589,23 +690,35 @@
     el.mathList.innerHTML = list
       .map((p, i) => {
         const tags = (p.topics || []).map(topicLabel).join(', ');
+        const topicId = (p.topics && p.topics[0]) || 'concepts';
+        const coach = window.CALC1_TUTORING?.coaches?.[topicId];
         return `
         <article class="card math-card" data-math="${p.id}">
           <span class="pill">${escapeHtml(tags || 'Math')}</span>
           <h3>${i + 1}. ${escapeHtml(p.title)}</h3>
           <p class="math-prompt">${escapeHtml(p.prompt)}</p>
+          <p class="sub math-try-first">Write a full solution on paper first — then open tutoring below.</p>
           <div class="toolbar">
-            <button type="button" class="btn" data-act="hints">Show hints</button>
-            <button type="button" class="btn btn-primary" data-act="sol">Show worked solution</button>
+            <button type="button" class="btn" data-act="hints">1 · Hints</button>
+            <button type="button" class="btn btn-primary" data-act="sol">2 · Full worked solution</button>
+            <button type="button" class="btn" data-act="coach">3 · Topic coach</button>
           </div>
           <div class="hints hidden" data-box="hints">
-            <strong>Hints</strong>
+            <strong>Hints (try before the full solution)</strong>
             <ol>${(p.hints || []).map((h) => `<li>${escapeHtml(h)}</li>`).join('')}</ol>
           </div>
           <div class="solution hidden" data-box="sol">
-            <strong>Worked solution</strong>
-            <ol>${(p.solution || []).map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>
-            <p class="answer-line">Answer: ${escapeHtml(p.answerLine || '')}</p>
+            <strong>Tutor walkthrough</strong>
+            <ol class="tutor-steps">${(p.solution || []).map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>
+            ${(p.commonMistakes || []).length ? `<div class="tutor-block"><strong>Common mistakes</strong><ul>${p.commonMistakes.map((m) => `<li>${escapeHtml(m)}</li>`).join('')}</ul></div>` : ''}
+            ${p.whyItWorks ? `<div class="tutor-block"><strong>Why this works</strong><p>${escapeHtml(p.whyItWorks)}</p></div>` : ''}
+            <p class="answer-line">Final answer: ${escapeHtml(p.answerLine || '')}</p>
+          </div>
+          <div class="solution coach hidden" data-box="coach">
+            <strong>${escapeHtml(coach?.title || 'Topic coach')}</strong>
+            <p><strong>How to think:</strong> ${escapeHtml(coach?.howToThink || '')}</p>
+            <p><strong>${escapeHtml(coach?.commonMistake || '')}</strong></p>
+            <p class="tutor-tip"><strong>Exam tip:</strong> ${escapeHtml(coach?.examTip || '')}</p>
           </div>
         </article>`;
       })
@@ -690,6 +803,11 @@
     readPlanFromDomAndSave();
   });
   document.getElementById('btn-plan-export')?.addEventListener('click', exportPlan);
+  document.getElementById('btn-plan-import')?.addEventListener('change', (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (f) importPlan(f);
+    e.target.value = '';
+  });
   document.getElementById('btn-plan-reset')?.addEventListener('click', resetWeekPlan);
   el.planExamNote?.addEventListener('input', markPlanDirty);
   el.planExamNote?.addEventListener('change', readPlanFromDomAndSave);

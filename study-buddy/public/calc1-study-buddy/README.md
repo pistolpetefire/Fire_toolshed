@@ -1,8 +1,10 @@
 # Calculus I Final Study Buddy
 
-**OSU-OKC · Online Calculus I · v1.0.2**
+**OSU-OKC · Online Calculus I · v1.1.1**
 
 Static Study Buddy app for a high school student preparing to pass a **typical college Calculus I final**. No course syllabus required — topics match common US Calc I finals (limits → derivatives → applications → integrals).
+
+**Tutoring:** every MCQ result can show a multi-step walkthrough, why wrong options fail, plus a topic coach (how to think / common mistake / exam tip). Workshop problems add common mistakes and “why this works.”
 
 ## Open
 

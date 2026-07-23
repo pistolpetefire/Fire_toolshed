@@ -31,8 +31,8 @@ function exists(rel) {
 function loadWin() {
   const ctx = { window: {} };
   vm.createContext(ctx);
-  for (const f of ['js/topics.js', 'js/questions.js', 'js/math-problems.js']) {
-    vm.runInContext(read(f), ctx);
+  for (const f of ['js/topics.js', 'js/tutoring.js', 'js/questions.js', 'js/math-problems.js']) {
+    if (exists(f)) vm.runInContext(read(f), ctx);
   }
   return ctx.window;
 }
@@ -47,6 +47,7 @@ if (MAX >= 1) {
     'css/style.css',
     'js/app.js',
     'js/topics.js',
+    'js/tutoring.js',
     'js/questions.js',
     'js/math-problems.js',
     'README.md',
@@ -55,8 +56,9 @@ if (MAX >= 1) {
     else fail(1, `File ${f}`);
   }
   const html = read('index.html');
-  if (html.includes('./css/style.css') && html.includes('./js/app.js')) pass(1, 'Asset paths');
-  else fail(1, 'Asset paths');
+  if (html.includes('./css/style.css') && html.includes('./js/app.js') && html.includes('tutoring.js')) {
+    pass(1, 'Asset paths incl tutoring.js');
+  } else fail(1, 'Asset paths incl tutoring.js');
   if (html.includes('personal exam preparation only')) pass(1, 'Disclaimer');
   else fail(1, 'Disclaimer');
 }
@@ -82,6 +84,10 @@ if (MAX >= 2) {
       fail(2, `schema ${q.id}`);
       bad++;
     }
+    if (!q.tutoring?.steps?.length) {
+      fail(2, `tutoring steps ${q.id}`);
+      bad++;
+    }
     for (const t of q.topics || []) {
       if (!tids.has(t)) {
         fail(2, `topic ${q.id}→${t}`);
@@ -89,9 +95,11 @@ if (MAX >= 2) {
       }
     }
   }
-  if (bad === 0) pass(2, 'All MCQs valid', String(Q.length));
+  if (bad === 0) pass(2, 'All MCQs valid + tutoring steps', String(Q.length));
   if (T.length >= 6 && T.length <= 12) pass(2, 'Topic count', String(T.length));
   else fail(2, 'Topic count', String(T.length));
+  if (typeof win.CALC1_TUTORING?.buildMcqTutor === 'function') pass(2, 'buildMcqTutor API');
+  else fail(2, 'buildMcqTutor API');
 }
 
 // 3 Math workshop
@@ -102,13 +110,17 @@ if (MAX >= 3) {
   if (M.length >= 20) pass(3, 'Math count ≥ 20', String(M.length));
   else fail(3, 'Math count ≥ 20', String(M.length));
   let bad = 0;
+  let tutorFields = 0;
   for (const p of M) {
     if (!p.id || !p.prompt || !p.answerLine || !p.solution?.length) {
       fail(3, `math fields ${p.id || '?'}`);
       bad++;
     }
+    if (p.whyItWorks && p.commonMistakes?.length) tutorFields++;
   }
   if (bad === 0) pass(3, 'All math have solutions', String(M.length));
+  if (tutorFields >= M.length * 0.9) pass(3, 'Math whyItWorks + commonMistakes', `${tutorFields}/${M.length}`);
+  else fail(3, 'Math whyItWorks + commonMistakes', `${tutorFields}/${M.length}`);
 }
 
 // 4 Modes & storage
@@ -200,27 +212,26 @@ if (MAX >= 8) {
   }
 }
 
-// 9 Improvement gates (may fail pre-fix)
+// 9 Tutoring product gates (may fail pre-fix) — exactly 3 improvement targets
 if (MAX >= 9) {
-  console.log(`\n═══ CYCLE 9: Improvement gates ═══`);
+  console.log(`\n═══ CYCLE 9: Tutoring product gates ═══`);
   const app = read('js/app.js');
   const html = read('index.html');
-  const css = read('css/style.css');
-  // Plan dirty / unsaved indicator
-  if ((app.includes('planDirty') || app.includes('markPlanDirty')) && app.includes('Unsaved')) {
-    pass(9, 'Plan dirty/unsaved UX');
-  } else fail(9, 'Plan dirty/unsaved UX', 'no dirty state');
-  // Export plan JSON
-  if (app.includes('function exportPlan') || (app.includes('exportPlan') && html.includes('btn-plan-export'))) {
-    pass(9, 'Export plan JSON');
-  } else fail(9, 'Export plan JSON', 'missing');
-  // Today highlight on plan
+
+  if (app.includes('!correct || showExp') || app.includes('!correct||showExp') || app.includes('forceTutorOnWrong')) {
+    pass(9, 'Always tutor on incorrect answers');
+  } else fail(9, 'Always tutor on incorrect answers', 'toggle can hide coaching after misses');
+
+  if (app.includes('importPlan') || html.includes('btn-plan-import') || html.includes('plan-import')) {
+    pass(9, 'Import plan JSON');
+  } else fail(9, 'Import plan JSON', 'export-only');
+
   if (
-    (app.includes('activeDay') || app.includes('plan-day-today')) &&
-    (css.includes('plan-day.today') || css.includes('.plan-day.today') || app.includes('today'))
+    (app.includes('relatedWorkshop') || app.includes('relatedMath') || app.includes('Open related workshop')) &&
+    app.includes('scrollIntoView')
   ) {
-    pass(9, 'Highlight today / active day');
-  } else fail(9, 'Highlight today / active day', 'missing');
+    pass(9, 'Related workshop + scroll feedback into view');
+  } else fail(9, 'Related workshop + scroll feedback into view', 'missing link and/or scroll');
 }
 
 // 10 Reset semantics

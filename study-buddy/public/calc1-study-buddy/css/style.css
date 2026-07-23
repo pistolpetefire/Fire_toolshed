@@ -441,6 +441,38 @@ label.field {
 }
 .plan-hint { margin: 0.65rem 0 0; }
 .plan-status-unsaved { color: var(--warn) !important; font-weight: 700; }
+
+/* Tutoring panels (MCQ + workshop) */
+.tutor-feedback { text-align: left; }
+.tutor-correct { margin: 0.35rem 0 0.65rem; font-size: 0.95rem; }
+.tutor-block {
+  margin-top: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.tutor-block.coach { border-color: #38bdf866; }
+.tutor-block p { margin: 0.4rem 0; }
+.tutor-steps { margin: 0.4rem 0 0 1.1rem; padding: 0; }
+.tutor-steps li { margin: 0.35rem 0; }
+.tutor-tip { color: #fde68a; }
+.math-try-first { margin: 0 0 0.65rem; color: var(--accent); font-weight: 600; }
+.feedback.ok .tutor-block { background: rgba(6, 78, 59, 0.35); }
+.feedback.no .tutor-block { background: rgba(69, 10, 10, 0.35); }
+.tutor-forced {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.85rem;
+  color: #fdba74;
+  font-weight: 600;
+}
+.related-workshop { border-color: #818cf8 !important; }
+.math-card.math-highlight {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
 .plan-day-check {
   margin-top: 0.45rem;
   width: 1.15rem;
