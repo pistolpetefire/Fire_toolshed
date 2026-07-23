@@ -47,7 +47,7 @@ npm run test:cycles   # 5 automated verification cycles
 | App | Courses | Path |
 |-----|---------|------|
 | **Anatomy Hub** | BIO 1314, BIO 1414 (OCCC) | `/classes/occc-bio-ap` |
-| Chemistry Lab Buddy | CHEM 1115 (placeholder) | coming soon |
+| **Chemistry I Final Study Buddy** | CHEM 1214 / 1315 (OSU-OKC) | `/chem1-study-buddy/` (static vanilla under `public/chem1-study-buddy/`) |
 | Microbiology Hub | BIO 2125 (placeholder) | coming soon |
 
 ## Add a new class app

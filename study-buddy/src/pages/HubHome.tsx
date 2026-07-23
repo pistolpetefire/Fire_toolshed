@@ -56,7 +56,7 @@ export function HubHome() {
           </h1>
           <p className="mt-3 text-sm text-indigo-100 sm:text-base">
             Each course lives in its own folder with its own progress, flashcards, and quizzes. Open a class below —
-            Anatomy &amp; Physiology is ready now; more subjects can plug in the same way.
+            Anatomy &amp; Physiology and Chemistry I final prep are ready; more subjects can plug in the same way.
           </p>
         </div>
       </section>
@@ -197,18 +197,25 @@ export function HubHome() {
   );
 }
 
+function resolveExternalHref(rel: string): string {
+  // BASE_URL is e.g. / or /Fire_toolshed/study-buddy/
+  const base = import.meta.env.BASE_URL || '/';
+  const root = base.endsWith('/') ? base : `${base}/`;
+  return `${root}${rel.replace(/^\//, '')}`;
+}
+
 function ClassCard({ app }: { app: ClassAppListing }) {
   const live = app.status === 'live' || app.status === 'beta';
   const gradient = COLOR[app.color] ?? COLOR.indigo;
   const to = live ? app.path : `/coming-soon/${app.slug}`;
+  const external = live && app.externalHref ? resolveExternalHref(app.externalHref) : null;
 
-  return (
-    <Link
-      to={to}
-      className={`group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-indigo-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-indigo-700 ${
-        !live ? 'opacity-95' : ''
-      }`}
-    >
+  const className = `group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-indigo-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-indigo-700 ${
+    !live ? 'opacity-95' : ''
+  }`;
+
+  const inner = (
+    <>
       <div className={`bg-gradient-to-br ${gradient} p-4 text-white`}>
         <div className="flex items-start justify-between gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur">
@@ -238,6 +245,20 @@ function ClassCard({ app }: { app: ClassAppListing }) {
           )}
         </div>
       </div>
+    </>
+  );
+
+  if (external) {
+    return (
+      <a href={external} className={className}>
+        {inner}
+      </a>
+    );
+  }
+
+  return (
+    <Link to={to} className={className}>
+      {inner}
     </Link>
   );
 }

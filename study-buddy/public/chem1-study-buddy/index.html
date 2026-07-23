@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="OSU-OKC Chemistry I final study buddy — practice MCQs, math workshop, progress tracking." />
+  <title>Chemistry I Final Study Buddy · OSU-OKC</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-header">
+      <div>
+        <h1>Chemistry I Final Study Buddy</h1>
+        <p class="sub">OSU-OKC · CHEM 1214 / CHEM 1315 · <span id="app-version">v1.0.0</span></p>
+      </div>
+      <nav class="nav-links" aria-label="App navigation">
+        <button type="button" class="btn btn-ghost" data-go-home>Home</button>
+        <a class="btn btn-ghost" href="../">Study Buddy hub</a>
+      </nav>
+    </header>
+
+    <!-- HOME -->
+    <section id="view-home" class="card" aria-label="Home">
+      <aside class="disclaimer-box" role="note">
+        <strong>Academic integrity / educational use</strong>
+        <p>
+          This Study Buddy tool is for personal exam preparation only. It is not affiliated with or endorsed by OSU-OKC as an official assessment.
+          Questions are practice items, not the actual final exam. Always rely on your instructor, syllabus, and assigned materials as the authority for what will be tested.
+        </p>
+      </aside>
+
+      <span class="pill">Educational tool · v1</span>
+      <h2>Prep for your Chem I final</h2>
+      <p class="lead">
+        About <strong>110</strong> multiple-choice questions by topic or mixed practice final
+        (includes a modest electrochemistry / redox set),
+        plus a <strong>math workshop</strong> with worked solutions. Progress stays in this browser only.
+      </p>
+      <div id="home-stats"></div>
+
+      <div class="grid two" style="margin-top:1rem">
+        <button type="button" class="mode-card" id="btn-topics">
+          <strong>Topic practice</strong>
+          <span>Pick one topic group and drill its MCQs with instant feedback.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-final">
+          <strong>Practice final</strong>
+          <span>Random mixed draw from the full bank (set length below).</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-math">
+          <strong>Math workshop</strong>
+          <span>Worked quantitative problems — hints + revealable solutions.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-missed">
+          <strong>Review missed</strong>
+          <span>Retake questions you missed until you clear them.</span>
+        </button>
+      </div>
+
+      <div class="toolbar" style="margin-top:1rem">
+        <label class="field">
+          Practice final length
+          <input type="number" id="final-count" min="5" max="100" value="50" inputmode="numeric" />
+        </label>
+        <button type="button" class="btn" id="btn-settings">Settings / reset</button>
+      </div>
+    </section>
+
+    <!-- TOPICS -->
+    <section id="view-topics" class="card hidden" aria-label="Topics">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Choose a topic</h2>
+      <p class="lead">Only questions tagged with that topic appear. Immediate feedback + short explanation after each answer.</p>
+      <div id="topic-grid" class="grid topics"></div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="view-quiz" class="card hidden" aria-label="Quiz">
+      <div class="progress-bar" aria-hidden="true"><i id="quiz-progress-fill"></i></div>
+      <div id="quiz-meta" class="quiz-meta"></div>
+      <p id="quiz-stem" class="stem"></p>
+      <div id="quiz-choices" class="choices" role="group" aria-label="Answer choices"></div>
+      <div id="quiz-feedback" class="feedback hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+      <div id="quiz-toolbar" class="toolbar"></div>
+    </section>
+
+    <!-- MATH -->
+    <section id="view-math" class="hidden" aria-label="Math workshop">
+      <div class="card">
+        <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+        <h2 style="margin-top:0.75rem">Math / quantitative workshop</h2>
+        <p class="lead">
+          Free-response style (v1): work on paper, use hints if stuck, then reveal the solution.
+          Not auto-graded.
+        </p>
+      </div>
+      <div id="math-list"></div>
+    </section>
+
+    <!-- MISSED -->
+    <section id="view-missed" class="card hidden" aria-label="Missed questions">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Review missed</h2>
+      <p class="lead">Questions you got wrong stay here until you answer them correctly in a session.</p>
+      <div id="missed-list"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" class="card hidden" aria-label="Settings">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Settings</h2>
+      <p class="lead">
+        Data is stored only in this browser under
+        <code>study-buddy:chem1-study-buddy:progress-v1</code>. No login, no cloud.
+      </p>
+      <label class="toggle" style="margin:1rem 0;display:flex">
+        <input type="checkbox" id="explain-toggle" checked />
+        Default: show explanation after answering MCQs
+      </label>
+      <div class="toolbar">
+        <button type="button" class="btn btn-danger" id="btn-reset">Reset all progress</button>
+      </div>
+      <h3 style="margin-top:1.5rem;font-size:1rem">Edit content (no heavy rebuild)</h3>
+      <p class="lead">
+        MCQs: <code>js/questions.js</code> · Math: <code>js/math-problems.js</code> · Topics: <code>js/topics.js</code>.
+        Drop this whole folder into Study Buddy / static hosting.
+      </p>
+    </section>
+
+    <footer class="disclaimer">
+      <p><strong>Scope:</strong> OSU-OKC Chemistry I topics plus a modest electrochemistry/redox intro. Out of scope for v1: chemical equilibrium, kinetics, Nernst equation detail, user accounts, auto-graded free response, lockdown exam mode.</p>
+      <p>See <a href="./REQUIREMENTS.md">REQUIREMENTS.md</a> and <a href="./README.md">README.md</a>.</p>
+    </footer>
+  </div>
+
+  <script src="./js/topics.js"></script>
+  <script src="./js/questions.js"></script>
+  <script src="./js/math-problems.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

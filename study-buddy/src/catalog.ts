@@ -21,7 +21,13 @@ export interface ClassAppListing {
   subject: string;
   description: string;
   status: AppStatus;
+  /** In-hub React route path (used when externalHref is not set) */
   path: string;
+  /**
+   * Optional path under the Study Buddy site root for static (vanilla) apps
+   * served from `public/`, e.g. `osu-okc-chem1/`. Resolved with Vite BASE_URL.
+   */
+  externalHref?: string;
   color: string;
   version: string;
   tags: string[];
@@ -30,21 +36,22 @@ export interface ClassAppListing {
 /** Live + planned class apps shown on the Study Buddy home screen */
 export const CLASS_APPS: ClassAppListing[] = [
   occcBioAp,
-  // Placeholder slots — replace when you add real apps
   {
-    id: 'placeholder-chem',
-    slug: 'occc-chem-example',
-    title: 'Chemistry Lab Buddy',
-    shortTitle: 'Chem',
-    courseCodes: ['CHEM 1115'],
-    school: 'Oklahoma City Community College',
-    subject: 'General Chemistry',
-    description: 'Coming soon — reactions, stoichiometry, and lab safety drills.',
-    status: 'coming-soon',
-    path: '/classes/occc-chem-example',
+    id: 'chem1-study-buddy',
+    slug: 'chem1-study-buddy',
+    title: 'Chemistry I Final Study Buddy',
+    shortTitle: 'Chem I',
+    courseCodes: ['CHEM 1214', 'CHEM 1315'],
+    school: 'Oklahoma State University–OKC',
+    subject: 'General Chemistry I final prep',
+    description:
+      '~110 MCQs by topic (incl. modest redox/electrochem), math workshop, practice final, and missed review. Vanilla static folder — edit js/questions.js freely.',
+    status: 'live',
+    path: '/chem1-study-buddy/',
+    externalHref: 'chem1-study-buddy/',
     color: 'emerald',
-    version: '0.0.0',
-    tags: ['chemistry', 'lab'],
+    version: '1.0.0',
+    tags: ['chemistry', 'OSU-OKC', 'final', 'stoichiometry'],
   },
   {
     id: 'placeholder-micro',
