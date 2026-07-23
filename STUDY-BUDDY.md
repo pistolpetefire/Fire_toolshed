@@ -10,6 +10,7 @@ Both groups run as **live web apps** from one GitHub Pages deploy.
 | **Study Buddy hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/ |
 | **Anatomy Hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/classes/occc-bio-ap |
 | **Chem I Final Study Buddy** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/chem1-study-buddy/ |
+| **Calc I Final Study Buddy** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/calc1-study-buddy/ |
 | Example fire tool | https://pistolpetefire.github.io/Fire_toolshed/fire-pump-sizer/ |
 
 ## How it works

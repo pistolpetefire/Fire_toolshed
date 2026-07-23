@@ -54,6 +54,23 @@ export const CLASS_APPS: ClassAppListing[] = [
     tags: ['chemistry', 'OSU-OKC', 'final', 'stoichiometry'],
   },
   {
+    id: 'calc1-study-buddy',
+    slug: 'calc1-study-buddy',
+    title: 'Calculus I Final Study Buddy',
+    shortTitle: 'Calc I',
+    courseCodes: ['MATH 2144', 'Calc I'],
+    school: 'Oklahoma State University–OKC',
+    subject: 'Calculus I final prep (typical topics)',
+    description:
+      'Limits, derivatives, applications, integrals, u-sub — MCQs + worked free-response with full solutions. Built for HS students tackling college Calc I online.',
+    status: 'live',
+    path: '/calc1-study-buddy/',
+    externalHref: 'calc1-study-buddy/',
+    color: 'indigo',
+    version: '1.0.0',
+    tags: ['calculus', 'OSU-OKC', 'final', 'limits', 'derivatives', 'integrals'],
+  },
+  {
     id: 'placeholder-micro',
     slug: 'occc-micro-example',
     title: 'Microbiology Hub',

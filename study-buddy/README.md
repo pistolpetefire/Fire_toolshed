@@ -48,6 +48,7 @@ npm run test:cycles   # 5 automated verification cycles
 |-----|---------|------|
 | **Anatomy Hub** | BIO 1314, BIO 1414 (OCCC) | `/classes/occc-bio-ap` |
 | **Chemistry I Final Study Buddy** | CHEM 1214 / 1315 (OSU-OKC) | `/chem1-study-buddy/` (static vanilla under `public/chem1-study-buddy/`) |
+| **Calculus I Final Study Buddy** | Calc I / MATH 2144-style (OSU-OKC) | `/calc1-study-buddy/` (static vanilla under `public/calc1-study-buddy/`) |
 | Microbiology Hub | BIO 2125 (placeholder) | coming soon |
 
 ## Add a new class app

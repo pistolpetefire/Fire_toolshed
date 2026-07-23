@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="OSU-OKC Calculus I final study buddy — limits, derivatives, integrals, worked problems." />
+  <title>Calculus I Final Study Buddy · OSU-OKC</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-header">
+      <div>
+        <h1>Calculus I Final Study Buddy</h1>
+        <p class="sub">OSU-OKC · Online Calc I · Typical final topics · <span id="app-version">v1.0.0</span></p>
+      </div>
+      <nav class="nav-links" aria-label="App navigation">
+        <button type="button" class="btn btn-ghost" data-go-home>Home</button>
+        <a class="btn btn-ghost" href="../">Study Buddy hub</a>
+      </nav>
+    </header>
+
+    <section id="view-home" class="card" aria-label="Home">
+      <aside class="disclaimer-box" role="note">
+        <strong>Academic integrity / educational use</strong>
+        <p>
+          This Study Buddy tool is for personal exam preparation only. It is not affiliated with or endorsed by OSU-OKC as an official assessment.
+          Questions are practice items modeled on <em>typical</em> college Calculus I finals — not your actual final exam. Always rely on your instructor,
+          course modules, and assigned materials as the authority for what will be tested.
+        </p>
+      </aside>
+
+      <span class="pill">High school → college Calc I</span>
+      <h2>Prep for a typical Calculus I final</h2>
+      <p class="lead">
+        Built for a motivated high school student taking <strong>online Calc I at OSU-OKC</strong> (no syllabus assumed).
+        Focus: the topics that show up most often on standard US Calculus I finals —
+        <strong>limits, derivatives, applications, integrals, and u-substitution</strong>,
+        with clear steps and lots of variations.
+      </p>
+      <div id="home-stats"></div>
+
+      <div class="grid two" style="margin-top:1rem">
+        <button type="button" class="mode-card" id="btn-topics">
+          <strong>1 · Topic practice (MCQ)</strong>
+          <span>Pick one topic. Multiple choice for concepts and “which rule?” skills, with explanations.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-final">
+          <strong>2 · Practice final</strong>
+          <span>Random mixed MCQs from the full bank — like a timed run-through without the timer pressure.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-math">
+          <strong>3 · Worked problem workshop</strong>
+          <span>Exam-style free-response. Hints first, then full solutions step-by-step.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-missed">
+          <strong>4 · Review missed</strong>
+          <span>Retake MCQs you missed until they clear. Great the week of the final.</span>
+        </button>
+      </div>
+
+      <div class="card plan-card" style="margin-top:1rem;background:var(--bg);box-shadow:none">
+        <div class="plan-header">
+          <div>
+            <h2 style="font-size:1.05rem;margin:0 0 0.25rem">7-day final plan</h2>
+            <p class="lead" style="margin:0">
+              Test is next week — max <strong>7 days</strong>. Edit any day to match your schedule. Saved on this device only.
+            </p>
+          </div>
+        </div>
+        <label class="field plan-exam-label">
+          Exam day note (optional)
+          <input type="text" id="plan-exam-note" maxlength="80" placeholder="e.g. Final Tuesday 10am online" autocomplete="off" />
+        </label>
+        <div id="week-plan" class="week-plan" aria-label="Editable 7-day study plan"></div>
+        <div class="toolbar plan-actions">
+          <button type="button" class="btn btn-primary" id="btn-plan-save">Save plan</button>
+          <button type="button" class="btn" id="btn-plan-export">Export plan JSON</button>
+          <button type="button" class="btn" id="btn-plan-reset">Restore default 7-day plan</button>
+          <span id="plan-save-status" class="sub" style="font-size:0.8rem" aria-live="polite"></span>
+        </div>
+        <p class="sub plan-hint">Tip: click <strong>Today</strong> on a day to highlight it. Edits show <em>Unsaved</em> until you save (or blur-save).</p>
+      </div>
+
+      <div class="toolbar" style="margin-top:1rem">
+        <label class="field">
+          Practice final length
+          <input type="number" id="final-count" min="5" max="120" value="40" inputmode="numeric" />
+        </label>
+        <button type="button" class="btn" id="btn-settings">Settings / reset</button>
+      </div>
+    </section>
+
+    <section id="view-topics" class="card hidden" aria-label="Topics">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Choose a topic</h2>
+      <p class="lead">MCQs with instant feedback. Use these for concepts, rule recognition, and common final “traps.”</p>
+      <div id="topic-grid" class="grid topics"></div>
+    </section>
+
+    <section id="view-quiz" class="card hidden" aria-label="Quiz">
+      <div class="progress-bar" aria-hidden="true"><i id="quiz-progress-fill"></i></div>
+      <div id="quiz-meta" class="quiz-meta"></div>
+      <p id="quiz-stem" class="stem"></p>
+      <div id="quiz-choices" class="choices" role="group" aria-label="Answer choices"></div>
+      <div id="quiz-feedback" class="feedback hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+      <div id="quiz-toolbar" class="toolbar"></div>
+    </section>
+
+    <section id="view-math" class="hidden" aria-label="Worked problems">
+      <div class="card">
+        <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+        <h2 style="margin-top:0.75rem">Worked problem workshop</h2>
+        <p class="lead">
+          These look like exam free-response. <strong>Write your work on paper first.</strong>
+          Use hints if stuck, then open the complete explanation to check every step.
+        </p>
+      </div>
+      <div id="math-list"></div>
+    </section>
+
+    <section id="view-missed" class="card hidden" aria-label="Missed questions">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Review missed</h2>
+      <p class="lead">Missed MCQs stay here until you get them right in a practice session.</p>
+      <div id="missed-list"></div>
+    </section>
+
+    <section id="view-settings" class="card hidden" aria-label="Settings">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Settings</h2>
+      <p class="lead">
+        Progress stays in this browser only:
+        <code>study-buddy:calc1-study-buddy:progress-v1</code>. No login.
+      </p>
+      <label class="toggle" style="margin:1rem 0;display:flex">
+        <input type="checkbox" id="explain-toggle" checked />
+        Default: show explanation after answering MCQs
+      </label>
+      <div class="toolbar">
+        <button type="button" class="btn btn-danger" id="btn-reset">Reset all progress</button>
+      </div>
+      <h3 style="margin-top:1.5rem;font-size:1rem">Edit content</h3>
+      <p class="lead">
+        MCQs: <code>js/questions.js</code> · Worked problems: <code>js/math-problems.js</code> · Topics: <code>js/topics.js</code>.
+      </p>
+    </section>
+
+    <footer class="disclaimer">
+      <p><strong>Typical Calc I final topics covered:</strong> limits &amp; continuity; derivative definition &amp; rules; applications (related rates, optimization, sketching); antiderivatives &amp; FTC; u-substitution; intro area/volume.</p>
+      <p><strong>Usually later courses (not emphasized here):</strong> series, multivariable, advanced techniques beyond basic sub, rigorous epsilon-delta proofs.</p>
+      <p>See <a href="./README.md">README.md</a> for how to edit questions and deploy.</p>
+    </footer>
+  </div>
+
+  <script src="./js/topics.js"></script>
+  <script src="./js/questions.js"></script>
+  <script src="./js/math-problems.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

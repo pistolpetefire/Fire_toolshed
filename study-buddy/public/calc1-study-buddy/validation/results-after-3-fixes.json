@@ -1,0 +1,274 @@
+{
+  "label": "after-3-fixes",
+  "when": "2026-07-23T21:46:35.841Z",
+  "max": 10,
+  "passed": 44,
+  "failed": 0,
+  "total": 44,
+  "results": [
+    {
+      "cycle": 1,
+      "name": "File index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File css/style.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/app.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/topics.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/questions.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/math-problems.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File README.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "Asset paths",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "Disclaimer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "MCQ count ≥ 80",
+      "ok": true,
+      "detail": "98"
+    },
+    {
+      "cycle": 2,
+      "name": "All MCQs valid",
+      "ok": true,
+      "detail": "98"
+    },
+    {
+      "cycle": 2,
+      "name": "Topic count",
+      "ok": true,
+      "detail": "8"
+    },
+    {
+      "cycle": 3,
+      "name": "Math count ≥ 20",
+      "ok": true,
+      "detail": "29"
+    },
+    {
+      "cycle": 3,
+      "name": "All math have solutions",
+      "ok": true,
+      "detail": "29"
+    },
+    {
+      "cycle": 4,
+      "name": "Topic practice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Practice final",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Math workshop",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Review missed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Reset quiz",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Namespaced storage",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Shuffle final",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "escapeHtml",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Plan UI on home",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Default plan data",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Exactly 7 default days",
+      "ok": true,
+      "detail": "7"
+    },
+    {
+      "cycle": 5,
+      "name": "normalizePlan clamps to 7",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Save/reset plan buttons",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Exam note in plan state",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 6,
+      "name": "aria-live feedback",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 6,
+      "name": "Keyboard MCQ support",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 6,
+      "name": "Touch targets",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 7,
+      "name": "Catalog entry",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 7,
+      "name": "Sibling chem app still present or N/A",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 8,
+      "name": "Topic limits",
+      "ok": true,
+      "detail": "14 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic derivative-rules",
+      "ok": true,
+      "detail": "16 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic integrals",
+      "ok": true,
+      "detail": "14 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic substitution",
+      "ok": true,
+      "detail": "10 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic applications",
+      "ok": true,
+      "detail": "14 MCQs"
+    },
+    {
+      "cycle": 9,
+      "name": "Plan dirty/unsaved UX",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 9,
+      "name": "Export plan JSON",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 9,
+      "name": "Highlight today / active day",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 10,
+      "name": "Quiz reset keeps plan",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 10,
+      "name": "Plan reset confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 10,
+      "name": "Plan forced to 7 days",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}
