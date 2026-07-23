@@ -1,9 +1,10 @@
-# Deploy Fire Toolshed + Study Buddy together on GitHub Pages
+# Deploy Fire Toolshed + Study Buddy + RSET Tool on GitHub Pages
 #
 # Live URLs (repo: pistolpetefire/Fire_toolshed):
 #   Fire tools portal:  https://pistolpetefire.github.io/Fire_toolshed/
 #   Study Buddy hub:    https://pistolpetefire.github.io/Fire_toolshed/study-buddy/
 #   Anatomy app:        https://pistolpetefire.github.io/Fire_toolshed/study-buddy/classes/occc-bio-ap
+#   RSET Tool:          https://pistolpetefire.github.io/Fire_toolshed/rset-tool/
 #
 # One-time: Settings → Pages → Source: GitHub Actions
 
@@ -35,7 +36,9 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: study-buddy/package-lock.json
+          cache-dependency-path: |
+            study-buddy/package-lock.json
+            rset-tool/package-lock.json
 
       - name: Install Study Buddy dependencies
         working-directory: study-buddy
@@ -51,18 +54,27 @@ jobs:
       - name: SPA fallback for Study Buddy deep links
         run: cp study-buddy/dist/index.html study-buddy/dist/404.html
 
-      - name: Assemble combined site (fire tools + Study Buddy)
+      - name: Install RSET Tool dependencies
+        working-directory: rset-tool
+        run: npm ci
+
+      - name: Build RSET Tool (relative base for Pages subpath)
+        working-directory: rset-tool
+        run: npm run build
+
+      - name: Assemble combined site (fire tools + Study Buddy + RSET)
         run: |
           set -euo pipefail
           rm -rf site
           mkdir -p site
 
-          # Copy fire-tool static apps + portal (exclude Study Buddy source & build noise)
+          # Copy fire-tool static apps + portal (exclude React app sources & build noise)
           rsync -a \
             --exclude='.git/' \
             --exclude='.github/' \
             --exclude='node_modules/' \
             --exclude='study-buddy/' \
+            --exclude='rset-tool/' \
             --exclude='validation/' \
             --exclude='dist/' \
             --exclude='scripts/' \
@@ -84,10 +96,16 @@ jobs:
           mkdir -p site/study-buddy
           cp -a study-buddy/dist/. site/study-buddy/
 
+          # Mount built RSET Tool at /rset-tool/ (vite base: './')
+          mkdir -p site/rset-tool
+          cp -a rset-tool/dist/. site/rset-tool/
+
           echo "Site tree (top level):"
           ls -la site
           echo "Study Buddy:"
           ls -la site/study-buddy | head
+          echo "RSET Tool:"
+          ls -la site/rset-tool | head
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

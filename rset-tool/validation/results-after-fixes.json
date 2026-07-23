@@ -1,0 +1,729 @@
+{
+  "label": "after-fixes",
+  "when": "2026-07-23T16:31:52.179Z",
+  "passed": 120,
+  "failed": 0,
+  "total": 120,
+  "results": [
+    {
+      "cycle": 1,
+      "name": "TypeScript check",
+      "ok": true,
+      "detail": "no errors"
+    },
+    {
+      "cycle": 1,
+      "name": "Vite production build",
+      "ok": true,
+      "detail": "dist/ produced"
+    },
+    {
+      "cycle": 2,
+      "name": "File: package.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: src/App.tsx",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: src/main.tsx",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: src/types.ts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: src/lib/calculateRset.ts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: src/data/detection.ts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: src/data/notification.ts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: src/data/preMovement.ts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: src/data/movement.ts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: guide/detection.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: guide/notification.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: guide/pre-movement.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: guide/movement.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: guide/methodologies.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: public/version.json",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: HANDOFF.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "File: README.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Type present: SuggestiveValue",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Type present: RsetSegment",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Type present: AssumptionsEntry",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Type present: RsetSession",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Type present: RsetComponent",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Four RSET segments initialized",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Export gated on guide ack + confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "calculateRset is pure sum",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Default sum = 255 s",
+      "ok": true,
+      "detail": "255"
+    },
+    {
+      "cycle": 3,
+      "name": "Zero segments sum to 0",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Missing value treated as 0",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "formatTime(125)",
+      "ok": true,
+      "detail": "2 min 5 s"
+    },
+    {
+      "cycle": 3,
+      "name": "formatTime(60)",
+      "ok": true,
+      "detail": "1 min"
+    },
+    {
+      "cycle": 3,
+      "name": "formatTime negative margin",
+      "ok": true,
+      "detail": "-1 min 5 s"
+    },
+    {
+      "cycle": 3,
+      "name": "Source formatTime handles sign",
+      "ok": true,
+      "detail": "Math.abs + sign"
+    },
+    {
+      "cycle": 3,
+      "name": "clampSeconds helper exported",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts has suggestive values",
+      "ok": true,
+      "detail": "8 ids"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts field id:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts field component:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts field label:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts field value:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts field units:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts field scenario:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts field shortJustification:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts field primaryCitation:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts field guideSectionId:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts field warning:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts field versionIntroduced:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/detection.ts units are seconds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts has suggestive values",
+      "ok": true,
+      "detail": "4 ids"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts field id:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts field component:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts field label:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts field value:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts field units:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts field scenario:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts field shortJustification:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts field primaryCitation:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts field guideSectionId:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts field warning:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts field versionIntroduced:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/notification.ts units are seconds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts has suggestive values",
+      "ok": true,
+      "detail": "5 ids"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts field id:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts field component:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts field label:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts field value:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts field units:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts field scenario:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts field shortJustification:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts field primaryCitation:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts field guideSectionId:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts field warning:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts field versionIntroduced:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/preMovement.ts units are seconds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts has suggestive values",
+      "ok": true,
+      "detail": "4 ids"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts field id:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts field component:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts field label:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts field value:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts field units:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts field scenario:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts field shortJustification:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts field primaryCitation:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts field guideSectionId:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts field warning:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts field versionIntroduced:",
+      "ok": true,
+      "detail": "present in file"
+    },
+    {
+      "cycle": 4,
+      "name": "src/data/movement.ts units are seconds",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "All suggestive ids unique",
+      "ok": true,
+      "detail": "21 ids"
+    },
+    {
+      "cycle": 5,
+      "name": "Export stamps tool version",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Session includes log + tenability + project",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Valid 4-segment session accepted",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Reject short session",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Reject missing components",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Loaded session RSET sum",
+      "ok": true,
+      "detail": "255"
+    },
+    {
+      "cycle": 5,
+      "name": "Export log chronological order",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Load restores selectedValues from suggestiveId",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 6,
+      "name": "Segment edit does not log every keystroke",
+      "ok": true,
+      "detail": "blur/commitDraft pattern"
+    },
+    {
+      "cycle": 6,
+      "name": "Segment values clamped non-negative",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 6,
+      "name": "Clear log requires confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 7,
+      "name": "Print summary escapes HTML",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 7,
+      "name": "escapeHtml neutralizes tags",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 7,
+      "name": "Print opens summary window",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 7,
+      "name": "Print includes disclaimer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 8,
+      "name": "Opening guide marks acknowledged",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 8,
+      "name": "Export/Print buttons disabled until canExport",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 8,
+      "name": "exportSession/printSummary hard-guard canExport",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 8,
+      "name": "Stub: Timeline.tsx",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 8,
+      "name": "Stub: SegmentEditor.tsx",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 8,
+      "name": "Stub: AssumptionsLog.tsx",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 8,
+      "name": "Stub: GuidePanel.tsx",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 9,
+      "name": "package.json matches version.json",
+      "ok": true,
+      "detail": "0.1.5"
+    },
+    {
+      "cycle": 9,
+      "name": "UI shows tool version",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 9,
+      "name": "Portal links to rset-tool",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 9,
+      "name": "CI builds rset-tool for Pages",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 9,
+      "name": "Vite relative base for Pages",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 10,
+      "name": "Warehouse scenario sum 630 s",
+      "ok": true,
+      "detail": "10 min 30 s"
+    },
+    {
+      "cycle": 10,
+      "name": "Negative margin detected for tight tenability",
+      "ok": true,
+      "detail": "-30"
+    },
+    {
+      "cycle": 10,
+      "name": "Office scenario sum 225 s",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 10,
+      "name": "Preview HTTP 200",
+      "ok": true,
+      "detail": "http://127.0.0.1:5174/"
+    },
+    {
+      "cycle": 10,
+      "name": "Preview serves version.json",
+      "ok": true,
+      "detail": "0.1.5"
+    }
+  ]
+}
