@@ -1,10 +1,14 @@
 # Transparent RSET Tool – Handoff for Grok Build
 
-**Version:** 0.1.5  
+**Version:** 0.1.7  
 **Date:** 2026-07-23  
 **Purpose:** Educational + engineering-judgment support tool for transparent Required Safe Egress Time (RSET) calculation.
 
-**v0.1.5 polish (Grok Build):** blur-commit segment edits (assumptions log no longer spams per keystroke); non-negative value clamp; `formatTime` signs for negative margins; HTML-escaped print summary; session load restores suggestive selection + warnings; export/print hard-guard on `canExport`. Validation: `node validation/test-cycles-10.mjs`.
+**v0.1.7:** Full Guide UX — lock background scroll while open; focus close button on open and restore previous focus on close; ←/→ (and ↑/↓) keys move walkthrough steps.
+
+**v0.1.6:** Full Guide button at top of app — plain-language walkthrough of every control plus complete technical markdown guides in-app. “Mark guides reviewed” from the tour counts toward export gate.
+
+**v0.1.5 polish:** blur-commit segment edits; non-negative clamp; signed `formatTime`; HTML-escaped print; session load restores suggestive selection; export/print hard-guard. Validation: `node validation/test-cycles-10.mjs`.
 
 ---
 

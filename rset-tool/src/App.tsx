@@ -5,6 +5,7 @@ import { preMovementValues } from './data/preMovement'
 import { movementValues } from './data/movement'
 import { calculateRset, formatTime, clampSeconds } from './lib/calculateRset'
 import { RsetSegment, SuggestiveValue, RsetComponent, AssumptionsEntry, RsetSession } from './types'
+import FullGuidePanel from './components/FullGuidePanel'
 
 /** Escape user/session text before embedding in the print-summary HTML document. */
 function escapeHtml(raw: string): string {
@@ -59,6 +60,7 @@ export default function App() {
   const [loadError, setLoadError] = useState<string | null>(null)
   /** In-progress number-field drafts — committed on blur/Enter so the log is not spammed per keystroke. */
   const [drafts, setDrafts] = useState<Partial<Record<RsetComponent, string>>>({})
+  const [showFullGuide, setShowFullGuide] = useState(false)
 
   const rset = calculateRset(segments)
   const margin = tenability !== undefined ? tenability - rset : null
@@ -85,6 +87,10 @@ export default function App() {
     setActiveComponent(component)
     setShowGuide(true)
     setAcknowledged(prev => new Set(prev).add(component))
+  }
+
+  function markAllGuidesReviewed() {
+    setAcknowledged(new Set(ALL_COMPONENTS))
   }
 
   function loadSession(file: File) {
@@ -192,7 +198,7 @@ export default function App() {
     if (!canExport) return
 
     const session: RsetSession = {
-      version: '0.1.5',
+      version: '0.1.7',
       created: log.length > 0 ? log[log.length - 1].timestamp : nowISO(),
       updated: nowISO(),
       segments,
@@ -263,7 +269,7 @@ export default function App() {
   <h1>Transparent RSET Calculation Summary</h1>
   <div class="meta">
     Project: <strong>${safeProject}</strong><br/>
-    Tool version: 0.1.5<br/>
+    Tool version: 0.1.7<br/>
     Generated: ${escapeHtml(new Date().toLocaleString())}
   </div>
 
@@ -308,7 +314,7 @@ export default function App() {
   </table>
 
   <div class="footer">
-    Transparent RSET Tool v0.1.5 · Educational / Engineering Judgment Support Only<br/>
+    Transparent RSET Tool v0.1.7 · Educational / Engineering Judgment Support Only<br/>
     Methodology: simple component sum (Detection + Notification + Pre-movement + Movement).<br/>
     Full teaching guides are maintained in the tool repository (guide/ directory).<br/>
     Primary references include SFPE Handbook of Fire Protection Engineering (5th Ed.), ISO/TR 16738, PD 7974-6 and related research.
@@ -340,14 +346,20 @@ export default function App() {
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 16px' }}>
+      <FullGuidePanel
+        open={showFullGuide}
+        onClose={() => setShowFullGuide(false)}
+        onMarkAllGuidesReviewed={markAllGuidesReviewed}
+      />
+
       {/* Header */}
-      <header style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
+      <header style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 4 }}>
             Transparent RSET Tool
           </h1>
           <p style={{ color: 'var(--muted)', fontSize: 14 }}>
-            Version 0.1.5 · Educational / Engineering Judgment Support Only
+            Version 0.1.7 · Educational / Engineering Judgment Support Only
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -425,6 +437,50 @@ export default function App() {
         </div>
       </header>
 
+      {/* Full guide CTA — top of app */}
+      <div
+        style={{
+          marginBottom: 20,
+          padding: '14px 16px',
+          borderRadius: 12,
+          border: '1px solid #3b82f6',
+          background: 'linear-gradient(135deg, #172554 0%, #1a2332 55%, #0f1419 100%)',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 12,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 220 }}>
+          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>
+            New here? Open the Full Guide first
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.45 }}>
+            Plain-language walkthrough of every button and box — then the complete technical guides for Detection,
+            Notification, Pre-movement, Movement, and methodologies.
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowFullGuide(true)}
+          style={{
+            background: 'var(--accent)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '12px 18px',
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            boxShadow: '0 4px 14px rgba(59, 130, 246, 0.35)',
+          }}
+        >
+          Full Guide — start here
+        </button>
+      </div>
+
       {loadError && (
         <div style={{
           background: '#450a0a',
@@ -465,6 +521,26 @@ export default function App() {
         <h2 style={{ fontSize: 14, marginBottom: 10, color: 'var(--muted)' }}>
           Guide Review Required Before Export
         </h2>
+        <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 10, lineHeight: 1.45 }}>
+          Open each short guide below, or use the{' '}
+          <button
+            type="button"
+            onClick={() => setShowFullGuide(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--accent)',
+              fontWeight: 600,
+              cursor: 'pointer',
+              padding: 0,
+              fontSize: 12,
+              textDecoration: 'underline',
+            }}
+          >
+            Full Guide
+          </button>
+          {' '}(recommended) which walks through every input and includes the complete technical chapters.
+        </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
           {ALL_COMPONENTS.map(c => {
             const done = acknowledged.has(c)
@@ -898,7 +974,24 @@ export default function App() {
               </>
             )}
             <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 16 }}>
-              Full guide text is maintained in the <code>guide/</code> directory. Primary sources include the SFPE Handbook of Fire Protection Engineering (5th Ed.), ISO/TR 16738, PD 7974-6 and the cited research literature.
+              For the complete chapters and a plain-language tour of every control, open the{' '}
+              <button
+                type="button"
+                onClick={() => setShowFullGuide(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--accent)',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  padding: 0,
+                  fontSize: 13,
+                  textDecoration: 'underline',
+                }}
+              >
+                Full Guide
+              </button>
+              . Primary sources include the SFPE Handbook of Fire Protection Engineering (5th Ed.), ISO/TR 16738, PD 7974-6 and the cited research literature.
             </p>
           </div>
         </section>
@@ -911,7 +1004,7 @@ export default function App() {
         fontSize: 12,
         color: 'var(--muted)'
       }}>
-        Transparent RSET Tool v0.1.5 · Guide acknowledgement required before export · Session load supported · 
+        Transparent RSET Tool v0.1.7 · Full in-app guide · Guide acknowledgement required before export · Session load supported ·
         Assumptions Log + JSON + Print summary active.
       </footer>
     </div>

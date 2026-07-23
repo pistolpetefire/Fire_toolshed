@@ -1,5 +1,5 @@
 {
-  "version": "0.1.5",
+  "version": "0.1.7",
   "name": "Transparent RSET Tool",
   "description": "Educational RSET calculator with mandatory teaching layer",
   "lockedComponents": [
@@ -8,6 +8,6 @@
     "Pre-movement Time (Perception / Interpretation / Action)",
     "Movement Time"
   ],
-  "status": "log-commit-safety-session-restore",
-  "notes": "v0.1.5: blur-commit segment edits (no log spam), non-negative clamp, negative margin formatTime, HTML-escaped print summary, session load restores suggestive selection, export/print hard-guard."
+  "status": "full-guide-a11y",
+  "notes": "v0.1.7: Full Guide locks body scroll, focuses close on open and restores focus on close, arrow keys navigate walkthrough. v0.1.6: plain-language full guide + technical chapters."
 }

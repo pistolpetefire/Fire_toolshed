@@ -346,8 +346,8 @@ else fail(7, 'Print opens summary window');
 if (app.includes('Disclaimer') && app.includes('educational')) pass(7, 'Print includes disclaimer');
 else fail(7, 'Print includes disclaimer');
 
-// ——— Cycle 8: Guide gate & components ———
-console.log(`\n═══ CYCLE 8: Guide gate & UI components ═══`);
+// ——— Cycle 8: Guide gate, Full Guide, components ———
+console.log(`\n═══ CYCLE 8: Guide gate, Full Guide & UI ═══`);
 if (app.includes('openGuide') && app.includes('setAcknowledged')) pass(8, 'Opening guide marks acknowledged');
 else fail(8, 'Opening guide marks acknowledged');
 
@@ -361,11 +361,65 @@ const printGuarded = /function printSummary\(\)\s*\{\s*if\s*\(\s*!canExport\s*\)
 if (exportGuarded && printGuarded) pass(8, 'exportSession/printSummary hard-guard canExport');
 else fail(8, 'exportSession/printSummary hard-guard canExport', `export=${exportGuarded} print=${printGuarded}`);
 
-// Component stubs exist
-for (const c of ['Timeline.tsx', 'SegmentEditor.tsx', 'AssumptionsLog.tsx', 'GuidePanel.tsx']) {
-  if (fileExists(`src/components/${c}`)) pass(8, `Stub: ${c}`);
-  else fail(8, `Stub: ${c}`);
+// Component stubs + Full Guide
+for (const c of ['Timeline.tsx', 'SegmentEditor.tsx', 'AssumptionsLog.tsx', 'GuidePanel.tsx', 'FullGuidePanel.tsx']) {
+  if (fileExists(`src/components/${c}`)) pass(8, `Component: ${c}`);
+  else fail(8, `Component: ${c}`);
 }
+
+if (app.includes('FullGuidePanel') && app.includes('Full Guide — start here')) {
+  pass(8, 'Top Full Guide CTA wired');
+} else fail(8, 'Top Full Guide CTA wired');
+
+if (app.includes('markAllGuidesReviewed')) pass(8, 'markAllGuidesReviewed for tour completion');
+else fail(8, 'markAllGuidesReviewed for tour completion');
+
+// Walkthrough content quality
+const walk = fileExists('src/content/walkthrough.ts') ? read('src/content/walkthrough.ts') : '';
+const requiredStepIds = [
+  'project-name', 'load-session', 'export-print', 'guide-gate', 'timeline',
+  'segment-boxes', 'suggestive', 'assumptions-log', 'tenability-input', 'how-to-use',
+];
+if (walk) {
+  let stepOk = 0;
+  for (const id of requiredStepIds) {
+    if (walk.includes(`id: '${id}'`) || walk.includes(`id: "${id}"`)) stepOk++;
+    else fail(8, `Walkthrough step: ${id}`);
+  }
+  if (stepOk === requiredStepIds.length) pass(8, 'Walkthrough covers core controls', `${stepOk} steps`);
+} else {
+  fail(8, 'Walkthrough covers core controls', 'walkthrough.ts missing');
+}
+
+// Technical guides bundled under src/guide
+const guideFiles = [
+  'src/guide/methodologies.md',
+  'src/guide/detection.md',
+  'src/guide/notification.md',
+  'src/guide/pre-movement.md',
+  'src/guide/movement.md',
+];
+for (const g of guideFiles) {
+  if (fileExists(g) && read(g).length > 200) pass(8, `Bundled guide: ${g}`);
+  else fail(8, `Bundled guide: ${g}`);
+}
+
+// Full Guide UX quality gates (fail until implemented)
+const fullGuide = fileExists('src/components/FullGuidePanel.tsx') ? read('src/components/FullGuidePanel.tsx') : '';
+if (fullGuide.includes('document.body.style.overflow') || fullGuide.includes('overflow = \'hidden\'') || fullGuide.includes('overflow = "hidden"')) {
+  pass(8, 'Full Guide locks background scroll');
+} else fail(8, 'Full Guide locks background scroll', 'page scrolls under modal');
+
+if (
+  fullGuide.includes('focus()') &&
+  (fullGuide.includes('previousFocus') || fullGuide.includes('prevFocus') || fullGuide.includes('returnFocus') || fullGuide.includes('activeElement'))
+) {
+  pass(8, 'Full Guide focus open/restore');
+} else fail(8, 'Full Guide focus open/restore', 'no focus management');
+
+if (fullGuide.includes('ArrowLeft') && fullGuide.includes('ArrowRight')) {
+  pass(8, 'Full Guide arrow-key walkthrough nav');
+} else fail(8, 'Full Guide arrow-key walkthrough nav', 'no ArrowLeft/ArrowRight handlers');
 
 // ——— Cycle 9: Version consistency & portal wiring ———
 console.log(`\n═══ CYCLE 9: Version + portal integration ═══`);
