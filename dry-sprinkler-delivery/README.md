@@ -3,7 +3,8 @@
 Preliminary web tool for fire protection engineers: model a dry-pipe or double-interlock preaction network, compute volume and Hazen–Williams steady-state demand, estimate water delivery time (trip + transit), and check NFPA 13 / FM Global limits.
 
 **Open:** [index.html](./index.html) (or via the Engineering Tools portal card).  
-**PWA:** installable; service worker caches shell for offline use after first load.
+**User guide:** in-app **User Guide** button (top bar) · full markdown [USER-GUIDE.md](./USER-GUIDE.md)  
+**PWA:** installable; service worker caches for offline use after first load.
 
 ## Explicit limitation
 

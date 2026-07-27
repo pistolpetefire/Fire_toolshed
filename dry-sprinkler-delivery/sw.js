@@ -1,14 +1,12 @@
 /* Dry Sprinkler Water Delivery — offline cache (network-first for shell) */
-const CACHE = "dry-sprinkler-delivery-v1.1";
+const CACHE = "dry-sprinkler-delivery-v1.2.1";
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./assets/styles.css?v=1.1.0",
-  "./assets/app.js?v=1.1.0",
+  "./assets/styles.css?v=1.2.1",
+  "./assets/app.js?v=1.2.1",
   "./icons/icon.svg",
-  "../shared/water-path-shell.css",
-  "../shared/water-path-shell.js",
   "../shared/report-logo.js",
 ];
 

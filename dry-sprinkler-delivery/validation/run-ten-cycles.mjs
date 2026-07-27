@@ -66,6 +66,12 @@ function loadAPI() {
     Blob: function () {},
     confirm: () => true,
     navigator: {},
+    setTimeout: (fn) => {
+      try {
+        fn();
+      } catch (_) { /* ignore */ }
+    },
+    clearTimeout: () => {},
   };
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
@@ -436,6 +442,30 @@ function runCycle(API, cycle) {
     pass("remote:maxPath", `best=${rMR.bestRemote} V=${rMR.volToRemoteGal}`);
   } else {
     fail("remote:maxPath", `best=${rMR.bestRemote} Vrem=${rMR.volToRemoteGal} Vtot=${rMR.totalVolGal}`);
+  }
+
+  // 10a) First-use simplicity probes
+  if (typeof API.loadExample === "function") {
+    API.loadExample({ silent: true, keepGettingStarted: true });
+    const rEx = API.calculate();
+    if (rEx.pathFound && rEx.compliance && rEx.compliance.eligible !== false) {
+      pass("firstuse:sample", `delivery=${rEx.deliverySec}s band=${rEx.compliance.overallBand}`);
+    } else {
+      fail("firstuse:sample", "sample must path-find and be delivery-eligible");
+    }
+    if (API.getState().systemType === "dry") pass("firstuse:dry", "sample is dry");
+    else fail("firstuse:dry", API.getState().systemType);
+  } else {
+    fail("firstuse:sample", "loadExample missing");
+  }
+  // Advanced defaults: transit method volume_flow, no forced overrides
+  {
+    const st = API.getState();
+    if (st.transitMethod === "volume_flow" && (st.tripTimeOverrideSec == null || st.tripTimeOverrideSec === "")) {
+      pass("firstuse:simpleDefaults", "volume/flow + auto trip");
+    } else {
+      fail("firstuse:simpleDefaults", `transit=${st.transitMethod} tripOv=${st.tripTimeOverrideSec}`);
+    }
   }
 
   // 10) Multi-page PDF fixture import + HW batch from printout pages

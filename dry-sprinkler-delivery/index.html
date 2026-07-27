@@ -12,12 +12,9 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icons/icon.svg">
-  <link rel="stylesheet" href="../shared/water-path-shell.css">
-  <link rel="stylesheet" href="./assets/styles.css?v=1.2.0">
+  <link rel="stylesheet" href="./assets/styles.css?v=1.3.0">
 </head>
 <body>
-  <div id="waterPathShell" class="no-print"></div>
-
   <div class="disclaimer-banner" role="alert">
     <strong>Preliminary design estimates only.</strong>
     This tool is <strong>not</strong> a listed calculation method under NFPA 13.
@@ -26,15 +23,18 @@
 
   <div class="shell screen-only">
     <header class="top">
-      <div>
-        <p class="eyebrow">Fire Toolshed</p>
-        <h1>Dry Sprinkler Water Delivery</h1>
-        <p class="version" id="appVersion">Version 1.2.0-prelim</p>
+      <div class="brand-block">
+        <a href="../" class="btn-portal" id="btnPortal" title="Return to Engineering Tools portal">← Portal</a>
+        <div>
+          <p class="eyebrow">Fire Toolshed</p>
+          <h1>Dry Sprinkler Water Delivery</h1>
+          <p class="version" id="appVersion">Version 1.3.0-prelim</p>
+        </div>
       </div>
       <div class="top-actions no-print">
+        <button type="button" id="btnUserGuide" class="primary" title="Open full user guide">User Guide</button>
         <button type="button" id="btnTheme" class="ghost" title="Toggle dark / light mode">Dark</button>
         <button type="button" id="btnMethodology" class="ghost" title="Show methodology panel">Methodology</button>
-        <button type="button" id="btnHelp" class="ghost" title="Calculation basis and help">Help</button>
         <button type="button" id="btnExample" title="Load example warehouse network">Example</button>
         <button type="button" id="btnImportFixture" title="Import multi-page PDF calc fixture (JSON)">Import PDF Fixture</button>
         <input id="fixtureFile" type="file" accept="application/json,.json" class="hidden" aria-hidden="true">
@@ -46,6 +46,27 @@
         <button type="button" id="btnReset" class="ghost">Reset</button>
       </div>
     </header>
+
+    <!-- First-use success path -->
+    <section id="gettingStarted" class="getting-started no-print" aria-label="Getting started">
+      <div class="gs-main">
+        <div>
+          <p class="gs-eyebrow">First-time path · ~30 seconds</p>
+          <h2 class="gs-title">Get a good result on the first try</h2>
+          <ol class="gs-steps">
+            <li><strong>Load the sample</strong> dry-pipe project (recommended).</li>
+            <li>Confirm <strong>System type = Dry</strong> and residual pressure at the dry-pipe valve.</li>
+            <li>Read the top metrics — green / yellow / red / exempt — then edit the pipe table for your job.</li>
+          </ol>
+        </div>
+        <div class="gs-actions">
+          <button type="button" id="btnStartSample" class="primary">Load sample dry system</button>
+          <button type="button" id="btnStartBlank" class="ghost">Start blank instead</button>
+          <button type="button" id="btnDismissStart" class="ghost sm" title="Hide this panel">Dismiss</button>
+        </div>
+      </div>
+      <p class="gs-tip">Tip: keep <strong>Fill flow override</strong> blank so fill rate comes from residual @ DPV. Open <strong>Advanced options</strong> only if you need overrides.</p>
+    </section>
 
     <div class="field-grid two no-print" style="margin-bottom:0.75rem;align-items:end">
       <div class="field">
@@ -252,14 +273,6 @@
               </label>
               <span class="sub">Listed accelerator / exhauster — enables ≤750 gal exemption; 50% trip planning reduction.</span>
             </div>
-            <div class="field">
-              <label for="fmMaxSecOverride">FM max delivery override</label>
-              <div class="row">
-                <input id="fmMaxSecOverride" type="number" min="0" step="1" placeholder="same as NFPA">
-                <span class="suffix">sec</span>
-              </div>
-              <span class="sub">Blank = use NFPA table value. Stricter occupancy-specific FM limit.</span>
-            </div>
           </div>
 
           <h3>Units</h3>
@@ -273,6 +286,18 @@
               <div><b>Metric display</b><small>Live convert: L, m, kPa, L/min (engine still US).</small></div>
             </label>
           </div>
+
+          <details class="adv-block" id="advCriteria">
+            <summary>Advanced criteria (optional)</summary>
+            <div class="field" style="margin-top:0.65rem">
+              <label for="fmMaxSecOverride">FM max delivery override</label>
+              <div class="row">
+                <input id="fmMaxSecOverride" type="number" min="0" step="1" placeholder="same as NFPA">
+                <span class="suffix">sec</span>
+              </div>
+              <span class="sub">Blank = use NFPA table value. Only needed for a stricter FM occupancy-specific limit.</span>
+            </div>
+          </details>
         </section>
 
         <section class="panel" style="margin-top:1rem">
@@ -354,7 +379,7 @@
 
         <section class="panel" style="margin-top:1rem">
           <h2>Water delivery time inputs</h2>
-          <p class="hint">Trip uses FMRC-style air bleed-down. Transit uses volume/flow (default) or path length / fill velocity.</p>
+          <p class="hint">Primary path: set air pressures below and residual at DPV (above). Leave overrides blank for automatic trip + transit.</p>
 
           <div class="field-grid two">
             <div class="field">
@@ -378,65 +403,69 @@
                 <span class="suffix">°F</span>
               </div>
             </div>
-            <div class="field">
-              <label for="tripTimeOverrideSec">Trip time override</label>
-              <div class="row">
-                <input id="tripTimeOverrideSec" type="number" min="0" step="0.1" placeholder="calc">
-                <span class="suffix">sec</span>
-              </div>
-            </div>
-          </div>
-
-          <h3>Transit method</h3>
-          <div class="criteria">
-            <label>
-              <input type="radio" name="transitMethod" value="volume_flow" checked>
-              <div>
-                <b>Volume / flow</b>
-                <small>t = 60 × V<sub>remote</sub> (gal) / Q<sub>fill</sub> (gpm)</small>
-              </div>
-            </label>
-            <label>
-              <input type="radio" name="transitMethod" value="length_velocity">
-              <div>
-                <b>Length / fill velocity</b>
-                <small>t = L<sub>path</sub> (ft) / v<sub>fill</sub> (fps)</small>
-              </div>
-            </label>
-          </div>
-          <div class="field-grid two" style="margin-top:0.65rem">
-            <div class="field">
-              <label for="fillFlowGpm">Fill flow override (optional)</label>
-              <div class="row">
-                <input id="fillFlowGpm" type="number" min="0" step="10" placeholder="auto from residual">
-                <span class="suffix">gpm</span>
-              </div>
-              <span class="sub">Blank = derive Q<sub>fill</sub> from residual @ DPV via HW. Else override. Falls back to design Q if residual unusable.</span>
-            </div>
-          </div>
-          <div id="blockFillVel" class="field-grid two hidden" style="margin-top:0.65rem">
-            <div class="field">
-              <label for="fillVelocityFps">Mean fill velocity</label>
-              <div class="row">
-                <input id="fillVelocityFps" type="number" min="0.1" step="0.5" value="10">
-                <span class="suffix">fps</span>
-              </div>
-            </div>
-          </div>
-          <div class="field" style="margin-top:0.65rem">
-            <label for="transitTimeOverrideSec">Transit time override</label>
-            <div class="row">
-              <input id="transitTimeOverrideSec" type="number" min="0" step="0.1" placeholder="calc">
-              <span class="suffix">sec</span>
-            </div>
           </div>
 
           <div class="formula-box" style="margin-top:0.75rem">
             t<sub>trip</sub> ≈ 0.0352 × (V<sub>T</sub> / (A<sub>n</sub> √T₀)) × ln(p<sub>a0</sub>/p<sub>a</sub>)<br>
             <span class="muted" id="tripFormulaDetail">—</span><br><br>
-            t<sub>transit</sub> = 60 × V<sub>remote</sub> / Q &nbsp;or&nbsp; L / v<br>
+            t<sub>transit</sub> = 60 × V<sub>remote</sub> / Q<sub>fill</sub> (auto from residual @ DPV)<br>
             <span class="muted" id="transitFormulaDetail">—</span>
           </div>
+
+          <details class="adv-block" id="advDelivery">
+            <summary>Advanced delivery options (optional)</summary>
+            <p class="hint" style="margin-top:0.5rem">Most users can leave these blank. Use only to force values from a listed model or field test.</p>
+            <div class="field-grid two">
+              <div class="field">
+                <label for="tripTimeOverrideSec">Trip time override</label>
+                <div class="row">
+                  <input id="tripTimeOverrideSec" type="number" min="0" step="0.1" placeholder="auto calc">
+                  <span class="suffix">sec</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="transitTimeOverrideSec">Transit time override</label>
+                <div class="row">
+                  <input id="transitTimeOverrideSec" type="number" min="0" step="0.1" placeholder="auto calc">
+                  <span class="suffix">sec</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="fillFlowGpm">Fill flow override</label>
+                <div class="row">
+                  <input id="fillFlowGpm" type="number" min="0" step="10" placeholder="auto from residual">
+                  <span class="suffix">gpm</span>
+                </div>
+                <span class="sub">Blank = derive from residual @ DPV (recommended).</span>
+              </div>
+            </div>
+            <h3 style="margin-top:0.75rem">Transit method</h3>
+            <div class="criteria">
+              <label>
+                <input type="radio" name="transitMethod" value="volume_flow" checked>
+                <div>
+                  <b>Volume / flow</b>
+                  <small>t = 60 × V<sub>remote</sub> (gal) / Q<sub>fill</sub> (gpm) — recommended</small>
+                </div>
+              </label>
+              <label>
+                <input type="radio" name="transitMethod" value="length_velocity">
+                <div>
+                  <b>Length / fill velocity</b>
+                  <small>t = L<sub>path</sub> (ft) / v<sub>fill</sub> (fps)</small>
+                </div>
+              </label>
+            </div>
+            <div id="blockFillVel" class="field-grid two hidden" style="margin-top:0.65rem">
+              <div class="field">
+                <label for="fillVelocityFps">Mean fill velocity</label>
+                <div class="row">
+                  <input id="fillVelocityFps" type="number" min="0.1" step="0.5" value="10">
+                  <span class="suffix">fps</span>
+                </div>
+              </div>
+            </div>
+          </details>
         </section>
       </div>
 
@@ -551,6 +580,10 @@
       Standards: NFPA 13 (2022/2025) dry pipe water delivery · FM Global alignment · Hazen–Williams per NFPA 13 hydraulic practice.
       Volume exemptions: ≤500 gal; ≤750 gal with listed QOD.
     </p>
+    <p class="hint no-print" style="margin-top:0.75rem">
+      <a href="../" style="color:var(--blue);font-weight:650">← Engineering Tools portal</a>
+      · <button type="button" id="btnUserGuideFooter" class="ghost sm" style="vertical-align:baseline">User Guide</button>
+    </p>
   </div>
 
   <!-- Print report -->
@@ -600,8 +633,286 @@
     <p style="font-size:0.75rem;color:#64748b">Calculator <span id="printVersion">—</span> · Fire Toolshed · Not a listed NFPA 13 method</p>
   </div>
 
+  <!-- Full user guide modal -->
+  <div id="userGuideModal" class="guide-modal hidden no-print" aria-hidden="true" role="dialog" aria-labelledby="userGuideTitle">
+    <div class="guide-backdrop" id="userGuideBackdrop"></div>
+    <div class="guide-card" role="document">
+      <div class="guide-head">
+        <div>
+          <h2 id="userGuideTitle">Dry Sprinkler Water Delivery — User Guide</h2>
+          <p class="guide-sub">Version 1.2 · Field-by-field input reference · Fire Toolshed · Preliminary only</p>
+        </div>
+        <button type="button" id="userGuideClose" class="primary" aria-label="Close user guide">Close</button>
+      </div>
+      <div class="guide-body" id="userGuideBody">
+        <div class="callout warn" style="margin-bottom:1rem">
+          <strong>Critical limitation.</strong> This tool provides preliminary design estimates only.
+          It is <em>not</em> a listed calculation method under NFPA 13. Final compliance requires a
+          nationally recognized testing laboratory–listed program or a successful field trip test.
+        </div>
+
+        <nav class="guide-toc" aria-label="Guide sections">
+          <a href="#ug-overview">Overview</a>
+          <a href="#ug-toolbar">Toolbar</a>
+          <a href="#ug-project">Project setup</a>
+          <a href="#ug-criteria">Criteria &amp; hazard</a>
+          <a href="#ug-design">Design flow</a>
+          <a href="#ug-delivery">Delivery time</a>
+          <a href="#ug-nodes">Network nodes</a>
+          <a href="#ug-pipe">Pipe table</a>
+          <a href="#ug-outputs">Outputs</a>
+          <a href="#ug-limits">Limits</a>
+        </nav>
+
+        <h3 id="ug-overview">1. Overview</h3>
+        <p>Use this calculator for <strong>dry pipe</strong> and <strong>double-interlock preaction</strong> water delivery time (trip + transit), volumes, and a simplified Hazen–Williams walk. Wet systems are <strong>rejected</strong> for delivery compliance.</p>
+        <table class="guide-table">
+          <thead><tr><th>System type</th><th>Delivery compliance</th></tr></thead>
+          <tbody>
+            <tr><td>Dry pipe</td><td>Evaluated</td></tr>
+            <tr><td>Double-interlock preaction</td><td>Evaluated</td></tr>
+            <tr><td>Single-interlock preaction</td><td><strong>Rejected</strong></td></tr>
+            <tr><td>Wet pipe</td><td><strong>Rejected</strong></td></tr>
+          </tbody>
+        </table>
+
+        <h3 id="ug-toolbar">2. Top toolbar — each control</h3>
+        <dl class="guide-dl">
+          <dt>← Portal</dt>
+          <dd>Returns to the Engineering Tools portal home page. Does not clear your saved project (data stays in this browser’s local storage).</dd>
+          <dt>User Guide</dt>
+          <dd>Opens this guide. Close with Close, click outside, or Esc.</dd>
+          <dt>Dark / Light</dt>
+          <dd>Toggles dark mode for the UI. Preference is stored in the browser.</dd>
+          <dt>Methodology</dt>
+          <dd>Shows or hides a short on-page strip of formulas and assumptions (not a full substitute for this guide).</dd>
+          <dt>Example</dt>
+          <dd>Loads a sample ordinary-hazard dry-pipe network with realistic residual and K-factor so you can see metrics and bands immediately. Overwrites the current on-screen model (use Save Project first if needed).</dd>
+          <dt>Import PDF Fixture</dt>
+          <dd>Loads a multi-page listed-calc JSON fixture (segments, optional page tags, HW check rows). Does not parse PDF binary files. Sample: <code>validation/fixtures/bravo-12k25-60-multipage.json</code>. Wet fixtures import but compliance is REJECTED.</dd>
+          <dt>Save Project</dt>
+          <dd>Stores a snapshot of the current model in the last-5 project history list. Choose a history entry later to restore.</dd>
+          <dt>CSV</dt>
+          <dd>Downloads pipe segments and node pressure tables as a CSV for Excel or design archives.</dd>
+          <dt>Report</dt>
+          <dd>Downloads an HTML report package plus a JSON project snapshot (inputs, tables, formulas, disclaimer, signature block).</dd>
+          <dt>PDF</dt>
+          <dd>Opens the browser print dialog so you can choose “Save as PDF.” Same content as Print.</dd>
+          <dt>Print</dt>
+          <dd>Print-ready package (disclaimer, project, volumes, delivery, pipe table, signature).</dd>
+          <dt>Reset</dt>
+          <dd>After confirmation, restores default inputs and the starter three-segment network.</dd>
+          <dt>Project history (last 5)</dt>
+          <dd>Dropdown of previously saved project snapshots. Selecting an entry restores that full model. Empty until you click Save Project.</dd>
+        </dl>
+
+        <h3 id="ug-project">3. Project setup — each input</h3>
+        <dl class="guide-dl">
+          <dt>Project name</dt>
+          <dd>Project title printed on every report and used in download filenames. Appears in history labels. Required for clear archives; not used in the math.</dd>
+          <dt>Building / area</dt>
+          <dd>Site, building number, or remote area name (e.g. “Warehouse high bay – System 1”). Report metadata only.</dd>
+          <dt>Engineer name</dt>
+          <dd>Preparer’s name for the signature block and report header. Also used as the printed “Prepared by” field.</dd>
+          <dt>PE number (optional)</dt>
+          <dd>Professional engineer license number if your firm puts it on charette packages. Optional; blank is fine for internal use.</dd>
+          <dt>Company</dt>
+          <dd>Firm name on the report header and signature block.</dd>
+          <dt>Date</dt>
+          <dd>Report date (defaults to today). Used on print/export and history labels.</dd>
+          <dt>Building / occupancy description</dt>
+          <dd>Free-text occupancy narrative (e.g. “OH-2 manufacturing, dry pipe, FM DS 8-9”). Helps AHJ packages; does not change the hazard table by itself—you still select Hazard below.</dd>
+          <dt>Notes</dt>
+          <dd>AHJ direction, QOD listing number, trip-test plan, or assumptions. Printed on reports under Notes.</dd>
+          <dt>Report logo</dt>
+          <dd>Logo for printed/saved reports. Options: Benham, MeadHunt JV, Haskell (by state), or upload an image. Selection is shared with other Fire Toolshed report tools in this browser.</dd>
+        </dl>
+
+        <h3 id="ug-criteria">4. Criteria &amp; hazard — each input</h3>
+        <dl class="guide-dl">
+          <dt>System type</dt>
+          <dd>
+            <ul>
+              <li><strong>Dry pipe</strong> — eligible for NFPA 13 §8.2 water delivery time evaluation.</li>
+              <li><strong>Double-interlock preaction</strong> — treated like dry for delivery time (both detection and sprinkler operation required before water).</li>
+              <li><strong>Single-interlock preaction</strong> — rejected for delivery compliance in this tool (not evaluated under the dry table here).</li>
+              <li><strong>Wet pipe</strong> — rejected. Water is already at the heads; dry delivery time does not apply. You may still model pipes for volume/HW information only.</li>
+            </ul>
+          </dd>
+          <dt>Criteria set — NFPA 13</dt>
+          <dd>Compares estimated delivery time to the hard-coded NFPA water delivery table for the selected hazard. Exemptions (≤500 gal; ≤750 gal + QOD) apply.</dd>
+          <dt>Criteria set — FM Global</dt>
+          <dd>Uses the same numerical time limits as NFPA by default. Enter a stricter value in FM max delivery override if the governing FM data sheet requires it.</dd>
+          <dt>Criteria set — Both (show stricter)</dt>
+          <dd>Shows NFPA and FM side-by-side. Overall pass requires meeting the stricter (smaller) time limit. Both bands are reported.</dd>
+          <dt>Hazard classification</dt>
+          <dd>Selects the NFPA 13 water delivery row (max seconds and suggested number of open heads):
+            <table class="guide-table">
+              <thead><tr><th>Hazard</th><th>Heads</th><th>Max (s)</th></tr></thead>
+              <tbody>
+                <tr><td>Dwelling Unit</td><td>1</td><td>15</td></tr>
+                <tr><td>Light</td><td>1</td><td>60</td></tr>
+                <tr><td>Ordinary (Group 1 or 2)</td><td>2</td><td>50</td></tr>
+                <tr><td>Extra (Group 1 or 2)</td><td>4</td><td>45</td></tr>
+                <tr><td>High-Piled</td><td>4</td><td>40</td></tr>
+              </tbody>
+            </table>
+            Changing hazard auto-fills “Most remote sprinklers open”; you may still edit heads.
+          </dd>
+          <dt>Most remote sprinklers open</dt>
+          <dd>Number of most remote heads assumed open for design flow and orifice area (1, 2, or 4). Used in K-factor mode as <em>n</em> in Q = n·K·√P, and for total open orifice area A<sub>n</sub> in trip time. Must match the hazard table unless the AHJ allows a different assumption—document overrides in Notes.</dd>
+          <dt>Quick-opening device (QOD) present</dt>
+          <dd>Check if a listed accelerator/exhauster is provided. Effects: (1) enables ≤750 gal volume exemption when volume is 500–750 gal; (2) applies a 50% planning reduction to calculated trip time (unless you override trip time). Confirm listing and installation with the manufacturer and AHJ.</dd>
+          <dt>FM max delivery override (sec)</dt>
+          <dd>Optional. Blank = use the same max seconds as the NFPA hazard row. Enter a smaller number when FM Global or the occupancy-specific data sheet is stricter. Does not change the NFPA column when Both is selected—it only tightens the FM limit.</dd>
+          <dt>Units — US Customary</dt>
+          <dd>Default. All calculations run in gal, ft, psi, gpm. Displays match the engine.</dd>
+          <dt>Units — Metric display</dt>
+          <dd>Converts live displays to L, m, kPa, L/min. The calculation engine remains US customary; this is display-only conversion for readability.</dd>
+        </dl>
+
+        <h3 id="ug-design">5. Design flow &amp; hydraulics — each input</h3>
+        <dl class="guide-dl">
+          <dt>Design mode — K-factor × √P × heads</dt>
+          <dd>Design flow Q = n · K · √P<sub>min</sub>, where n = open heads, K = sprinkler K-factor, P<sub>min</sub> = minimum residual pressure at the remote heads. Use when you size from listed K and required residual (common for remote-area checks).</dd>
+          <dt>Design mode — Total design flow</dt>
+          <dd>You enter the total gpm for the open remote heads (or a planning total). Use when a hydraulic package or hand calc already provides demand at the remote.</dd>
+          <dt>Design mode — Density × area</dt>
+          <dd>Q = density (gpm/sf) × design area (sf). Useful for preliminary density-area demand; may overstate flow vs only the open remote heads—use carefully for delivery estimates.</dd>
+          <dt>Sprinkler K-factor</dt>
+          <dd>Listed K of the open remote sprinklers (e.g. 5.6, 8.0, 11.2, 25.2). Used for design Q in K-mode and to estimate orifice area A<sub>n</sub> for trip time. Use the same K for all open heads in this simplified model.</dd>
+          <dt>Min. pressure at remote (psi)</dt>
+          <dd>Required residual pressure at the most remote open heads (often 7 psi minimum for standard sprinklers; ESFR/storage listings may require much higher, e.g. 60 psi). This is the starting pressure for the HW walk back to the supply. Flag if your supply residual cannot support it.</dd>
+          <dt>Total design flow (gpm)</dt>
+          <dd>Visible in total-flow mode. Total gpm of water discharging at the open remote sprinklers for the hydraulic walk and as fallback fill rate.</dd>
+          <dt>Design density (gpm/sf)</dt>
+          <dd>Visible in density mode. Design density for the remote area (e.g. 0.15 for OH-1 planning). Confirm adopted code/edition.</dd>
+          <dt>Design area (sf)</dt>
+          <dd>Visible in density mode. Design area of application for the density-area calculation. Dry systems often use a larger design area than wet (+30% in many NFPA cases)—enter the area you are using for demand.</dd>
+          <dt>Residual pressure at supply / DPV after trip (psi)</dt>
+          <dd>
+            Gauge residual available at the dry-pipe valve (or modeled supply node) once the valve has tripped and water is flowing.
+            <ul>
+              <li>Used to check whether available pressure ≥ required pressure from the remote HW walk.</li>
+              <li>Used to derive average fill rate for transit: Q<sub>fill</sub> from inverse Hazen–Williams after elev and fixed losses.</li>
+              <li>Enter a realistic residual from a flow test or pump curve at the expected fill/design flow—not the static only.</li>
+            </ul>
+          </dd>
+        </dl>
+
+        <h3 id="ug-delivery">6. Water delivery time inputs — each field</h3>
+        <dl class="guide-dl">
+          <dt>Initial air pressure (psig)</dt>
+          <dd>Supervisory air (or nitrogen) pressure on the dry system before trip. Converted to absolute (psig + 14.7) as p<sub>a0</sub> in the trip formula. Typical dry systems often ~30–50 psig; use project set-point.</dd>
+          <dt>Trip pressure (psig)</dt>
+          <dd>Air pressure at which the dry-pipe valve is designed/set to trip (differential trip pressure), as gauge. Converted to absolute p<sub>a</sub>. Must be less than initial air pressure. Check valve data sheet.</dd>
+          <dt>Temperature (°F)</dt>
+          <dd>Air temperature used for absolute temperature T₀ = °F + 460 (°R) in the trip formula. Default 70 °F. Extreme cold/hot spaces can be entered if justified.</dd>
+          <dt>Trip time override (sec)</dt>
+          <dd>Optional. Blank = calculate trip with the FMRC-style formula (and QOD reduction if checked). Enter a value to force trip time (e.g. from a listed model or field test). Overrides all trip math.</dd>
+          <dt>Transit method — Volume / flow</dt>
+          <dd>Default. t<sub>transit</sub> = 60 × V<sub>remote</sub> (gal) / Q<sub>fill</sub> (gpm). Transparent volume-fill estimate for the path from DPV to most remote node.</dd>
+          <dt>Transit method — Length / fill velocity</dt>
+          <dd>t<sub>transit</sub> = L<sub>path</sub> (ft) / v<sub>fill</sub> (fps). Use when you prefer a constant fill velocity assumption instead of volume/flow.</dd>
+          <dt>Fill flow override (gpm)</dt>
+          <dd>Optional. Blank = derive Q<sub>fill</sub> from residual @ DPV via inverse HW (preferred). If residual is missing or unusable, falls back to design Q of open heads. Enter a known fill rate from a model or test to override derivation.</dd>
+          <dt>Mean fill velocity (fps)</dt>
+          <dd>Visible when length/velocity transit is selected. Planning default 10 fps. Higher velocity shortens transit; document the basis.</dd>
+          <dt>Transit time override (sec)</dt>
+          <dd>Optional. Blank = calculate transit. Enter a value to force transit time from another analysis or test. Overrides volume/flow and L/v methods.</dd>
+        </dl>
+        <div class="formula-box">
+          t<sub>trip</sub> ≈ 0.0352 × (V<sub>T</sub> / (A<sub>n</sub> √T₀)) × ln(p<sub>a0</sub>/p<sub>a</sub>)<br>
+          t<sub>transit</sub> = 60 × V<sub>remote</sub> / Q<sub>fill</sub> &nbsp;or&nbsp; L / v<sub>fill</sub><br>
+          Total delivery = trip + transit
+        </div>
+
+        <h3 id="ug-nodes">7. Network nodes — each input</h3>
+        <dl class="guide-dl">
+          <dt>Supply / dry-pipe valve node</dt>
+          <dd>Exact node name used in the pipe table as the supply end of the path (typically “DPV”). Must match a From or To name in the network. Pathfinding starts here.</dd>
+          <dt>Remote sprinkler node(s)</dt>
+          <dd>Comma- or semicolon-separated names of remote sprinkler locations (e.g. <code>Remote, Remote2</code>). Must match table nodes. When several are listed, the tool uses the path with the <strong>largest volume</strong> to a remote for delivery volume and transit.</dd>
+          <dt>Include approximate fitting volume</dt>
+          <dd>When checked, adds a planning allowance for fitting internal volume ≈ 15% of each segment’s equivalent length treated as pipe. Uncheck for pure pipe-only volume (common when comparing to software that ignores fitting volume).</dd>
+        </dl>
+
+        <h3 id="ug-pipe">8. Pipe network table — each column</h3>
+        <p>Model a <strong>tree or simple branch</strong> only (no full looped grid solver). Use Add Row / Insert Row / Duplicate Path; per-row ⧉ duplicates and ✕ deletes.</p>
+        <dl class="guide-dl">
+          <dt>From</dt>
+          <dd>Upstream (or either end) node name for the segment. Names are case-sensitive matches for pathfinding—keep consistent (e.g. always “DPV”, not “Dpv”).</dd>
+          <dt>To</dt>
+          <dd>Other end node name. Together with From, defines connectivity for the undirected tree path from supply to remote.</dd>
+          <dt>L (ft)</dt>
+          <dd>Centerline pipe length in feet. Must be &gt; 0. Used for volume and for friction length (plus equivalent length).</dd>
+          <dt>Nom.</dt>
+          <dd>Nominal pipe size ½″ through 12″. Selects default internal diameter from Sch 10/40 tables when ID is left blank.</dd>
+          <dt>Sch</dt>
+          <dd>Schedule 10 or 40 for standard steel ID tables. Schedule 10 has larger ID (less friction, more volume) than Sch 40 for the same nominal size.</dd>
+          <dt>ID (in)</dt>
+          <dd>Actual internal diameter (inches). Leave blank to auto-fill from Nom + Sch. Override for ductile iron, copper, CPVC, or listed special IDs from a multi-page PDF (e.g. 10.42, 10.58).</dd>
+          <dt>C</dt>
+          <dd>Hazen–Williams C-factor. Default 120 for new black steel. 100 is common for older or mildly tuberculated steel. Soft warning if outside 80–150. Higher C → less friction.</dd>
+          <dt>Fittings (counts)</dt>
+          <dd>Counts of 90° elbows, 45° elbows, tee run, tee branch, gate, butterfly, check, coupling, reducer. Each multiplies the NFPA-style equivalent length for that size and sums into EL. Use branch tee when flow turns through the branch; run tee when flow is straight through.</dd>
+          <dt>EL ovrd</dt>
+          <dd>Optional total equivalent length (ft) for fittings on this segment. Blank = auto sum from fitting counts. Enter a value from a listed calc printout to match that EL exactly.</dd>
+          <dt>Elev (ft)</dt>
+          <dd>Elevation change From → To in feet (positive = rise in that direction). Converted at 0.433 psi/ft. Correct sign matters for required pressure at the supply (remote higher than DPV increases required residual).</dd>
+          <dt>Fix ΔP</dt>
+          <dd>Fixed pressure loss (psi) for devices that are not modeled as pipe friction alone—riser checks, OS&amp;Y, butterfly valves, etc., as listed on multi-page PDF device rows. Added to friction on the HW walk and subtracted from available head when deriving fill rate.</dd>
+          <dt>Vol gal</dt>
+          <dd>Read-only segment volume (pipe ± fittings). Running total appears in metrics.</dd>
+          <dt>Notes</dt>
+          <dd>Free text (PDF page number, “crossmain,” “branch line,” listing note). Imported fixtures may append <code>[PDF p.#]</code>.</dd>
+        </dl>
+
+        <h3 id="ug-outputs">9. Outputs &amp; color bands (read-only)</h3>
+        <dl class="guide-dl">
+          <dt>Compliance</dt>
+          <dd>MEETS (green ≤90% of limit) · TIGHT (yellow, within 10% of limit) · EXCEEDS (red) · EXEMPT (volume) · REJECTED (wrong system type).</dd>
+          <dt>Water delivery (s)</dt>
+          <dd>Trip + transit. Compared to NFPA/FM limit for the hazard.</dd>
+          <dt>Trip / Transit (s)</dt>
+          <dd>Components of delivery; formulas shown in the delivery panel.</dd>
+          <dt>Total volume / Vol. to remote</dt>
+          <dd>Full network volume vs path volume supply→most remote (drives exemptions and transit).</dd>
+          <dt>Design flow</dt>
+          <dd>Q used for the HW walk (and fill fallback).</dd>
+          <dt>NFPA / FM cards</dt>
+          <dd>Side-by-side delivery vs each limit and band when that criteria set is active.</dd>
+          <dt>Hydraulic results table</dt>
+          <dd>Node-by-node Q, residual pressure, friction (incl. fixed ΔP), elevation, and segment labels along the walk remote→supply.</dd>
+          <dt>Segment volumes table</dt>
+          <dd>Per-segment ID, L, EL, pipe/fitting/total gallons.</dd>
+        </dl>
+
+        <h3>10. Volume exemptions (NFPA 13)</h3>
+        <ul>
+          <li><strong>≤ 500 gal</strong> total system — no water delivery time requirement (EXEMPT).</li>
+          <li><strong>≤ 750 gal + listed QOD</strong> — no water delivery time requirement (EXEMPT).</li>
+          <li><strong>&gt; 750 gal without QOD</strong> — soft warning; time criteria apply.</li>
+        </ul>
+
+        <h3 id="ug-limits">11. Assumptions &amp; limits</h3>
+        <ul>
+          <li>Tree / simple branch only — no full gridded peaking solver</li>
+          <li>Steady-state HW; simplified volume/flow transit</li>
+          <li>No detailed multi-phase air or accelerator dynamics</li>
+          <li>Pump is not a curve device — enter residual pressure manually</li>
+          <li>Not a substitute for listed software or field trip testing</li>
+        </ul>
+
+        <p class="hint" style="margin-top:1.25rem">Markdown copy with the same field detail: <code>USER-GUIDE.md</code> in the tool folder.</p>
+      </div>
+      <div class="guide-foot">
+        <button type="button" id="userGuideClose2" class="primary">Close guide</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../shared/report-logo.js"></script>
-  <script src="../shared/water-path-shell.js"></script>
-  <script src="./assets/app.js?v=1.2.0"></script>
+  <script src="./assets/app.js?v=1.3.0"></script>
 </body>
 </html>

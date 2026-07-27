@@ -8,7 +8,9 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.2.0-prelim";
+  const APP_VERSION = "1.3.0-prelim";
+  const FIRST_RUN_KEY = "drySprinklerDelivery.firstRun.v1";
+  const START_DISMISS_KEY = "drySprinklerDelivery.startDismissed.v1";
 
   /** System types that use dry-pipe water delivery time criteria (NFPA 13 §8.2) */
   const DELIVERY_ELIGIBLE = {
@@ -207,11 +209,20 @@
       .replace(/"/g, "&quot;");
   }
   function toast(msg) {
-    const el = document.createElement("div");
-    el.className = "toast";
-    el.textContent = msg;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2800);
+    try {
+      if (!document.body || typeof document.createElement !== "function") return;
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = msg;
+      document.body.appendChild(el);
+      if (typeof setTimeout === "function") {
+        setTimeout(() => {
+          try {
+            el.remove();
+          } catch (_) { /* ignore */ }
+        }, 2800);
+      }
+    } catch (_) { /* headless / no DOM */ }
   }
 
   // ─── Unit helpers ────────────────────────────────────────────────────────
@@ -2205,8 +2216,9 @@ ${state.notes ? `<h2>Notes</h2><p>${escapeHtml(state.notes)}</p>` : ""}
     window.print();
   }
 
-  // ─── Example / reset ─────────────────────────────────────────────────────
-  function loadExample() {
+  // ─── Example / reset / first-use ──────────────────────────────────────────
+  function loadExample(opts) {
+    opts = opts || {};
     state = defaultState();
     state.projectName = "Example Warehouse — Dry Pipe OH-2";
     state.facility = "Building A, high bay";
@@ -2226,8 +2238,10 @@ ${state.notes ? `<h2>Notes</h2><p>${escapeHtml(state.notes)}</p>` : ""}
     state.criteriaSet = "both";
     state.notes =
       "Example network for tool demonstration only. Transit fill rate derived from residual pressure at DPV via inverse Hazen–Williams.";
+    markFirstRunDone();
+    if (!opts.keepGettingStarted) dismissGettingStarted(true);
     render();
-    toast("Example project loaded");
+    if (!opts.silent) toast("Sample dry system loaded — check metrics at the top");
   }
 
   function resetAll() {
@@ -2237,47 +2251,64 @@ ${state.notes ? `<h2>Notes</h2><p>${escapeHtml(state.notes)}</p>` : ""}
     toast("Reset to defaults");
   }
 
-  // ─── Help modal ──────────────────────────────────────────────────────────
-  function showHelp() {
-    const backdrop = document.createElement("div");
-    backdrop.className = "modal-backdrop no-print";
-    backdrop.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
-      <h2 id="helpTitle">Help / calculation basis</h2>
-      <p class="hint">This tool produces <strong>preliminary</strong> dry-pipe / double-interlock preaction water delivery estimates. It is not a listed method.</p>
-      <h3>Volumes</h3>
-      <p>Pipe volume from actual internal diameter and length. Optional fitting volume ≈ 15% of equivalent length treated as pipe (toggleable).</p>
-      <h3>Hazen–Williams</h3>
-      <div class="formula-box">p (psi/ft) = 4.52 × Q<sup>1.85</sup> / (C<sup>1.85</sup> × d<sup>4.87</sup>)</div>
-      <p>Walk from remote node(s) back to supply; accumulate friction + elevation (0.433 psi/ft).</p>
-      <h3>Trip time (FMRC-style)</h3>
-      <div class="formula-box">t_trip ≈ 0.0352 × (V_T / (A_n √T₀)) × ln(p_a0 / p_a)</div>
-      <p>V_T gal, A_n in² (from K-factor orifice), T₀ °R, absolute pressures. QOD applies 50% planning reduction unless you override trip time.</p>
-      <h3>Transit time</h3>
-      <div class="formula-box">t_transit = 60 × V_remote / Q_fill<br>Q_fill from residual @ DPV: Q = (P_avail / Σk)<sup>1/1.85</sup></div>
-      <p>P_avail = residual − elevation. Σk from path Hazen–Williams coefficients. Override fill flow if desired. Alternate: L / v_fill.</p>
-      <h3>Color bands</h3>
-      <p><strong>Green</strong> ≤ 90% of limit · <strong>Yellow</strong> within 10% of limit (still ≤ limit) · <strong>Red</strong> exceeds.</p>
-      <h3>NFPA 13 exemptions</h3>
-      <ul>
-        <li>≤ 500 gal — no water delivery time requirement</li>
-        <li>≤ 750 gal with listed QOD — no water delivery time requirement</li>
-      </ul>
-      <h3>Delivery limits (NFPA 13 table)</h3>
-      <ul>
-        <li>Dwelling 1 head — 15 s</li>
-        <li>Light 1 head — 60 s</li>
-        <li>Ordinary 2 heads — 50 s</li>
-        <li>Extra 4 heads — 45 s</li>
-        <li>High-piled 4 heads — 40 s</li>
-      </ul>
-      <div class="close-row"><button type="button" class="primary" id="helpClose">Close</button></div>
-    </div>`;
-    document.body.appendChild(backdrop);
-    const close = () => backdrop.remove();
-    backdrop.addEventListener("click", (e) => {
-      if (e.target === backdrop) close();
-    });
-    backdrop.querySelector("#helpClose").addEventListener("click", close);
+  function markFirstRunDone() {
+    try {
+      localStorage.setItem(FIRST_RUN_KEY, "1");
+    } catch (_) { /* ignore */ }
+  }
+
+  function isGettingStartedDismissed() {
+    try {
+      return localStorage.getItem(START_DISMISS_KEY) === "1";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function dismissGettingStarted(persist) {
+    $("gettingStarted")?.classList.add("hidden");
+    if (persist) {
+      try {
+        localStorage.setItem(START_DISMISS_KEY, "1");
+      } catch (_) { /* ignore */ }
+    }
+  }
+
+  function showGettingStartedIfNeeded() {
+    const el = $("gettingStarted");
+    if (!el) return;
+    if (isGettingStartedDismissed()) {
+      el.classList.add("hidden");
+      return;
+    }
+    el.classList.remove("hidden");
+  }
+
+  /** True if no meaningful saved project yet (first open). */
+  function isFreshInstall() {
+    try {
+      if (localStorage.getItem(FIRST_RUN_KEY) === "1") return false;
+      if (localStorage.getItem(STORAGE_KEY)) return false;
+    } catch (_) { /* ignore */ }
+    return true;
+  }
+
+  // ─── User guide modal ────────────────────────────────────────────────────
+  function openUserGuide() {
+    const modal = $("userGuideModal");
+    if (!modal) return;
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden", "false");
+    const body = $("userGuideBody");
+    if (body) body.scrollTop = 0;
+    $("userGuideClose")?.focus();
+  }
+  function closeUserGuide() {
+    const modal = $("userGuideModal");
+    if (!modal) return;
+    modal.classList.add("hidden");
+    modal.setAttribute("aria-hidden", "true");
+    $("btnUserGuide")?.focus();
   }
 
   // ─── Wire UI ─────────────────────────────────────────────────────────────
@@ -2349,7 +2380,16 @@ ${state.notes ? `<h2>Notes</h2><p>${escapeHtml(state.notes)}</p>` : ""}
       toast("Path duplicated (nodes primed with ')");
     });
 
-    $("btnHelp")?.addEventListener("click", showHelp);
+    $("btnUserGuide")?.addEventListener("click", openUserGuide);
+    $("btnUserGuideFooter")?.addEventListener("click", openUserGuide);
+    $("userGuideClose")?.addEventListener("click", closeUserGuide);
+    $("userGuideClose2")?.addEventListener("click", closeUserGuide);
+    $("userGuideBackdrop")?.addEventListener("click", closeUserGuide);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && $("userGuideModal") && !$("userGuideModal").classList.contains("hidden")) {
+        closeUserGuide();
+      }
+    });
     $("btnMethodology")?.addEventListener("click", () => {
       $("methodologyPanel")?.classList.toggle("hidden");
     });
@@ -2358,7 +2398,19 @@ ${state.notes ? `<h2>Notes</h2><p>${escapeHtml(state.notes)}</p>` : ""}
     $("btnPdf")?.addEventListener("click", exportPdf);
     $("btnCsv")?.addEventListener("click", exportCsv);
     $("btnSaveProject")?.addEventListener("click", pushHistory);
-    $("btnExample")?.addEventListener("click", loadExample);
+    $("btnExample")?.addEventListener("click", () => loadExample());
+    $("btnStartSample")?.addEventListener("click", () => loadExample());
+    $("btnStartBlank")?.addEventListener("click", () => {
+      markFirstRunDone();
+      dismissGettingStarted(true);
+      state = defaultState();
+      render();
+      toast("Blank project — set system type Dry, residual @ DPV, then edit pipes");
+    });
+    $("btnDismissStart")?.addEventListener("click", () => {
+      markFirstRunDone();
+      dismissGettingStarted(true);
+    });
     $("btnReset")?.addEventListener("click", resetAll);
     $("btnImportFixture")?.addEventListener("click", () => $("fixtureFile")?.click());
     $("fixtureFile")?.addEventListener("change", (e) => {
@@ -2440,12 +2492,24 @@ ${state.notes ? `<h2>Notes</h2><p>${escapeHtml(state.notes)}</p>` : ""}
     importPdfFixture,
     verifyHwChecks,
     loadMultiPageFixture: importPdfFixture,
+    loadExample,
+    isFreshInstall,
+    isGettingStartedDismissed,
   };
 
   // ─── Boot ────────────────────────────────────────────────────────────────
   function boot() {
     if ($("appVersion")) $("appVersion").textContent = "Version " + APP_VERSION;
+    const fresh = isFreshInstall();
     load();
+    // First visit: auto-load sample so metrics show a complete worked result immediately
+    if (fresh) {
+      loadExample({ silent: true, keepGettingStarted: true });
+      $("gettingStarted")?.classList.remove("hidden");
+      toast("Sample dry system ready — edit inputs or start blank from Getting started");
+    } else {
+      showGettingStartedIfNeeded();
+    }
     applyTheme();
     wire();
     render();
@@ -2457,12 +2521,6 @@ ${state.notes ? `<h2>Notes</h2><p>${escapeHtml(state.notes)}</p>` : ""}
         navigator.serviceWorker.register("./sw.js").catch(() => { /* offline optional */ });
       }
     } catch (_) { /* ignore */ }
-
-    if (window.FireToolshedShell && typeof window.FireToolshedShell.mount === "function") {
-      try {
-        window.FireToolshedShell.mount({ step: "hub", base: ".." });
-      } catch (_) { /* optional */ }
-    }
   }
 
   if (document.readyState === "loading") {
