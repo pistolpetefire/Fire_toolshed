@@ -1,0 +1,1005 @@
+{
+  "summary": {
+    "label": "pre",
+    "version": "1.1.1-prelim",
+    "cycles": 10,
+    "cyclesPass": 0,
+    "totalPass": 140,
+    "totalFail": 30,
+    "failureFrequency": {
+      "pipe:10in": 10,
+      "valve:fixedLoss": 10,
+      "pdf:importAPI": 10
+    },
+    "improvements": [
+      {
+        "id": "pipe-10-12",
+        "title": "Add 10\" and 12\" nominal pipe sizes (PDF mains)",
+        "reason": "Multi-page HW printouts routinely use 10\" UG/mains; app stopped at 8\"."
+      },
+      {
+        "id": "fixed-loss",
+        "title": "Support fixed pressure-loss devices (valves)",
+        "reason": "PDF pipe tables show riser check / OS&Y / butterfly fixed ΔP rows."
+      },
+      {
+        "id": "pdf-fixture",
+        "title": "Multi-page PDF fixture import API + sample fixture",
+        "reason": "Calcs are multi-page PDFs; need structured fixture load for regression."
+      }
+    ],
+    "at": "2026-07-27T18:15:58.765Z"
+  },
+  "cycleResults": [
+    {
+      "cycle": 1,
+      "passed": 14,
+      "failed": 3,
+      "checks": [
+        {
+          "name": "hw:PDF-S2S3",
+          "ok": true,
+          "detail": "0.38572853543799296 ≈ 0.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-S4-104",
+          "ok": true,
+          "detail": "23.028671371800613 ≈ 23.1 ±0.12"
+        },
+        {
+          "name": "hw:PDF-10in",
+          "ok": true,
+          "detail": "3.3433765516237925 ≈ 3.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-DI10",
+          "ok": true,
+          "detail": "6.758097775418985 ≈ 6.8 ±0.12"
+        },
+        {
+          "name": "wet:rejected",
+          "ok": true,
+          "detail": "Wet pipe systems are water-filled. NFPA 13 dry-pipe water delivery time criteria"
+        },
+        {
+          "name": "dry:path",
+          "ok": true,
+          "detail": "DPV>UG1>RISER>CM>CM1>CM2>CM3>CM4>CM5>CM6>CM7>CM8>CM9>CM10>CM"
+        },
+        {
+          "name": "dry:volume",
+          "ok": true,
+          "detail": "4205.63 gal"
+        },
+        {
+          "name": "dry:delivery",
+          "ok": true,
+          "detail": "718.3s band=red"
+        },
+        {
+          "name": "dry:perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "pipe:10in",
+          "ok": false,
+          "detail": "PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains"
+        },
+        {
+          "name": "valve:fixedLoss",
+          "ok": false,
+          "detail": "fixedLossPsi ignored (need=27.18, expect ~32.18)"
+        },
+        {
+          "name": "net:20seg",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "net:20perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "exempt:500",
+          "ok": true,
+          "detail": "0.45 gal"
+        },
+        {
+          "name": "valid:zeroL",
+          "ok": true,
+          "detail": "Segment 1 (DPV→Remote): length must be > 0."
+        },
+        {
+          "name": "remote:maxPath",
+          "ok": true,
+          "detail": "best=R2 V=132.26"
+        },
+        {
+          "name": "pdf:importAPI",
+          "ok": false,
+          "detail": "no multi-page PDF fixture import API"
+        }
+      ],
+      "failures": [
+        "pipe:10in: PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains",
+        "valve:fixedLoss: fixedLossPsi ignored (need=27.18, expect ~32.18)",
+        "pdf:importAPI: no multi-page PDF fixture import API"
+      ]
+    },
+    {
+      "cycle": 2,
+      "passed": 14,
+      "failed": 3,
+      "checks": [
+        {
+          "name": "hw:PDF-S2S3",
+          "ok": true,
+          "detail": "0.38572853543799296 ≈ 0.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-S4-104",
+          "ok": true,
+          "detail": "23.028671371800613 ≈ 23.1 ±0.12"
+        },
+        {
+          "name": "hw:PDF-10in",
+          "ok": true,
+          "detail": "3.3433765516237925 ≈ 3.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-DI10",
+          "ok": true,
+          "detail": "6.758097775418985 ≈ 6.8 ±0.12"
+        },
+        {
+          "name": "wet:rejected",
+          "ok": true,
+          "detail": "Wet pipe systems are water-filled. NFPA 13 dry-pipe water delivery time criteria"
+        },
+        {
+          "name": "dry:path",
+          "ok": true,
+          "detail": "DPV>UG1>RISER>CM>CM1>CM2>CM3>CM4>CM5>CM6>CM7>CM8>CM9>CM10>CM"
+        },
+        {
+          "name": "dry:volume",
+          "ok": true,
+          "detail": "4205.63 gal"
+        },
+        {
+          "name": "dry:delivery",
+          "ok": true,
+          "detail": "718.3s band=red"
+        },
+        {
+          "name": "dry:perf",
+          "ok": true,
+          "detail": "0ms"
+        },
+        {
+          "name": "pipe:10in",
+          "ok": false,
+          "detail": "PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains"
+        },
+        {
+          "name": "valve:fixedLoss",
+          "ok": false,
+          "detail": "fixedLossPsi ignored (need=27.18, expect ~32.18)"
+        },
+        {
+          "name": "net:20seg",
+          "ok": true,
+          "detail": "0ms"
+        },
+        {
+          "name": "net:20perf",
+          "ok": true,
+          "detail": "0ms"
+        },
+        {
+          "name": "exempt:500",
+          "ok": true,
+          "detail": "0.45 gal"
+        },
+        {
+          "name": "valid:zeroL",
+          "ok": true,
+          "detail": "Segment 1 (DPV→Remote): length must be > 0."
+        },
+        {
+          "name": "remote:maxPath",
+          "ok": true,
+          "detail": "best=R2 V=132.26"
+        },
+        {
+          "name": "pdf:importAPI",
+          "ok": false,
+          "detail": "no multi-page PDF fixture import API"
+        }
+      ],
+      "failures": [
+        "pipe:10in: PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains",
+        "valve:fixedLoss: fixedLossPsi ignored (need=27.18, expect ~32.18)",
+        "pdf:importAPI: no multi-page PDF fixture import API"
+      ]
+    },
+    {
+      "cycle": 3,
+      "passed": 14,
+      "failed": 3,
+      "checks": [
+        {
+          "name": "hw:PDF-S2S3",
+          "ok": true,
+          "detail": "0.38572853543799296 ≈ 0.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-S4-104",
+          "ok": true,
+          "detail": "23.028671371800613 ≈ 23.1 ±0.12"
+        },
+        {
+          "name": "hw:PDF-10in",
+          "ok": true,
+          "detail": "3.3433765516237925 ≈ 3.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-DI10",
+          "ok": true,
+          "detail": "6.758097775418985 ≈ 6.8 ±0.12"
+        },
+        {
+          "name": "wet:rejected",
+          "ok": true,
+          "detail": "Wet pipe systems are water-filled. NFPA 13 dry-pipe water delivery time criteria"
+        },
+        {
+          "name": "dry:path",
+          "ok": true,
+          "detail": "DPV>UG1>RISER>CM>CM1>CM2>CM3>CM4>CM5>CM6>CM7>CM8>CM9>CM10>CM"
+        },
+        {
+          "name": "dry:volume",
+          "ok": true,
+          "detail": "4205.63 gal"
+        },
+        {
+          "name": "dry:delivery",
+          "ok": true,
+          "detail": "718.3s band=red"
+        },
+        {
+          "name": "dry:perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "pipe:10in",
+          "ok": false,
+          "detail": "PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains"
+        },
+        {
+          "name": "valve:fixedLoss",
+          "ok": false,
+          "detail": "fixedLossPsi ignored (need=27.18, expect ~32.18)"
+        },
+        {
+          "name": "net:20seg",
+          "ok": true,
+          "detail": "0ms"
+        },
+        {
+          "name": "net:20perf",
+          "ok": true,
+          "detail": "0ms"
+        },
+        {
+          "name": "exempt:500",
+          "ok": true,
+          "detail": "0.45 gal"
+        },
+        {
+          "name": "valid:zeroL",
+          "ok": true,
+          "detail": "Segment 1 (DPV→Remote): length must be > 0."
+        },
+        {
+          "name": "remote:maxPath",
+          "ok": true,
+          "detail": "best=R2 V=132.26"
+        },
+        {
+          "name": "pdf:importAPI",
+          "ok": false,
+          "detail": "no multi-page PDF fixture import API"
+        }
+      ],
+      "failures": [
+        "pipe:10in: PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains",
+        "valve:fixedLoss: fixedLossPsi ignored (need=27.18, expect ~32.18)",
+        "pdf:importAPI: no multi-page PDF fixture import API"
+      ]
+    },
+    {
+      "cycle": 4,
+      "passed": 14,
+      "failed": 3,
+      "checks": [
+        {
+          "name": "hw:PDF-S2S3",
+          "ok": true,
+          "detail": "0.38572853543799296 ≈ 0.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-S4-104",
+          "ok": true,
+          "detail": "23.028671371800613 ≈ 23.1 ±0.12"
+        },
+        {
+          "name": "hw:PDF-10in",
+          "ok": true,
+          "detail": "3.3433765516237925 ≈ 3.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-DI10",
+          "ok": true,
+          "detail": "6.758097775418985 ≈ 6.8 ±0.12"
+        },
+        {
+          "name": "wet:rejected",
+          "ok": true,
+          "detail": "Wet pipe systems are water-filled. NFPA 13 dry-pipe water delivery time criteria"
+        },
+        {
+          "name": "dry:path",
+          "ok": true,
+          "detail": "DPV>UG1>RISER>CM>CM1>CM2>CM3>CM4>CM5>CM6>CM7>CM8>CM9>CM10>CM"
+        },
+        {
+          "name": "dry:volume",
+          "ok": true,
+          "detail": "4205.63 gal"
+        },
+        {
+          "name": "dry:delivery",
+          "ok": true,
+          "detail": "718.3s band=red"
+        },
+        {
+          "name": "dry:perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "pipe:10in",
+          "ok": false,
+          "detail": "PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains"
+        },
+        {
+          "name": "valve:fixedLoss",
+          "ok": false,
+          "detail": "fixedLossPsi ignored (need=27.18, expect ~32.18)"
+        },
+        {
+          "name": "net:20seg",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "net:20perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "exempt:500",
+          "ok": true,
+          "detail": "0.45 gal"
+        },
+        {
+          "name": "valid:zeroL",
+          "ok": true,
+          "detail": "Segment 1 (DPV→Remote): length must be > 0."
+        },
+        {
+          "name": "remote:maxPath",
+          "ok": true,
+          "detail": "best=R2 V=132.26"
+        },
+        {
+          "name": "pdf:importAPI",
+          "ok": false,
+          "detail": "no multi-page PDF fixture import API"
+        }
+      ],
+      "failures": [
+        "pipe:10in: PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains",
+        "valve:fixedLoss: fixedLossPsi ignored (need=27.18, expect ~32.18)",
+        "pdf:importAPI: no multi-page PDF fixture import API"
+      ]
+    },
+    {
+      "cycle": 5,
+      "passed": 14,
+      "failed": 3,
+      "checks": [
+        {
+          "name": "hw:PDF-S2S3",
+          "ok": true,
+          "detail": "0.38572853543799296 ≈ 0.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-S4-104",
+          "ok": true,
+          "detail": "23.028671371800613 ≈ 23.1 ±0.12"
+        },
+        {
+          "name": "hw:PDF-10in",
+          "ok": true,
+          "detail": "3.3433765516237925 ≈ 3.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-DI10",
+          "ok": true,
+          "detail": "6.758097775418985 ≈ 6.8 ±0.12"
+        },
+        {
+          "name": "wet:rejected",
+          "ok": true,
+          "detail": "Wet pipe systems are water-filled. NFPA 13 dry-pipe water delivery time criteria"
+        },
+        {
+          "name": "dry:path",
+          "ok": true,
+          "detail": "DPV>UG1>RISER>CM>CM1>CM2>CM3>CM4>CM5>CM6>CM7>CM8>CM9>CM10>CM"
+        },
+        {
+          "name": "dry:volume",
+          "ok": true,
+          "detail": "4205.63 gal"
+        },
+        {
+          "name": "dry:delivery",
+          "ok": true,
+          "detail": "718.3s band=red"
+        },
+        {
+          "name": "dry:perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "pipe:10in",
+          "ok": false,
+          "detail": "PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains"
+        },
+        {
+          "name": "valve:fixedLoss",
+          "ok": false,
+          "detail": "fixedLossPsi ignored (need=27.18, expect ~32.18)"
+        },
+        {
+          "name": "net:20seg",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "net:20perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "exempt:500",
+          "ok": true,
+          "detail": "0.45 gal"
+        },
+        {
+          "name": "valid:zeroL",
+          "ok": true,
+          "detail": "Segment 1 (DPV→Remote): length must be > 0."
+        },
+        {
+          "name": "remote:maxPath",
+          "ok": true,
+          "detail": "best=R2 V=132.26"
+        },
+        {
+          "name": "pdf:importAPI",
+          "ok": false,
+          "detail": "no multi-page PDF fixture import API"
+        }
+      ],
+      "failures": [
+        "pipe:10in: PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains",
+        "valve:fixedLoss: fixedLossPsi ignored (need=27.18, expect ~32.18)",
+        "pdf:importAPI: no multi-page PDF fixture import API"
+      ]
+    },
+    {
+      "cycle": 6,
+      "passed": 14,
+      "failed": 3,
+      "checks": [
+        {
+          "name": "hw:PDF-S2S3",
+          "ok": true,
+          "detail": "0.38572853543799296 ≈ 0.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-S4-104",
+          "ok": true,
+          "detail": "23.028671371800613 ≈ 23.1 ±0.12"
+        },
+        {
+          "name": "hw:PDF-10in",
+          "ok": true,
+          "detail": "3.3433765516237925 ≈ 3.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-DI10",
+          "ok": true,
+          "detail": "6.758097775418985 ≈ 6.8 ±0.12"
+        },
+        {
+          "name": "wet:rejected",
+          "ok": true,
+          "detail": "Wet pipe systems are water-filled. NFPA 13 dry-pipe water delivery time criteria"
+        },
+        {
+          "name": "dry:path",
+          "ok": true,
+          "detail": "DPV>UG1>RISER>CM>CM1>CM2>CM3>CM4>CM5>CM6>CM7>CM8>CM9>CM10>CM"
+        },
+        {
+          "name": "dry:volume",
+          "ok": true,
+          "detail": "4205.63 gal"
+        },
+        {
+          "name": "dry:delivery",
+          "ok": true,
+          "detail": "718.3s band=red"
+        },
+        {
+          "name": "dry:perf",
+          "ok": true,
+          "detail": "0ms"
+        },
+        {
+          "name": "pipe:10in",
+          "ok": false,
+          "detail": "PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains"
+        },
+        {
+          "name": "valve:fixedLoss",
+          "ok": false,
+          "detail": "fixedLossPsi ignored (need=27.18, expect ~32.18)"
+        },
+        {
+          "name": "net:20seg",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "net:20perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "exempt:500",
+          "ok": true,
+          "detail": "0.45 gal"
+        },
+        {
+          "name": "valid:zeroL",
+          "ok": true,
+          "detail": "Segment 1 (DPV→Remote): length must be > 0."
+        },
+        {
+          "name": "remote:maxPath",
+          "ok": true,
+          "detail": "best=R2 V=132.26"
+        },
+        {
+          "name": "pdf:importAPI",
+          "ok": false,
+          "detail": "no multi-page PDF fixture import API"
+        }
+      ],
+      "failures": [
+        "pipe:10in: PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains",
+        "valve:fixedLoss: fixedLossPsi ignored (need=27.18, expect ~32.18)",
+        "pdf:importAPI: no multi-page PDF fixture import API"
+      ]
+    },
+    {
+      "cycle": 7,
+      "passed": 14,
+      "failed": 3,
+      "checks": [
+        {
+          "name": "hw:PDF-S2S3",
+          "ok": true,
+          "detail": "0.38572853543799296 ≈ 0.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-S4-104",
+          "ok": true,
+          "detail": "23.028671371800613 ≈ 23.1 ±0.12"
+        },
+        {
+          "name": "hw:PDF-10in",
+          "ok": true,
+          "detail": "3.3433765516237925 ≈ 3.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-DI10",
+          "ok": true,
+          "detail": "6.758097775418985 ≈ 6.8 ±0.12"
+        },
+        {
+          "name": "wet:rejected",
+          "ok": true,
+          "detail": "Wet pipe systems are water-filled. NFPA 13 dry-pipe water delivery time criteria"
+        },
+        {
+          "name": "dry:path",
+          "ok": true,
+          "detail": "DPV>UG1>RISER>CM>CM1>CM2>CM3>CM4>CM5>CM6>CM7>CM8>CM9>CM10>CM"
+        },
+        {
+          "name": "dry:volume",
+          "ok": true,
+          "detail": "4205.63 gal"
+        },
+        {
+          "name": "dry:delivery",
+          "ok": true,
+          "detail": "718.3s band=red"
+        },
+        {
+          "name": "dry:perf",
+          "ok": true,
+          "detail": "0ms"
+        },
+        {
+          "name": "pipe:10in",
+          "ok": false,
+          "detail": "PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains"
+        },
+        {
+          "name": "valve:fixedLoss",
+          "ok": false,
+          "detail": "fixedLossPsi ignored (need=27.18, expect ~32.18)"
+        },
+        {
+          "name": "net:20seg",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "net:20perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "exempt:500",
+          "ok": true,
+          "detail": "0.45 gal"
+        },
+        {
+          "name": "valid:zeroL",
+          "ok": true,
+          "detail": "Segment 1 (DPV→Remote): length must be > 0."
+        },
+        {
+          "name": "remote:maxPath",
+          "ok": true,
+          "detail": "best=R2 V=132.26"
+        },
+        {
+          "name": "pdf:importAPI",
+          "ok": false,
+          "detail": "no multi-page PDF fixture import API"
+        }
+      ],
+      "failures": [
+        "pipe:10in: PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains",
+        "valve:fixedLoss: fixedLossPsi ignored (need=27.18, expect ~32.18)",
+        "pdf:importAPI: no multi-page PDF fixture import API"
+      ]
+    },
+    {
+      "cycle": 8,
+      "passed": 14,
+      "failed": 3,
+      "checks": [
+        {
+          "name": "hw:PDF-S2S3",
+          "ok": true,
+          "detail": "0.38572853543799296 ≈ 0.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-S4-104",
+          "ok": true,
+          "detail": "23.028671371800613 ≈ 23.1 ±0.12"
+        },
+        {
+          "name": "hw:PDF-10in",
+          "ok": true,
+          "detail": "3.3433765516237925 ≈ 3.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-DI10",
+          "ok": true,
+          "detail": "6.758097775418985 ≈ 6.8 ±0.12"
+        },
+        {
+          "name": "wet:rejected",
+          "ok": true,
+          "detail": "Wet pipe systems are water-filled. NFPA 13 dry-pipe water delivery time criteria"
+        },
+        {
+          "name": "dry:path",
+          "ok": true,
+          "detail": "DPV>UG1>RISER>CM>CM1>CM2>CM3>CM4>CM5>CM6>CM7>CM8>CM9>CM10>CM"
+        },
+        {
+          "name": "dry:volume",
+          "ok": true,
+          "detail": "4205.63 gal"
+        },
+        {
+          "name": "dry:delivery",
+          "ok": true,
+          "detail": "718.3s band=red"
+        },
+        {
+          "name": "dry:perf",
+          "ok": true,
+          "detail": "0ms"
+        },
+        {
+          "name": "pipe:10in",
+          "ok": false,
+          "detail": "PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains"
+        },
+        {
+          "name": "valve:fixedLoss",
+          "ok": false,
+          "detail": "fixedLossPsi ignored (need=27.18, expect ~32.18)"
+        },
+        {
+          "name": "net:20seg",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "net:20perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "exempt:500",
+          "ok": true,
+          "detail": "0.45 gal"
+        },
+        {
+          "name": "valid:zeroL",
+          "ok": true,
+          "detail": "Segment 1 (DPV→Remote): length must be > 0."
+        },
+        {
+          "name": "remote:maxPath",
+          "ok": true,
+          "detail": "best=R2 V=132.26"
+        },
+        {
+          "name": "pdf:importAPI",
+          "ok": false,
+          "detail": "no multi-page PDF fixture import API"
+        }
+      ],
+      "failures": [
+        "pipe:10in: PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains",
+        "valve:fixedLoss: fixedLossPsi ignored (need=27.18, expect ~32.18)",
+        "pdf:importAPI: no multi-page PDF fixture import API"
+      ]
+    },
+    {
+      "cycle": 9,
+      "passed": 14,
+      "failed": 3,
+      "checks": [
+        {
+          "name": "hw:PDF-S2S3",
+          "ok": true,
+          "detail": "0.38572853543799296 ≈ 0.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-S4-104",
+          "ok": true,
+          "detail": "23.028671371800613 ≈ 23.1 ±0.12"
+        },
+        {
+          "name": "hw:PDF-10in",
+          "ok": true,
+          "detail": "3.3433765516237925 ≈ 3.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-DI10",
+          "ok": true,
+          "detail": "6.758097775418985 ≈ 6.8 ±0.12"
+        },
+        {
+          "name": "wet:rejected",
+          "ok": true,
+          "detail": "Wet pipe systems are water-filled. NFPA 13 dry-pipe water delivery time criteria"
+        },
+        {
+          "name": "dry:path",
+          "ok": true,
+          "detail": "DPV>UG1>RISER>CM>CM1>CM2>CM3>CM4>CM5>CM6>CM7>CM8>CM9>CM10>CM"
+        },
+        {
+          "name": "dry:volume",
+          "ok": true,
+          "detail": "4205.63 gal"
+        },
+        {
+          "name": "dry:delivery",
+          "ok": true,
+          "detail": "718.3s band=red"
+        },
+        {
+          "name": "dry:perf",
+          "ok": true,
+          "detail": "0ms"
+        },
+        {
+          "name": "pipe:10in",
+          "ok": false,
+          "detail": "PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains"
+        },
+        {
+          "name": "valve:fixedLoss",
+          "ok": false,
+          "detail": "fixedLossPsi ignored (need=27.18, expect ~32.18)"
+        },
+        {
+          "name": "net:20seg",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "net:20perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "exempt:500",
+          "ok": true,
+          "detail": "0.45 gal"
+        },
+        {
+          "name": "valid:zeroL",
+          "ok": true,
+          "detail": "Segment 1 (DPV→Remote): length must be > 0."
+        },
+        {
+          "name": "remote:maxPath",
+          "ok": true,
+          "detail": "best=R2 V=132.26"
+        },
+        {
+          "name": "pdf:importAPI",
+          "ok": false,
+          "detail": "no multi-page PDF fixture import API"
+        }
+      ],
+      "failures": [
+        "pipe:10in: PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains",
+        "valve:fixedLoss: fixedLossPsi ignored (need=27.18, expect ~32.18)",
+        "pdf:importAPI: no multi-page PDF fixture import API"
+      ]
+    },
+    {
+      "cycle": 10,
+      "passed": 14,
+      "failed": 3,
+      "checks": [
+        {
+          "name": "hw:PDF-S2S3",
+          "ok": true,
+          "detail": "0.38572853543799296 ≈ 0.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-S4-104",
+          "ok": true,
+          "detail": "23.028671371800613 ≈ 23.1 ±0.12"
+        },
+        {
+          "name": "hw:PDF-10in",
+          "ok": true,
+          "detail": "3.3433765516237925 ≈ 3.4 ±0.12"
+        },
+        {
+          "name": "hw:PDF-DI10",
+          "ok": true,
+          "detail": "6.758097775418985 ≈ 6.8 ±0.12"
+        },
+        {
+          "name": "wet:rejected",
+          "ok": true,
+          "detail": "Wet pipe systems are water-filled. NFPA 13 dry-pipe water delivery time criteria"
+        },
+        {
+          "name": "dry:path",
+          "ok": true,
+          "detail": "DPV>UG1>RISER>CM>CM1>CM2>CM3>CM4>CM5>CM6>CM7>CM8>CM9>CM10>CM"
+        },
+        {
+          "name": "dry:volume",
+          "ok": true,
+          "detail": "4205.63 gal"
+        },
+        {
+          "name": "dry:delivery",
+          "ok": true,
+          "detail": "718.3s band=red"
+        },
+        {
+          "name": "dry:perf",
+          "ok": true,
+          "detail": "1ms"
+        },
+        {
+          "name": "pipe:10in",
+          "ok": false,
+          "detail": "PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains"
+        },
+        {
+          "name": "valve:fixedLoss",
+          "ok": false,
+          "detail": "fixedLossPsi ignored (need=27.18, expect ~32.18)"
+        },
+        {
+          "name": "net:20seg",
+          "ok": true,
+          "detail": "0ms"
+        },
+        {
+          "name": "net:20perf",
+          "ok": true,
+          "detail": "0ms"
+        },
+        {
+          "name": "exempt:500",
+          "ok": true,
+          "detail": "0.45 gal"
+        },
+        {
+          "name": "valid:zeroL",
+          "ok": true,
+          "detail": "Segment 1 (DPV→Remote): length must be > 0."
+        },
+        {
+          "name": "remote:maxPath",
+          "ok": true,
+          "detail": "best=R2 V=132.26"
+        },
+        {
+          "name": "pdf:importAPI",
+          "ok": false,
+          "detail": "no multi-page PDF fixture import API"
+        }
+      ],
+      "failures": [
+        "pipe:10in: PIPE_ID missing 10\" — PDF calcs commonly use 10\" mains",
+        "valve:fixedLoss: fixedLossPsi ignored (need=27.18, expect ~32.18)",
+        "pdf:importAPI: no multi-page PDF fixture import API"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Preliminary dry-pipe / preaction sprinkler water delivery time calculator — volume, Hazen-Williams, trip + transit, NFPA 13 / FM checks. Not a listed method.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Dry Delivery">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Dry Sprinkler Water Delivery · Fire Toolshed</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon.svg">
+  <link rel="stylesheet" href="../shared/water-path-shell.css">
+  <link rel="stylesheet" href="./assets/styles.css?v=1.2.0">
+</head>
+<body>
+  <div id="waterPathShell" class="no-print"></div>
+
+  <div class="disclaimer-banner" role="alert">
+    <strong>Preliminary design estimates only.</strong>
+    This tool is <strong>not</strong> a listed calculation method under NFPA 13.
+    <span class="lim">Final compliance requires a nationally recognized testing laboratory–listed program or a successful field trip test. Every report repeats this limitation.</span>
+  </div>
+
+  <div class="shell screen-only">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Fire Toolshed</p>
+        <h1>Dry Sprinkler Water Delivery</h1>
+        <p class="version" id="appVersion">Version 1.2.0-prelim</p>
+      </div>
+      <div class="top-actions no-print">
+        <button type="button" id="btnTheme" class="ghost" title="Toggle dark / light mode">Dark</button>
+        <button type="button" id="btnMethodology" class="ghost" title="Show methodology panel">Methodology</button>
+        <button type="button" id="btnHelp" class="ghost" title="Calculation basis and help">Help</button>
+        <button type="button" id="btnExample" title="Load example warehouse network">Example</button>
+        <button type="button" id="btnImportFixture" title="Import multi-page PDF calc fixture (JSON)">Import PDF Fixture</button>
+        <input id="fixtureFile" type="file" accept="application/json,.json" class="hidden" aria-hidden="true">
+        <button type="button" id="btnSaveProject" title="Save to last-5 project history">Save Project</button>
+        <button type="button" id="btnCsv" title="Export pipe + node tables as CSV">CSV</button>
+        <button type="button" id="btnSaveReport" class="primary" title="Download HTML report + JSON">Report</button>
+        <button type="button" id="btnPdf" title="Print / Save as PDF">PDF</button>
+        <button type="button" id="btnPrint" class="ghost" title="Print clean report">Print</button>
+        <button type="button" id="btnReset" class="ghost">Reset</button>
+      </div>
+    </header>
+
+    <div class="field-grid two no-print" style="margin-bottom:0.75rem;align-items:end">
+      <div class="field">
+        <label for="projectHistory">Project history (last 5)</label>
+        <select id="projectHistory" aria-label="Restore a saved project">
+          <option value="">— Last 5 projects —</option>
+        </select>
+      </div>
+      <p class="hint" style="margin:0" id="calcTiming">Recalc —</p>
+    </div>
+
+    <div id="systemTypeBanner" class="callout fail hidden no-print" role="alert" style="margin-bottom:0.75rem"></div>
+    <div id="pdfSourceBanner" class="callout info hidden no-print" role="status" style="margin-bottom:0.75rem"></div>
+    <div id="validationBanner" class="callout warn hidden no-print" role="status" style="margin-bottom:0.75rem"></div>
+
+    <!-- Live metrics -->
+    <section class="metrics" aria-label="Live results">
+      <div class="metric" id="metricStatusCard">
+        <div class="label">Compliance</div>
+        <div class="value" id="metricStatus">—</div>
+        <div class="unit">green / yellow / red</div>
+      </div>
+      <div class="metric">
+        <div class="label">Water delivery</div>
+        <div class="value" id="metricDelivery">0</div>
+        <div class="unit">seconds (trip + transit)</div>
+      </div>
+      <div class="metric">
+        <div class="label">Trip time</div>
+        <div class="value" id="metricTrip">0</div>
+        <div class="unit">seconds</div>
+      </div>
+      <div class="metric">
+        <div class="label">Transit time</div>
+        <div class="value" id="metricTransit">0</div>
+        <div class="unit">seconds</div>
+      </div>
+      <div class="metric">
+        <div class="label">Total volume</div>
+        <div class="value" id="metricVolTotal">0</div>
+        <div class="unit" id="unitVolTotal">gal</div>
+      </div>
+      <div class="metric">
+        <div class="label">Vol. to remote</div>
+        <div class="value" id="metricVolRemote">0</div>
+        <div class="unit" id="unitVolRemote">gal</div>
+      </div>
+      <div class="metric">
+        <div class="label">Design flow</div>
+        <div class="value" id="metricFlow">0</div>
+        <div class="unit" id="unitFlow">gpm (open heads)</div>
+      </div>
+    </section>
+
+    <section class="dual-compare" id="dualCompare" aria-label="NFPA and FM comparison">
+      <div class="compare-card" id="nfpaCompareCard">
+        <div class="compare-title">NFPA 13</div>
+        <div class="compare-time" id="nfpaCompareTime">—</div>
+        <div class="compare-limit" id="nfpaCompareLimit">Limit —</div>
+        <div class="compare-band" id="nfpaCompareBand">—</div>
+      </div>
+      <div class="compare-card" id="fmCompareCard">
+        <div class="compare-title">FM Global</div>
+        <div class="compare-time" id="fmCompareTime">—</div>
+        <div class="compare-limit" id="fmCompareLimit">Limit —</div>
+        <div class="compare-band" id="fmCompareBand">—</div>
+      </div>
+    </section>
+
+    <section class="panel hidden no-print" id="methodologyPanel" style="margin-bottom:1rem">
+      <h2>Methodology &amp; assumptions</h2>
+      <ul class="hint" style="margin:0;padding-left:1.15rem;line-height:1.55">
+        <li><strong>Eligible systems only:</strong> dry pipe and double-interlock preaction. <strong>Wet pipe is rejected</strong> for water delivery compliance (water is already at the heads). Single-interlock is not evaluated here.</li>
+        <li><strong>Tree / simple branched networks only</strong> (no full grids in v1).</li>
+        <li><strong>Volume:</strong> π/4 · (ID/12)² · L · 7.4805 gal; optional fitting volume ≈ 15% of EL as pipe.</li>
+        <li><strong>Hazen–Williams:</strong> p = 4.52 Q<sup>1.85</sup> / (C<sup>1.85</sup> d<sup>4.87</sup>) psi/ft; elev 0.433 psi/ft.</li>
+        <li><strong>Trip:</strong> t ≈ 0.0352 · (V<sub>T</sub>/(A<sub>n</sub>√T₀)) · ln(p<sub>a0</sub>/p<sub>a</sub>); QOD applies 50% planning reduction.</li>
+        <li><strong>Transit:</strong> t = 60 · V<sub>remote</sub> / Q<sub>fill</sub>; Q<sub>fill</sub> from residual @ DPV via inverse HW, or override.</li>
+        <li><strong>Bands:</strong> Green ≤90% of limit; Yellow within 10% (still ≤ limit); Red exceeds.</li>
+        <li>Does <em>not</em> model compressible multi-phase flow, accelerator dynamics, or listed software methods.</li>
+        <li>Not a substitute for listed calculation programs or field trip testing.</li>
+      </ul>
+      <p class="sub" id="fillRateDetail" style="margin-top:0.65rem">—</p>
+    </section>
+
+    <div class="layout">
+      <!-- Left column: project + criteria + design -->
+      <div>
+        <section class="panel">
+          <h2>Project setup</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="projectName">Project name</label>
+              <input id="projectName" type="text" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="facility">Building / area</label>
+              <input id="facility" type="text" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="preparedBy">Engineer name</label>
+              <input id="preparedBy" type="text" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="peNumber">PE number (optional)</label>
+              <input id="peNumber" type="text" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="company">Company</label>
+              <input id="company" type="text" autocomplete="organization">
+            </div>
+            <div class="field">
+              <label for="reportDate">Date</label>
+              <input id="reportDate" type="date">
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="occupancyDesc">Building / occupancy description</label>
+              <input id="occupancyDesc" type="text" placeholder="e.g. OH-2 manufacturing, dry pipe">
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="projectNotes">Notes</label>
+              <textarea id="projectNotes" rows="2" placeholder="AHJ notes, QOD listing, trip-test plans…"></textarea>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="reportLogoSource">Report logo</label>
+              <select id="reportLogoSource">
+                <option value="benham">Benham</option>
+                <option value="meadhunt">MeadHunt JV</option>
+                <option value="haskell">Haskell (by state)</option>
+                <option value="upload">Upload image…</option>
+              </select>
+              <div id="reportLogoFileWrap" class="hidden" style="margin-top:0.5rem">
+                <input id="reportLogoFile" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp,image/*">
+              </div>
+              <div id="reportLogoPreview" style="margin-top:0.5rem;min-height:2rem"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:1rem">
+          <h2>Criteria &amp; hazard</h2>
+          <p class="hint">Water delivery time applies only to <strong>dry pipe</strong> and <strong>double-interlock preaction</strong>. Wet systems are rejected for compliance.</p>
+
+          <div class="field" style="margin-bottom:0.85rem">
+            <label for="systemType">System type</label>
+            <select id="systemType">
+              <option value="dry" selected>Dry pipe</option>
+              <option value="double_interlock">Double-interlock preaction</option>
+              <option value="single_interlock">Single-interlock preaction (not evaluated)</option>
+              <option value="wet">Wet pipe (rejected)</option>
+            </select>
+            <span class="sub">NFPA 13 §8.2 dry-pipe water delivery. Wet pipe is water-filled — delivery time does not apply.</span>
+          </div>
+
+          <h3>Criteria set</h3>
+          <div class="criteria">
+            <label>
+              <input type="radio" name="criteriaSet" value="nfpa" checked>
+              <div>
+                <b>NFPA 13</b>
+                <small>Section 8.2 / water delivery table (2022 &amp; 2025 editions).</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="criteriaSet" value="fm">
+              <div>
+                <b>FM Global</b>
+                <small>Same numerical limits by default; use override for occupancy-specific DS.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="criteriaSet" value="both">
+              <div>
+                <b>Both (show stricter)</b>
+                <small>Report both; pass only if within the stricter limit.</small>
+              </div>
+            </label>
+          </div>
+
+          <div class="field-grid two" style="margin-top:0.85rem">
+            <div class="field">
+              <label for="hazardId">Hazard classification</label>
+              <select id="hazardId">
+                <option value="dwelling">Dwelling Unit — 1 head / 15 s</option>
+                <option value="light">Light — 1 head / 60 s</option>
+                <option value="ordinary" selected>Ordinary (Group 1 or 2) — 2 heads / 50 s</option>
+                <option value="extra">Extra (Group 1 or 2) — 4 heads / 45 s</option>
+                <option value="highpiled">High-Piled — 4 heads / 40 s</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="openHeads">Most remote sprinklers open</label>
+              <select id="openHeads">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="4">4</option>
+              </select>
+              <span class="sub">Auto-suggested by hazard; editable.</span>
+            </div>
+            <div class="field">
+              <label class="chk-row" for="qodPresent">
+                <input id="qodPresent" type="checkbox">
+                Quick-opening device (QOD) present
+              </label>
+              <span class="sub">Listed accelerator / exhauster — enables ≤750 gal exemption; 50% trip planning reduction.</span>
+            </div>
+            <div class="field">
+              <label for="fmMaxSecOverride">FM max delivery override</label>
+              <div class="row">
+                <input id="fmMaxSecOverride" type="number" min="0" step="1" placeholder="same as NFPA">
+                <span class="suffix">sec</span>
+              </div>
+              <span class="sub">Blank = use NFPA table value. Stricter occupancy-specific FM limit.</span>
+            </div>
+          </div>
+
+          <h3>Units</h3>
+          <div class="criteria" style="grid-template-columns:1fr 1fr">
+            <label>
+              <input type="radio" name="units" value="us" checked>
+              <div><b>US Customary</b><small>gal, ft, psi, gpm (calculation + default display)</small></div>
+            </label>
+            <label>
+              <input type="radio" name="units" value="metric">
+              <div><b>Metric display</b><small>Live convert: L, m, kPa, L/min (engine still US).</small></div>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:1rem">
+          <h2>Design flow &amp; hydraulics</h2>
+          <div class="criteria">
+            <label>
+              <input type="radio" name="designMode" value="kfactor" checked>
+              <div>
+                <b>K-factor × √P × heads</b>
+                <small>Q = n · K · √P<sub>min</sub> at remote open sprinklers.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="designMode" value="totalflow">
+              <div>
+                <b>Total design flow</b>
+                <small>Enter total gpm for open remote heads.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="designMode" value="density">
+              <div>
+                <b>Density × area</b>
+                <small>Q = density × design area (full remote area demand).</small>
+              </div>
+            </label>
+          </div>
+
+          <div id="blockKfactor" class="field-grid two" style="margin-top:0.75rem">
+            <div class="field">
+              <label for="kFactor">Sprinkler K-factor</label>
+              <input id="kFactor" type="number" min="0" step="0.1" value="5.6">
+            </div>
+            <div class="field">
+              <label for="minPressurePsi">Min. pressure at remote</label>
+              <div class="row">
+                <input id="minPressurePsi" type="number" min="0" step="0.1" value="7">
+                <span class="suffix">psi</span>
+              </div>
+            </div>
+          </div>
+          <div id="blockTotalflow" class="field-grid two hidden" style="margin-top:0.75rem">
+            <div class="field">
+              <label for="totalDesignFlowGpm">Total design flow</label>
+              <div class="row">
+                <input id="totalDesignFlowGpm" type="number" min="0" step="1">
+                <span class="suffix">gpm</span>
+              </div>
+            </div>
+          </div>
+          <div id="blockDensity" class="field-grid two hidden" style="margin-top:0.75rem">
+            <div class="field">
+              <label for="densityGpmSf">Design density</label>
+              <div class="row">
+                <input id="densityGpmSf" type="number" min="0" step="0.01" value="0.15">
+                <span class="suffix">gpm/sf</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="designAreaSf">Design area</label>
+              <div class="row">
+                <input id="designAreaSf" type="number" min="0" step="50" value="1500">
+                <span class="suffix">sf</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-grid two" style="margin-top:0.75rem">
+            <div class="field">
+              <label for="residualSupplyPsi">Residual pressure at supply / DPV (after trip)</label>
+              <div class="row">
+                <input id="residualSupplyPsi" type="number" min="0" step="1" placeholder="required for fill rate">
+                <span class="suffix">psi</span>
+              </div>
+              <span class="sub">Used for design residual check <em>and</em> average fill rate (inverse Hazen–Williams).</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:1rem">
+          <h2>Water delivery time inputs</h2>
+          <p class="hint">Trip uses FMRC-style air bleed-down. Transit uses volume/flow (default) or path length / fill velocity.</p>
+
+          <div class="field-grid two">
+            <div class="field">
+              <label for="airPressurePsi">Initial air pressure</label>
+              <div class="row">
+                <input id="airPressurePsi" type="number" min="0" step="1" value="40">
+                <span class="suffix">psig</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="tripPressurePsi">Trip pressure</label>
+              <div class="row">
+                <input id="tripPressurePsi" type="number" min="0" step="1" value="15">
+                <span class="suffix">psig</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="temperatureF">Temperature</label>
+              <div class="row">
+                <input id="temperatureF" type="number" step="1" value="70">
+                <span class="suffix">°F</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="tripTimeOverrideSec">Trip time override</label>
+              <div class="row">
+                <input id="tripTimeOverrideSec" type="number" min="0" step="0.1" placeholder="calc">
+                <span class="suffix">sec</span>
+              </div>
+            </div>
+          </div>
+
+          <h3>Transit method</h3>
+          <div class="criteria">
+            <label>
+              <input type="radio" name="transitMethod" value="volume_flow" checked>
+              <div>
+                <b>Volume / flow</b>
+                <small>t = 60 × V<sub>remote</sub> (gal) / Q<sub>fill</sub> (gpm)</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="transitMethod" value="length_velocity">
+              <div>
+                <b>Length / fill velocity</b>
+                <small>t = L<sub>path</sub> (ft) / v<sub>fill</sub> (fps)</small>
+              </div>
+            </label>
+          </div>
+          <div class="field-grid two" style="margin-top:0.65rem">
+            <div class="field">
+              <label for="fillFlowGpm">Fill flow override (optional)</label>
+              <div class="row">
+                <input id="fillFlowGpm" type="number" min="0" step="10" placeholder="auto from residual">
+                <span class="suffix">gpm</span>
+              </div>
+              <span class="sub">Blank = derive Q<sub>fill</sub> from residual @ DPV via HW. Else override. Falls back to design Q if residual unusable.</span>
+            </div>
+          </div>
+          <div id="blockFillVel" class="field-grid two hidden" style="margin-top:0.65rem">
+            <div class="field">
+              <label for="fillVelocityFps">Mean fill velocity</label>
+              <div class="row">
+                <input id="fillVelocityFps" type="number" min="0.1" step="0.5" value="10">
+                <span class="suffix">fps</span>
+              </div>
+            </div>
+          </div>
+          <div class="field" style="margin-top:0.65rem">
+            <label for="transitTimeOverrideSec">Transit time override</label>
+            <div class="row">
+              <input id="transitTimeOverrideSec" type="number" min="0" step="0.1" placeholder="calc">
+              <span class="suffix">sec</span>
+            </div>
+          </div>
+
+          <div class="formula-box" style="margin-top:0.75rem">
+            t<sub>trip</sub> ≈ 0.0352 × (V<sub>T</sub> / (A<sub>n</sub> √T₀)) × ln(p<sub>a0</sub>/p<sub>a</sub>)<br>
+            <span class="muted" id="tripFormulaDetail">—</span><br><br>
+            t<sub>transit</sub> = 60 × V<sub>remote</sub> / Q &nbsp;or&nbsp; L / v<br>
+            <span class="muted" id="transitFormulaDetail">—</span>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right column: results + network controls summary -->
+      <div>
+        <section class="panel">
+          <h2>Compliance summary</h2>
+          <div id="deliveryCallout" class="callout info">—</div>
+          <div id="volumeCallout" class="callout info" style="margin-top:0.5rem">—</div>
+          <ul class="check-list" id="checkList" style="margin-top:0.75rem"></ul>
+        </section>
+
+        <section class="panel" style="margin-top:1rem">
+          <h2>Network nodes</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="supplyNode">Supply / dry-pipe valve node</label>
+              <input id="supplyNode" type="text" value="DPV" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="remoteNodes">Remote sprinkler node(s)</label>
+              <input id="remoteNodes" type="text" value="Remote" placeholder="Remote, Remote2" autocomplete="off">
+              <span class="sub">Comma-separated. Most remote volume path is used for delivery.</span>
+            </div>
+          </div>
+          <label class="chk-row" for="includeFittingVolume" style="margin-top:0.5rem">
+            <input id="includeFittingVolume" type="checkbox" checked>
+            Include approximate fitting volume
+          </label>
+        </section>
+
+        <section class="panel" style="margin-top:1rem">
+          <h2>Hydraulic results</h2>
+          <p class="hint" id="hydroSummary">—</p>
+          <div class="table-wrap">
+            <table class="result-table">
+              <thead>
+                <tr>
+                  <th>Node</th>
+                  <th class="num">Q (gpm)</th>
+                  <th class="num">P (psi)</th>
+                  <th class="num">ΔP fric</th>
+                  <th class="num">ΔP elev</th>
+                  <th>Segment</th>
+                </tr>
+              </thead>
+              <tbody id="hydroBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:1rem">
+          <h2>Segment volumes</h2>
+          <div class="table-wrap">
+            <table class="result-table">
+              <thead>
+                <tr>
+                  <th>Segment</th>
+                  <th class="num">ID (in)</th>
+                  <th class="num">L (ft)</th>
+                  <th class="num">EL (ft)</th>
+                  <th class="num">Pipe gal</th>
+                  <th class="num">Fit gal</th>
+                  <th class="num">Total</th>
+                </tr>
+              </thead>
+              <tbody id="volBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- Full width pipe table -->
+      <section class="panel layout-full" style="margin-top:0">
+        <h2>Pipe network</h2>
+        <p class="hint">
+          Tree or simple branched network. From/To nodes must connect supply → remote.
+          Nominal size + schedule auto-fills ID (editable). Fittings: E90, E45, T thr, T br, gate, bf, chk, cpl, red — counts → NFPA-style equivalent length.
+        </p>
+        <div class="toolbar no-print">
+          <button type="button" id="btnAddRow" class="primary sm">Add Row</button>
+          <button type="button" id="btnInsertRow" class="sm">Insert Row</button>
+          <button type="button" id="btnDupPath" class="sm">Duplicate Path</button>
+        </div>
+        <div class="table-wrap">
+          <table class="pipe-table">
+            <thead>
+              <tr>
+                <th>From</th>
+                <th>To</th>
+                <th class="num">L (ft)</th>
+                <th>Nom.</th>
+                <th>Sch</th>
+                <th class="num">ID (in)</th>
+                <th class="num">C</th>
+                <th>Fittings (count)</th>
+                <th class="num">EL ovrd</th>
+                <th class="num">Elev (ft)</th>
+                <th class="num">Fix ΔP</th>
+                <th class="num">Vol gal</th>
+                <th>Notes</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="pipeBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <p class="hint" style="margin-top:1.25rem">
+      Standards: NFPA 13 (2022/2025) dry pipe water delivery · FM Global alignment · Hazen–Williams per NFPA 13 hydraulic practice.
+      Volume exemptions: ≤500 gal; ≤750 gal with listed QOD.
+    </p>
+  </div>
+
+  <!-- Print report -->
+  <div class="print-report print-only" id="printReport">
+    <div id="reportLogoPrint"></div>
+    <h1>Dry Sprinkler System Water Delivery Time</h1>
+    <div class="print-disclaimer">
+      <strong>Preliminary design estimates only.</strong>
+      This tool is not a listed calculation method under NFPA 13.
+      Final compliance requires a nationally recognized testing laboratory–listed program or a successful field trip test.
+    </div>
+    <p class="meta">
+      <strong id="printProject">—</strong> · <span id="printFacility">—</span><br>
+      Prepared by <span id="printBy">—</span> · PE <span id="printPe">—</span> · <span id="printCompany">—</span> · <span id="printDate">—</span><br>
+      Occupancy: <span id="printOccupancy">—</span>
+    </p>
+    <table>
+      <tr><th>System type</th><td id="printSystemType">—</td></tr>
+      <tr><th>Criteria</th><td id="printCriteria">—</td></tr>
+      <tr><th>Hazard / heads</th><td><span id="printHazard">—</span> · <span id="printHeads">—</span> open · QOD: <span id="printQod">—</span></td></tr>
+      <tr><th>Total volume</th><td id="printVolTotal">—</td></tr>
+      <tr><th>Volume to remote</th><td id="printVolRemote">—</td></tr>
+      <tr><th>Design flow</th><td id="printFlow">—</td></tr>
+      <tr><th>Trip / transit / total</th><td><span id="printTrip">—</span> + <span id="printTransit">—</span> = <strong id="printDelivery">—</strong> (limit <span id="printLimit">—</span>)</td></tr>
+      <tr><th>Status</th><td id="printStatus">—</td></tr>
+      <tr><th>NFPA / FM bands</th><td>NFPA <span id="printNfpaBand">—</span> · FM <span id="printFmBand">—</span></td></tr>
+      <tr><th>Trip formula</th><td id="printTripFormula">—</td></tr>
+      <tr><th>Transit formula</th><td id="printTransitFormula">—</td></tr>
+      <tr><th>Fill rate</th><td id="printFillNote">—</td></tr>
+      <tr><th>Hydraulics</th><td id="printHydro">—</td></tr>
+      <tr><th>Notes</th><td id="printNotes">—</td></tr>
+    </table>
+    <h2 style="font-size:1rem">Pipe segments</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>From–To</th><th>Pipe</th><th>ID</th><th>L</th><th>EL</th><th>C</th><th>Vol</th><th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="printSegBody"></tbody>
+    </table>
+    <h2 style="font-size:1rem">Signature</h2>
+    <table>
+      <tr><th>Name</th><td id="printSignName">—</td><th>PE #</th><td id="printSignPe">—</td></tr>
+      <tr><th>Date</th><td id="printSignDate">—</td><th>Signature</th><td style="height:2.5rem"> </td></tr>
+    </table>
+    <p style="font-size:0.75rem;color:#64748b">Calculator <span id="printVersion">—</span> · Fire Toolshed · Not a listed NFPA 13 method</p>
+  </div>
+
+  <script src="../shared/report-logo.js"></script>
+  <script src="../shared/water-path-shell.js"></script>
+  <script src="./assets/app.js?v=1.2.0"></script>
+</body>
+</html>
