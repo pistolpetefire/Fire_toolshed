@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Calc II Buddy" />
+  <meta name="description" content="OSU Calculus II semester study buddy — MATH 2153 exam topics, MCQs, workshop, syllabus locker." />
+  <title>Calculus II Semester Study Buddy · OSU MATH 2153</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-header">
+      <div>
+        <h1>Calculus II Semester Study Buddy</h1>
+        <p class="sub">OSU MATH 2153 · 3 exams + final · 75 MCQs / midterm · <span id="app-version">v1.1.0</span></p>
+      </div>
+      <nav class="nav-links" aria-label="App navigation">
+        <button type="button" class="btn btn-ghost" id="btn-manual">User manual</button>
+        <button type="button" class="btn btn-ghost" data-go-home>Home</button>
+        <a class="btn btn-ghost" href="../">Study Buddy hub</a>
+      </nav>
+    </header>
+
+    <section id="view-home" class="card" aria-label="Home">
+      <aside class="disclaimer-box" role="note">
+        <strong>Academic integrity / educational use</strong>
+        <p>
+          Personal exam preparation only. Not affiliated with or endorsed by Oklahoma State University or OSU-OKC.
+          Exam splits follow <em>typical</em> MATH 2153 syllabi (Stewart-style 3 midterms + comprehensive final).
+          Your instructor’s syllabus wins — drop a copy into the Syllabus locker when you have it.
+        </p>
+      </aside>
+
+      <span class="pill">Whole-semester Calc II</span>
+      <h2>Study by the test, not just the final</h2>
+      <p class="lead">
+        Built like the Calc I Study Buddy, expanded for a full
+        <strong>Oklahoma State Calculus II (MATH 2153)</strong> semester:
+        techniques of integration, sequences &amp; series, power/Taylor, parametric &amp; polar.
+        Open an exam unit, drill its topics, then sit a mixed practice exam.
+        After every MCQ you get a <strong>full solve path</strong>: how to start, the method for that type,
+        this problem step by step, why each choice works or fails, and what to write plus how to check.
+        Workshop problems use the same path.
+      </p>
+      <div id="home-stats"></div>
+
+      <h3 style="margin:1.15rem 0 0.35rem;font-size:1rem">Exam units</h3>
+      <p class="lead" style="margin-bottom:0">
+        Common OSU split: three midterms plus a comprehensive final. Tap a unit for its topics, key focus, and a practice exam.
+      </p>
+      <div id="exam-grid" class="exam-grid"></div>
+
+      <div class="grid two" style="margin-top:1rem">
+        <button type="button" class="mode-card" id="btn-topics">
+          <strong>1 · Topic practice (MCQ)</strong>
+          <span>All topics, or filter by exam. Concepts, “which test?”, and trap recognition with tutoring.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-exam-practice">
+          <strong>2 · Practice exam</strong>
+          <span>Mixed MCQs from the exam you pick — or a comprehensive final-length set.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-math">
+          <strong>3 · Worked problem workshop</strong>
+          <span>Exam-style free-response. Hints first, then full solutions and common mistakes.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-missed">
+          <strong>4 · Review missed</strong>
+          <span>Retake MCQs you missed until they clear. Filter by exam week-of-test.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-formulas">
+          <strong>5 · Formula &amp; strategy sheets</strong>
+          <span>IBP, trig-sub triangles, series tests, Maclaurin list, polar area — one place to skim.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-syllabus">
+          <strong>6 · Syllabus locker</strong>
+          <span>Placeholder for your section’s syllabus. Paste coverage notes to override key focus per exam.</span>
+        </button>
+      </div>
+
+      <div class="card plan-card" style="margin-top:1rem;background:var(--bg);box-shadow:none">
+        <div class="plan-header">
+          <div>
+            <h2 style="font-size:1.05rem;margin:0 0 0.25rem">16-week semester roadmap</h2>
+            <p class="lead" style="margin:0">
+              Default pace for a 16-week OSU term. Edit any week. Check off as you go. Saved on this device only.
+            </p>
+          </div>
+        </div>
+        <label class="field plan-exam-label">
+          Section / exam-day note (optional)
+          <input type="text" id="plan-exam-note" maxlength="120" placeholder="e.g. MATH 2153 · Exam 1 Wed Feb 11 · Final May 6 10am" autocomplete="off" />
+        </label>
+        <div id="semester-plan" class="semester-plan" aria-label="Editable 16-week study plan"></div>
+        <div class="toolbar plan-actions">
+          <button type="button" class="btn btn-primary" id="btn-plan-save">Save plan</button>
+          <button type="button" class="btn" id="btn-plan-export">Export plan JSON</button>
+          <label class="btn" style="cursor:pointer;margin:0">
+            Import plan JSON
+            <input type="file" id="btn-plan-import" accept=".json,application/json" style="display:none" />
+          </label>
+          <button type="button" class="btn" id="btn-plan-reset">Restore default 16-week plan</button>
+          <span id="plan-save-status" class="sub" style="font-size:0.8rem" aria-live="polite"></span>
+        </div>
+        <p class="sub plan-hint">Tip: click <strong>This week</strong> to highlight where you are. Edits show <em>Unsaved</em> until you save (or blur-save).</p>
+      </div>
+
+      <div class="toolbar" style="margin-top:1rem">
+        <label class="field">
+          Practice-exam length
+          <input type="number" id="final-count" min="5" max="225" value="25" inputmode="numeric" />
+        </label>
+        <button type="button" class="btn" id="btn-settings">Settings / reset</button>
+      </div>
+    </section>
+
+    <section id="view-exam" class="card hidden" aria-label="Exam unit">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <div id="exam-detail"></div>
+    </section>
+
+    <section id="view-topics" class="card hidden" aria-label="Topics">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Choose a topic</h2>
+      <p class="lead">MCQs with instant tutoring. Filter by exam unit if you are in a test week.</p>
+      <div id="topic-filter" class="topic-filter"></div>
+      <div id="topic-grid" class="grid topics"></div>
+    </section>
+
+    <section id="view-quiz" class="card hidden" aria-label="Quiz">
+      <div class="progress-bar" aria-hidden="true"><i id="quiz-progress-fill"></i></div>
+      <div id="quiz-meta" class="quiz-meta"></div>
+      <p id="quiz-stem" class="stem"></p>
+      <div id="quiz-choices" class="choices" role="group" aria-label="Answer choices"></div>
+      <div id="quiz-feedback" class="feedback hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+      <div id="quiz-toolbar" class="toolbar"></div>
+    </section>
+
+    <section id="view-math" class="hidden" aria-label="Worked problems">
+      <div class="card">
+        <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+        <h2 style="margin-top:0.75rem">Worked problem workshop</h2>
+        <p class="lead">
+          These look like exam free-response. <strong>Write your work on paper first.</strong>
+          Filter by exam, use hints if stuck, then open the complete explanation.
+        </p>
+        <div id="math-filter" class="topic-filter"></div>
+      </div>
+      <div id="math-list"></div>
+    </section>
+
+    <section id="view-missed" class="card hidden" aria-label="Missed questions">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Review missed</h2>
+      <p class="lead">Missed MCQs stay here until you get them right. Filter by exam before a test.</p>
+      <div id="missed-filter" class="topic-filter"></div>
+      <div id="missed-list"></div>
+    </section>
+
+    <section id="view-formulas" class="hidden" aria-label="Formula sheets">
+      <div class="card">
+        <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+        <h2 style="margin-top:0.75rem">Formula &amp; strategy sheets</h2>
+        <p class="lead">
+          Skim before a practice exam. If your section allows one handwritten sheet, copy the items you still miss —
+          not this entire page.
+        </p>
+        <div id="formula-filter" class="topic-filter"></div>
+      </div>
+      <div id="formula-list" class="formula-grid"></div>
+    </section>
+
+    <section id="view-syllabus" class="card hidden" aria-label="Syllabus locker">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Syllabus locker</h2>
+      <div id="syllabus-body"></div>
+    </section>
+
+    <section id="view-manual" class="card hidden" aria-label="User manual">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">User manual</h2>
+      <p class="lead">Study Calc II by exam. Do the work on paper. Then open the solve path to check.</p>
+
+      <h3 style="margin:1rem 0 0.35rem;font-size:1rem">How to use it</h3>
+      <ol class="manual-steps">
+        <li>Open an <strong>exam unit</strong> (Exam 1, 2, 3, or Final).</li>
+        <li>Drill that unit’s <strong>topics</strong>, or run a <strong>practice exam</strong>.</li>
+        <li>Answer on paper first. After you pick a choice, read all five tutor blocks.</li>
+        <li>Clear <strong>Review missed</strong> before the real test.</li>
+        <li>When you have a syllabus, paste coverage into the <strong>Syllabus locker</strong> so key focus matches your section.</li>
+      </ol>
+
+      <h3 style="margin:1.1rem 0 0.35rem;font-size:1rem">What each button does</h3>
+      <ul class="manual-list">
+        <li><strong>Exam cards</strong> — topics + key focus for that test.</li>
+        <li><strong>Topic practice</strong> — MCQs, one topic at a time.</li>
+        <li><strong>Practice exam</strong> — mixed questions from one unit (or all 225 for the final).</li>
+        <li><strong>Workshop</strong> — free-response. Hints → method → full solution → what to write / how to check.</li>
+        <li><strong>Review missed</strong> — only items you got wrong, until you get them right.</li>
+        <li><strong>Formula sheets</strong> — short strategy lists, not a substitute for working problems.</li>
+        <li><strong>16-week plan</strong> — check off weeks; saved on this device only.</li>
+      </ul>
+
+      <h3 style="margin:1.1rem 0 0.35rem;font-size:1rem">After every MCQ</h3>
+      <ol class="manual-steps">
+        <li><strong>Start here</strong> — first move.</li>
+        <li><strong>Method</strong> — how to solve any problem of that type.</li>
+        <li><strong>This problem</strong> — the actual steps.</li>
+        <li><strong>Why each choice</strong> — correct vs traps.</li>
+        <li><strong>Write-up + check</strong> — what to put on the exam, how to verify.</li>
+      </ol>
+
+      <p class="lead" style="margin-top:1rem">Progress stays in this browser. Not an official OSU exam. Your instructor’s syllabus wins.</p>
+    </section>
+
+    <section id="view-settings" class="card hidden" aria-label="Settings">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Settings</h2>
+      <p class="lead">
+        Progress stays in this browser only:
+        <code>study-buddy:calc2-study-buddy:progress-v1</code>. No login.
+      </p>
+      <label class="toggle" style="margin:1rem 0;display:flex">
+        <input type="checkbox" id="explain-toggle" checked />
+        Default: show full tutoring after answering MCQs
+      </label>
+      <div class="toolbar">
+        <button type="button" class="btn btn-danger" id="btn-reset">Reset quiz progress</button>
+      </div>
+      <h3 style="margin-top:1.5rem;font-size:1rem">Edit content</h3>
+      <p class="lead">
+        MCQs: <code>js/questions.js</code> · Workshop: <code>js/math-problems.js</code> ·
+        Exams/topics: <code>js/topics.js</code> · Syllabus defaults: <code>js/syllabus.js</code>
+        and <code>syllabus/EXTRACT.md</code>.
+      </p>
+    </section>
+
+    <div id="exam-picker" class="picker-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="picker-title">
+      <div class="picker-sheet">
+        <h2 id="picker-title">Practice which exam?</h2>
+        <p class="lead">Tap a unit. Length uses the home-screen “Practice-exam length” box (max 75 per midterm, 225 on the final).</p>
+        <div id="picker-list" class="picker-list"></div>
+        <button type="button" class="btn btn-ghost" id="picker-cancel">Cancel</button>
+      </div>
+    </div>
+
+    <footer class="disclaimer">
+      <p><strong>Typical OSU MATH 2153 coverage:</strong> techniques of integration (parts, trig, trig sub, partial fractions), improper integrals, arc length/surface/work, sequences, series tests, power &amp; Taylor series, parametric equations, polar coordinates.</p>
+      <p><strong>Usually later courses (not emphasized here):</strong> multivariable (Calc III), vector calculus, rigorous epsilon-N proofs, DE beyond a light separable mention.</p>
+      <p>See <a href="./README.md">README.md</a> for how to add your syllabus, edit questions, and deploy to GitHub Pages.</p>
+    </footer>
+  </div>
+
+  <script src="./js/topics.js"></script>
+  <script src="./js/syllabus.js"></script>
+  <script src="./js/formulas.js"></script>
+  <script src="./js/tutoring.js"></script>
+  <script src="./js/questions.js"></script>
+  <script src="./js/math-problems.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

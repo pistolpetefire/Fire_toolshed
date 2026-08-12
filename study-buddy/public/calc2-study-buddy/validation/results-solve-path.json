@@ -1,0 +1,400 @@
+{
+  "label": "solve-path",
+  "when": "2026-08-12T21:21:47.182Z",
+  "max": 10,
+  "passed": 65,
+  "failed": 0,
+  "total": 65,
+  "results": [
+    {
+      "cycle": 1,
+      "name": "File index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File css/style.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/app.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/topics.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/tutoring.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/questions.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/math-problems.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/syllabus.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/formulas.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File syllabus/EXTRACT.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File README.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "Asset paths incl tutoring + syllabus",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "Disclaimer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "MCQ count = 225",
+      "ok": true,
+      "detail": "225"
+    },
+    {
+      "cycle": 2,
+      "name": "All MCQs valid + unique choices + tutoring",
+      "ok": true,
+      "detail": "225"
+    },
+    {
+      "cycle": 2,
+      "name": "exam1 has 75",
+      "ok": true,
+      "detail": "75"
+    },
+    {
+      "cycle": 2,
+      "name": "exam2 has 75",
+      "ok": true,
+      "detail": "75"
+    },
+    {
+      "cycle": 2,
+      "name": "exam3 has 75",
+      "ok": true,
+      "detail": "75"
+    },
+    {
+      "cycle": 2,
+      "name": "buildMcqTutor API",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Solve path on every MCQ (recipe + autopsy + write-up/check)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Math count ≥ 16",
+      "ok": true,
+      "detail": "16"
+    },
+    {
+      "cycle": 3,
+      "name": "All math have solutions",
+      "ok": true,
+      "detail": "16"
+    },
+    {
+      "cycle": 3,
+      "name": "Math whyItWorks + commonMistakes",
+      "ok": true,
+      "detail": "16/16"
+    },
+    {
+      "cycle": 3,
+      "name": "Workshop method + write-up/check path",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Topic practice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Practice exam",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Math workshop",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Review missed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Formula sheets",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Syllabus locker",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Reset quiz",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Namespaced storage",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "Shuffle practice exam",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 4,
+      "name": "escapeHtml",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Plan UI on home",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Default 16 weeks in topics.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "WEEK_COUNT = 16",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Save/reset plan buttons",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 5,
+      "name": "Exam note + normalizePlan",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 6,
+      "name": "aria-live feedback",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 6,
+      "name": "Keyboard MCQ support",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 6,
+      "name": "Touch targets",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 6,
+      "name": "viewport-fit cover (notch)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 7,
+      "name": "Catalog entry",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 7,
+      "name": "Sibling Calc I still present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 8,
+      "name": "Topic ibp",
+      "ok": true,
+      "detail": "13 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic trig-int",
+      "ok": true,
+      "detail": "13 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic trig-sub",
+      "ok": true,
+      "detail": "12 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic partial",
+      "ok": true,
+      "detail": "13 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic improper",
+      "ok": true,
+      "detail": "12 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic apps-int",
+      "ok": true,
+      "detail": "12 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic sequences",
+      "ok": true,
+      "detail": "25 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic series-basic",
+      "ok": true,
+      "detail": "25 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic series-tests",
+      "ok": true,
+      "detail": "25 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic power",
+      "ok": true,
+      "detail": "19 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic taylor",
+      "ok": true,
+      "detail": "19 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic parametric",
+      "ok": true,
+      "detail": "19 MCQs"
+    },
+    {
+      "cycle": 8,
+      "name": "Topic polar",
+      "ok": true,
+      "detail": "18 MCQs"
+    },
+    {
+      "cycle": 9,
+      "name": "In-page exam picker (no window.prompt)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 9,
+      "name": "Sticky header/quiz bar + 16px inputs + 48px coarse targets",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 9,
+      "name": "iPad breakpoint + hover isolation + apple web-app meta",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 10,
+      "name": "Quiz reset keeps plan + syllabus",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 10,
+      "name": "Plan reset confirm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 10,
+      "name": "Syllabus locker save",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 10,
+      "name": "On-disk syllabus slot",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

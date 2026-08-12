@@ -71,6 +71,23 @@ export const CLASS_APPS: ClassAppListing[] = [
     tags: ['calculus', 'OSU-OKC', 'final', 'limits', 'derivatives', 'integrals'],
   },
   {
+    id: 'calc2-study-buddy',
+    slug: 'calc2-study-buddy',
+    title: 'Calculus II Semester Study Buddy',
+    shortTitle: 'Calc II',
+    courseCodes: ['MATH 2153', 'Calc II'],
+    school: 'Oklahoma State University (Stillwater / OSU-OKC typical)',
+    subject: 'Calculus II full semester (3 exams + final)',
+    description:
+      '75 MCQs per midterm (225 final). Full solve path after every item: method recipe, choice-by-choice autopsy, exam write-up and check. Organized by common OSU MATH 2153 tests.',
+    status: 'live',
+    path: '/calc2-study-buddy/',
+    externalHref: 'calc2-study-buddy/',
+    color: 'sky',
+    version: '1.2.0',
+    tags: ['calculus', 'OSU', 'MATH 2153', 'series', 'integration', 'semester'],
+  },
+  {
     id: 'placeholder-micro',
     slug: 'occc-micro-example',
     title: 'Microbiology Hub',
