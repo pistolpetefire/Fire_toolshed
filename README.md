@@ -32,6 +32,7 @@ Details: [STUDY-BUDDY.md](./STUDY-BUDDY.md)
 | Tool | Path |
 |------|------|
 | [Occupant Load & Egress Capacity](./occupant-egress/) | IBC / NFPA 101 paths — load factors, egress width capacity, travel checks |
+| [FA Power Extenders](./fa-power-extenders/) | NAC horn/strobe + speaker taps (25/70 V), voltage drop, booster / remote-amp warrant (NFPA 72 / UFC) |
 | [Transparent RSET Tool](./rset-tool/) | Educational RSET = Detection + Notification + Pre-movement + Movement; guides + assumptions log (React app; build with `npm run build` in `rset-tool/`) |
 | [IBC / IFC Hazard Impacts](./ibc-ifc-hazard/) | H occupancy + hazmat classes → construction/mitigations with drivers (2015–2024) |
 | [Concrete Fire Rating Thickness](./concrete-fire-rating/) | Min. concrete / CMU thickness for 1–4 hr FRR (IBC / ACI 216.1 material tables) |

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="FA Power Extenders — preliminary NAC and speaker load, voltage drop, and fire-alarm power-extender / remote-amp warrant. NFPA 72 / UFC. Runs in the browser.">
+  <title>FA Power Extenders · Fire Toolshed</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Fire Toolshed · Fire alarm</p>
+        <h1>FA Power Extenders</h1>
+        <p class="version" id="appVersion">Version 1.1.1</p>
+        <p class="lead">
+          Preliminary <strong>NAC horn/strobe</strong> and <strong>speaker / voice</strong> check.
+          Decide whether onboard FACP NACs and the onboard amplifier are enough, or a remote power extender / amplifier is warranted.
+          New to fire alarm? Open <strong>Help / Guide</strong> or the “How to find device details” panel below.
+        </p>
+      </div>
+      <div class="top-actions no-print">
+        <label class="ufc-toggle" title="UFC 3-600-01 / 4-021-01 durations. With speakers: 60 min MNS alarm.">
+          <span id="ufcLabel">NFPA 72</span>
+          <span class="toggle-switch">
+            <input type="checkbox" id="ufcToggle" aria-label="Use UFC durations">
+            <span class="slider"></span>
+          </span>
+          <span>UFC</span>
+        </label>
+        <button type="button" id="btnTheme" class="ghost sm" title="Toggle dark / light">Dark</button>
+        <button type="button" id="btnMethod" class="ghost sm">Methodology</button>
+        <button type="button" id="btnHelp" class="ghost">Help / Guide</button>
+        <button type="button" id="btnExample" class="ghost">Example</button>
+        <button type="button" id="btnSaveProject" class="ghost">Save project</button>
+        <button type="button" id="btnCsv" class="ghost sm">CSV</button>
+        <button type="button" id="btnCopy" class="ghost sm">Copy summary</button>
+        <button type="button" id="btnPrintPdf" class="primary">Print to PDF</button>
+        <button type="button" id="btnSave">Save report</button>
+        <a class="btn-link" href="../">Portal</a>
+        <button type="button" id="btnReset" class="ghost">Reset</button>
+        <button type="button" id="btnDisclaimer" class="ghost sm" title="Disclaimer">⚠</button>
+      </div>
+    </header>
+
+    <section class="metrics" aria-label="Live results">
+      <div class="metric" id="mFailCard">
+        <div class="label">Circuits failing</div>
+        <div class="value" id="mFail">0</div>
+        <div class="unit" id="mFailSub">of 0 NAC circuits</div>
+      </div>
+      <div class="metric">
+        <div class="label">FACP NAC load</div>
+        <div class="value" id="mLoad">0.00</div>
+        <div class="unit" id="mLoadSub">A of 0 A budget</div>
+      </div>
+      <div class="metric">
+        <div class="label">Worst last-device V</div>
+        <div class="value" id="mVolt">—</div>
+        <div class="unit">V (source minus drop)</div>
+      </div>
+      <div class="metric">
+        <div class="label">Extenders</div>
+        <div class="value" id="mExt">0</div>
+        <div class="unit" id="mExtSub">placed</div>
+      </div>
+      <div class="metric metric-status" id="mStatusCard">
+        <div class="label">Verdict</div>
+        <div class="value status" id="mStatus">—</div>
+        <div class="unit" id="mStatusSub">Enter panel and devices</div>
+      </div>
+    </section>
+    <p id="stickyNote"></p>
+
+    <section class="panel hidden no-print" id="methodPanel">
+      <h2>Methodology</h2>
+      <div class="method-box">
+        <p><code>I = Σ (qty × device alarm current)</code></p>
+        <p><code>L<sub>eff</sub> = k × L<sub>one-way</sub></code> (k = 1 end, 0.5 distributed, 0.15 start). Class A adds the return length.</p>
+        <p><code>VD = 2 × I × (Ω/kft ÷ 1000) × L<sub>eff</sub></code> using NEC Ch. 9 Table 8 stranded copper.</p>
+        <p><code>V<sub>last</sub> = V<sub>source</sub> − VD</code>. Default source is <strong>20.4 V</strong> (85% of 24 V). Fail if V<sub>last</sub> &lt; V<sub>min</sub> (default 16 V) or I &gt; NAC rating.</p>
+        <p>Entire circuit current is applied over each row’s length (conservative). Not a node-by-node listed calc.</p>
+        <p>Speakers: <code>W = Σ (qty × tap)</code>, <code>I<sub>pair</sub> = W / V<sub>audio</sub></code> (25 V or 70.7 V). V<sub>min</sub> = 85% of V<sub>audio</sub>. Remote-amp 24 V current: <code>I = idle + W / (η × 24)</code>.</p>
+        <p>Battery: <code>Ah = (I<sub>stby</sub>·t<sub>stby</sub> + I<sub>alarm</sub>·t<sub>alarm</sub>) × aging × temp × spare</code>. Standby 24 h (NFPA) or 60 h (UFC). Alarm 5 min horn-strobe, <strong>15 min</strong> NFPA voice, or <strong>60 min</strong> UFC 4-021-01 MNS at max connected load.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Project &amp; criteria</h2>
+      <p class="hint">These labels go on the report. They do not size the system. New to this work? Keep the defaults except name and building.</p>
+      <div class="field-grid two">
+        <div class="field">
+          <label for="projectName">Project name</label>
+          <input id="projectName" type="text" autocomplete="off" placeholder="Project name">
+          <span class="sub">Job title on the report and download filename.</span>
+        </div>
+        <div class="field">
+          <label for="buildingArea">Building / area</label>
+          <input id="buildingArea" type="text" placeholder="e.g. Bldg 1442 · west wing">
+          <span class="sub">Which building or wing this takeoff covers.</span>
+        </div>
+        <div class="field">
+          <label for="engineer">Engineer</label>
+          <input id="engineer" type="text" autocomplete="name">
+          <span class="sub">Your name on the signature block.</span>
+        </div>
+        <div class="field">
+          <label for="company">Company</label>
+          <input id="company" type="text">
+          <span class="sub">Firm name on the report header.</span>
+        </div>
+        <div class="field">
+          <label for="peNumber">PE number (optional)</label>
+          <input id="peNumber" type="text">
+          <span class="sub">Leave blank if you are not sealing this estimate.</span>
+        </div>
+        <div class="field">
+          <label for="reportDate">Date</label>
+          <input id="reportDate" type="date">
+          <span class="sub">Defaults to today.</span>
+        </div>
+        <div class="field">
+          <label for="occupancy">Occupancy / notification</label>
+          <input id="occupancy" type="text" placeholder="B office, horn-strobe">
+          <span class="sub">e.g. office with horns/strobes, or school with voice / MNS. Reminder only.</span>
+        </div>
+        <div class="field">
+          <label for="nfpaEdition">NFPA 72 edition (report)</label>
+          <select id="nfpaEdition">
+            <option value="2016">2016</option>
+            <option value="2019">2019</option>
+            <option value="2022" selected>2022</option>
+            <option value="2025">2025</option>
+          </select>
+          <span class="sub">Year the project uses. Printed only — math does not change.</span>
+        </div>
+        <div class="field">
+          <label for="sourceVoltage">Source voltage</label>
+          <select id="sourceVoltage">
+            <option value="20.4">20.4 V — battery end of life (recommended)</option>
+            <option value="24">24.0 V — nominal</option>
+            <option value="custom">Custom…</option>
+          </select>
+          <span class="sub">Keep 20.4 V. That is 24 V when batteries are nearly worn out (safer).</span>
+        </div>
+        <div class="field hidden" id="sourceCustomWrap">
+          <label for="sourceCustom">Custom source voltage</label>
+          <input id="sourceCustom" type="number" step="0.1" min="12" max="30" value="20.4">
+          <span class="sub">Only if the manufacturer’s NAC note lists a different starting voltage.</span>
+        </div>
+        <div class="field">
+          <label for="sparePct">Spare capacity target</label>
+          <input id="sparePct" type="number" min="0" max="40" step="5" value="20">
+          <span class="sub">Keep 20%. A 2.0 A circuit should not go past 1.6 A.</span>
+        </div>
+        <div class="field span-all">
+          <label for="notes">Notes</label>
+          <textarea id="notes" placeholder="AHJ notes, manufacturer, sync plan…"></textarea>
+          <span class="sub">Free text for the report: reviewer comments, “currents are typical until submittal.”</span>
+        </div>
+        <div class="field span-all" id="logoFieldMount"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>FACP NAC inventory</h2>
+      <p class="hint">This is the <strong>main fire alarm panel’s power</strong>. Copy amps-per-circuit and total NAC power from the panel data sheet. Changing a preset rebuilds empty circuits if you confirm.</p>
+      <div class="field-grid three">
+        <div class="field">
+          <label for="panelPreset">Panel preset</label>
+          <select id="panelPreset"></select>
+          <span class="sub">Starter sizes. Replace with the data sheet if you have it.</span>
+        </div>
+        <div class="field">
+          <label for="panelName">Panel name / model</label>
+          <input id="panelName" type="text" placeholder="Generic 24 V addressable">
+          <span class="sub">From the cover of the FACP installation manual.</span>
+        </div>
+        <div class="field">
+          <label for="panelVoltage">System voltage</label>
+          <select id="panelVoltage">
+            <option value="24" selected>24 VDC</option>
+            <option value="12">12 VDC (unusual for new work)</option>
+          </select>
+          <span class="sub">Use 24 VDC for almost all new systems.</span>
+        </div>
+        <div class="field">
+          <label for="circuitCount">Total circuits</label>
+          <input id="circuitCount" type="number" min="1" max="16" step="1" value="4">
+          <span class="sub">Or use Add NAC / Add audio circuit. Lowering this can delete rows.</span>
+        </div>
+        <div class="field">
+          <label for="ampsPerCircuit">Default amps / NAC</label>
+          <input id="ampsPerCircuit" type="number" min="0.25" max="10" step="0.25" value="2">
+          <span class="sub">Data sheet: “NAC 2.0 A” or “3.0 A special application.” New rows only.</span>
+        </div>
+        <div class="field">
+          <label for="budgetA">Panel NAC budget</label>
+          <input id="budgetA" type="number" min="0.5" max="30" step="0.5" value="6">
+          <span class="sub">Total 24 V the panel can give <em>all</em> NACs together — often less than circuits × amps.</span>
+        </div>
+        <div class="field">
+          <label for="ampBudgetW">Onboard amplifier</label>
+          <input id="ampBudgetW" type="number" min="0" max="400" step="5" value="0">
+          <span class="sub">Built-in speaker watts (25, 50…). Type 0 if horns/strobes only.</span>
+        </div>
+        <div class="field">
+          <label for="audioVoltage">Default speaker voltage</label>
+          <select id="audioVoltage">
+            <option value="25" selected>25 V</option>
+            <option value="70.7">70.7 V</option>
+          </select>
+          <span class="sub">25 V is typical inside one building. 70.7 V for longer runs. Must match the amp.</span>
+        </div>
+        <div class="field">
+          <label for="defaultClass">Default circuit class</label>
+          <select id="defaultClass">
+            <option value="B" selected>Class B</option>
+            <option value="A">Class A (outgoing + return)</option>
+          </select>
+          <span class="sub">Class B = two wires out. Class A = loop back. Use B unless the spec requires A.</span>
+        </div>
+        <div class="field">
+          <label for="defaultAwg">Default wire</label>
+          <select id="defaultAwg">
+            <option value="18">18 AWG</option>
+            <option value="16" selected>16 AWG</option>
+            <option value="14">14 AWG</option>
+            <option value="12">12 AWG</option>
+            <option value="10">10 AWG</option>
+          </select>
+          <span class="sub">16 AWG is a common start. Thicker wire (14, 12) if the run is long.</span>
+        </div>
+        <div class="field">
+          <label for="defaultPlacement">Default placement</label>
+          <select id="defaultPlacement">
+            <option value="end">End of line (conservative)</option>
+            <option value="distributed" selected>Distributed (½ run)</option>
+            <option value="start">Near panel</option>
+          </select>
+          <span class="sub">Distributed = devices along a corridor. End = safest if you are unsure.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Notification circuits</h2>
+        <div>
+          <button type="button" class="sm" id="btnAddCircuit">Add NAC</button>
+          <button type="button" class="sm" id="btnAddAudio">Add audio circuit</button>
+        </div>
+      </div>
+      <p class="hint">NAC = 24 V horns/strobes. Audio = speaker taps. A speaker-strobe is <em>two</em> loads (strobe on a NAC, tap on audio). Distance is one-way from that circuit’s source.</p>
+      <details class="coach no-print" id="deviceCoach">
+        <summary>How to find device details (candela, mA, taps, distance)</summary>
+        <div class="coach-body">
+          <p><strong>Type</strong> — Match the plan symbol: H/S = horn-strobe, S = strobe, SPKR = speaker, SP/ST = speaker-strobe (enter on <em>both</em> a NAC and an audio circuit).</p>
+          <p><strong>Candela (Cd)</strong> — Strobe brightness from the NFPA 72 room-size tables, or the value already noted on the lighting/FA plan. 15 cd is a small room; <strong>75 cd</strong> is a common corridor start. Brighter = more milliamps.</p>
+          <p><strong>mA</strong> — Open the device <em>cut sheet</em>. Use the 24 VDC alarm-current row for your candela. If the sheet says 0.165 A, type <strong>165</strong>. Until you have the sheet, leave the typical value and note “replace at submittal.”</p>
+          <p><strong>Speaker tap (W)</strong> — Often written next to the speaker on the drawing (<code>1W</code>, <code>2W</code>). Higher tap = louder = more amplifier load. <strong>1 W</strong> is a common interior start if nothing is shown. Confirm with the voice-evac layout later.</p>
+          <p><strong>Qty</strong> — Count devices that share the same type, candela or tap, and roughly the same wire length on <em>this</em> circuit. Split the row if any of those change.</p>
+          <p><strong>Ft</strong> — One-way cable length along the route (corridors and shafts, not through walls). After you add a booster, measure from the <em>booster</em>, not the old homerun to the FACP. When unsure, enter a longer distance (safer).</p>
+          <p><strong>AWG</strong> — 16 is typical. 14 or 12 if the run is long. This app will not treat 10 AWG as a recommended fix — use a booster instead.</p>
+          <p><strong>Place</strong> — Distributed = devices along a corridor. End = treat the load as at the far end (conservative). Start = clustered at the panel.</p>
+          <p><a href="#" id="openFullGuide">Open the full step-by-step guide</a> for every other box on this page.</p>
+        </div>
+      </details>
+      <div id="circuitList"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Verdict &amp; recommended fix</h2>
+        <button type="button" class="sm primary" id="btnApplyExt">Apply recommended extender</button>
+      </div>
+      <div id="verdictBox"></div>
+      <div id="strategyBox"></div>
+      <div class="compare" id="compareBox"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Power extenders</h2>
+        <button type="button" class="sm" id="btnAddExt">Add extender</button>
+      </div>
+      <p class="hint">Assign remote NACs to a 24 V extender, or speaker circuits to a remote amplifier, then update those rows to the run from the new panel. Reserve a FACP NAC or SLC module as the trigger. Dedicated 120 VAC. Keep strobes in the same zone synchronized.</p>
+      <div id="extenderList"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Extender batteries</h2>
+      <p class="hint" id="batteryHint">NFPA 72: 24 h standby + 5 min alarm. FACP batteries are not sized here.</p>
+      <div class="field-grid three">
+        <div class="field">
+          <label for="batteryAging">Aging factor</label>
+          <input id="batteryAging" type="number" min="1" max="1.5" step="0.05" value="1.25">
+          <span class="sub">Keep 1.25. Batteries lose capacity as they age.</span>
+        </div>
+        <div class="field">
+          <label for="batteryTemp">Temperature factor</label>
+          <input id="batteryTemp" type="number" min="1" max="1.5" step="0.05" value="1">
+          <span class="sub">Keep 1.0 indoors. Use about 1.2 if the box is in a cold garage.</span>
+        </div>
+        <div class="field">
+          <label for="batterySpare">Battery spare factor</label>
+          <input id="batterySpare" type="number" min="1" max="1.5" step="0.05" value="1.2">
+          <span class="sub">Keep 1.2 (extra 20% on calculated amp-hours).</span>
+        </div>
+      </div>
+      <div id="batteryList"></div>
+    </section>
+
+    <section class="panel no-print">
+      <div class="panel-head">
+        <h2>Project history</h2>
+      </div>
+      <div class="history-row">
+        <select id="historySelect" aria-label="Saved projects"></select>
+        <button type="button" class="sm" id="btnRestore">Restore</button>
+      </div>
+      <p class="hint" style="margin-top:0.55rem">Last 5 Save Project snapshots stay in this browser only.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Assumptions log</h2>
+      <ul class="assumptions" id="assumptionsList"></ul>
+    </section>
+
+    <div class="print-package" id="printPackage"></div>
+
+    <footer class="site-foot">
+      <p><strong>For qualified fire protection engineers.</strong> Preliminary tool — not a listed voltage-drop or battery calculation, and not a substitute for the panel/extender manual, stamped design, or AHJ approval.</p>
+      <p><a href="../">Engineering Tools portal</a> · data stays in this browser · FA Power Extenders v1.1.1</p>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <div id="helpModal" class="modal-back hidden" role="dialog" aria-labelledby="helpTitle">
+    <div class="modal">
+      <h2 id="helpTitle">FA Power Extenders — step-by-step guide</h2>
+      <p class="hint" id="helpStatus" style="margin-top:0">Written for first-time fire-alarm users. Every input is explained.</p>
+      <div id="helpBody" class="guide-md"></div>
+      <div class="modal-actions">
+        <button type="button" class="primary" id="btnHelpClose">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="discModal" class="modal-back hidden" role="dialog" aria-labelledby="discTitle">
+    <div class="modal">
+      <h2 id="discTitle">Disclaimer</h2>
+      <p>This is a <strong>preliminary</strong> NAC capacity and voltage-drop aid for qualified fire protection engineers.</p>
+      <p>It is <strong>not</strong> a listed calculation method, not a manufacturer battery calculator of record, and not a substitute for NFPA 72, UFC 3-600-01 / 4-021-01, NEC 760, the FACP or extender installation manual, or AHJ approval.</p>
+      <p>Device currents and speaker taps in the library are typical catalog composites. Replace them with the project submittal before any issued calc. v1.1 covers 24 V NACs and 25/70.7 V speaker circuits.</p>
+      <div class="modal-actions">
+        <button type="button" class="primary" id="btnDiscClose">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/report-logo.js"></script>
+  <script src="./assets/catalog.js"></script>
+  <script src="./assets/engine.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
