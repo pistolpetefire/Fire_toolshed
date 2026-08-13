@@ -56,7 +56,7 @@ export function HubHome() {
           </h1>
           <p className="mt-3 text-sm text-indigo-100 sm:text-base">
             Each course lives in its own folder with its own progress, flashcards, and quizzes. Open a class below —
-            Anatomy &amp; Physiology, Chemistry I, Calc I, and the Calc II semester app are ready; more subjects can plug in the same way.
+            Anatomy &amp; Physiology, Chemistry I, Calc I, Calc II, FE General Math, and FE Industrial are ready; more subjects can plug in the same way.
           </p>
         </div>
       </section>

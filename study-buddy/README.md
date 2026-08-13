@@ -50,6 +50,8 @@ npm run test:cycles   # 5 automated verification cycles
 | **Chemistry I Final Study Buddy** | CHEM 1214 / 1315 (OSU-OKC) | `/chem1-study-buddy/` (static vanilla under `public/chem1-study-buddy/`) |
 | **Calculus I Final Study Buddy** | Calc I / MATH 2144-style (OSU-OKC) | `/calc1-study-buddy/` (static vanilla under `public/calc1-study-buddy/`) |
 | **Calculus II Semester Study Buddy** | MATH 2153 / Calc II (OSU typical) | `/calc2-study-buddy/` (static vanilla under `public/calc2-study-buddy/`) |
+| **FE General Math Practice** | FE Other Disciplines math + stats | `/fe-math-study-buddy/` (static vanilla under `public/fe-math-study-buddy/`) |
+| **FE Industrial Practice** | FE Industrial & Systems (old afternoon) | `/fe-ie-study-buddy/` (static vanilla under `public/fe-ie-study-buddy/`) |
 | Microbiology Hub | BIO 2125 (placeholder) | coming soon |
 
 ## Add a new class app

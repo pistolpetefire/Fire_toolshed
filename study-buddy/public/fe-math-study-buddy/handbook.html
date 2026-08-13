@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FE formula handbook · Ctrl+F to search</title>
+  <link rel="stylesheet" href="./css/style.css" />
+  <style>
+    body { padding: 1rem; }
+    .hb-search {
+      position: sticky; top: 0; z-index: 5;
+      background: var(--bg); padding: 0.5rem 0 0.75rem;
+      border-bottom: 1px solid var(--border); margin-bottom: 1rem;
+    }
+    .hb-search input { width: 100%; font-size: 16px; padding: 0.55rem 0.7rem; }
+    mark.hb-hit { background: #fbbf24; color: #111; padding: 0 0.1em; }
+    .hb-sec { margin-bottom: 1.25rem; }
+    .hb-sec h2 { font-size: 1.05rem; margin: 0 0 0.4rem; color: var(--accent); }
+    .hb-sec p { margin: 0.25rem 0; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="pill">Searchable like the FE CBT handbook</p>
+    <h1>Formula handbook</h1>
+    <p class="lead">Press <strong>Ctrl+F</strong> (Windows) or <strong>⌘F</strong> (Mac) to find a formula — same habit as the official NCEES handbook on exam day. Or use the box below.</p>
+    <div class="hb-search">
+      <label class="field">Find in this sheet
+        <input type="search" id="find" placeholder="e.g. Bayes, trapezoid, determinant, z-score" />
+      </label>
+      <p class="sub" id="find-status"></p>
+    </div>
+    <p class="lead">
+      Official NCEES download (free, MyNCEES login):
+      <a href="https://account.ncees.org/reference-handbooks/" target="_blank" rel="noopener">https://account.ncees.org/reference-handbooks/</a>
+    </p>
+    <p class="toolbar"><a class="btn btn-primary" href="https://account.ncees.org/reference-handbooks/" target="_blank" rel="noopener">Download FE Handbook from NCEES</a></p>
+    <p class="lead">Then attach that PDF in the practice app. This page is a searchable math/stats extract — not a reprint of the copyrighted Handbook.</p>
+    <div id="hb-body"></div>
+  </div>
+  <script src="./js/handbook.js"></script>
+  <script>
+    (function () {
+      const body = document.getElementById('hb-body');
+      const hb = window.FE_HANDBOOK;
+      body.innerHTML = hb.sections.map((s) =>
+        '<section class="hb-sec card" id="' + s.id + '"><h2>' + s.title + '</h2>' +
+        s.body.map((line) => '<p>' + line.replace(/</g, '&lt;') + '</p>').join('') +
+        '</section>'
+      ).join('');
+      const input = document.getElementById('find');
+      const status = document.getElementById('find-status');
+      input.addEventListener('input', () => {
+        const q = input.value.trim();
+        document.querySelectorAll('mark.hb-hit').forEach((m) => {
+          const t = document.createTextNode(m.textContent);
+          m.parentNode.replaceChild(t, m);
+        });
+        if (!q) { status.textContent = ''; return; }
+        const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        let n = 0;
+        body.querySelectorAll('p, h2').forEach((el) => {
+          const text = el.textContent;
+          if (!re.test(text)) return;
+          el.innerHTML = text.replace(re, (m) => { n += 1; return '<mark class="hb-hit">' + m + '</mark>'; });
+        });
+        status.textContent = n ? n + ' match(es). Ctrl+F also works in this window.' : 'No match.';
+      });
+    })();
+  </script>
+</body>
+</html>

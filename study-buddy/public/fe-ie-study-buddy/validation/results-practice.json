@@ -1,0 +1,164 @@
+{
+  "when": "2026-08-13T02:23:49.441Z",
+  "passed": 26,
+  "failed": 0,
+  "total": 26,
+  "results": [
+    {
+      "cycle": 1,
+      "name": "Diagnostic A has 3 per topic",
+      "ok": true,
+      "detail": "30"
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic stems present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic explanations present",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic A diversity econ",
+      "ok": true,
+      "detail": "3 templates"
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic A diversity modeling",
+      "ok": true,
+      "detail": "3 templates"
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic A diversity management",
+      "ok": true,
+      "detail": "3 templates"
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic A diversity production",
+      "ok": true,
+      "detail": "3 templates"
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic A diversity facilities",
+      "ok": true,
+      "detail": "3 templates"
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic A diversity human",
+      "ok": true,
+      "detail": "3 templates"
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic A diversity work",
+      "ok": true,
+      "detail": "3 templates"
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic A diversity quality",
+      "ok": true,
+      "detail": "3 templates"
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic A diversity systems",
+      "ok": true,
+      "detail": "3 templates"
+    },
+    {
+      "cycle": 1,
+      "name": "Diagnostic A diversity ie-stats",
+      "ok": true,
+      "detail": "3 templates"
+    },
+    {
+      "cycle": 2,
+      "name": "Spot-checked formula items match stems",
+      "ok": true,
+      "detail": "all matched families"
+    },
+    {
+      "cycle": 2,
+      "name": "No duplicate stems",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Unique ids",
+      "ok": true,
+      "detail": "1533"
+    },
+    {
+      "cycle": 3,
+      "name": "Simulated Diagnostic A all-correct scores 30/30",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Quality drill can start a 20-item set",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Missed-item tutor has write-up",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "topics.js does not wipe IE_FORMULAS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "No leftover FE Math storage copy",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Formula cards loaded",
+      "ok": true,
+      "detail": "10"
+    },
+    {
+      "cycle": 3,
+      "name": "Handbook has 10 IE sections",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Open resources loaded for HF and quality",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Tutor pack cites open sources",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Workshop covers all 10 topics",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "label": "after-5",
+  "when": "2026-08-13T01:46:55.255Z",
+  "passed": 24,
+  "failed": 0,
+  "total": 24,
+  "results": [
+    {
+      "cycle": 1,
+      "name": "File index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File css/style.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/app.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/topics.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/tutoring.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/questions.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/math-problems.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/formulas.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File README.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "Asset paths",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "NCEES disclaimer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "Core mode buttons (diag A/B)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "MCQ count ≥ 1100",
+      "ok": true,
+      "detail": "1518"
+    },
+    {
+      "cycle": 2,
+      "name": "All MCQs valid unique choices",
+      "ok": true,
+      "detail": "1518"
+    },
+    {
+      "cycle": 2,
+      "name": "Diagnostic A/B = 27/27",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "9 topics",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Workshop ≥ 18",
+      "ok": true,
+      "detail": "18"
+    },
+    {
+      "cycle": 2,
+      "name": "Solve-path tutor pack",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "No PAD filler on diagnostic forms",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Diagnostic scores by topic",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Strength map on home",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Timed mixed set",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Hub catalog card",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "User manual",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

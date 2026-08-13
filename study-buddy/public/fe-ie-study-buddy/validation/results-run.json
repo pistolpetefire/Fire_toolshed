@@ -1,0 +1,207 @@
+{
+  "label": "run",
+  "when": "2026-08-13T02:23:49.074Z",
+  "passed": 33,
+  "failed": 0,
+  "total": 33,
+  "results": [
+    {
+      "cycle": 1,
+      "name": "File index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File css/style.css",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/app.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/topics.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/tutoring.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/questions.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/math-problems.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/formulas.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File js/resources.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "File README.md",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "Asset paths",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "NCEES disclaimer",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "Core mode buttons (diag A/B)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "Industrial / afternoon branding",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 1,
+      "name": "IE storage key in settings",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "MCQ count ≥ 1100",
+      "ok": true,
+      "detail": "1533"
+    },
+    {
+      "cycle": 2,
+      "name": "All MCQs valid unique choices",
+      "ok": true,
+      "detail": "1533"
+    },
+    {
+      "cycle": 2,
+      "name": "Diagnostic A/B = 30/30",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "10 industrial topics",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Diagnostic A mixes templates per topic",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "No duplicate stems",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 2,
+      "name": "Workshop ≥ 18",
+      "ok": true,
+      "detail": "20"
+    },
+    {
+      "cycle": 2,
+      "name": "Solve-path tutor pack",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Diagnostic scores by topic",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Strength map on home",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Timed mixed set",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Hub catalog card",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "User manual",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Searchable handbook (Ctrl+F) during practice",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Progress isolated from FE Math",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Open resources view",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "OSS / public-domain sources on non-math topics",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "cycle": 3,
+      "name": "Primer + source cites in tutor path",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

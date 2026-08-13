@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="FE Industrial and Systems practice — old afternoon industrial topics. Diagnostic then targeted reps." />
+  <title>FE Industrial Practice · Study Buddy</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-header">
+      <div>
+        <h1>FE Industrial Practice</h1>
+        <p class="sub">Industrial &amp; Systems · old afternoon topics · diagnostic then reps · <span id="app-version">v1.1.0</span></p>
+      </div>
+      <nav class="nav-links" aria-label="App navigation">
+        <button type="button" class="btn btn-primary" id="btn-handbook">Handbook</button>
+        <button type="button" class="btn btn-ghost" id="btn-manual">User manual</button>
+        <button type="button" class="btn btn-ghost" data-go-home>Home</button>
+        <a class="btn btn-ghost" href="../">Study Buddy hub</a>
+      </nav>
+    </header>
+
+    <section id="view-home" class="card" aria-label="Home">
+      <aside class="disclaimer-box" role="note">
+        <strong>Not an official NCEES exam</strong>
+        <p>
+          Practice only for interns preparing for the <em>FE Industrial and Systems</em> exam
+          (the old paper <strong>afternoon industrial</strong> portion). Not affiliated with NCEES.
+          Use the official handbook on exam day.
+          Free official download:
+          <a href="https://account.ncees.org/reference-handbooks/" target="_blank" rel="noopener">account.ncees.org/reference-handbooks</a>
+        </p>
+      </aside>
+      <span class="pill">Diagnostic → drill weak topics</span>
+      <h2>Find the holes, then fill them</h2>
+      <p class="lead">
+        Start with a <strong>30-question diagnostic</strong> (3 per industrial topic). Then drill weak
+        areas from a <strong>1,100+ MCQ</strong> bank: engineering economy, quality, work design,
+        production, facilities, human factors, management, modeling, systems/reliability.
+        Math morning topics live in the FE General Math app. After every item: full solve path.
+      </p>
+      <div id="home-stats"></div>
+      <div id="strength-map"></div>
+      <div class="grid two" style="margin-top:1rem">
+        <button type="button" class="mode-card" id="btn-diag-a">
+          <strong>1 · Diagnostic A</strong>
+          <span>Do this first. 30 mixed industrial questions, 3 per topic. Held out of the drill bank.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-diag-b">
+          <strong>1b · Diagnostic B</strong>
+          <span>Retest after you have drilled. Different 30 items. Confirms weak → strong.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-topics">
+          <strong>2 · Drill a topic</strong>
+          <span>Reps from the bank. Weak topics sort to the top after a diagnostic.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-math">
+          <strong>3 · Workshop</strong>
+          <span>Paper write-ups. Hints, method, full solution, what to write on the FE.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-missed">
+          <strong>4 · Review missed</strong>
+          <span>Stay here until the list is empty.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-timed">
+          <strong>5 · Timed mixed set</strong>
+          <span>~2.5 min/question. FE pace. Uses the drill bank.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-formulas">
+          <strong>6 · Handbook (Ctrl+F)</strong>
+          <span>Searchable formula sheets during study and during timed/diagnostic tests — same habit as the FE CBT handbook.</span>
+        </button>
+        <button type="button" class="mode-card" id="btn-resources">
+          <strong>7 · Open resources</strong>
+          <span>Free OSHA, NIOSH, NIST, NASA, and MIT OCW readings for the non-math industrial topics. Primer first, then drill.</span>
+        </button>
+      </div>
+      <div class="toolbar" style="margin-top:1rem">
+        <label class="toggle"><input type="checkbox" id="explain-toggle" checked /> Show full tutoring after answers</label>
+        <button type="button" class="btn" id="btn-settings">Settings / reset</button>
+      </div>
+    </section>
+
+    <section id="view-topics" class="card hidden" aria-label="Topics">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Drill a topic</h2>
+      <p class="lead">Weak topics (from your diagnostic) are listed first.</p>
+      <div id="topic-grid" class="grid topics"></div>
+    </section>
+
+    <section id="view-quiz" class="card hidden" aria-label="Quiz">
+      <div class="progress-bar" aria-hidden="true"><i id="quiz-progress-fill"></i></div>
+      <div id="quiz-meta" class="quiz-meta"></div>
+      <p id="quiz-timer" class="sub" hidden></p>
+      <p id="quiz-stem" class="stem"></p>
+      <div id="quiz-choices" class="choices" role="group" aria-label="Answer choices"></div>
+      <div id="quiz-feedback" class="feedback hidden" role="status"></div>
+      <div id="quiz-toolbar" class="toolbar"></div>
+    </section>
+
+    <section id="view-math" class="hidden" aria-label="Workshop">
+      <div class="card">
+        <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+        <h2 style="margin-top:0.75rem">Workshop</h2>
+        <p class="lead">Write on paper first. FE is closed-notes except the Handbook.</p>
+        <div id="math-filter" class="topic-filter"></div>
+      </div>
+      <div id="math-list"></div>
+    </section>
+
+    <section id="view-missed" class="card hidden" aria-label="Missed">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Review missed</h2>
+      <div id="missed-list"></div>
+    </section>
+
+    <section id="view-formulas" class="hidden" aria-label="Handbook">
+      <div class="card">
+        <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+        <h2 style="margin-top:0.75rem">FE formula handbook</h2>
+        <p class="lead">
+          On the real exam you search the official <strong>NCEES FE Reference Handbook</strong> with find (Ctrl+F).
+          Do the same here. This page is <strong>plain text</strong> so browser Find works.
+          Download the official PDF from NCEES (free MyNCEES login), then attach it below. It stays on this device.
+        </p>
+        <div class="toolbar">
+          <a class="btn btn-primary" id="link-ncees-hb" href="https://account.ncees.org/reference-handbooks/" target="_blank" rel="noopener">Download FE Handbook from NCEES</a>
+          <button type="button" class="btn" id="btn-hb-window">Open searchable practice sheets</button>
+          <label class="btn" style="cursor:pointer;margin:0">
+            Attach official NCEES PDF
+            <input type="file" id="hb-pdf-file" accept="application/pdf,.pdf" hidden />
+          </label>
+          <button type="button" class="btn" id="btn-hb-pdf-clear">Remove attached PDF</button>
+        </div>
+        <p class="sub" id="hb-pdf-status"></p>
+        <label class="field" style="margin-top:0.75rem">Find on this page (or press Ctrl+F / ⌘F)
+          <input type="search" id="hb-find" placeholder="EOQ, PERT, Cpk, MTTF, Little, allowance…" />
+        </label>
+        <p class="sub" id="hb-find-status"></p>
+      </div>
+      <div id="hb-pdf-wrap" class="card hidden">
+        <h3 style="margin-top:0">Attached official PDF</h3>
+        <p class="lead">Click inside the PDF, then Ctrl+F / ⌘F — same as the exam computer’s handbook search.</p>
+        <iframe id="hb-pdf-frame" title="Official FE Reference Handbook PDF" style="width:100%;min-height:70vh;border:1px solid var(--border);border-radius:10px;background:#111"></iframe>
+      </div>
+      <div id="formula-list"></div>
+    </section>
+
+    <section id="view-resources" class="hidden" aria-label="Open resources">
+      <div class="card">
+        <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+        <h2 style="margin-top:0.75rem">Open resources</h2>
+        <p class="lead">
+          Non-math industrial topics (safety, quality, work, reliability, management) need a short reading, not only a formula.
+          These are public-domain U.S. government pages and Creative Commons courseware. They are <strong>not</strong> the NCEES handbook.
+        </p>
+      </div>
+      <div id="resource-list"></div>
+    </section>
+
+    <section id="view-manual" class="card hidden" aria-label="User manual">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">User manual</h2>
+      <ol class="manual-steps">
+        <li>Take the <strong>diagnostic</strong> (30 questions, 3 per industrial topic).</li>
+        <li>Read the <strong>weak / ok / strong</strong> map.</li>
+        <li><strong>Drill</strong> weak industrial topics from the 1,100+ bank. Workshop on paper.</li>
+        <li>Retake <strong>diagnostic B</strong> to confirm a topic moved to strong.</li>
+        <li>Clear <strong>Review missed</strong>. Do one <strong>timed</strong> mixed set at FE pace (~2.5 min each).</li>
+        <li>During diagnostics and timed sets, open <strong>Handbook</strong> and search with <strong>Ctrl+F</strong> (or ⌘F) — same condition as the FE CBT.</li>
+        <li>For HF/safety, quality, work, and reliability: open <strong>Open resources</strong> and read the OSHA / NIOSH / NIST / NASA primer before you only memorize a formula.</li>
+      </ol>
+      <p class="lead">Approved calculator only on the real exam (e.g. TI-36X Pro). Attach your NCEES Handbook PDF in Handbook for identical pages. Progress stays in this browser. Not NCEES.</p>
+    </section>
+
+    <section id="view-settings" class="card hidden" aria-label="Settings">
+      <button type="button" class="btn btn-ghost" data-go-home>← Home</button>
+      <h2 style="margin-top:0.75rem">Settings</h2>
+      <p class="lead">Stored here only: <code>study-buddy:fe-ie-study-buddy:progress-v1</code></p>
+      <div class="toolbar">
+        <button type="button" class="btn btn-danger" id="btn-reset">Reset all progress</button>
+      </div>
+    </section>
+
+    <footer class="disclaimer">
+      <p>Covers typical <strong>FE Industrial and Systems</strong> afternoon-style topics (econ, quality, work, production, facilities, HF, management, modeling, reliability). Math is in the FE General Math app. Not the official NCEES exam.</p>
+    </footer>
+  </div>
+  <div id="hb-overlay" class="hb-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="hb-ov-title">
+    <div class="hb-sheet">
+      <div class="hb-ov-bar">
+        <h2 id="hb-ov-title">Handbook</h2>
+        <div class="toolbar" style="margin:0">
+          <a class="btn" href="https://account.ncees.org/reference-handbooks/" target="_blank" rel="noopener">Download from NCEES</a>
+          <button type="button" class="btn" id="btn-hb-ov-window">New window (best Ctrl+F)</button>
+          <button type="button" class="btn btn-ghost" id="btn-hb-close">Close</button>
+        </div>
+      </div>
+      <p class="lead">Find a formula like the FE computer: <strong>Ctrl+F</strong> / <strong>⌘F</strong>, or type below. Timer keeps running if a timed set is open.
+        Official NCEES PDF:
+        <a href="https://account.ncees.org/reference-handbooks/" target="_blank" rel="noopener">Download FE Handbook from NCEES</a>
+      </p>
+      <label class="field">Find
+        <input type="search" id="hb-ov-find" placeholder="e.g. EOQ, PERT, Cpk, availability" />
+      </label>
+      <p class="sub" id="hb-ov-status"></p>
+      <div id="hb-ov-body" class="hb-ov-body"></div>
+    </div>
+  </div>
+
+  <script src="./js/topics.js"></script>
+  <script src="./js/resources.js"></script>
+  <script src="./js/handbook.js"></script>
+  <script src="./js/formulas.js"></script>
+  <script src="./js/tutoring.js"></script>
+  <script src="./js/questions.js"></script>
+  <script src="./js/math-problems.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
