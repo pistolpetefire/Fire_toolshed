@@ -12,6 +12,8 @@ interface SystemDiagramProps {
   stickySelect?: boolean;
   /** Unlabeled plate + no hover names (for quizzes) */
   quizMode?: boolean;
+  /** Keep the full plate (click-region hunt) instead of zooming to the selection */
+  zoomOnFocus?: boolean;
 }
 
 /** Renders the interactive diagram for a system, if one exists in the catalog. */

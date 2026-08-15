@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { X, Info, ExternalLink } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { X, Info, ExternalLink, Focus, RotateCcw } from 'lucide-react';
 import { getStructureById } from '../../data/structures';
 import type { Structure } from '../../types';
 import type { DiagramConfig, DiagramRenderStyle } from './types';
 import { diagramUrl } from './diagramAssets';
+import { fitViewBox, parseViewBox, pathBBox } from './pathBBox';
 
 export interface InteractiveDiagramProps {
   config: DiagramConfig;
@@ -19,16 +20,20 @@ export interface InteractiveDiagramProps {
    * and use a non-spoiling hint so answers are not obvious from the diagram.
    */
   quizMode?: boolean;
+  /**
+   * When false, keep the full plate even if a region is selected/highlighted.
+   * Click-the-region quizzes pass false until the answer is revealed.
+   */
+  zoomOnFocus?: boolean;
 }
 
 function styleClasses(style: DiagramRenderStyle | undefined, hasImage: boolean) {
   if (style === 'hotspot' || hasImage) {
     return {
-      // Tight highlight: modest fill so size reads as the structure, not a huge wash
-      selected: 'fill-sky-500/35 stroke-sky-700 dark:fill-sky-400/30 dark:stroke-sky-200',
-      highlight: 'fill-amber-400/40 stroke-amber-700 dark:fill-amber-300/35 dark:stroke-amber-200',
-      // Subtle idle outline so clickable targets are discoverable without looking oversized
-      idle: 'fill-sky-400/0 stroke-sky-600/0 hover:fill-sky-400/20 hover:stroke-sky-500/70 dark:hover:fill-sky-300/15',
+      // Thin non-scaling stroke + light fill so the plate shows through on a phone
+      selected: 'fill-sky-500/28 stroke-sky-700 dark:fill-sky-400/25 dark:stroke-sky-200',
+      highlight: 'fill-amber-400/32 stroke-amber-800 dark:fill-amber-300/28 dark:stroke-amber-100',
+      idle: 'fill-sky-400/0 stroke-sky-600/0 hover:fill-sky-400/16 hover:stroke-sky-500/80 dark:hover:fill-sky-300/12',
     };
   }
   switch (style) {
@@ -73,10 +78,25 @@ export function InteractiveDiagram({
   stickySelect = false,
   className = '',
   quizMode = false,
+  zoomOnFocus = true,
 }: InteractiveDiagramProps) {
   const [internalSelected, setInternalSelected] = useState<string | null>(null);
+  const [narrow, setNarrow] = useState(false);
+  const [userZoomedOut, setUserZoomedOut] = useState(false);
   const selectedId = controlledSelected !== undefined ? controlledSelected : internalSelected;
   const selected = selectedId ? getStructureById(selectedId) ?? null : null;
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const sync = () => setNarrow(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    setUserZoomedOut(false);
+  }, [selectedId, highlightIds.join('|'), config.viewBox]);
   const plateFile =
     quizMode && config.quizBackgroundImage
       ? config.quizBackgroundImage
@@ -109,15 +129,49 @@ export function InteractiveDiagram({
     onSelect?.(structure, next);
   };
 
+  const focusId =
+    selectedId ?? (highlightIds.length === 1 ? highlightIds[0] : null);
+  const focusRegion = focusId ? config.regions.find((r) => r.id === focusId) : undefined;
+  const fullBox = useMemo(() => parseViewBox(config.viewBox), [config.viewBox]);
+  const shouldZoom =
+    Boolean(focusRegion) && zoomOnFocus && !userZoomedOut && (narrow || compact);
+  const liveViewBox = useMemo(() => {
+    if (!shouldZoom || !focusRegion) return config.viewBox;
+    const box = pathBBox(focusRegion.d);
+    if (!box) return config.viewBox;
+    return fitViewBox(box, fullBox);
+  }, [shouldZoom, focusRegion, config.viewBox, fullBox]);
+
   return (
     <div className={`flex flex-col gap-4 ${compact ? '' : 'lg:flex-row'} ${className}`}>
-      <div className="card flex-1 overflow-hidden p-2 sm:p-4">
-        <p className="mb-2 px-2 text-center text-xs text-slate-500 dark:text-slate-400">{hint}</p>
+      <div className="card flex-1 overflow-hidden p-1.5 sm:p-4">
+        <div className="mb-1.5 flex items-center justify-between gap-2 px-1 sm:mb-2 sm:px-2">
+          <p className="min-w-0 flex-1 text-left text-[11px] leading-snug text-slate-500 dark:text-slate-400 sm:text-xs">{hint}</p>
+          {shouldZoom && (
+            <button
+              type="button"
+              className="btn-ghost shrink-0 px-2 py-1 text-[11px]"
+              onClick={() => setUserZoomedOut(true)}
+            >
+              <RotateCcw className="h-3 w-3" /> Full plate
+            </button>
+          )}
+          {!shouldZoom && focusRegion && (narrow || compact) && (
+            <button
+              type="button"
+              className="btn-ghost shrink-0 px-2 py-1 text-[11px]"
+              onClick={() => setUserZoomedOut(false)}
+            >
+              <Focus className="h-3 w-3" /> Zoom
+            </button>
+          )}
+        </div>
         <svg
-          viewBox={config.viewBox}
-          className={`mx-auto w-full select-none ${config.maxWidthClass ?? 'max-w-sm'}`}
+          viewBox={liveViewBox}
+          className={`mx-auto w-full select-none touch-manipulation ${config.maxWidthClass ?? 'max-w-sm'}`}
           role="img"
           aria-label={config.ariaLabel}
+          style={{ WebkitTapHighlightColor: 'transparent' }}
         >
           <defs>
             <linearGradient id="boneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -142,7 +196,8 @@ export function InteractiveDiagram({
                 y={0}
                 width={imgW}
                 height={imgH}
-                preserveAspectRatio="none"
+                preserveAspectRatio="xMidYMid meet"
+                style={{ pointerEvents: 'none' }}
               />
             );
           })()}
@@ -171,24 +226,75 @@ export function InteractiveDiagram({
 
             const useBoneFill =
               !hasImage && config.renderStyle === 'bone' && !isSelected && !isHighlight;
+            const area = pathBBox(region.d);
+            const areaRatio = area
+              ? (area.width * area.height) / (fullBox.width * fullBox.height)
+              : 0.05;
+            const slop = areaRatio > 0.12 ? 14 : 28;
 
             return (
-              <path
-                key={region.id}
-                d={region.d}
-                className={`cursor-pointer transition-all duration-150 ${cls}`}
-                fill={useBoneFill ? 'url(#boneGrad)' : undefined}
-                strokeWidth={isSelected || isHighlight ? 2.5 : hasImage ? 1.5 : 1.35}
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                onClick={() => handleClick(region.id)}
-              >
-                {/* Hover titles spoil quiz answers — only show when studying */}
-                {!quizMode && <title>{region.label}</title>}
-              </path>
+              <g key={region.id} className="cursor-pointer" onClick={() => handleClick(region.id)}>
+                {/* Fat-finger hit slop: screen-space stroke. Large regions get less slop so they do not steal small bones. */}
+                <path
+                  d={region.d}
+                  fill="transparent"
+                  stroke="transparent"
+                  strokeWidth={slop}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  pointerEvents={dimmed ? 'none' : 'all'}
+                  style={{ vectorEffect: 'non-scaling-stroke' }}
+                />
+                <path
+                  d={region.d}
+                  className={`transition-[fill,stroke] duration-150 ${cls}`}
+                  fill={useBoneFill ? 'url(#boneGrad)' : undefined}
+                  fillRule="evenodd"
+                  strokeWidth={isSelected || isHighlight ? 2 : hasImage ? 1.25 : 1.1}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  pointerEvents="none"
+                  style={{
+                    vectorEffect: 'non-scaling-stroke',
+                    paintOrder: 'stroke fill',
+                    shapeRendering: 'geometricPrecision',
+                  }}
+                >
+                  {!quizMode && <title>{region.label}</title>}
+                </path>
+              </g>
             );
           })}
         </svg>
+
+        {!quizMode && (
+          <div
+            className="mt-2 flex gap-1.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            role="listbox"
+            aria-label="Structures on this plate"
+          >
+            {config.regions.map((region) => {
+              const on = selectedId === region.id;
+              return (
+                <button
+                  key={`chip-${region.id}`}
+                  type="button"
+                  role="option"
+                  aria-pressed={on}
+                  aria-selected={on}
+                  onClick={() => handleClick(region.id)}
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
+                    on
+                      ? 'bg-brand-600 text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {region.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {config.credit && (
           <p className="mt-2 px-1 text-[10px] leading-snug text-slate-400 dark:text-slate-500">

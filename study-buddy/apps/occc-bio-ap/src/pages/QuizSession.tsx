@@ -447,6 +447,7 @@ function LabelView({
             compact
             stickySelect
             quizMode
+            zoomOnFocus={mode === 'select-name' || revealed}
             selectedId={
               mode === 'select-name' ? q.structureId : revealed ? q.structureId : selected
             }

@@ -3,11 +3,11 @@ import type { SystemId } from '../../types';
 import { DIAGRAM_CREDITS } from './diagramAssets';
 import skeletonHotspots from './skeletonHotspots.json';
 
-/** Skeleton — verified good (SVG-path-derived hotspots). Leave as-is. */
+/** Skeleton — outlines extracted from LadyofHats SVG groups (not bounding boxes). */
 export const skeletalConfig: DiagramConfig = {
   title: 'Skeletal system',
   ariaLabel: 'Interactive skeleton — LadyofHats public-domain plate',
-  hint: 'Click directly on a bone — hotspots match the plate geometry',
+  hint: 'Tap a bone — highlight follows the plate outline (zooms on phones)',
   viewBox: '0 0 435.687 841.89',
   // PNG is a uniform scale of the SVG; stretch into SVG user space (hotspots are SVG units)
   imageWidth: 435.687,
@@ -40,25 +40,85 @@ export const muscularConfig: DiagramConfig = {
   renderStyle: 'hotspot',
   credit: DIAGRAM_CREDITS.muscular,
   /**
-   * Hotspots in anterior-plate pixel space (same as original left half of dual plate).
-   * Figure center ≈ x 320–400. Large regions first; small last.
+   * Tight polygons in anterior-plate pixel space (figure center ≈ x 320).
+   * Large regions first; small last so they win hit-testing.
    */
   regions: [
-    { id: 'quadriceps-femoris', label: 'Quadriceps femoris', d: 'M250 630 h70 v195 h-70z M355 630 h70 v195 h-70z' },
-    { id: 'hamstrings', label: 'Hamstrings (medial thigh)', d: 'M220 645 h38 v175 h-38z M435 645 h38 v175 h-38z' },
-    { id: 'gastrocnemius', label: 'Gastrocnemius', d: 'M265 845 h60 v135 h-60z M355 845 h60 v135 h-60z' },
-    { id: 'tibialis-anterior', label: 'Tibialis anterior', d: 'M245 860 h28 v140 h-28z M405 860 h28 v140 h-28z' },
-    { id: 'gluteus-maximus', label: 'Gluteal region', d: 'M265 555 h145 v68 h-145z' },
-    { id: 'rectus-abdominis', label: 'Rectus abdominis', d: 'M295 375 h78 v160 h-78z' },
-    { id: 'external-oblique', label: 'External oblique', d: 'M230 380 h65 v145 h-65z M385 380 h65 v145 h-65z' },
-    { id: 'pectoralis-major', label: 'Pectoralis major', d: 'M250 265 h170 v95 h-170z' },
-    { id: 'latissimus-dorsi', label: 'Latissimus dorsi (lateral)', d: 'M200 320 h50 v100 h-50z M440 320 h50 v100 h-50z' },
-    { id: 'diaphragm', label: 'Diaphragm', d: 'M255 350 h160 v28 h-160z' },
-    { id: 'deltoid', label: 'Deltoid', d: 'M170 245 h68 v100 h-68z M445 245 h68 v100 h-68z' },
-    { id: 'biceps-brachii', label: 'Biceps brachii', d: 'M155 350 h52 v140 h-52z M475 350 h52 v140 h-52z' },
-    { id: 'triceps-brachii', label: 'Triceps brachii', d: 'M128 360 h32 v130 h-32z M520 360 h32 v130 h-32z' },
-    { id: 'trapezius', label: 'Trapezius', d: 'M265 190 h140 v60 h-140z' },
-    { id: 'sternocleidomastoid', label: 'Sternocleidomastoid', d: 'M290 150 h42 v68 h-42z M350 150 h42 v68 h-42z' },
+    {
+      id: 'quadriceps-femoris',
+      label: 'Quadriceps femoris',
+      d: 'M268 628 L318 622 332 720 322 825 278 828 258 720 Z M362 622 L412 628 422 720 402 828 358 825 348 720 Z',
+    },
+    {
+      id: 'hamstrings',
+      label: 'Hamstrings (medial thigh)',
+      d: 'M248 650 L268 648 274 800 252 818 236 800 Z M412 648 L432 650 444 800 428 818 406 800 Z',
+    },
+    {
+      id: 'gastrocnemius',
+      label: 'Gastrocnemius',
+      d: 'M272 848 L322 846 328 960 300 978 268 960 Z M358 846 L408 848 412 960 380 978 352 960 Z',
+    },
+    {
+      id: 'tibialis-anterior',
+      label: 'Tibialis anterior',
+      d: 'M252 862 L274 860 278 990 258 998 246 990 Z M406 860 L428 862 434 990 422 998 402 990 Z',
+    },
+    {
+      id: 'gluteus-maximus',
+      label: 'Gluteal region',
+      d: 'M278 558 L402 558 412 600 392 628 288 628 268 600 Z',
+    },
+    {
+      id: 'rectus-abdominis',
+      label: 'Rectus abdominis',
+      d: 'M304 378 L376 378 372 534 308 534 Z',
+    },
+    {
+      id: 'external-oblique',
+      label: 'External oblique',
+      d: 'M238 388 L300 382 304 528 242 518 Z M380 382 L442 388 438 518 376 528 Z',
+    },
+    {
+      id: 'pectoralis-major',
+      label: 'Pectoralis major',
+      d: 'M248 268 L332 258 400 268 418 320 400 358 332 348 260 358 242 320 Z',
+    },
+    {
+      id: 'latissimus-dorsi',
+      label: 'Latissimus dorsi (lateral)',
+      d: 'M208 318 L250 312 256 412 214 418 Z M430 312 L472 318 466 418 424 412 Z',
+    },
+    {
+      id: 'diaphragm',
+      label: 'Diaphragm',
+      d: 'M258 348 Q340 372 422 348 L418 368 Q340 392 262 368 Z',
+    },
+    {
+      id: 'deltoid',
+      label: 'Deltoid',
+      d: 'M176 248 L238 242 248 300 228 348 178 340 Z M442 242 L504 248 502 340 452 348 432 300 Z',
+    },
+    {
+      id: 'biceps-brachii',
+      label: 'Biceps brachii',
+      d: 'M162 348 L206 342 214 470 176 488 154 470 Z M474 342 L518 348 526 470 504 488 466 470 Z',
+    },
+    {
+      id: 'triceps-brachii',
+      label: 'Triceps brachii',
+      d: 'M130 358 L158 354 164 478 132 486 118 470 Z M522 354 L550 358 562 470 548 486 516 478 Z',
+    },
+    {
+      id: 'trapezius',
+      label: 'Trapezius',
+      d: 'M278 188 L340 178 402 188 392 242 340 228 288 242 Z',
+    },
+    {
+      id: 'sternocleidomastoid',
+      label: 'Sternocleidomastoid',
+      d: 'M296 148 L328 146 334 214 304 218 Z M352 146 L384 148 376 218 346 214 Z',
+    },
   ],
 };
 
@@ -80,18 +140,61 @@ export const cardiovascularConfig: DiagramConfig = {
   renderStyle: 'hotspot',
   credit: DIAGRAM_CREDITS.cardiovascular,
   regions: [
-    // Large chambers first (paint order still works; click uses topmost path later in list for small targets)
-    { id: 'left-ventricle', label: 'Left ventricle', d: 'M275 255 h145 v155 h-145z' },
-    { id: 'right-ventricle', label: 'Right ventricle', d: 'M145 290 h145 v130 h-145z' },
-    { id: 'right-atrium', label: 'Right atrium', d: 'M95 175 h140 v115 h-140z' },
-    { id: 'left-atrium', label: 'Left atrium', d: 'M285 155 h130 v100 h-130z' },
-    { id: 'aorta', label: 'Aorta', d: 'M205 25 h105 v95 h-105z' },
-    { id: 'pulmonary-artery', label: 'Pulmonary trunk', d: 'M295 95 h120 v55 h-120z' },
-    { id: 'vena-cava', label: 'Venae cavae', d: 'M95 45 h60 v100 h-60z M175 400 h70 v60 h-70z' },
-    { id: 'pulmonary-vein', label: 'Pulmonary veins', d: 'M35 195 h75 v45 h-75z M400 175 h80 v50 h-80z' },
-    { id: 'coronary-arteries', label: 'Coronary arteries', d: 'M230 245 h75 v32 h-75z' },
-    { id: 'carotid-artery', label: 'Carotid arteries', d: 'M225 2 h55 v28 h-55z' },
-    { id: 'heart', label: 'Heart (overview)', d: 'M200 445 h120 v40 h-120z' },
+    {
+      id: 'left-ventricle',
+      label: 'Left ventricle',
+      d: 'M278 268 L410 248 430 320 418 400 340 418 278 360 Z',
+    },
+    {
+      id: 'right-ventricle',
+      label: 'Right ventricle',
+      d: 'M168 300 L290 278 300 390 250 420 170 400 Z',
+    },
+    {
+      id: 'right-atrium',
+      label: 'Right atrium',
+      d: 'M108 188 L228 170 236 268 170 292 100 260 Z',
+    },
+    {
+      id: 'left-atrium',
+      label: 'Left atrium',
+      d: 'M292 168 L408 158 418 238 360 258 288 240 Z',
+    },
+    {
+      id: 'aorta',
+      label: 'Aorta',
+      d: 'M218 48 L300 28 318 88 292 118 248 108 222 78 Z',
+    },
+    {
+      id: 'pulmonary-artery',
+      label: 'Pulmonary trunk',
+      d: 'M298 102 L412 92 418 138 330 152 292 138 Z',
+    },
+    {
+      id: 'vena-cava',
+      label: 'Venae cavae',
+      d: 'M108 48 L158 42 164 138 112 148 Z M178 402 L242 398 246 452 176 458 Z',
+    },
+    {
+      id: 'pulmonary-vein',
+      label: 'Pulmonary veins',
+      d: 'M42 198 L108 188 112 232 48 238 Z M402 178 L472 172 478 218 408 224 Z',
+    },
+    {
+      id: 'coronary-arteries',
+      label: 'Coronary arteries',
+      d: 'M232 248 L300 240 308 272 240 278 Z',
+    },
+    {
+      id: 'carotid-artery',
+      label: 'Carotid arteries',
+      d: 'M228 4 L278 2 280 28 230 30 Z',
+    },
+    {
+      id: 'heart',
+      label: 'Heart (overview)',
+      d: 'M210 448 L330 444 336 478 208 482 Z',
+    },
   ],
 };
 
@@ -179,17 +282,27 @@ export const nervousConfig: DiagramConfig = {
     sourceUrl: 'https://commons.wikimedia.org/wiki/File:Nervous_system_diagram_unlabeled.svg',
   },
   regions: [
-    // Large first; finer CNS targets last so they win click hit-testing
-    { id: 'peripheral-nerves', label: 'Peripheral nerves', d: 'M100 360 h210 v540 h-210z M650 360 h210 v540 h-210z M270 1160 h190 v640 h-190z M500 1160 h190 v640 h-190z' },
-    { id: 'spinal-cord', label: 'Spinal cord', d: 'M450 270 h60 v800 h-60z' },
-    { id: 'cerebrum', label: 'Cerebrum', d: 'M365 28 h240 v155 h-240z' },
-    // Cerebellum = posterior-inferior tan mass of brain (right of midline in this view)
-    { id: 'cerebellum', label: 'Cerebellum', d: 'M490 118 h105 v85 h-105z' },
-    { id: 'brainstem', label: 'Brainstem', d: 'M450 185 h65 v90 h-65z' },
-    { id: 'thalamus', label: 'Thalamus', d: 'M455 150 h55 v40 h-55z' },
-    { id: 'hypothalamus', label: 'Hypothalamus', d: 'M458 185 h48 v32 h-48z' },
-    // Blue nerve roots near base of skull / upper neck
-    { id: 'cranial-nerves', label: 'Cranial nerves', d: 'M325 150 h100 v110 h-100z M555 150 h100 v110 h-100z' },
+    {
+      id: 'peripheral-nerves',
+      label: 'Peripheral nerves',
+      d:
+        'M130 380 L300 360 310 520 240 900 150 900 120 520 Z M660 360 L830 380 840 520 810 900 720 900 650 520 Z M300 1160 L450 1148 460 1780 340 1800 290 1500 Z M510 1148 L660 1160 670 1500 620 1800 500 1780 Z',
+    },
+    { id: 'spinal-cord', label: 'Spinal cord', d: 'M462 280 L500 276 506 1060 468 1064 Z' },
+    {
+      id: 'cerebrum',
+      label: 'Cerebrum',
+      d: 'M390 36 Q480 12 590 40 L605 140 Q480 168 375 140 Z',
+    },
+    { id: 'cerebellum', label: 'Cerebellum', d: 'M498 128 L590 122 598 198 500 204 Z' },
+    { id: 'brainstem', label: 'Brainstem', d: 'M456 190 L512 186 518 268 460 272 Z' },
+    { id: 'thalamus', label: 'Thalamus', d: 'M460 152 L508 150 512 186 462 188 Z' },
+    { id: 'hypothalamus', label: 'Hypothalamus', d: 'M462 188 L506 186 508 214 464 216 Z' },
+    {
+      id: 'cranial-nerves',
+      label: 'Cranial nerves',
+      d: 'M338 158 L420 152 426 248 342 254 Z M548 152 L630 158 622 254 540 248 Z',
+    },
   ],
 };
 
