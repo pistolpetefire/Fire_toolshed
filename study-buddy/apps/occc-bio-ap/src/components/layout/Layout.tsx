@@ -13,12 +13,16 @@ import {
   Moon,
   Sun,
   Home,
+  ListOrdered,
+  GraduationCap,
 } from 'lucide-react';
 import { useProgressContext } from '../../context/ProgressContext';
 import { p } from '../../basePath';
 
 const navItems = [
   { to: p('/'), label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: p('/units'), label: 'Units', icon: ListOrdered },
+  { to: p('/syllabus'), label: 'Syllabus', icon: GraduationCap },
   { to: p('/systems'), label: 'Body Systems', icon: Bone },
   { to: p('/flashcards'), label: 'Flashcards', icon: Layers },
   { to: p('/quizzes'), label: 'Quizzes', icon: BrainCircuit },
@@ -90,7 +94,7 @@ export function Layout() {
           </div>
           <div>
             <div className="font-display text-sm font-bold leading-tight">Anatomy Hub</div>
-            <div className="text-[11px] text-slate-500">A&amp;P I · BIO 1314/1414 · OCCC</div>
+            <div className="text-[11px] text-slate-500">BIO 1314 · Fall 2026 · Senter</div>
           </div>
         </div>
         {nav}
@@ -158,7 +162,7 @@ export function Layout() {
         </main>
 
         <footer className="border-t border-slate-200 px-4 py-4 text-center text-xs text-slate-500 dark:border-slate-800 sm:px-6">
-          Study Buddy · OCCC Anatomy Hub · BIO 1314 / BIO 1414 · Progress saved in this browser
+          Study Buddy · OCCC BIO 1314 Fall 2026 · Progress saved in this browser
         </footer>
       </div>
     </div>

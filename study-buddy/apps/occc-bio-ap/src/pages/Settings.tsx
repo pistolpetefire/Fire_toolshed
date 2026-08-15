@@ -214,9 +214,9 @@ export function Settings() {
         <div className="flex items-start gap-2">
           <Info className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
           <div className="text-sm text-slate-600 dark:text-slate-300">
-            <p className="font-semibold text-slate-800 dark:text-slate-100">OCCC Anatomy Hub v1.2</p>
+            <p className="font-semibold text-slate-800 dark:text-slate-100">OCCC Anatomy Hub v2.0</p>
             <p className="mt-1">
-              Educational study tool for Human Anatomy &amp; Physiology (BIO 1314 / BIO 1414) at Oklahoma City
+              Educational study tool for Human Anatomy &amp; Physiology I (BIO 1314, Fall 2026, Senter) at Oklahoma City
               Community College. Not a substitute for textbooks, lab manuals, or instructor materials.
             </p>
           </div>

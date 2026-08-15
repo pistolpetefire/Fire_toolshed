@@ -56,7 +56,9 @@ export function SystemsList() {
       <header>
         <h1 className="page-title">Body Systems</h1>
         <p className="page-subtitle">
-          Personal A&amp;P I path (BIO 1314 / BIO 1414) — overview, sharper diagrams, study tips, and key structures. Foundations, chemistry, cells, tissues, and blood are on the Dashboard unit path.
+          BIO 1314 Fall 2026 treats integumentary, skeletal, nervous, and muscular in depth. Other systems are BIO
+          1414 extras — useful later, not on Senter’s lecture exams. Foundations, chemistry, cells, and genetics
+          live on the <span className="font-medium">Units</span> path.
         </p>
       </header>
 

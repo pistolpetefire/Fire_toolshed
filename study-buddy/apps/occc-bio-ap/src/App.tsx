@@ -2,6 +2,9 @@ import { Routes, Route } from 'react-router-dom';
 import { ProgressProvider } from './context/ProgressContext';
 import { Layout } from './components/layout/Layout';
 import { Dashboard } from './pages/Dashboard';
+import { Syllabus } from './pages/Syllabus';
+import { UnitsList } from './pages/UnitsList';
+import { UnitDetail } from './pages/UnitDetail';
 import { SystemsList } from './pages/SystemsList';
 import { SystemDetail } from './pages/SystemDetail';
 import { Flashcards } from './pages/Flashcards';
@@ -13,7 +16,7 @@ import { Settings } from './pages/Settings';
 import { NotFound } from './pages/NotFound';
 
 /**
- * OCCC BIO 1314 / BIO 1414 — Anatomy Hub
+ * OCCC BIO 1314 Fall 2026 (Senter) — Anatomy Hub
  * Mounted by Study Buddy at /classes/occc-bio-ap/*
  * Hub owns the single top-level router; this file only exports Routes.
  */
@@ -23,6 +26,9 @@ export default function OcccBioApApp() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Dashboard />} />
+          <Route path="syllabus" element={<Syllabus />} />
+          <Route path="units" element={<UnitsList />} />
+          <Route path="units/:unitId" element={<UnitDetail />} />
           <Route path="systems" element={<SystemsList />} />
           <Route path="systems/:systemId" element={<SystemDetail />} />
           <Route path="flashcards" element={<Flashcards />} />

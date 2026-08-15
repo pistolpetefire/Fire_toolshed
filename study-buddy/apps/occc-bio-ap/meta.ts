@@ -7,16 +7,16 @@ export const classAppMeta = {
   slug: 'occc-bio-ap',
   title: 'Anatomy Hub',
   shortTitle: 'A&P I',
-  courseCodes: ['BIO 1314', 'BIO 1414', 'A&P I'],
+  courseCodes: ['BIO 1314', 'A&P I'],
   school: 'Oklahoma City Community College',
-  subject: 'Personal Anatomy & Physiology I',
+  subject: 'Human Anatomy & Physiology I (Fall 2026, Senter)',
   description:
-    'Syllabus-aligned A&P I path for nursing prep: 16 units, sharper diagrams, flashcards, quizzes, and atlas. Goal — strong foundation toward nursing school / CRNA.',
+    'Official Fall 2026 BIO 1314 path: 10 units with lesson, practice, quiz, and review aligned to Senter’s objectives, plus diagrams, flashcards, and atlas.',
   status: 'live' as const,
   /** Hub route mount point */
   path: '/classes/occc-bio-ap',
   color: 'sky',
-  version: '1.3.0',
+  version: '2.0.0',
   tags: ['anatomy', 'physiology', 'OCCC', 'nursing', 'lab'],
 };
 

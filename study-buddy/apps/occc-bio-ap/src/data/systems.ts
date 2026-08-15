@@ -1,9 +1,9 @@
 import type { BodySystem } from '../types';
 
 /**
- * Body systems for Personal A&P I (BIO 1314 / BIO 1414) — nursing prep path.
- * Unit order follows the student syllabus (Integumentary → Skeletal → … → Reproductive).
- * Foundations / chemistry / cells / tissues / blood are covered in course units on the dashboard.
+ * Body systems for BIO 1314 / BIO 1414. Official Fall 2026 lecture exams cover
+ * integumentary, skeletal, nervous, and muscular. Other systems stay as 1414 extras.
+ * Foundations / chemistry / cells / genetics live on the Units path.
  * To add a new system: append here + structures.ts + optional flashcards/quizzes.
  */
 export const bodySystems: BodySystem[] = [
@@ -14,7 +14,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Bones, joints, and cartilages that support the body and protect organs.',
     overview:
       'The skeletal system provides structural support, protects vital organs, enables movement with muscles, stores minerals (especially calcium and phosphate), and houses hematopoietic tissue in bone marrow. Adult humans have 206 bones organized into axial and appendicular divisions. BIO 1314 typically covers bone tissue, classification of bones, the axial skeleton, and major joints; BIO 1414 revisits pathology and clinical correlations.',
-    courseRelevance: 'Syllabus Unit 6 — bones, joints, bone cells, remodeling, calcium, fractures.',
+    courseRelevance: 'BIO 1314 Unit 6 (Exam 3) — long bone, histology, calcium, ossification, joints.',
     color: 'sky',
     icon: 'Bone',
     keyStructures: [
@@ -55,7 +55,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Skeletal, cardiac, and smooth muscle that produce movement and heat.',
     overview:
       'Muscle tissue converts chemical energy into mechanical work. Skeletal muscle is voluntary and striated; cardiac muscle is involuntary, striated, and intercalated; smooth muscle is involuntary and non-striated. Key concepts include the sliding filament theory, neuromuscular junction, motor units, and major muscle groups by region.',
-    courseRelevance: 'Syllabus Unit 7 — muscle anatomy, contraction, ATP, motor units, major muscles.',
+    courseRelevance: 'BIO 1314 Unit 10 (Exam 5) — muscle physiology, NMJ, twitch/tetany, disorders.',
     color: 'rose',
     icon: 'Dumbbell',
     keyStructures: [
@@ -88,7 +88,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Brain, spinal cord, nerves, and sensory receptors for communication and control.',
     overview:
       'The nervous system is divided into central (brain + spinal cord) and peripheral (cranial & spinal nerves, ganglia). Neurons communicate via action potentials and synapses. Major brain regions include cerebrum, diencephalon, brainstem, and cerebellum. BIO 1314 covers neuron physiology and CNS anatomy; BIO 1414 expands PNS, senses, and clinical disorders.',
-    courseRelevance: 'BIO 1314 & BIO 1414 — neuron physiology, CNS/PNS anatomy, special senses.',
+    courseRelevance: 'BIO 1314 Units 7–9 (Exams 4–5) — neuron/AP, CNS, ANS, eye, ear.',
     color: 'violet',
     icon: 'Brain',
     keyStructures: [
@@ -114,7 +114,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Heart, blood vessels, and blood that transport gases, nutrients, and wastes.',
     overview:
       'The heart is a four-chambered pump driving pulmonary and systemic circuits. Arteries carry blood away from the heart; veins return it. Capillaries allow exchange. Key topics: cardiac cycle, ECG basics, blood pressure regulation, and major vessels.',
-    courseRelevance: 'BIO 1414 emphasis — heart anatomy, vessels, blood composition, hemodynamics.',
+    courseRelevance: 'BIO 1414 — not on BIO 1314 Fall 2026 lecture exams (Senter).',
     color: 'red',
     icon: 'Heart',
     keyStructures: [
@@ -143,7 +143,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Airways and lungs for gas exchange between atmosphere and blood.',
     overview:
       'Conducting zone (nose to terminal bronchioles) warms, filters, and humidifies air. Respiratory zone (respiratory bronchioles to alveoli) performs gas exchange. Breathing is driven by pressure changes from diaphragm and intercostals.',
-    courseRelevance: 'BIO 1414 — upper/lower respiratory tract, ventilation, gas exchange, control of breathing.',
+    courseRelevance: 'BIO 1414 — not on BIO 1314 Fall 2026 lecture exams (Senter).',
     color: 'cyan',
     icon: 'Wind',
     keyStructures: ['nasal-cavity', 'pharynx', 'larynx', 'trachea', 'bronchi', 'lungs', 'alveoli', 'diaphragm'],
@@ -160,7 +160,7 @@ export const bodySystems: BodySystem[] = [
     description: 'GI tract and accessory organs that break down food and absorb nutrients.',
     overview:
       'The alimentary canal runs from mouth to anus. Accessory organs (salivary glands, liver, gallbladder, pancreas) contribute enzymes and bile. Digestion is mechanical and chemical; absorption is primarily in the small intestine.',
-    courseRelevance: 'BIO 1414 — GI anatomy, enzymes, liver/pancreas, absorption.',
+    courseRelevance: 'BIO 1414 — not on BIO 1314 Fall 2026 lecture exams (Senter).',
     color: 'amber',
     icon: 'Apple',
     keyStructures: [
@@ -186,7 +186,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Glands that secrete hormones for long-distance chemical regulation.',
     overview:
       'Hormones travel via blood to target cells with specific receptors. Major glands: pituitary, thyroid, parathyroid, adrenals, pancreas, gonads, pineal. Feedback loops (negative more common) maintain homeostasis.',
-    courseRelevance: 'BIO 1414 — glands, major hormones, feedback, diabetes & thyroid disorders.',
+    courseRelevance: 'BIO 1414 — not on BIO 1314 Fall 2026 lecture exams (Senter). Named in Unit 1 system list only.',
     color: 'fuchsia',
     icon: 'FlaskConical',
     keyStructures: [
@@ -211,7 +211,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Kidneys and urinary tract that filter blood and regulate fluid/electrolytes.',
     overview:
       'Kidneys filter plasma at glomeruli, reabsorb needed substances, and secrete wastes to form urine. Nephrons are the functional units. ADH, aldosterone, and ANP regulate water and Na⁺ balance.',
-    courseRelevance: 'BIO 1414 — kidney anatomy, nephron physiology, urine formation, acid-base.',
+    courseRelevance: 'BIO 1414 — not on BIO 1314 Fall 2026 lecture exams. Kidneys appear in Unit 2 as a pH regulator.',
     color: 'yellow',
     icon: 'Droplets',
     keyStructures: ['kidney', 'nephron', 'ureter', 'bladder', 'urethra'],
@@ -228,7 +228,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Skin, hair, nails, and glands — the body\'s outer protective barrier.',
     overview:
       'Skin has epidermis (stratified squamous keratinized epithelium), dermis (connective tissue), and hypodermis. Functions: protection, sensation, thermoregulation, vitamin D synthesis, and excretion.',
-    courseRelevance: 'BIO 1314 intro unit — layers, glands, burns, skin cancer types.',
+    courseRelevance: 'BIO 1314 Unit 6 (Exam 3) — membranes, skin layers, glands, derivatives.',
     color: 'orange',
     icon: 'Hand',
     keyStructures: ['epidermis', 'dermis', 'hypodermis', 'sweat-glands', 'sebaceous-glands', 'hair-follicle'],
@@ -245,7 +245,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Lymph vessels, nodes, and lymphoid organs supporting immunity and fluid balance.',
     overview:
       'Lymphatic vessels return interstitial fluid to blood and transport lipids from the gut. Lymph nodes filter lymph. Primary lymphoid organs (bone marrow, thymus) produce/mature lymphocytes; secondary (nodes, spleen, MALT) activate immune responses.',
-    courseRelevance: 'BIO 1414 — lymph flow, nodes, spleen, innate vs adaptive immunity.',
+    courseRelevance: 'BIO 1414 — not on BIO 1314 Fall 2026 lecture exams (Senter).',
     color: 'lime',
     icon: 'Shield',
     keyStructures: ['lymph-nodes', 'spleen', 'thymus', 'tonsils', 'lymph-vessels'],
@@ -262,7 +262,7 @@ export const bodySystems: BodySystem[] = [
     description: 'Organs for gamete production, sex hormones, and (female) pregnancy support.',
     overview:
       'Male system produces sperm and testosterone (testes, ducts, glands). Female system produces ova and hormones, supports fertilization and pregnancy (ovaries, uterine tubes, uterus, vagina). Hypothalamic-pituitary-gonadal axis regulates both.',
-    courseRelevance: 'BIO 1414 — male/female anatomy, gametogenesis, menstrual cycle, hormones.',
+    courseRelevance: 'BIO 1414 — not on BIO 1314 Fall 2026 lecture exams. Meiosis appears in Unit 5 genetics.',
     color: 'pink',
     icon: 'HeartHandshake',
     keyStructures: ['testes', 'ovaries', 'uterus', 'prostate', 'fallopian-tubes'],

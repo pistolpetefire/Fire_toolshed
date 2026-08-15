@@ -15,6 +15,7 @@ export function normalizeProgress(parsed: Partial<UserProgress>): UserProgress {
     ...parsed,
     streak: { ...DEFAULT_PROGRESS.streak, ...parsed.streak },
     systems: { ...(parsed.systems ?? {}) },
+    units: { ...(parsed.units ?? {}) },
     cardProgress: { ...(parsed.cardProgress ?? {}) },
     customCards: Array.isArray(parsed.customCards) ? parsed.customCards : [],
     quizHistory: Array.isArray(parsed.quizHistory) ? parsed.quizHistory : [],
@@ -168,6 +169,26 @@ export function mergeProgress(local: UserProgress, incoming: UserProgress): User
     };
   }
 
+  const units: UserProgress['units'] = { ...local.units };
+  for (const [uid, remote] of Object.entries(incoming.units ?? {})) {
+    if (!remote) continue;
+    const key = uid as keyof typeof units;
+    const cur = units[key];
+    if (!cur) {
+      units[key] = remote;
+      continue;
+    }
+    units[key] = {
+      ...cur,
+      lessonViewed: cur.lessonViewed || remote.lessonViewed,
+      reviewOpened: cur.reviewOpened || remote.reviewOpened,
+      practiceAnswered: Math.max(cur.practiceAnswered, remote.practiceAnswered),
+      practiceCorrect: Math.max(cur.practiceCorrect, remote.practiceCorrect),
+      quizScores: [...cur.quizScores, ...remote.quizScores].slice(-20),
+      lastMistakes: remote.lastMistakes?.length ? remote.lastMistakes : cur.lastMistakes,
+    };
+  }
+
   return {
     streak: {
       current: Math.max(local.streak.current, incoming.streak.current),
@@ -178,6 +199,7 @@ export function mergeProgress(local: UserProgress, incoming: UserProgress): User
           : incoming.streak.lastStudyDate,
     },
     systems,
+    units,
     cardProgress,
     customCards: [...customById.values()],
     quizHistory,

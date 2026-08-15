@@ -13,6 +13,19 @@ export type SystemId =
   | 'lymphatic'
   | 'reproductive';
 
+/** Official Fall 2026 BIO 1314 lecture units (Senter). */
+export type UnitId =
+  | 'unit-1'
+  | 'unit-2'
+  | 'unit-3'
+  | 'unit-4'
+  | 'unit-5'
+  | 'unit-6'
+  | 'unit-7'
+  | 'unit-8'
+  | 'unit-9'
+  | 'unit-10';
+
 /** Topics for flashcards — body systems plus early A&P I units without a system page */
 export type FlashcardTopicId =
   | SystemId
@@ -121,21 +134,36 @@ export interface MatchingQuestion {
 
 export type QuizQuestion = MCQuestion | LabelingQuestion | MatchingQuestion;
 
+export interface QuizMistake {
+  questionId: string;
+  prompt: string;
+  userAnswer: string;
+  correctAnswer: string;
+  explanation: string;
+  objective?: number;
+}
+
 export interface QuizAttempt {
   id: string;
   quizType: QuizType;
   systemId: SystemId | 'mixed';
+  /** Official BIO 1314 unit, when the quiz is from the unit path */
+  unitId?: UnitId;
   score: number;
   total: number;
   percentage: number;
   date: string;
-  mistakes: {
-    questionId: string;
-    prompt: string;
-    userAnswer: string;
-    correctAnswer: string;
-    explanation: string;
-  }[];
+  mistakes: QuizMistake[];
+}
+
+export interface UnitProgress {
+  unitId: UnitId;
+  lessonViewed: boolean;
+  practiceCorrect: number;
+  practiceAnswered: number;
+  quizScores: number[];
+  reviewOpened: boolean;
+  lastMistakes: QuizMistake[];
 }
 
 export interface StudyStreak {
@@ -155,6 +183,7 @@ export interface SystemProgress {
 export interface UserProgress {
   streak: StudyStreak;
   systems: Partial<Record<SystemId, SystemProgress>>;
+  units: Partial<Record<UnitId, UnitProgress>>;
   cardProgress: Record<string, CardProgress>;
   customCards: Flashcard[];
   quizHistory: QuizAttempt[];
@@ -165,6 +194,7 @@ export interface UserProgress {
 export const DEFAULT_PROGRESS: UserProgress = {
   streak: { current: 0, longest: 0, lastStudyDate: null },
   systems: {},
+  units: {},
   cardProgress: {},
   customCards: [],
   quizHistory: [],

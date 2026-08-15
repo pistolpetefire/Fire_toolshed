@@ -7,7 +7,7 @@ study-buddy/
   src/                    ← Hub shell (home, catalog, theme)
   apps/
     _template/            ← Copy this to start a new class
-    occc-bio-ap/          ← First live app: OCCC A&P (BIO 1314 / BIO 1414)
+    occc-bio-ap/          ← First live app: OCCC BIO 1314 (Fall 2026, Senter)
   package.json
 ```
 
@@ -46,7 +46,7 @@ npm run test:cycles   # 5 automated verification cycles
 
 | App | Courses | Path |
 |-----|---------|------|
-| **Anatomy Hub** | BIO 1314, BIO 1414 (OCCC) | `/classes/occc-bio-ap` |
+| **Anatomy Hub** | BIO 1314 Fall 2026 (OCCC, Senter) | `/classes/occc-bio-ap` |
 | **Chemistry I Final Study Buddy** | CHEM 1214 / 1315 (OSU-OKC) | `/chem1-study-buddy/` (static vanilla under `public/chem1-study-buddy/`) |
 | **Calculus I Final Study Buddy** | Calc I / MATH 2144-style (OSU-OKC) | `/calc1-study-buddy/` (static vanilla under `public/calc1-study-buddy/`) |
 | **Calculus II Semester Study Buddy** | MATH 2153 / Calc II (OSU typical) | `/calc2-study-buddy/` (static vanilla under `public/calc2-study-buddy/`) |
