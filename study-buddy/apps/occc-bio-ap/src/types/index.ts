@@ -70,6 +70,8 @@ export interface Flashcard {
   /** Body system or foundation unit topic */
   systemId: FlashcardTopicId;
   tags: string[];
+  /** Official BIO 1314 units this card belongs to (extras / syllabus gaps) */
+  unitIds?: UnitId[];
   /** true when created by the user */
   custom?: boolean;
 }
@@ -85,7 +87,7 @@ export interface CardProgress {
   lastReviewed?: string;
 }
 
-export type QuizType = 'multiple-choice' | 'diagram-labeling' | 'matching';
+export type QuizType = 'multiple-choice' | 'diagram-labeling' | 'matching' | 'exam-prep';
 
 export interface MCQuestion {
   id: string;
@@ -95,6 +97,8 @@ export interface MCQuestion {
   options: string[];
   correctIndex: number;
   explanation: string;
+  unitId?: UnitId;
+  objective?: number;
 }
 
 /**
@@ -116,6 +120,8 @@ export interface LabelingQuestion {
   explanation: string;
   /** Defaults to select-name when omitted */
   interactionMode?: LabelingMode;
+  /** Unit plate id (long-bone, neuron, …). Falls back to the system plate. */
+  diagramId?: string;
 }
 
 export interface MatchingPair {

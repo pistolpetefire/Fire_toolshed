@@ -6,16 +6,20 @@ import {
   FLASHCARD_TOPIC_LABELS,
   FLASHCARD_TOPIC_ORDER,
 } from '../data/flashcards';
+import { courseUnits } from '../data/courseUnits';
+import { getFlashcardsForUnit, isUnitId, unitFlashcardCount, unitFlashcardExtras } from '../data/flashcardUnits';
 import { useProgressContext } from '../context/ProgressContext';
 import { isDue, reviewCard } from '../lib/srs';
 import { recordStudyDay } from '../lib/progress';
-import type { Flashcard, FlashcardTopicId, SRSRating } from '../types';
+import type { Flashcard, FlashcardTopicId, SRSRating, UnitId } from '../types';
 
 export function Flashcards() {
   const { progress, updateProgress } = useProgressContext();
   const [params, setParams] = useSearchParams();
   const dueOnly = params.get('due') === '1';
+  const unitFromUrl = params.get('unit');
 
+  const [unitFilter, setUnitFilter] = useState<UnitId | 'all'>(isUnitId(unitFromUrl) ? unitFromUrl : 'all');
   const [systemFilter, setSystemFilter] = useState<FlashcardTopicId | 'all' | 'custom'>('all');
   const [showAdd, setShowAdd] = useState(false);
   const [flipped, setFlipped] = useState(false);
@@ -24,12 +28,16 @@ export function Flashcards() {
   const [announce, setAnnounce] = useState('');
 
   const allCards = useMemo(
-    () => [...builtInFlashcards, ...progress.customCards],
+    () => [...builtInFlashcards, ...unitFlashcardExtras, ...progress.customCards],
     [progress.customCards]
   );
 
   const deck = useMemo(() => {
     let cards = allCards;
+    if (unitFilter !== 'all') {
+      const allowed = new Set(getFlashcardsForUnit(unitFilter).map((c) => c.id));
+      cards = cards.filter((c) => allowed.has(c.id) || (c.custom && c.unitIds?.includes(unitFilter)));
+    }
     if (systemFilter === 'custom') {
       cards = cards.filter((c) => c.custom);
     } else if (systemFilter !== 'all') {
@@ -45,7 +53,7 @@ export function Flashcards() {
       });
     }
     return cards;
-  }, [allCards, systemFilter, dueOnly, progress.cardProgress]);
+  }, [allCards, unitFilter, systemFilter, dueOnly, progress.cardProgress]);
 
   const dueCount = allCards.filter((c) => isDue(progress.cardProgress[c.id])).length;
   const card = deck[index] as Flashcard | undefined;
@@ -168,8 +176,7 @@ export function Flashcards() {
         <div>
           <h1 className="page-title">Flashcards</h1>
           <p className="page-subtitle">
-            {builtInFlashcards.length}+ built-in cards across A&amp;P I (foundations → reproductive). Rate Hard / Good /
-            Easy for spaced repetition.
+            Organized by BIO 1314 unit. Rate Hard / Good / Easy for spaced repetition.
           </p>
         </div>
         <button type="button" className="btn-primary" onClick={() => setShowAdd(true)}>
@@ -178,9 +185,52 @@ export function Flashcards() {
       </header>
 
       <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            setUnitFilter('all');
+            const next = new URLSearchParams(params);
+            next.delete('unit');
+            setParams(next, { replace: true });
+            setIndex(0);
+            setFlipped(false);
+          }}
+          className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
+            unitFilter === 'all'
+              ? 'bg-brand-600 text-white'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+          }`}
+        >
+          All units
+        </button>
+        {courseUnits.map((u) => (
+          <button
+            key={u.id}
+            type="button"
+            onClick={() => {
+              setUnitFilter(u.id);
+              setSystemFilter('all');
+              const next = new URLSearchParams(params);
+              next.set('unit', u.id);
+              setParams(next, { replace: true });
+              setIndex(0);
+              setFlipped(false);
+            }}
+            className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
+              unitFilter === u.id
+                ? 'bg-brand-600 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+            }`}
+          >
+            U{u.number} ({unitFlashcardCount(u.id)})
+          </button>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
         {(
           [
-            ['all', `All (${builtInFlashcards.length + progress.customCards.length})`],
+            ['all', `All topics (${allCards.length})`],
             ...FLASHCARD_TOPIC_ORDER.map(
               (id) =>
                 [

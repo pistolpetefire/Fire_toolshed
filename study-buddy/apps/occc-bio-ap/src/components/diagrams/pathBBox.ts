@@ -107,3 +107,28 @@ export function fitViewBox(region: PathBox, full: PathBox, padRatio = 0.22): str
 function round(n: number): number {
   return Math.round(n * 100) / 100;
 }
+
+export interface TapPoint {
+  x: number;
+  y: number;
+  r: number;
+}
+
+/** Label/leader tap targets. Prefer explicit tapX/Y; else one point per subpath. */
+export function tapPoints(
+  region: { d: string; tapX?: number; tapY?: number; tapR?: number },
+  defaultR = 28
+): TapPoint[] {
+  if (region.tapX != null && region.tapY != null) {
+    return [{ x: region.tapX, y: region.tapY, r: region.tapR ?? defaultR }];
+  }
+  const chunks = region.d.split(/(?=[Mm])/).filter((s) => s.trim().length > 2);
+  const pts: TapPoint[] = [];
+  for (const chunk of chunks) {
+    const box = pathBBox(chunk);
+    if (!box || box.width + box.height < 1) continue;
+    const r = region.tapR ?? Math.max(defaultR, Math.min(40, Math.max(box.width, box.height) * 0.28));
+    pts.push({ x: box.minX + box.width / 2, y: box.minY + box.height / 2, r });
+  }
+  return pts;
+}

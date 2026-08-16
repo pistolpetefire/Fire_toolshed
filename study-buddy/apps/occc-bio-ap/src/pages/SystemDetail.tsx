@@ -6,8 +6,17 @@ import { getSystemById } from '../data/systems';
 import { getStructureById } from '../data/structures';
 import { useProgressContext } from '../context/ProgressContext';
 import { markSystemStudied, markStructureViewed } from '../lib/progress';
-import { SystemDiagram, hasInteractiveDiagram } from '../components/diagrams/SystemDiagram';
+import { hasInteractiveDiagram } from '../components/diagrams/SystemDiagram';
+import { getDiagramConfig, getDiagramsByIds } from '../components/diagrams/diagramConfigs';
+import { StaticPlate } from '../components/diagrams/StaticPlate';
 import type { Structure, SystemId } from '../types';
+
+const EXTRA_PLATES: Partial<Record<string, string[]>> = {
+  skeletal: ['long-bone', 'osteon', 'synovial-joint'],
+  integumentary: [],
+  nervous: ['neuron', 'action-potential', 'spinal-cord', 'brain', 'diencephalon', 'cranial-nerves', 'ans', 'eye', 'ear'],
+  muscular: ['sarcomere', 'nmj', 'biceps'],
+};
 
 export function SystemDetail() {
   const { systemId } = useParams<{ systemId: string }>();
@@ -27,12 +36,6 @@ export function SystemDetail() {
     .filter(Boolean) as Structure[];
 
   const showDiagram = hasInteractiveDiagram(system.id);
-
-  const onDiagramSelect = (structure: Structure | null) => {
-    if (structure) {
-      updateProgress((prog) => markStructureViewed(prog, structure.systemId, structure.id));
-    }
-  };
 
   return (
     <div className="space-y-8">
@@ -61,8 +64,15 @@ export function SystemDetail() {
 
       {showDiagram ? (
         <section>
-          <h2 className="mb-3 font-display text-lg font-semibold">Interactive study area</h2>
-          <SystemDiagram systemId={system.id} onSelect={onDiagramSelect} />
+          <h2 className="mb-3 font-display text-lg font-semibold">Reference plate</h2>
+          <p className="mb-3 text-sm text-slate-500">
+            Labeled figure for study. To practice locations, use the{' '}
+            <Link to={p('/quizzes/diagram-labeling')} className="font-medium text-brand-600 hover:underline">
+              diagram quiz
+            </Link>{' '}
+            (unlabeled plate).
+          </p>
+          {getDiagramConfig(system.id) && <StaticPlate config={getDiagramConfig(system.id)!} />}
         </section>
       ) : (
         <section className="card p-5">
@@ -83,6 +93,18 @@ export function SystemDetail() {
               <Search className="h-3.5 w-3.5" /> Atlas filter
             </Link>
           </div>
+        </section>
+      )}
+
+      {(EXTRA_PLATES[system.id] ?? []).length > 0 && (
+        <section className="space-y-4">
+          <h2 className="font-display text-lg font-semibold">BIO 1314 objective plates</h2>
+          {getDiagramsByIds(EXTRA_PLATES[system.id] ?? []).map((cfg) => (
+            <div key={cfg.title}>
+              <h3 className="mb-2 text-sm font-semibold text-slate-600 dark:text-slate-300">{cfg.title}</h3>
+              <StaticPlate config={cfg} />
+            </div>
+          ))}
         </section>
       )}
 

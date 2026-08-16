@@ -4,6 +4,8 @@ import { getDiagramConfig } from './diagramConfigs';
 
 interface SystemDiagramProps {
   systemId: SystemId | string;
+  /** Unit plate (osteon, eye, …) when different from the whole-system figure */
+  diagramId?: string;
   onSelect?: (structure: Structure | null) => void;
   selectedId?: string | null;
   highlightIds?: string[];
@@ -17,8 +19,8 @@ interface SystemDiagramProps {
 }
 
 /** Renders the interactive diagram for a system, if one exists in the catalog. */
-export function SystemDiagram({ systemId, onSelect, quizMode, ...rest }: SystemDiagramProps) {
-  const config = getDiagramConfig(systemId);
+export function SystemDiagram({ systemId, diagramId, onSelect, quizMode, ...rest }: SystemDiagramProps) {
+  const config = getDiagramConfig(diagramId || systemId);
   if (!config) return null;
 
   const handle: InteractiveDiagramProps['onSelect'] = (structure) => onSelect?.(structure);
@@ -26,6 +28,6 @@ export function SystemDiagram({ systemId, onSelect, quizMode, ...rest }: SystemD
   return <InteractiveDiagram config={config} onSelect={handle} quizMode={quizMode} {...rest} />;
 }
 
-export function hasInteractiveDiagram(systemId: string): boolean {
-  return Boolean(getDiagramConfig(systemId));
+export function hasInteractiveDiagram(systemId: string, diagramId?: string): boolean {
+  return Boolean(getDiagramConfig(diagramId || systemId));
 }

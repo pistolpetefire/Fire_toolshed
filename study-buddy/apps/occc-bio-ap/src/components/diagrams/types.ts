@@ -4,8 +4,15 @@ export interface DiagramRegion {
   /** Must match a structure id in structures.ts when possible */
   id: string;
   label: string;
-  /** SVG path data for clickable hotspot (over image or as shape) */
+  /** SVG path data (legacy outlines; quizzes use tap points, not fills) */
   d: string;
+  /** Used when the atlas has no matching structure */
+  detail?: string;
+  category?: string;
+  /** Quiz tap target — label/leader location on the plate */
+  tapX?: number;
+  tapY?: number;
+  tapR?: number;
 }
 
 export type DiagramRenderStyle = 'bone' | 'muscle' | 'organ' | 'hotspot' | 'default';

@@ -97,8 +97,24 @@ function mirrorPathD(d, cx) {
   return out.join(' ');
 }
 
-function join(ids) {
-  return ids.flatMap((id) => extractGroupPaths(id)).filter(Boolean).join(' ');
+/** First path in a LadyofHats group is usually the outer silhouette. */
+function joinFirst(ids) {
+  return ids
+    .map((id) => extractGroupPaths(id).filter(Boolean)[0])
+    .filter(Boolean)
+    .join(' ');
+}
+
+/** Keep the longest silhouette(s) per group so internal hatching does not fill as a box. */
+function join(ids, keepPerGroup = 1) {
+  return ids
+    .flatMap((id) =>
+      extractGroupPaths(id)
+        .filter(Boolean)
+        .sort((a, b) => b.length - a.length)
+        .slice(0, keepPerGroup)
+    )
+    .join(' ');
 }
 
 function bboxFromD(d) {
@@ -162,12 +178,12 @@ function rectPath(b, pad = 0) {
   return `M${x} ${y} h${w} v${h} h${-w}z`;
 }
 
-const femurLeft = join(['FemurLeft']);
-const femurRightExisting = join(['FemurRight']);
+const femurLeft = join(['FemurLeft'], 3);
+const femurRightExisting = join(['FemurRight'], 3);
 const femurRight = femurRightExisting || (femurLeft ? mirrorPathD(femurLeft, CX) : '');
 
-const scapula = join(['Scapula']);
-const ribsFromBones = join(['Manubrium', 'Sternum']);
+const scapula = join(['Scapula'], 2);
+const ribsFromBones = join(['Manubrium', 'Sternum'], 2);
 // Rib cage: envelope of scapula inner + sternum, but keep as a slightly inset box
 // only if we cannot find rib paths. Use a tighter polygon from scapula/clavicle/lumbar.
 const clav = bboxFromD(join(['ClavicleLeft', 'ClavicleRight']));
@@ -187,28 +203,28 @@ if (scapB && clav && lumB) {
 
 const defs = [
   ['ribs', 'Ribs', ribs || ribsFromBones],
-  ['pelvis', 'Pelvic girdle', join(['PelvicGirdle'])],
-  ['skull', 'Skull', join(['Skull', 'Cranium', 'Mandible'])],
+  ['pelvis', 'Pelvic girdle', join(['PelvicGirdle'], 1)],
+  ['skull', 'Skull', join(['Skull', 'Cranium', 'Mandible'], 2)],
   ['femur', 'Femur', [femurLeft, femurRight].filter(Boolean).join(' ')],
-  ['humerus', 'Humerus', join(['HumerusLeft', 'HumerusRight'])],
-  ['tibia', 'Tibia', join(['TibiaLeft', 'TibiaRight'])],
-  ['fibula', 'Fibula', join(['FibulaLeft', 'FibulaRight'])],
-  ['thoracic-vertebrae', 'Thoracic vertebrae', join(['ThoracicVertebrae'])],
-  ['lumbar-vertebrae', 'Lumbar vertebrae', join(['LumbarVertebrae'])],
+  ['humerus', 'Humerus', join(['HumerusLeft', 'HumerusRight'], 2)],
+  ['tibia', 'Tibia', join(['TibiaLeft', 'TibiaRight'], 2)],
+  ['fibula', 'Fibula', join(['FibulaLeft', 'FibulaRight'], 2)],
+  ['thoracic-vertebrae', 'Thoracic vertebrae', join(['ThoracicVertebrae'], 8)],
+  ['lumbar-vertebrae', 'Lumbar vertebrae', join(['LumbarVertebrae'], 6)],
   ['scapula', 'Scapula', scapula],
-  ['radius', 'Radius', join(['RadiusLeft', 'RadiusRight'])],
-  ['ulna', 'Ulna', join(['UlnaLeft', 'UlnaRight'])],
-  ['clavicle', 'Clavicle', join(['ClavicleLeft', 'ClavicleRight'])],
-  ['sternum', 'Sternum', join(['Sternum', 'Manubrium'])],
-  ['mandible', 'Mandible', join(['Mandible'])],
-  ['cervical-vertebrae', 'Cervical vertebrae', join(['CervicalVertebrae'])],
-  ['carpals', 'Carpals', join(['CarpalsLeft', 'CarpalsRight'])],
-  ['metacarpals', 'Metacarpals', join(['MetacarpalsLeft', 'MetacarpalsRight'])],
-  ['phalanges-hand', 'Phalanges (hand)', join(['PhalangesLeft', 'PhalangesRight'])],
-  ['patella', 'Patella', join(['PatellaLeft', 'PatellaRight'])],
-  ['tarsals', 'Tarsals', join(['TarsalsLeft', 'TarsalsRight'])],
-  ['metatarsals', 'Metatarsals', join(['MetatarsalsLeft', 'MetatarsalsRight'])],
-  ['phalanges-foot', 'Phalanges (foot)', join(['PhalangesFootLeft', 'PhalangesFootRight'])],
+  ['radius', 'Radius', join(['RadiusLeft', 'RadiusRight'], 2)],
+  ['ulna', 'Ulna', join(['UlnaLeft', 'UlnaRight'], 2)],
+  ['clavicle', 'Clavicle', join(['ClavicleLeft', 'ClavicleRight'], 2)],
+  ['sternum', 'Sternum', join(['Sternum', 'Manubrium'], 2)],
+  ['mandible', 'Mandible', join(['Mandible'], 1)],
+  ['cervical-vertebrae', 'Cervical vertebrae', join(['CervicalVertebrae'], 6)],
+  ['carpals', 'Carpals', join(['CarpalsLeft', 'CarpalsRight'], 2)],
+  ['metacarpals', 'Metacarpals', join(['MetacarpalsLeft', 'MetacarpalsRight'], 2)],
+  ['phalanges-hand', 'Phalanges (hand)', join(['PhalangesLeft', 'PhalangesRight'], 2)],
+  ['patella', 'Patella', joinFirst(['PatellaLeft', 'PatellaRight'])],
+  ['tarsals', 'Tarsals', join(['TarsalsLeft', 'TarsalsRight'], 2)],
+  ['metatarsals', 'Metatarsals', join(['MetatarsalsLeft', 'MetatarsalsRight'], 2)],
+  ['phalanges-foot', 'Phalanges (foot)', join(['PhalangesFootLeft', 'PhalangesFootRight'], 2)],
 ];
 
 const regions = defs

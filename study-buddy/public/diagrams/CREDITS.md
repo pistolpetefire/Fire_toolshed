@@ -20,6 +20,23 @@ Procured for Study Buddy Anatomy Hub from free / open-license sources listed by 
 | `integumentary-skin.svg` | [Human skin structure.svg](https://commons.wikimedia.org/wiki/File:Human_skin_structure.svg) | **In use** — CC BY-SA |
 | `lymphatic-te.svg` | [TE-Lymphatic system diagram.svg](https://commons.wikimedia.org/wiki/File:TE-Lymphatic_system_diagram.svg) | The Emirr — **CC BY 3.0** (in use) |
 | `reproductive-mf.svg` | [Male and female anatomy.svg](https://commons.wikimedia.org/wiki/File:Male_and_female_anatomy.svg) | Tsaitgaist — **CC BY-SA 3.0** (in use) |
+| `unit/long-bone.jpg` | OpenStax A&P 2e Fig. 6.7 Anatomy of a Long Bone | **CC BY 4.0** — [6.3 Bone Structure](https://openstax.org/books/anatomy-and-physiology-2e/pages/6-3-bone-structure) |
+| `unit/compact-bone.jpg` | OpenStax A&P 2e Fig. 6.12 Compact Bone | **CC BY 4.0** — same chapter |
+| `unit/synovial-joint.jpg` | OpenStax A&P 2e Fig. 9.8 Synovial Joints | **CC BY 4.0** — [9.4 Synovial Joints](https://openstax.org/books/anatomy-and-physiology-2e/pages/9-4-synovial-joints) |
+| `unit/neuron.jpg` | OpenStax A&P 2e Fig. 12.8 The Neuron | **CC BY 4.0** — [12.2 Nervous Tissue](https://openstax.org/books/anatomy-and-physiology-2e/pages/12-2-nervous-tissue) |
+| `unit/action-potential.jpg` / `ap-unlabeled.jpg` | OpenStax A&P 2e Fig. 12.23 Action Potential | **CC BY 4.0** — [12.4 The Action Potential](https://openstax.org/books/anatomy-and-physiology-2e/pages/12-4-the-action-potential) |
+| `unit/spinal-cord.jpg` | OpenStax A&P 2e Fig. 13.17 Spinal Cord Cross-Section | **CC BY 4.0** — [13.2 CNS](https://openstax.org/books/anatomy-and-physiology-2e/pages/13-2-the-central-nervous-system) |
+| `unit/brain.jpg` | OpenStax A&P 2e Fig. 13.13 Lobes of the Cerebral Cortex | **CC BY 4.0** — same chapter |
+| `unit/diencephalon.jpg` | OpenStax A&P 2e Fig. 13.16 Diencephalon | **CC BY 4.0** — same chapter |
+| `unit/cranial-nerves.jpg` | OpenStax A&P 2e Fig. 13.20 The Cranial Nerves | **CC BY 4.0** — [13.4 PNS](https://openstax.org/books/anatomy-and-physiology-2e/pages/13-4-the-peripheral-nervous-system) |
+| `unit/ans.jpg` | OpenStax A&P 2e Fig. 15.3 Sympathetic Connections | **CC BY 4.0** — [15.1 ANS](https://openstax.org/books/anatomy-and-physiology-2e/pages/15-1-divisions-of-the-autonomic-nervous-system) |
+| `unit/eye.jpg` | OpenStax A&P 2e Fig. 14.13 Structure of the Eye | **CC BY 4.0** — [14.1 Sensory Perception](https://openstax.org/books/anatomy-and-physiology-2e/pages/14-1-sensory-perception) |
+| `unit/ear.jpg` | OpenStax A&P 2e Fig. 14.5 Structures of the Ear | **CC BY 4.0** — same chapter |
+| `unit/sarcomere.jpg` | OpenStax A&P 2e Fig. 10.7 Thick and Thin Filaments | **CC BY 4.0** — [10.2 Skeletal Muscle](https://openstax.org/books/anatomy-and-physiology-2e/pages/10-2-skeletal-muscle) |
+| `unit/nmj.jpg` | OpenStax A&P 2e Fig. 10.9 Motor End-Plate | **CC BY 4.0** — same chapter |
+| `unit/biceps.jpg` | OpenStax A&P 2e Fig. 11.2 Biceps Muscle | **CC BY 4.0** — [11.1 Muscle interactions](https://openstax.org/books/anatomy-and-physiology-2e/pages/11-1-interactions-of-skeletal-muscles-their-fascicle-arrangement-and-their-lever-systems) |
+
+Unit-6–10 plates are **textbook figures**, not original drawings. SVG paths in `unitDiagrams.ts` are only transparent tap targets traced on those JPGs. Re-download with `node scripts/download-openstax-plates.mjs` if files go missing.
 
 ## Source directories (from student list)
 

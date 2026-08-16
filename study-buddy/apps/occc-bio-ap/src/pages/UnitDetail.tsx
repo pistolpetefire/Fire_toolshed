@@ -15,9 +15,17 @@ import {
   Bone,
   Lightbulb,
 } from 'lucide-react';
-import { getUnitById, courseUnits } from '../data/courseUnits';
+import { getUnitById, courseUnits, EXAM_BLOCKS } from '../data/courseUnits';
 import { getLesson } from '../data/lessons';
-import { getQuestionsForUnit, shuffle, type UnitQuestion } from '../data/unitQuestions';
+import {
+  buildUnitQuizDeck,
+  getQuestionsForObjectives,
+  getQuestionsForUnit,
+  shuffle,
+  type UnitQuestion,
+} from '../data/unitQuestions';
+import { getDiagramsByIds } from '../components/diagrams/diagramConfigs';
+import { StaticPlate } from '../components/diagrams/StaticPlate';
 import { useProgressContext } from '../context/ProgressContext';
 import {
   addQuizAttempt,
@@ -28,6 +36,7 @@ import {
   unitMastery,
 } from '../lib/progress';
 import type { QuizAttempt, UnitId } from '../types';
+import { citeForUnitObjective } from '../data/syllabusCite';
 import { ProgressBar } from '../components/ui/ProgressBar';
 
 const MODES = ['lesson', 'practice', 'quiz', 'review'] as const;
@@ -71,6 +80,7 @@ export function UnitDetail() {
       </div>
 
       <UnitStepper unitId={unit.id} mode={mode} onMode={setMode} />
+      <UnitQuizLinks unitId={unit.id} />
 
       {mode === 'lesson' && <LessonPanel unitId={unit.id} onContinue={() => setMode('practice')} />}
       {mode === 'practice' && <PracticePanel unitId={unit.id} onQuiz={() => setMode('quiz')} />}
@@ -96,6 +106,40 @@ export function UnitDetail() {
         )}
       </div>
     </div>
+  );
+}
+
+function UnitQuizLinks({ unitId }: { unitId: UnitId }) {
+  const unit = getUnitById(unitId)!;
+  const block = EXAM_BLOCKS.find((b) => b.id === unit.examBlock);
+  const partnerIds = block?.unitIds.filter((id) => id !== unit.id) ?? [];
+  const partner = partnerIds[0] ? getUnitById(partnerIds[0]) : undefined;
+  const hasDiagrams = unit.diagramIds.length > 0;
+
+  return (
+    <section className="card p-4">
+      <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Quizzes for this unit</h2>
+      <p className="mt-1 text-xs text-slate-500">
+        Unit quiz is this unit only. Exam practice mixes this unit with Unit {partner?.number ?? '—'} (
+        {block?.title}).
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Link to={p(`/units/${unit.id}?mode=quiz`)} className="btn-secondary text-xs">
+          <BrainCircuit className="h-3.5 w-3.5" /> Unit {unit.number} quiz
+        </Link>
+        {hasDiagrams && (
+          <Link to={p(`/quizzes/diagram-labeling?unit=${unit.id}`)} className="btn-secondary text-xs">
+            Locate on unit diagrams
+          </Link>
+        )}
+        <Link to={p(`/flashcards?unit=${unit.id}`)} className="btn-secondary text-xs">
+          Unit {unit.number} flashcards
+        </Link>
+        <Link to={p(`/quizzes/exam/${unit.examBlock}`)} className="btn-primary text-xs">
+          {block?.title ?? `Exam ${unit.examBlock}`} practice
+        </Link>
+      </div>
+    </section>
   );
 }
 
@@ -186,6 +230,25 @@ function LessonPanel({ unitId, onContinue }: { unitId: UnitId; onContinue: () =>
         </section>
       ))}
 
+      {unit.diagramIds.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="font-display text-lg font-semibold">Reference plates for this unit</h2>
+          <p className="text-sm text-slate-500">
+            Labeled textbook figures for study. Location practice is on the{' '}
+            <Link to={p('/quizzes/diagram-labeling')} className="font-medium text-brand-600 hover:underline">
+              diagram quiz
+            </Link>{' '}
+            — unlabeled plate, tap where the label would be.
+          </p>
+          {getDiagramsByIds(unit.diagramIds).map((cfg) => (
+            <div key={cfg.title}>
+              <h3 className="mb-2 text-sm font-semibold text-slate-600 dark:text-slate-300">{cfg.title}</h3>
+              <StaticPlate config={cfg} />
+            </div>
+          ))}
+        </section>
+      )}
+
       <section className="card p-5">
         <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
           <Lightbulb className="h-5 w-5 text-amber-500" /> Official objectives
@@ -235,7 +298,7 @@ function LessonPanel({ unitId, onContinue }: { unitId: UnitId; onContinue: () =>
             <Bone className="h-4 w-4" /> Diagrams
           </Link>
         )}
-        <Link to={p(`/flashcards`)} className="btn-secondary">
+        <Link to={p(`/flashcards?unit=${unitId}`)} className="btn-secondary">
           <Layers className="h-4 w-4" /> Flashcards
         </Link>
       </div>
@@ -293,8 +356,7 @@ function QuizPanel({ unitId, onReview }: { unitId: UnitId; onReview: () => void 
   const { updateProgress } = useProgressContext();
   const [sessionKey, setSessionKey] = useState(0);
   const questions = useMemo(() => {
-    const pool = getQuestionsForUnit(unitId);
-    return shuffle(pool).slice(0, Math.min(8, pool.length));
+    return buildUnitQuizDeck(unitId, 25);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unitId, sessionKey]);
 
@@ -421,13 +483,25 @@ function ReviewPanel({ unitId }: { unitId: UnitId }) {
   const lesson = getLesson(unitId);
   const { progress, updateProgress } = useProgressContext();
   const up = getUnitProgress(progress, unitId);
+  const [drilling, setDrilling] = useState(false);
 
   useEffect(() => {
     updateProgress((p0) => markReviewOpened(p0, unitId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unitId]);
+  }, [unitId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const missedObjectives = new Set(up.lastMistakes.map((m) => m.objective).filter(Boolean) as number[]);
+  const missedObjectives = [...new Set(up.lastMistakes.map((m) => m.objective).filter(Boolean) as number[])].sort(
+    (a, b) => a - b
+  );
+
+  if (drilling && missedObjectives.length > 0) {
+    return (
+      <ObjectiveDrill
+        unitId={unitId}
+        objectives={missedObjectives}
+        onDone={() => setDrilling(false)}
+      />
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -440,6 +514,19 @@ function ReviewPanel({ unitId }: { unitId: UnitId }) {
               : 'No misses on the last quiz. Re-read any shaky official objectives below, then move on.'}
           </p>
         ) : (
+          <>
+          <p className="mt-2 text-sm text-slate-500">
+            Weak official objectives: {missedObjectives.map((n) => n).join(', ') || 'unnumbered'}. Drill those, then
+            retake the unit quiz.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" className="btn-primary text-sm" onClick={() => setDrilling(true)}>
+              <ListChecks className="h-4 w-4" /> Restudy missed objectives
+            </button>
+            <Link to={p(`/flashcards?unit=${unitId}`)} className="btn-secondary text-sm">
+              <Layers className="h-4 w-4" /> Unit flashcards
+            </Link>
+          </div>
           <ul className="mt-3 space-y-3">
             {up.lastMistakes.map((m) => (
               <li
@@ -455,9 +542,15 @@ function ReviewPanel({ unitId }: { unitId: UnitId }) {
                 <p className="mt-1 text-rose-600 dark:text-rose-400">You: {m.userAnswer}</p>
                 <p className="text-emerald-600 dark:text-emerald-400">Correct: {m.correctAnswer}</p>
                 <p className="mt-1 text-xs text-slate-500">{m.explanation}</p>
+                {m.objective ? (
+                  <p className="mt-2 text-xs leading-relaxed text-slate-400">
+                    {citeForUnitObjective(unitId, m.objective)}
+                  </p>
+                ) : null}
               </li>
             ))}
           </ul>
+          </>
         )}
       </section>
 
@@ -465,7 +558,7 @@ function ReviewPanel({ unitId }: { unitId: UnitId }) {
         <h2 className="font-display text-lg font-semibold">Official objectives checklist</h2>
         <ul className="mt-3 space-y-2">
           {unit.objectives.map((o) => {
-            const weak = missedObjectives.has(o.number);
+            const weak = missedObjectives.includes(o.number);
             return (
               <li
                 key={o.number}
@@ -498,7 +591,7 @@ function ReviewPanel({ unitId }: { unitId: UnitId }) {
         <Link to={p(`/units/${unitId}?mode=practice`)} className="btn-secondary">
           More practice
         </Link>
-        <Link to={p('/flashcards')} className="btn-secondary">
+        <Link to={p(`/flashcards?unit=${unitId}`)} className="btn-secondary">
           <Layers className="h-4 w-4" /> Flashcards
         </Link>
         {unit.systemIds[0] && (
@@ -507,6 +600,103 @@ function ReviewPanel({ unitId }: { unitId: UnitId }) {
           </Link>
         )}
       </div>
+    </div>
+  );
+}
+
+function ObjectiveDrill({
+  unitId,
+  objectives,
+  onDone,
+}: {
+  unitId: UnitId;
+  objectives: number[];
+  onDone: () => void;
+}) {
+  const { updateProgress } = useProgressContext();
+  const bank = useMemo(
+    () => shuffle(getQuestionsForObjectives(unitId, objectives)),
+    [unitId, objectives.join(',')]
+  );
+  const [qi, setQi] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [revealed, setRevealed] = useState(false);
+  const [doneCount, setDoneCount] = useState(0);
+  const q = bank[qi];
+
+  if (!q) {
+    return (
+      <div className="card p-5">
+        <p className="text-sm text-slate-500">No drill items for those objectives yet.</p>
+        <button type="button" className="btn-secondary mt-3" onClick={onDone}>
+          Back to review
+        </button>
+      </div>
+    );
+  }
+
+  const choose = (idx: number) => {
+    if (revealed) return;
+    setSelected(idx);
+    setRevealed(true);
+    updateProgress((p0) => recordPracticeAnswer(p0, unitId, idx === q.correctIndex));
+  };
+
+  const next = () => {
+    const last = qi + 1 >= bank.length;
+    if (last) {
+      setDoneCount(bank.length);
+      return;
+    }
+    setSelected(null);
+    setRevealed(false);
+    setQi((i) => i + 1);
+  };
+
+  if (doneCount > 0) {
+    return (
+      <div className="card mx-auto max-w-lg p-8 text-center">
+        <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-500" />
+        <h2 className="mt-3 font-display text-xl font-bold">Restudy pass done</h2>
+        <p className="mt-2 text-sm text-slate-500">
+          You worked {doneCount} items on official objectives {objectives.join(', ')}.
+        </p>
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          <Link to={p(`/units/${unitId}?mode=quiz`)} className="btn-primary">
+            Retake unit quiz
+          </Link>
+          <Link to={p(`/flashcards?unit=${unitId}`)} className="btn-secondary">
+            Unit flashcards
+          </Link>
+          <button type="button" className="btn-secondary" onClick={onDone}>
+            Back to review
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-slate-500">
+        <span>
+          Restudy drill · objectives {objectives.join(', ')}
+        </span>
+        <span className="tabular-nums">
+          {qi + 1} / {bank.length}
+        </span>
+      </div>
+      <QuestionCard q={q} selected={selected} revealed={revealed} onChoose={choose} />
+      {revealed && (
+        <div className="flex flex-wrap gap-2">
+          <button type="button" className="btn-primary" onClick={next}>
+            {qi + 1 >= bank.length ? 'Finish restudy' : 'Next weak-objective item'}
+          </button>
+          <button type="button" className="btn-ghost" onClick={onDone}>
+            Stop drill
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -527,6 +717,7 @@ function QuestionCard({
     <div className="card p-5 sm:p-6">
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
         Objective {q.objective}
+        {q.kind === 'vocab' ? ' · Required term (¼ pt on her exam)' : ''}
       </p>
       <h2 className="mt-2 text-lg font-semibold leading-snug text-slate-900 dark:text-white">{q.prompt}</h2>
       <div className="mt-5 space-y-2" role="listbox" aria-label="Answer choices">
@@ -573,6 +764,9 @@ function QuestionCard({
             )}
           </div>
           <p className="mt-2 text-slate-700 dark:text-slate-200">{q.explanation}</p>
+          <p className="mt-3 border-t border-current/10 pt-2 text-xs leading-relaxed opacity-90">
+            {citeForUnitObjective(q.unitId, q.objective)}
+          </p>
         </div>
       )}
     </div>

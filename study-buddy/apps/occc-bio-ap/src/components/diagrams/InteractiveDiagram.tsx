@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type MouseEvent } from 'react';
 import { X, Info, ExternalLink, Focus, RotateCcw } from 'lucide-react';
 import { getStructureById } from '../../data/structures';
 import type { Structure } from '../../types';
 import type { DiagramConfig, DiagramRenderStyle } from './types';
 import { diagramUrl } from './diagramAssets';
-import { fitViewBox, parseViewBox, pathBBox } from './pathBBox';
+import { fitViewBox, parseViewBox, pathBBox, tapPoints } from './pathBBox';
 
 export interface InteractiveDiagramProps {
   config: DiagramConfig;
@@ -105,21 +105,30 @@ export function InteractiveDiagram({
   const palette = { ...styleClasses(config.renderStyle, hasImage), ...config.palette };
   const bgSrc = plateFile ? diagramUrl(plateFile) : null;
   const hint = quizMode
-    ? 'Unlabeled plate — use anatomy knowledge (no name labels on the figure)'
+    ? 'Unlabeled plate — tap where that structure’s label / leader would be'
     : config.hint;
+
+  const locateTargets = useMemo(
+    () =>
+      config.regions.flatMap((region) =>
+        tapPoints(region).map((pt) => ({ id: region.id, label: region.label, ...pt }))
+      ),
+    [config.regions]
+  );
 
   const handleClick = (regionId: string) => {
     const next = !stickySelect && regionId === selectedId ? null : regionId;
     if (controlledSelected === undefined) setInternalSelected(next);
     const structure = next ? getStructureById(next) ?? null : null;
     if (next && !structure) {
+      const region = config.regions.find((r) => r.id === next);
       onSelect?.(
         {
           id: next,
-          name: config.regions.find((r) => r.id === next)?.label ?? next,
+          name: region?.label ?? next,
           systemId: 'skeletal',
-          category: 'Diagram region',
-          function: 'See atlas for full details when available.',
+          category: region?.category ?? 'Diagram region',
+          function: region?.detail ?? 'See atlas for full details when available.',
           relations: [],
         },
         next
@@ -127,6 +136,27 @@ export function InteractiveDiagram({
       return;
     }
     onSelect?.(structure, next);
+  };
+
+  const handleSvgClick = (e: MouseEvent<SVGSVGElement>) => {
+    if (!quizMode) return;
+    const svg = e.currentTarget;
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm || locateTargets.length === 0) return;
+    const p = pt.matrixTransform(ctm.inverse());
+    let best = locateTargets[0];
+    let bestD = Infinity;
+    for (const t of locateTargets) {
+      const d = (t.x - p.x) ** 2 + (t.y - p.y) ** 2;
+      if (d < bestD) {
+        bestD = d;
+        best = t;
+      }
+    }
+    handleClick(best.id);
   };
 
   const focusId =
@@ -168,10 +198,11 @@ export function InteractiveDiagram({
         </div>
         <svg
           viewBox={liveViewBox}
-          className={`mx-auto w-full select-none touch-manipulation ${config.maxWidthClass ?? 'max-w-sm'}`}
+          className={`mx-auto w-full select-none touch-manipulation ${config.maxWidthClass ?? 'max-w-sm'} ${quizMode ? 'cursor-crosshair' : ''}`}
           role="img"
           aria-label={config.ariaLabel}
           style={{ WebkitTapHighlightColor: 'transparent' }}
+          onClick={quizMode ? handleSvgClick : undefined}
         >
           <defs>
             <linearGradient id="boneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -215,7 +246,31 @@ export function InteractiveDiagram({
             <path d={config.backdrop} className="fill-slate-100 dark:fill-slate-800/60" />
           )}
 
-          {config.regions.map((region) => {
+          {quizMode
+            ? locateTargets
+                .filter((t) => t.id === selectedId || highlightIds.includes(t.id))
+                .map((t, i) => {
+                  const ok = highlightIds.includes(t.id);
+                  const fill = ok ? 'rgba(16,185,129,0.85)' : 'rgba(244,63,94,0.85)';
+                  const stroke = ok ? '#047857' : '#b91c1c';
+                  return (
+                    <g key={`pin-${t.id}-${i}`} pointerEvents="none">
+                      <circle cx={t.x} cy={t.y} r={Math.min(t.r * 0.45, 14)} fill={fill} stroke={stroke} strokeWidth={2} />
+                      <text
+                        x={t.x}
+                        y={t.y - Math.min(t.r * 0.55, 16)}
+                        textAnchor="middle"
+                        fill={stroke}
+                        fontSize={11}
+                        fontWeight={700}
+                        style={{ paintOrder: 'stroke', stroke: '#fff', strokeWidth: 3 }}
+                      >
+                        {t.label}
+                      </text>
+                    </g>
+                  );
+                })
+            : config.regions.map((region) => {
             const isSelected = selectedId === region.id;
             const isHighlight = highlightIds.includes(region.id);
             const dimmed = dimOthers && highlightIds.length > 0 && !isHighlight && !isSelected;
@@ -231,10 +286,24 @@ export function InteractiveDiagram({
               ? (area.width * area.height) / (fullBox.width * fullBox.height)
               : 0.05;
             const slop = areaRatio > 0.12 ? 14 : 28;
+            const hotspotPaint = hasImage || config.renderStyle === 'hotspot';
+            let paintFill: string | undefined = useBoneFill ? 'url(#boneGrad)' : undefined;
+            let paintStroke: string | undefined;
+            if (hotspotPaint) {
+              if (isSelected) {
+                paintFill = 'rgba(14, 165, 233, 0.40)';
+                paintStroke = '#0369a1';
+              } else if (isHighlight) {
+                paintFill = 'rgba(251, 191, 36, 0.42)';
+                paintStroke = '#b45309';
+              } else {
+                paintFill = 'rgba(14, 165, 233, 0)';
+                paintStroke = 'rgba(14, 165, 233, 0)';
+              }
+            }
 
             return (
               <g key={region.id} className="cursor-pointer" onClick={() => handleClick(region.id)}>
-                {/* Fat-finger hit slop: screen-space stroke. Large regions get less slop so they do not steal small bones. */}
                 <path
                   d={region.d}
                   fill="transparent"
@@ -247,8 +316,9 @@ export function InteractiveDiagram({
                 />
                 <path
                   d={region.d}
-                  className={`transition-[fill,stroke] duration-150 ${cls}`}
-                  fill={useBoneFill ? 'url(#boneGrad)' : undefined}
+                  className={`transition-[fill,stroke] duration-150 ${hotspotPaint ? '' : cls}`}
+                  fill={paintFill}
+                  stroke={paintStroke}
                   fillRule="evenodd"
                   strokeWidth={isSelected || isHighlight ? 2 : hasImage ? 1.25 : 1.1}
                   strokeLinejoin="round"
@@ -260,7 +330,7 @@ export function InteractiveDiagram({
                     shapeRendering: 'geometricPrecision',
                   }}
                 >
-                  {!quizMode && <title>{region.label}</title>}
+                  <title>{region.label}</title>
                 </path>
               </g>
             );

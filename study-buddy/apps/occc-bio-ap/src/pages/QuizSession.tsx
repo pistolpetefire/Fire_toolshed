@@ -7,14 +7,21 @@ import {
   XCircle,
   Trophy,
   MousePointerClick,
-  Highlighter,
   RotateCcw,
 } from 'lucide-react';
 import { getQuestionsByType, shuffle } from '../data/quizQuestions';
 import { getStructureById } from '../data/structures';
 import { bodySystems } from '../data/systems';
+import { getUnitById } from '../data/courseUnits';
+import {
+  examBlockLabel,
+  getDiagramQuestionsForUnit,
+  getExamBlock,
+  getExamPracticeDeck,
+} from '../data/examPractice';
 import { useProgressContext } from '../context/ProgressContext';
 import { addQuizAttempt } from '../lib/progress';
+import { citeForDiagram, citeForSystem, citeForUnitObjective } from '../data/syllabusCite';
 import { SystemDiagram, hasInteractiveDiagram } from '../components/diagrams/SystemDiagram';
 import type {
   QuizType,
@@ -25,6 +32,7 @@ import type {
   SystemId,
   Structure,
   QuizQuestion,
+  UnitId,
 } from '../types';
 
 const VALID: QuizType[] = ['multiple-choice', 'diagram-labeling', 'matching'];
@@ -37,18 +45,47 @@ export function QuizSession() {
   return <QuizRunner type={type} />;
 }
 
-function buildDeck(type: QuizType, systemFilter: SystemId | 'all'): QuizQuestion[] {
+export function ExamPrep() {
+  const { blockId } = useParams<{ blockId: string }>();
+  const id = Number(blockId);
+  if (id !== 1 && id !== 2 && id !== 3 && id !== 4 && id !== 5) {
+    return <Navigate to={p('/quizzes')} replace />;
+  }
+  return <QuizRunner type="exam-prep" examBlock={id} />;
+}
+
+function buildDeck(
+  type: QuizType,
+  systemFilter: SystemId | 'all',
+  unitFilter: string | null,
+  examBlock?: 1 | 2 | 3 | 4 | 5
+): QuizQuestion[] {
+  if (examBlock) return getExamPracticeDeck(examBlock);
+  if (type === 'exam-prep') return [];
+  if (type === 'diagram-labeling' && unitFilter) {
+    return shuffle(getDiagramQuestionsForUnit(unitFilter)).slice(0, 10);
+  }
   let pool = getQuestionsByType(type);
   if (systemFilter !== 'all') {
     pool = pool.filter((q) => q.systemId === systemFilter);
   }
-  return shuffle(pool).slice(0, Math.min(8, pool.length));
+  if (unitFilter && type === 'diagram-labeling') {
+    pool = getDiagramQuestionsForUnit(unitFilter);
+  }
+  return shuffle(pool).slice(0, Math.min(10, pool.length));
 }
 
-function QuizRunner({ type }: { type: QuizType }) {
+function QuizRunner({
+  type,
+  examBlock,
+}: {
+  type: QuizType;
+  examBlock?: 1 | 2 | 3 | 4 | 5;
+}) {
   const { updateProgress } = useProgressContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const systemParam = searchParams.get('system');
+  const unitFilter = searchParams.get('unit');
   const systemFilter: SystemId | 'all' =
     systemParam && bodySystems.some((s) => s.id === systemParam)
       ? (systemParam as SystemId)
@@ -56,10 +93,10 @@ function QuizRunner({ type }: { type: QuizType }) {
 
   const [sessionKey, setSessionKey] = useState(0);
   const questions = useMemo(
-    () => buildDeck(type, systemFilter),
+    () => buildDeck(type, systemFilter, unitFilter, examBlock),
     // sessionKey forces a new shuffle on retry
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [type, systemFilter, sessionKey]
+    [type, systemFilter, unitFilter, examBlock, sessionKey]
   );
 
   const [qi, setQi] = useState(0);
@@ -197,7 +234,12 @@ function QuizRunner({ type }: { type: QuizType }) {
       const finalAttempt: QuizAttempt = {
         id: `quiz-${Date.now()}`,
         quizType: type,
-        systemId: systemFilter === 'all' ? q.systemId : systemFilter,
+        systemId: examBlock ? 'mixed' : systemFilter === 'all' ? q.systemId : systemFilter,
+        unitId: examBlock
+          ? getExamBlock(examBlock)?.unitIds[0]
+          : unitFilter && getUnitById(unitFilter)
+            ? (unitFilter as UnitId)
+            : undefined,
         score: actualScore,
         total: questions.length,
         percentage: Math.round((actualScore / questions.length) * 100),
@@ -230,7 +272,11 @@ function QuizRunner({ type }: { type: QuizType }) {
         </Link>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h1 className="font-display text-xl font-bold capitalize sm:text-2xl">
-            {type.replace('-', ' ')}
+            {examBlock
+              ? examBlockLabel(examBlock)
+              : unitFilter
+                ? `${getUnitById(unitFilter)?.shortTitle ?? unitFilter} diagrams`
+                : type.replace('-', ' ')}
           </h1>
           <span className="text-sm text-slate-500">
             {qi + 1} / {questions.length}
@@ -238,19 +284,36 @@ function QuizRunner({ type }: { type: QuizType }) {
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter by body system">
-          <FilterChip
-            label="All systems"
-            active={systemFilter === 'all'}
-            onClick={() => setSystemFilter('all')}
-          />
-          {bodySystems.slice(0, 6).map((s) => (
-            <FilterChip
-              key={s.id}
-              label={s.shortName}
-              active={systemFilter === s.id}
-              onClick={() => setSystemFilter(s.id)}
-            />
-          ))}
+          {examBlock ? (
+            <span className="text-sm text-slate-500">
+              {getExamBlock(examBlock)?.note} · mixed MC
+              {getExamBlock(examBlock)?.unitIds.some((id) => (getUnitById(id)?.diagramIds.length ?? 0) > 0)
+                ? ' + diagram locate'
+                : ''}
+            </span>
+          ) : unitFilter ? (
+            <Link to={p(`/units/${unitFilter}`)} className="text-sm text-brand-600 hover:underline">
+              Back to {getUnitById(unitFilter)?.shortTitle ?? 'unit'}
+            </Link>
+          ) : (
+            <>
+              <FilterChip
+                label="All systems"
+                active={systemFilter === 'all'}
+                onClick={() => setSystemFilter('all')}
+              />
+              {bodySystems
+                .filter((s) => ['integumentary', 'skeletal', 'nervous', 'muscular'].includes(s.id))
+                .map((s) => (
+                  <FilterChip
+                    key={s.id}
+                    label={s.shortName}
+                    active={systemFilter === s.id}
+                    onClick={() => setSystemFilter(s.id)}
+                  />
+                ))}
+            </>
+          )}
         </div>
 
         <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
@@ -324,6 +387,13 @@ function QuizRunner({ type }: { type: QuizType }) {
               )}
             </div>
             <p className="mt-2 text-slate-700 dark:text-slate-200">{q.explanation}</p>
+            <p className="mt-3 border-t border-current/10 pt-2 text-xs leading-relaxed opacity-90">
+              {q.type === 'multiple-choice' && q.unitId && q.objective
+                ? citeForUnitObjective(q.unitId, q.objective)
+                : q.type === 'diagram-labeling'
+                  ? citeForDiagram(q.diagramId, q.systemId)
+                  : citeForSystem(q.systemId)}
+            </p>
             <button type="button" className="btn-primary mt-4" onClick={next}>
               {qi + 1 >= questions.length ? 'See results' : 'Next question'}
             </button>
@@ -411,8 +481,8 @@ function LabelView({
   onSelectName: (name: string) => void;
   onClickRegion: (regionId: string, label: string) => void;
 }) {
-  const mode = q.interactionMode ?? 'select-name';
-  const hasDiagram = hasInteractiveDiagram(q.systemId);
+  const plateId = q.diagramId ?? q.systemId;
+  const hasDiagram = hasInteractiveDiagram(q.systemId, q.diagramId);
   const structure = getStructureById(q.structureId);
   const displayName = structure?.name ?? q.structureName;
 
@@ -422,57 +492,42 @@ function LabelView({
   );
 
   const onDiagramSelect = (s: Structure | null) => {
-    if (revealed || mode !== 'click-region' || !s) return;
+    if (revealed || !s) return;
     onClickRegion(s.id, s.name);
   };
 
   return (
     <div className="mt-5 space-y-4">
       <div className="flex flex-wrap items-center gap-2 text-xs">
-        {mode === 'click-region' ? (
-          <span className="badge bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">
-            <MousePointerClick className="h-3 w-3" /> Click the structure on the diagram
-          </span>
-        ) : (
-          <span className="badge bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300">
-            <Highlighter className="h-3 w-3" /> Name the highlighted structure
-          </span>
-        )}
+        <span className="badge bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">
+          <MousePointerClick className="h-3 w-3" /> Tap where it is — unlabeled plate
+        </span>
       </div>
 
       {hasDiagram && (
-        <div className={revealed && mode === 'click-region' ? 'pointer-events-none' : ''}>
+        <div className={revealed ? 'pointer-events-none' : ''}>
           <SystemDiagram
             systemId={q.systemId}
+            diagramId={plateId}
             compact
             stickySelect
             quizMode
-            zoomOnFocus={mode === 'select-name' || revealed}
-            selectedId={
-              mode === 'select-name' ? q.structureId : revealed ? q.structureId : selected
-            }
-            highlightIds={
-              mode === 'select-name'
-                ? [q.structureId]
-                : revealed
-                  ? [q.structureId]
-                  : selected
-                    ? [selected]
-                    : []
-            }
-            dimOthers={mode === 'select-name' || revealed}
-            onSelect={mode === 'click-region' && !revealed ? onDiagramSelect : undefined}
+            zoomOnFocus={false}
+            selectedId={selected}
+            highlightIds={revealed ? [q.structureId] : []}
+            dimOthers={false}
+            onSelect={!revealed ? onDiagramSelect : undefined}
           />
         </div>
       )}
 
       {!hasDiagram && (
         <div className="rounded-xl bg-slate-100 p-4 text-center text-sm text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-          No interactive diagram for this system yet — answer using the options below.
+          No plate for this system yet — answer using the options below.
         </div>
       )}
 
-      {(mode === 'select-name' || !hasDiagram) && (
+      {!hasDiagram && (
         <div className="grid gap-2 sm:grid-cols-2">
           {options.map((name) => {
             let cls = 'border-slate-200 hover:border-brand-300 dark:border-slate-700';
@@ -495,9 +550,9 @@ function LabelView({
         </div>
       )}
 
-      {mode === 'click-region' && hasDiagram && !revealed && (
-        <p className="text-center text-xs text-slate-500">
-          Target: <span className="font-semibold text-slate-700 dark:text-slate-200">{displayName}</span>
+      {hasDiagram && !revealed && (
+        <p className="text-center text-sm text-slate-600 dark:text-slate-300">
+          Where is <span className="font-semibold text-slate-900 dark:text-white">{displayName}</span>? Tap that spot.
         </p>
       )}
     </div>

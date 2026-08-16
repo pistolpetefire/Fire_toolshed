@@ -21,6 +21,8 @@ export interface CourseUnit {
   /** 1–5, matching the five unit exams / study guides / lecture quizzes */
   examBlock: 1 | 2 | 3 | 4 | 5;
   systemIds: SystemId[];
+  /** Interactive plates for this unit (system ids or unit-plate ids) */
+  diagramIds: string[];
   flashcardTopics: FlashcardTopicId[];
   objectives: CourseObjective[];
 }
@@ -80,6 +82,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 1', 'Appendix A'],
     examBlock: 1,
     systemIds: [],
+    diagramIds: [],
     flashcardTopics: ['foundations'],
     objectives: [
       {
@@ -140,6 +143,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 2', 'Ch 24 §24.3'],
     examBlock: 1,
     systemIds: [],
+    diagramIds: [],
     flashcardTopics: ['chemistry'],
     objectives: [
       {
@@ -191,6 +195,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 3', 'Ch 24 §24.1–24.2'],
     examBlock: 2,
     systemIds: [],
+    diagramIds: [],
     flashcardTopics: ['cells'],
     objectives: [
       {
@@ -251,6 +256,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 4'],
     examBlock: 2,
     systemIds: [],
+    diagramIds: [],
     flashcardTopics: ['cells'],
     objectives: [
       {
@@ -311,6 +317,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 4', 'Ch 27', 'Ch 29', 'Ch 18', 'Ch 6', 'Ch 16'],
     examBlock: 3,
     systemIds: [],
+    diagramIds: [],
     flashcardTopics: ['cells'],
     objectives: [
       {
@@ -385,6 +392,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 5', 'Ch 6', 'Ch 7', 'Ch 9'],
     examBlock: 3,
     systemIds: ['integumentary', 'skeletal'],
+    diagramIds: ['integumentary', 'skeletal', 'long-bone', 'osteon', 'synovial-joint'],
     flashcardTopics: ['integumentary', 'skeletal', 'tissues'],
     objectives: [
       {
@@ -476,6 +484,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 1 §1.6c', 'Ch 12'],
     examBlock: 4,
     systemIds: ['nervous'],
+    diagramIds: ['neuron', 'action-potential', 'nervous'],
     flashcardTopics: ['nervous'],
     objectives: [
       {
@@ -530,6 +539,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 13', 'Ch 14'],
     examBlock: 4,
     systemIds: ['nervous'],
+    diagramIds: ['spinal-cord', 'brain', 'diencephalon', 'cranial-nerves'],
     flashcardTopics: ['nervous'],
     objectives: [
       {
@@ -577,6 +587,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 15', 'Ch 16'],
     examBlock: 5,
     systemIds: ['nervous'],
+    diagramIds: ['ans', 'eye', 'ear'],
     flashcardTopics: ['nervous'],
     objectives: [
       {
@@ -637,6 +648,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 10', 'Ch 11', 'Ch 13 DI 13.5', 'Ch 19 §19.4d'],
     examBlock: 5,
     systemIds: ['muscular'],
+    diagramIds: ['sarcomere', 'nmj', 'biceps', 'muscular'],
     flashcardTopics: ['muscular'],
     objectives: [
       { number: 1, text: 'Identify the functions of muscles.', chapters: 'Ch 10 §10.1a' },

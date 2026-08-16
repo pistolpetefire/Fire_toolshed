@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { p } from '../basePath';
 import { BrainCircuit, ListChecks, Tag, GitCompare, History, ArrowRight } from 'lucide-react';
 import { useProgressContext } from '../context/ProgressContext';
+import { EXAM_BLOCKS, getUnitById } from '../data/courseUnits';
 import type { QuizType } from '../types';
 
 const QUIZ_TYPES: {
@@ -22,7 +23,7 @@ const QUIZ_TYPES: {
     type: 'diagram-labeling',
     title: 'Diagram Labeling',
     description:
-      'Name the highlighted structure or click the region — unlabeled plates so answers are not written on the figure.',
+      'Unlabeled plate. We name a structure; you tap where its label / leader would be.',
     icon: Tag,
     color: 'bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300',
   },
@@ -47,6 +48,33 @@ export function Quizzes() {
           Test yourself with multiple choice, diagram labeling, and matching. Scores and mistakes are saved locally.
         </p>
       </header>
+
+      <section>
+        <h2 className="mb-3 font-display text-lg font-semibold">Exam prep — two units each</h2>
+        <p className="mb-3 text-sm text-slate-500">
+          Each lecture exam covers a pair of units. These mix that pair’s unit questions and, when the units have
+          plates, diagram locate items.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {EXAM_BLOCKS.map((block) => {
+            const nums = block.unitIds.map((id) => getUnitById(id)?.number).filter(Boolean).join(' & ');
+            return (
+              <Link
+                key={block.id}
+                to={p(`/quizzes/exam/${block.id}`)}
+                className="card group flex flex-col p-4 transition hover:border-brand-300 hover:shadow-md dark:hover:border-brand-700"
+              >
+                <h3 className="font-display font-semibold">{block.title}</h3>
+                <p className="mt-1 text-sm text-slate-500">Units {nums}</p>
+                <p className="mt-1 flex-1 text-xs text-slate-400">{block.note}</p>
+                <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 group-hover:gap-1.5 dark:text-brand-400">
+                  Start practice exam <ArrowRight className="h-4 w-4" />
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
 
       <div className="grid gap-4 sm:grid-cols-3">
         {QUIZ_TYPES.map(({ type, title, description, icon: Icon, color }) => (

@@ -1,4 +1,7 @@
 import type { UnitId } from '../types';
+import { extraUnitQuestions } from './unitQuestionsExtra';
+import { vocabUnitQuestions } from './unitVocabQuestions';
+import { getUnitById } from './courseUnits';
 
 export interface UnitQuestion {
   id: string;
@@ -8,6 +11,8 @@ export interface UnitQuestion {
   options: string[];
   correctIndex: number;
   explanation: string;
+  /** Official required-term / spelling item (Senter ¼-point rule) */
+  kind?: 'vocab';
 }
 
 export const unitQuestions: UnitQuestion[] = [
@@ -1102,7 +1107,42 @@ export const unitQuestions: UnitQuestion[] = [
 ];
 
 export function getQuestionsForUnit(unitId: UnitId): UnitQuestion[] {
-  return unitQuestions.filter((q) => q.unitId === unitId);
+  return [...unitQuestions, ...extraUnitQuestions, ...vocabUnitQuestions].filter((q) => q.unitId === unitId);
+}
+
+export function getQuestionsForObjectives(unitId: UnitId, objectives: number[]): UnitQuestion[] {
+  const want = new Set(objectives);
+  return getQuestionsForUnit(unitId).filter((q) => want.has(q.objective));
+}
+
+/** At least one item per official objective, then fill to `size`. */
+export function buildUnitQuizDeck(unitId: UnitId, size = 25): UnitQuestion[] {
+  const unit = getUnitById(unitId);
+  const pool = getQuestionsForUnit(unitId);
+  const byObj = new Map<number, UnitQuestion[]>();
+  for (const q of pool) {
+    const list = byObj.get(q.objective) ?? [];
+    list.push(q);
+    byObj.set(q.objective, list);
+  }
+  const official = unit?.objectives.map((o) => o.number) ?? [...byObj.keys()];
+  const required: UnitQuestion[] = [];
+  const leftover: UnitQuestion[] = [];
+  for (const n of official) {
+    const qs = shuffle(byObj.get(n) ?? []);
+    if (qs[0]) required.push(qs[0]);
+    leftover.push(...qs.slice(1));
+  }
+  for (const [n, qs] of byObj) {
+    if (!official.includes(n)) leftover.push(...qs);
+  }
+  const vocab = shuffle(pool.filter((q) => q.kind === 'vocab' && !required.includes(q)));
+  const vocabTake = vocab.slice(0, Math.min(4, vocab.length));
+  const leftoverNoVocab = leftover.filter((q) => !vocabTake.includes(q));
+  const used = required.length + vocabTake.length;
+  if (used >= size) return shuffle([...required, ...vocabTake.slice(0, Math.max(0, size - required.length))]);
+  const fill = shuffle(leftoverNoVocab).slice(0, Math.max(0, size - used));
+  return shuffle([...required, ...vocabTake, ...fill]);
 }
 
 export function shuffle<T>(arr: T[]): T[] {

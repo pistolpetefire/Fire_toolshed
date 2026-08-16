@@ -2,6 +2,7 @@ import type { DiagramConfig } from './types';
 import type { SystemId } from '../../types';
 import { DIAGRAM_CREDITS } from './diagramAssets';
 import skeletonHotspots from './skeletonHotspots.json';
+import { UNIT_DIAGRAMS } from './unitDiagrams';
 
 /** Skeleton — outlines extracted from LadyofHats SVG groups (not bounding boxes). */
 export const skeletalConfig: DiagramConfig = {
@@ -47,7 +48,7 @@ export const muscularConfig: DiagramConfig = {
     {
       id: 'quadriceps-femoris',
       label: 'Quadriceps femoris',
-      d: 'M268 628 L318 622 332 720 322 825 278 828 258 720 Z M362 622 L412 628 422 720 402 828 358 825 348 720 Z',
+      d: 'M258 618 C278 612 318 614 328 640 C334 700 326 780 318 822 C300 830 270 828 258 800 C248 740 248 670 258 618Z M362 618 C382 612 422 614 422 650 C428 710 418 790 400 824 C380 832 358 826 354 796 C348 730 350 660 362 618Z',
     },
     {
       id: 'hamstrings',
@@ -57,12 +58,12 @@ export const muscularConfig: DiagramConfig = {
     {
       id: 'gastrocnemius',
       label: 'Gastrocnemius',
-      d: 'M272 848 L322 846 328 960 300 978 268 960 Z M358 846 L408 848 412 960 380 978 352 960 Z',
+      d: 'M268 848 C288 842 318 848 322 880 C324 920 312 960 296 972 C276 968 264 930 262 890 C262 868 264 852 268 848Z M358 848 C378 842 408 850 410 882 C412 924 400 962 382 972 C364 966 354 928 352 888 C352 866 354 852 358 848Z',
     },
     {
       id: 'tibialis-anterior',
       label: 'Tibialis anterior',
-      d: 'M252 862 L274 860 278 990 258 998 246 990 Z M406 860 L428 862 434 990 422 998 402 990 Z',
+      d: 'M248 868 C258 864 270 870 272 910 C274 950 268 988 256 996 C246 988 242 940 244 900 C244 880 246 870 248 868Z M408 868 C418 864 430 872 432 912 C434 952 426 990 416 996 C406 986 404 940 406 900 C406 880 406 870 408 868Z',
     },
     {
       id: 'gluteus-maximus',
@@ -72,7 +73,7 @@ export const muscularConfig: DiagramConfig = {
     {
       id: 'rectus-abdominis',
       label: 'Rectus abdominis',
-      d: 'M304 378 L376 378 372 534 308 534 Z',
+      d: 'M296 378 C320 372 356 372 372 380 C374 430 372 490 368 532 C340 538 312 538 300 530 C296 480 294 420 296 378Z',
     },
     {
       id: 'external-oblique',
@@ -82,7 +83,7 @@ export const muscularConfig: DiagramConfig = {
     {
       id: 'pectoralis-major',
       label: 'Pectoralis major',
-      d: 'M248 268 L332 258 400 268 418 320 400 358 332 348 260 358 242 320 Z',
+      d: 'M210 255 C250 248 300 250 328 268 C332 300 320 338 292 348 C250 352 220 330 208 300 C206 280 208 262 210 255Z M332 268 C360 250 410 248 430 258 C434 290 422 338 388 348 C356 344 338 318 332 288 C330 278 330 272 332 268Z',
     },
     {
       id: 'latissimus-dorsi',
@@ -97,27 +98,27 @@ export const muscularConfig: DiagramConfig = {
     {
       id: 'deltoid',
       label: 'Deltoid',
-      d: 'M176 248 L238 242 248 300 228 348 178 340 Z M442 242 L504 248 502 340 452 348 432 300 Z',
+      d: 'M152 204 C136 214 130 238 130 264 C132 290 146 310 168 314 C188 310 200 288 200 260 C198 230 180 204 158 200 C156 200 154 202 152 204 Z M488 204 C504 214 510 238 510 264 C508 290 494 310 472 314 C452 310 440 288 440 260 C442 230 460 204 482 200 C484 200 486 202 488 204 Z',
     },
     {
       id: 'biceps-brachii',
       label: 'Biceps brachii',
-      d: 'M162 348 L206 342 214 470 176 488 154 470 Z M474 342 L518 348 526 470 504 488 466 470 Z',
+      d: 'M145 270 C125 280 118 310 120 345 C122 375 128 395 140 405 C155 408 172 395 178 365 C180 330 172 290 158 272 C152 268 148 268 145 270Z M495 270 C515 280 522 310 520 345 C518 375 512 395 500 405 C485 408 468 395 462 365 C460 330 468 290 482 272 C488 268 492 268 495 270Z',
     },
     {
       id: 'triceps-brachii',
       label: 'Triceps brachii',
-      d: 'M130 358 L158 354 164 478 132 486 118 470 Z M522 354 L550 358 562 470 548 486 516 478 Z',
+      d: 'M88 330 C80 370 78 420 86 452 L100 448 102 332 Z M552 330 C560 370 562 420 554 452 L540 448 538 332 Z',
     },
     {
       id: 'trapezius',
       label: 'Trapezius',
-      d: 'M278 188 L340 178 402 188 392 242 340 228 288 242 Z',
+      d: 'M286 178 C320 168 360 168 382 180 C376 214 350 228 320 222 C296 226 284 206 286 178Z',
     },
     {
       id: 'sternocleidomastoid',
       label: 'Sternocleidomastoid',
-      d: 'M296 148 L328 146 334 214 304 218 Z M352 146 L384 148 376 218 346 214 Z',
+      d: 'M304 152 C318 148 328 152 330 180 C328 208 318 218 308 216 C300 190 300 164 304 152Z M350 152 C364 148 376 154 374 182 C370 210 360 218 350 214 C348 188 348 164 350 152Z',
     },
   ],
 };
@@ -392,13 +393,88 @@ export const integumentaryConfig: DiagramConfig = {
     credit: 'Wikimedia Commons Human_skin_structure.svg — CC BY-SA',
     sourceUrl: 'https://commons.wikimedia.org/wiki/File:Human_skin_structure.svg',
   },
+  // Tips follow the plate’s printed label → leader → object (not a box over the block).
   regions: [
-    { id: 'epidermis', label: 'Epidermis', d: 'M15 5 h280 v42 h-280z' },
-    { id: 'dermis', label: 'Dermis', d: 'M15 48 h280 v115 h-280z' },
-    { id: 'hypodermis', label: 'Hypodermis (subcutis)', d: 'M15 163 h280 v100 h-280z' },
-    { id: 'hair-follicle', label: 'Hair follicle', d: 'M175 35 h32 v145 h-32z' },
-    { id: 'sebaceous-glands', label: 'Sebaceous gland', d: 'M145 85 h40 v35 h-40z' },
-    { id: 'sweat-glands', label: 'Sweat gland', d: 'M255 130 h55 v55 h-55z' },
+    {
+      id: 'hypodermis',
+      label: 'Hypodermis (subcutis)',
+      d: 'M130 172 L200 198 342 176 342 228 200 246 130 208Z',
+      tapX: 330,
+      tapY: 195,
+      tapR: 22,
+    },
+    {
+      id: 'dermis',
+      label: 'Dermis',
+      d: 'M130 90 L188 120 342 86 342 174 200 196 130 168Z',
+      tapX: 330,
+      tapY: 130,
+      tapR: 24,
+    },
+    {
+      id: 'epidermis',
+      label: 'Epidermis',
+      d: 'M130 76 L278 40 342 76 342 88 188 118 130 88Z',
+      tapX: 330,
+      tapY: 78,
+      tapR: 20,
+    },
+    {
+      id: 'dermal-papilla',
+      label: 'Dermal papilla',
+      d: 'M155 96 L188 116 202 106 186 90 160 88Z',
+      tapX: 175,
+      tapY: 105,
+      tapR: 16,
+    },
+    {
+      id: 'hair-follicle',
+      label: 'Hair follicle',
+      d: 'M210 96 L228 92 234 188 220 200 208 188Z',
+      tapX: 220,
+      tapY: 175,
+      tapR: 18,
+    },
+    {
+      id: 'arrector-pili',
+      label: 'Arrector pili',
+      d: 'M170 128 L208 146 202 158 164 138Z',
+      tapX: 195,
+      tapY: 145,
+      tapR: 16,
+    },
+    {
+      id: 'sebaceous-glands',
+      label: 'Sebaceous gland',
+      d: 'M228 138 L260 142 264 160 232 166 220 150Z',
+      tapX: 248,
+      tapY: 152,
+      tapR: 16,
+    },
+    {
+      id: 'pacinian',
+      label: 'Pacinian corpuscle',
+      d: 'M174 174 L204 176 206 198 176 200 168 186Z',
+      tapX: 190,
+      tapY: 185,
+      tapR: 16,
+    },
+    {
+      id: 'sweat-glands',
+      label: 'Sweat gland',
+      d: 'M308 170 L328 166 332 200 316 206 304 188Z',
+      tapX: 318,
+      tapY: 188,
+      tapR: 16,
+    },
+    {
+      id: 'sweat-pore',
+      label: 'Sweat pore',
+      d: 'M184 52 L200 50 204 68 188 72Z',
+      tapX: 192,
+      tapY: 60,
+      tapR: 14,
+    },
   ],
 };
 
@@ -477,7 +553,11 @@ export const DIAGRAM_BY_SYSTEM: Partial<Record<SystemId, DiagramConfig>> = {
 };
 
 export function getDiagramConfig(systemId: string): DiagramConfig | undefined {
-  return DIAGRAM_BY_SYSTEM[systemId as SystemId];
+  return DIAGRAM_BY_SYSTEM[systemId as SystemId] ?? UNIT_DIAGRAMS[systemId];
+}
+
+export function getDiagramsByIds(ids: string[]): DiagramConfig[] {
+  return ids.map((id) => getDiagramConfig(id)).filter((c): c is DiagramConfig => Boolean(c));
 }
 
 export function getQuizableRegionIds(systemId: SystemId): string[] {
