@@ -138,6 +138,11 @@ function UnitQuizLinks({ unitId }: { unitId: UnitId }) {
         <Link to={p(`/quizzes/exam/${unit.examBlock}`)} className="btn-primary text-xs">
           {block?.title ?? `Exam ${unit.examBlock}`} practice
         </Link>
+        {unit.examBlock === 1 && (
+          <Link to={p('/quizzes/exam/1/guide')} className="btn-secondary text-xs">
+            Official Exam 1 study guide
+          </Link>
+        )}
       </div>
     </section>
   );

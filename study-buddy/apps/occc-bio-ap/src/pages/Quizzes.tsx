@@ -59,18 +59,27 @@ export function Quizzes() {
           {EXAM_BLOCKS.map((block) => {
             const nums = block.unitIds.map((id) => getUnitById(id)?.number).filter(Boolean).join(' & ');
             return (
-              <Link
+              <div
                 key={block.id}
-                to={p(`/quizzes/exam/${block.id}`)}
-                className="card group flex flex-col p-4 transition hover:border-brand-300 hover:shadow-md dark:hover:border-brand-700"
+                className="card flex flex-col p-4 transition hover:border-brand-300 hover:shadow-md dark:hover:border-brand-700"
               >
-                <h3 className="font-display font-semibold">{block.title}</h3>
-                <p className="mt-1 text-sm text-slate-500">Units {nums}</p>
-                <p className="mt-1 flex-1 text-xs text-slate-400">{block.note}</p>
-                <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 group-hover:gap-1.5 dark:text-brand-400">
-                  Start practice exam <ArrowRight className="h-4 w-4" />
-                </span>
-              </Link>
+                <Link to={p(`/quizzes/exam/${block.id}`)} className="group flex flex-1 flex-col">
+                  <h3 className="font-display font-semibold">{block.title}</h3>
+                  <p className="mt-1 text-sm text-slate-500">Units {nums}</p>
+                  <p className="mt-1 flex-1 text-xs text-slate-400">{block.note}</p>
+                  <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 group-hover:gap-1.5 dark:text-brand-400">
+                    Start practice exam <ArrowRight className="h-4 w-4" />
+                  </span>
+                </Link>
+                {block.id === 1 && (
+                  <Link
+                    to={p('/quizzes/exam/1/guide')}
+                    className="mt-3 inline-flex items-center gap-1 border-t border-slate-100 pt-3 text-xs font-semibold text-slate-600 hover:text-brand-600 dark:border-slate-800 dark:text-slate-300"
+                  >
+                    Official study guide + terminology sheet <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
+              </div>
             );
           })}
         </div>

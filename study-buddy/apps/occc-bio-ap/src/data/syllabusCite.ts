@@ -50,7 +50,11 @@ export function citeForUnitObjective(unitId: UnitId, objective: number): string 
   const unit = getUnitById(unitId);
   const obj = unit?.objectives.find((o) => o.number === objective);
   const ch = obj?.chapters ?? unit?.chapters.join(', ') ?? 'the unit’s listed chapters';
-  return formatSyllabusCite(ch, ` Matches Senter syllabus Unit ${unit?.number ?? ''} objective ${objective}.`);
+  const exam1 =
+    unitId === 'unit-1' || unitId === 'unit-2'
+      ? ' Also on Senter’s Unit One study guide (Ch 1 & 2) and/or the terminology worksheet.'
+      : '';
+  return formatSyllabusCite(ch, ` Matches Senter syllabus Unit ${unit?.number ?? ''} objective ${objective}.${exam1}`);
 }
 
 export function citeForDiagram(diagramId?: string, systemId?: SystemId): string {

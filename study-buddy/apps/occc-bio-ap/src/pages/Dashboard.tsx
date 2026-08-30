@@ -82,6 +82,24 @@ export function Dashboard() {
         </ol>
       </section>
 
+      {/* Exam 1 official sheets */}
+      <section className="card border-brand-200 p-5 dark:border-brand-800">
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">Exam 1 focus</p>
+        <h2 className="mt-1 font-display text-lg font-semibold">Official Unit One study guide (Ch 1 &amp; 2)</h2>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+          32 lecture items from Senter’s Unit One sheet plus the 20-item body organization / membranes /
+          terminology worksheet. Walk the answers, then take the two-unit practice exam.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link to={p('/quizzes/exam/1/guide')} className="btn-primary text-sm">
+            Open study guide
+          </Link>
+          <Link to={p('/quizzes/exam/1')} className="btn-secondary text-sm">
+            Exam 1 practice
+          </Link>
+        </div>
+      </section>
+
       {/* Progress + quick start */}
       <div className="grid gap-6 lg:grid-cols-3">
         <section className="card p-5 lg:col-span-1">

@@ -290,6 +290,14 @@ function QuizRunner({
               {getExamBlock(examBlock)?.unitIds.some((id) => (getUnitById(id)?.diagramIds.length ?? 0) > 0)
                 ? ' + diagram locate'
                 : ''}
+              {examBlock === 1 ? (
+                <>
+                  {' · '}
+                  <Link to={p('/quizzes/exam/1/guide')} className="text-brand-600 hover:underline">
+                    official study guide
+                  </Link>
+                </>
+              ) : null}
             </span>
           ) : unitFilter ? (
             <Link to={p(`/units/${unitFilter}`)} className="text-sm text-brand-600 hover:underline">

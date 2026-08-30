@@ -10,6 +10,7 @@ import { SystemDetail } from './pages/SystemDetail';
 import { Flashcards } from './pages/Flashcards';
 import { Quizzes } from './pages/Quizzes';
 import { QuizSession, ExamPrep } from './pages/QuizSession';
+import { Exam1Guide } from './pages/Exam1Guide';
 import { Atlas } from './pages/Atlas';
 import { AtlasDetail } from './pages/AtlasDetail';
 import { Settings } from './pages/Settings';
@@ -33,6 +34,7 @@ export default function OcccBioApApp() {
           <Route path="systems/:systemId" element={<SystemDetail />} />
           <Route path="flashcards" element={<Flashcards />} />
           <Route path="quizzes" element={<Quizzes />} />
+          <Route path="quizzes/exam/1/guide" element={<Exam1Guide />} />
           <Route path="quizzes/exam/:blockId" element={<ExamPrep />} />
           <Route path="quizzes/:quizType" element={<QuizSession />} />
           <Route path="atlas" element={<Atlas />} />

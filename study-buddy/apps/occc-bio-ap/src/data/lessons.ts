@@ -51,9 +51,31 @@ export const unitLessons: Record<UnitId, UnitLesson> = {
       },
       {
         heading: 'Scientific method',
-        body: 'Observation → question → hypothesis (testable prediction) → experiment with independent/dependent variables, experimental vs control groups, sometimes a placebo → data → conclusion → peer review. A theory is a well-supported explanation, not a guess. Inductive reasoning builds a general rule from specific observations.',
+        body: 'Observation → question → hypothesis (testable prediction) → experiment with independent/dependent variables, experimental vs control groups, sometimes a placebo → data → conclusion → peer review. A theory is a well-supported explanation, not a guess. A law describes what happens (often mathematically). Inductive reasoning builds a general rule from specific observations.',
         nursing:
           'Evidence-based practice is the scientific method applied to patient care. Know the difference between a hypothesis and a proven theory.',
+      },
+      {
+        heading: 'Spelling (¼-point rule)',
+        body: 'Senter deducts ¼ point per misspelled required term and for missing left/right on bilateral structures. Ileum (gut) is not ilium (pelvis). Abduction is not adduction. Write hallux, popliteal, olecranal, ipsilateral, fibular, parietal, and visceral until they are automatic.',
+      },
+      {
+        heading: 'Anatomical position, directions, regions, planes',
+        body: 'Reference pose: standing erect, face forward, arms at sides, palms forward. Learn the worksheet terms cold.',
+        bullets: [
+          'Superior/inferior, anterior(ventral)/posterior(dorsal), medial/lateral, proximal/distal (limbs), superficial/deep, ipsilateral/contralateral',
+          'Nasal is medial and anterior to otic. Tarsal is distal to femoral. Hallux = great toe. Pollex = thumb. Popliteal = posterior knee. Olecranal = posterior elbow. Fibular/peroneal = lateral leg. Antecubital = anterior elbow. Tarsal is lower extremity, not upper.',
+          'Sagittal = right/left (midsagittal = equal halves). Frontal/coronal = anterior/posterior. Transverse/horizontal = superior/inferior; a cross-section of tubes can look like circles.',
+          'Lateral to umbilical = lumbar region. Inferior to coxal (hip) = femoral and the rest of the lower limb.',
+        ],
+      },
+      {
+        heading: 'Cavities and serous membranes',
+        body: 'Dorsal (posterior) aspect: cranial cavity + vertebral (spinal) cavity. Ventral (anterior) cavity: thoracic + abdominopelvic, divided by the diaphragm. Structures superior to the diaphragm include heart and lungs.',
+        bullets: [
+          'Parietal layer lines the cavity wall (farther from the organ). Visceral layer sits on the organ. Serous fluid is between them.',
+          'Named sacs: pleura (lungs), pericardium (heart), peritoneum (abdominopelvic).',
+        ],
       },
     ],
     mustKnow: [
@@ -68,8 +90,25 @@ export const unitLessons: Record<UnitId, UnitLesson> = {
       'hypothesis',
       'placebo',
       'theory',
+      'ipsilateral',
+      'hallux',
+      'popliteal',
+      'olecranal',
+      'parietal',
+      'visceral',
     ],
-    spelling: ['homeostasis', 'physiology', 'hypothalamus', 'integumentary', 'lymphatic'],
+    spelling: [
+      'homeostasis',
+      'physiology',
+      'hypothalamus',
+      'integumentary',
+      'lymphatic',
+      'ipsilateral',
+      'hallux',
+      'popliteal',
+      'olecranal',
+      'fibular',
+    ],
   },
   'unit-2': {
     unitId: 'unit-2',
@@ -78,12 +117,14 @@ export const unitLessons: Record<UnitId, UnitLesson> = {
     sections: [
       {
         heading: 'Atoms, ions, and bonds',
-        body: 'Matter is anything with mass. An element is a pure substance (C, H, O, N). An atom has protons (+, atomic number), neutrons, and electrons. Atomic mass ≈ protons + neutrons. Isotopes differ in neutrons. Ions (electrolytes) are charged atoms: cations +, anions −.',
+        body: 'Matter is anything with mass and volume. An element is a pure substance of one kind of atom. An atom has protons (+, atomic number), neutrons (0, mass), and electrons (−, bonding). A molecule is 2+ atoms bonded; a compound is 2+ different elements chemically combined. Atomic mass ≈ protons + neutrons. Isotopes differ in neutrons. Ions (electrolytes) are charged: cations +, anions −. A salt is an ionic compound from acid + base (e.g. NaCl).',
         bullets: [
+          'Most common body elements: O, C, H, N, then Ca, P, K, S, Na, Cl, Mg',
+          'Required ions: Na+, K+, Ca2+, Mg2+, HPO4^2− (phosphate), Cl−, HCO3− (bicarbonate)',
           'Ionic bond — electrons transferred (NaCl)',
           'Covalent bond — electrons shared; polar if unequal (H2O), nonpolar if equal (O2)',
-          'Hydrogen bond — weak attraction between polar molecules; holds water together and DNA bases',
-          'Free radicals — unstable molecules with unpaired electrons; antioxidants neutralize them',
+          'Hydrogen bond — weak attraction between polar molecules; water, DNA bases',
+          'Van der Waals — brief weak attractions between nearby atoms',
         ],
       },
       {
@@ -93,8 +134,17 @@ export const unitLessons: Record<UnitId, UnitLesson> = {
           'A pH of 7.25 is acidosis even though 7 is “neutral” on the bench scale. Tiny pH shifts are emergencies.',
       },
       {
-        heading: 'How the body defends pH',
-        body: 'Three lines: (1) chemical buffers (bicarbonate, phosphate, protein) act in seconds; (2) respiratory system blows off or retains CO2 in minutes (CO2 + H2O ⇌ H2CO3 ⇌ H+ + HCO3−); (3) kidneys excrete H+ or HCO3− over hours to days.',
+        heading: 'How the body defends pH (know this reaction cold)',
+        body: 'Three lines: (1) chemical buffers act in seconds; (2) lungs change CO2 in minutes; (3) kidneys excrete H+ or HCO3− over hours to days. The bicarbonate buffer is reversible: CO2 + H2O ↔ H2CO3 ↔ HCO3− + H+.',
+        bullets: [
+          'If H+ is depleted: reaction shifts right to make more H+; pH had risen (more alkaline) and the buffer pulls it back down.',
+          'If H+ rises rapidly: reaction shifts left (H+ + HCO3− → H2CO3 → CO2 + H2O); pH had fallen and the buffer raises it back.',
+          'This is a reversible (equilibrium) buffer reaction — the double arrows are the giveaway.',
+        ],
+      },
+      {
+        heading: 'Metabolism',
+        body: 'Metabolism = all chemical reactions. Catabolism breaks molecules down and releases energy. Anabolism builds molecules and uses energy.',
       },
       {
         heading: 'Why water matters',
@@ -104,11 +154,11 @@ export const unitLessons: Record<UnitId, UnitLesson> = {
         heading: 'Macromolecules and enzymes',
         body: 'Built by dehydration synthesis; broken by hydrolysis.',
         bullets: [
-          'Carbohydrates — monosaccharides (glucose); fuel and structure',
-          'Lipids — fatty acids + glycerol; membranes, energy, steroids',
-          'Proteins — amino acids; enzymes, structure, transport, receptors',
-          'Nucleic acids — nucleotides; DNA/RNA; ATP is the energy nucleotide',
-          'Enzyme = protein catalyst. Lowers activation energy. Active site binds substrate → product. Shape is pH- and temperature-sensitive — denature it and it stops.',
+          'Carbohydrates — monomers = monosaccharides (glucose, fructose, galactose). Disaccharides: sucrose, lactose, maltose. Polysaccharides: glycogen, starch, cellulose. Fuel + stored energy + glycoproteins.',
+          'Lipids — triglycerides = glycerol + 3 fatty acids (energy, insulation). Also phospholipids (membranes), steroids (cholesterol, hormones), eicosanoids (prostaglandins).',
+          'Proteins — amino acids; enzymes, structure, transport, antibodies, receptors, contraction, some hormones.',
+          'Nucleic acids — nucleotides (sugar + phosphate + base). Types: DNA, RNA (mRNA, tRNA, rRNA), and ATP (energy nucleotide).',
+          'Enzyme = protein catalyst. Lowers activation energy at an active site. Denaturation (heat, extreme pH, heavy metals, alcohol, radiation) unfolds the protein and it stops working.',
         ],
       },
     ],
@@ -123,8 +173,12 @@ export const unitLessons: Record<UnitId, UnitLesson> = {
       'enzyme',
       'substrate',
       'ATP',
+      'catabolism',
+      'anabolism',
+      'denaturation',
+      'HCO3−',
     ],
-    spelling: ['electrolyte', 'bicarbonate', 'hydrolysis', 'adenosine triphosphate', 'catalyst'],
+    spelling: ['electrolyte', 'bicarbonate', 'hydrolysis', 'adenosine triphosphate', 'catalyst', 'denaturation'],
   },
   'unit-3': {
     unitId: 'unit-3',

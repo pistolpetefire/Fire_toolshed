@@ -958,6 +958,33 @@ export const quizQuestions: QuizQuestion[] = [
     ],
     explanation: 'Pulmonary arteries are the only arteries carrying deoxygenated blood in adult systemic-pulmonary separation.',
   },
+  {
+    id: 'mt-e1-regions',
+    type: 'matching',
+    systemId: 'skeletal',
+    prompt: 'Match the regional term (Exam 1 terminology).',
+    pairs: [
+      { left: 'Hallux', right: 'Great toe' },
+      { left: 'Pollex', right: 'Thumb' },
+      { left: 'Popliteal', right: 'Posterior knee' },
+      { left: 'Olecranal', right: 'Posterior elbow' },
+      { left: 'Fibular (peroneal)', right: 'Lateral leg' },
+    ],
+    explanation: 'These names are on the body-organization / terminology worksheet.',
+  },
+  {
+    id: 'mt-e1-planes',
+    type: 'matching',
+    systemId: 'skeletal',
+    prompt: 'Match each plane to the portions it creates.',
+    pairs: [
+      { left: 'Sagittal', right: 'Right and left' },
+      { left: 'Frontal (coronal)', right: 'Anterior and posterior' },
+      { left: 'Transverse', right: 'Superior and inferior' },
+      { left: 'Midsagittal', right: 'Equal right and left halves' },
+    ],
+    explanation: 'Transverse cuts through tubes can appear as circles.',
+  },
 ];
 
 export function getQuestionsByType(type: QuizQuestion['type']): QuizQuestion[] {

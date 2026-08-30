@@ -26,9 +26,16 @@ export function UnitsList() {
               <h2 className="font-display text-lg font-semibold">{block.title}</h2>
               <p className="text-sm text-slate-500">{block.note}</p>
             </div>
-            <Link to={p(`/quizzes/exam/${block.id}`)} className="btn-secondary shrink-0 text-xs">
-              Two-unit practice exam
-            </Link>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              {block.id === 1 && (
+                <Link to={p('/quizzes/exam/1/guide')} className="btn-ghost text-xs">
+                  Official study guide
+                </Link>
+              )}
+              <Link to={p(`/quizzes/exam/${block.id}`)} className="btn-secondary text-xs">
+                Two-unit practice exam
+              </Link>
+            </div>
           </div>
           <div className="grid gap-3">
             {courseUnits
