@@ -9,6 +9,7 @@ Browser-based engineering calculators for team use. Hosted with **GitHub Pages**
 | **Fire tools portal** | https://pistolpetefire.github.io/Fire_toolshed/ |
 | **Study Buddy** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/ |
 | **Anatomy Hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/classes/occc-bio-ap |
+| **OSU PLNT 1213 Agronomy Hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/classes/osu-plnt-1213 |
 | Fire Pump Sizer | https://pistolpetefire.github.io/Fire_toolshed/fire-pump-sizer/ |
 
 Both groups deploy together via GitHub Actions (`.github/workflows/deploy-study-buddy.yml`).

@@ -7,7 +7,8 @@ study-buddy/
   src/                    ← Hub shell (home, catalog, theme)
   apps/
     _template/            ← Copy this to start a new class
-    occc-bio-ap/          ← First live app: OCCC BIO 1314 (Fall 2026, Senter)
+    occc-bio-ap/          ← OCCC BIO 1314 (Fall 2026, Senter)
+    osu-plnt-1213/        ← OSU PLNT 1213 (Fall 2026, Haggard)
   package.json
 ```
 
@@ -20,6 +21,7 @@ Fire tools and Study Buddy run on the **same** GitHub Pages site:
 | **Fire tools portal** | https://pistolpetefire.github.io/Fire_toolshed/ |
 | **Study Buddy hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/ |
 | **Anatomy Hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/classes/occc-bio-ap |
+| **OSU PLNT 1213 Agronomy Hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/classes/osu-plnt-1213 |
 
 Deploy workflow builds Study Buddy into `/study-buddy/` and keeps all fire tool folders at the site root.
 
@@ -35,6 +37,9 @@ npm run dev
 
 - **Hub:** http://localhost:5173/  
 - **Anatomy Hub:** http://localhost:5173/classes/occc-bio-ap  
+- **PLNT 1213 Agronomy Hub:** http://localhost:5173/classes/osu-plnt-1213
+- **OSU Micro:** http://localhost:5173/econ-micro-study-buddy/  
+- **OSU Macro:** http://localhost:5173/econ-macro-study-buddy/  
 
 ```bash
 npm run build
@@ -47,6 +52,9 @@ npm run test:cycles   # 5 automated verification cycles
 | App | Courses | Path |
 |-----|---------|------|
 | **Anatomy Hub** | BIO 1314 Fall 2026 (OCCC, Senter) | `/classes/occc-bio-ap` |
+| **PLNT 1213 Agronomy Hub** | PLNT 1213 Fall 2026 (OSU, Haggard) | `/classes/osu-plnt-1213` |
+| **OSU Micro for Business Study Buddy** | ECON 2003 | `/econ-micro-study-buddy/` (static vanilla under `public/econ-micro-study-buddy/`) |
+| **OSU Macro for Business Study Buddy** | ECON 2203 | `/econ-macro-study-buddy/` (static vanilla under `public/econ-macro-study-buddy/`) |
 | **Chemistry I Final Study Buddy** | CHEM 1214 / 1315 (OSU-OKC) | `/chem1-study-buddy/` (static vanilla under `public/chem1-study-buddy/`) |
 | **Calculus I Final Study Buddy** | Calc I / MATH 2144-style (OSU-OKC) | `/calc1-study-buddy/` (static vanilla under `public/calc1-study-buddy/`) |
 | **Calculus II Semester Study Buddy** | MATH 2153 / Calc II (OSU typical) | `/calc2-study-buddy/` (static vanilla under `public/calc2-study-buddy/`) |

@@ -8,6 +8,7 @@
  * 4. (Optional) add a card color / icon in HubHome
  */
 import { classAppMeta as occcBioAp } from '../apps/occc-bio-ap/meta';
+import { classAppMeta as osuPlnt1213 } from '../apps/osu-plnt-1213/meta';
 
 export type AppStatus = 'live' | 'coming-soon' | 'beta';
 
@@ -35,6 +36,7 @@ export interface ClassAppListing {
 
 /** Live + planned class apps shown on the Study Buddy home screen */
 export const CLASS_APPS: ClassAppListing[] = [
+  osuPlnt1213,
   occcBioAp,
   {
     id: 'chem1-study-buddy',

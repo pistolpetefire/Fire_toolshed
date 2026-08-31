@@ -9,6 +9,9 @@ Both groups run as **live web apps** from one GitHub Pages deploy.
 | **Fire Tools portal** | https://pistolpetefire.github.io/Fire_toolshed/ |
 | **Study Buddy hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/ |
 | **Anatomy Hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/classes/occc-bio-ap |
+| **OSU PLNT 1213 Agronomy Hub** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/classes/osu-plnt-1213 |
+| **OSU Micro for Business (ECON 2003)** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/econ-micro-study-buddy/ |
+| **OSU Macro for Business (ECON 2203)** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/econ-macro-study-buddy/ |
 | **Chem I Final Study Buddy** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/chem1-study-buddy/ |
 | **Calc I Final Study Buddy** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/calc1-study-buddy/ |
 | **Calc II Semester Study Buddy** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/calc2-study-buddy/ |
