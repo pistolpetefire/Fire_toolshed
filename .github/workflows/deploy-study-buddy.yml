@@ -53,7 +53,10 @@ jobs:
         run: npm run build
 
       - name: SPA fallback for Study Buddy deep links
-        run: cp study-buddy/dist/index.html study-buddy/dist/404.html
+        run: |
+          # Nested copy still helps vite-preview; GitHub Pages only honors 404.html
+          # at the published site root (see repo-root 404.html copied by rsync).
+          cp study-buddy/dist/index.html study-buddy/dist/404.html
 
       - name: Install RSET Tool dependencies
         working-directory: rset-tool
@@ -101,6 +104,7 @@ jobs:
           mkdir -p site/rset-tool
           cp -a rset-tool/dist/. site/rset-tool/
 
+          test -f site/404.html
           echo "Site tree (top level):"
           ls -la site
           echo "Study Buddy:"

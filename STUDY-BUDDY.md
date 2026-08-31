@@ -23,6 +23,7 @@ Both groups run as **live web apps** from one GitHub Pages deploy.
 
 ```
 GitHub Pages site root
+├── 404.html                ← SPA deep-link fallback (refresh of /classes/…)
 ├── index.html              ← Engineering Tools portal
 ├── fire-pump-sizer/        ← static fire tools (and friends)
 ├── games/
@@ -30,8 +31,10 @@ GitHub Pages site root
 └── study-buddy/            ← built Vite SPA (Study Buddy)
     ├── index.html
     ├── assets/
-    └── 404.html            ← SPA deep-link fallback
+    └── 404.html
 ```
+
+Refreshing `/study-buddy/classes/occc-bio-ap` (or PLNT) hits GitHub’s site-root `404.html`, which restores the path into the SPA.
 
 Workflow: `.github/workflows/deploy-study-buddy.yml` (name: **Deploy GitHub Pages**)
 

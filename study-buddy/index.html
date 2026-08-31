@@ -17,6 +17,18 @@
     <title>Study Buddy</title>
   </head>
   <body class="antialiased">
+    <script>
+      (function () {
+        try {
+          var key = 'study-buddy:spa-redirect';
+          var saved = sessionStorage.getItem(key);
+          if (saved && saved.indexOf('/Fire_toolshed/study-buddy') === 0) {
+            sessionStorage.removeItem(key);
+            history.replaceState(null, '', saved);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      (function () {
+        var prefix = '/Fire_toolshed/study-buddy';
+        var path = location.pathname;
+        if (path === prefix || path.indexOf(prefix + '/') === 0) {
+          try {
+            sessionStorage.setItem(
+              'study-buddy:spa-redirect',
+              path + location.search + location.hash
+            );
+          } catch (e) {}
+          location.replace(prefix + '/');
+          return;
+        }
+        location.replace('/Fire_toolshed/');
+      })();
+    </script>
+  </head>
+  <body>
+    <p>
+      Redirecting…
+      <a href="/Fire_toolshed/study-buddy/">Study Buddy</a>
+      ·
+      <a href="/Fire_toolshed/">Fire tools</a>
+    </p>
+  </body>
+</html>
