@@ -5,8 +5,11 @@ import type { UnitQuestion } from './unitQuestions';
  * Official BIO 1314 Exam 1 source sheets (Senter):
  * - "BIO 1314 STUDY GUIDE UNIT ONE CHAPTER ONE & TWO" (32 items)
  * - "BODY ORGANIZATION, MEMBRANES & TERMINOLOGY" worksheet (20 items)
+ * - "BIO 1314 (ONLINE) *UNIT 1 LEARNING OBJECTIVES*" (Ch 1, Ch 2, Ch 24 pH) — student photo 2026-08-31
+ * - "ANATOMICAL TERMINOLOGY LAB EXAM LEARNING OBJECTIVES" (2 pages) — student photo 2026-08-31
+ * Lecture Keynotes: INTRODUCTION TO THE BODY; UNIT 2 CHEMISTRY OF LIFE; Student study Ch 2.
  *
- * App Exam 1 = Units 1–2 (Ch 1, Appendix A, Ch 2).
+ * App Exam 1 = Units 1–2 (Ch 1, Appendix A, Ch 2, Ch 24 §24.3) + terminology lab list.
  */
 
 export interface StudyGuideItem {

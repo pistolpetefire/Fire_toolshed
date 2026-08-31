@@ -11,12 +11,12 @@ export const classAppMeta = {
   school: 'Oklahoma City Community College',
   subject: 'Human Anatomy & Physiology I (Fall 2026, Senter)',
   description:
-    'Official Fall 2026 BIO 1314 path: 10 units with lesson, practice, quiz, and review aligned to Senter’s objectives. Exam 1 follows the Unit One Ch 1–2 study guide plus the terminology worksheet.',
+    'Official Fall 2026 BIO 1314 path: 10 units with lesson, practice, quiz, and review aligned to Senter’s objectives. Exam 1: Unit One study guide, chemistry/pH objectives, and anatomical terminology lab list.',
   status: 'live' as const,
   /** Hub route mount point */
   path: '/classes/occc-bio-ap',
   color: 'sky',
-  version: '2.1.0',
+  version: '2.2.0',
   tags: ['anatomy', 'physiology', 'OCCC', 'nursing', 'lab'],
 };
 

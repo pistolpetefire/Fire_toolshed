@@ -1,4 +1,5 @@
 import type { Flashcard } from '../types';
+import { labTermFlashcards } from './exam1LabTerms';
 
 /**
  * Built-in flashcards for OCCC BIO 1314/1414 (A&P I).
@@ -1533,7 +1534,8 @@ export const builtInFlashcards: Flashcard[] = [
     back: "Maintains corpus luteum so progesterone continues until placenta takes over — basis of pregnancy tests.",
     systemId: "reproductive",
     tags: ["pregnancy","clinical"],
-  }
+  },
+  ...labTermFlashcards,
 ];
 
 export function getFlashcardsBySystem(systemId: string): Flashcard[] {

@@ -7,6 +7,7 @@ import {
   UNIT_ONE_STUDY_GUIDE,
   type StudyGuideItem,
 } from '../data/exam1StudyGuide';
+import { LAB_TERMINOLOGY, UNIT1_LEARNING_OBJECTIVES } from '../data/exam1LabTerms';
 
 const CHECK_KEY = 'study-buddy:occc-bio-ap:exam1-guide-checks';
 
@@ -25,15 +26,25 @@ function saveChecks(next: Record<string, boolean>) {
   localStorage.setItem(CHECK_KEY, JSON.stringify(next));
 }
 
-type Tab = 'guide' | 'terms';
+type Tab = 'guide' | 'terms' | 'objectives' | 'lab';
 
 export function Exam1Guide() {
   const [tab, setTab] = useState<Tab>('guide');
   const [openId, setOpenId] = useState<string | null>(null);
   const [checks, setChecks] = useState<Record<string, boolean>>(loadChecks);
 
-  const items = tab === 'guide' ? UNIT_ONE_STUDY_GUIDE : TERMINOLOGY_WORKSHEET;
-  const allItems = useMemo(() => [...UNIT_ONE_STUDY_GUIDE, ...TERMINOLOGY_WORKSHEET], []);
+  const items =
+    tab === 'guide'
+      ? UNIT_ONE_STUDY_GUIDE
+      : tab === 'terms'
+        ? TERMINOLOGY_WORKSHEET
+        : tab === 'objectives'
+          ? UNIT1_LEARNING_OBJECTIVES
+          : LAB_TERMINOLOGY;
+  const allItems = useMemo(
+    () => [...UNIT_ONE_STUDY_GUIDE, ...TERMINOLOGY_WORKSHEET, ...UNIT1_LEARNING_OBJECTIVES, ...LAB_TERMINOLOGY],
+    []
+  );
   const done = allItems.filter((i) => checks[i.id]).length;
 
   const toggleCheck = (id: string) => {
@@ -58,9 +69,9 @@ export function Exam1Guide() {
         <p className="text-sm font-medium text-brand-600 dark:text-brand-400">Exam 1 · Units 1 &amp; 2</p>
         <h1 className="page-title">Official Unit One study guide</h1>
         <p className="page-subtitle">
-          Senter’s BIO 1314 Unit One sheet (Ch 1 &amp; 2, 32 items) plus the Body organization, membranes &amp;
-          terminology worksheet (20 items). Tap an item to see the model answer; check it off when you can say it
-          cold.
+          Official Unit 1 learning objectives (Ch 1, Ch 2, Ch 24 pH), the Unit One study guide (32), the body
+          organization worksheet (20), and the anatomical terminology lab exam list. Tap for a model answer; check
+          off when you can say it cold. Lecture Keynotes (intro to the body + chemistry of life) match these units.
         </p>
       </div>
 
@@ -78,7 +89,7 @@ export function Exam1Guide() {
         </div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           type="button"
           className={`rounded-xl px-4 py-2 text-sm font-semibold ${
@@ -106,6 +117,34 @@ export function Exam1Guide() {
           }}
         >
           Terminology worksheet (20)
+        </button>
+        <button
+          type="button"
+          className={`rounded-xl px-4 py-2 text-sm font-semibold ${
+            tab === 'objectives'
+              ? 'bg-brand-600 text-white'
+              : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200'
+          }`}
+          onClick={() => {
+            setTab('objectives');
+            setOpenId(null);
+          }}
+        >
+          Unit 1 objectives sheet
+        </button>
+        <button
+          type="button"
+          className={`rounded-xl px-4 py-2 text-sm font-semibold ${
+            tab === 'lab'
+              ? 'bg-brand-600 text-white'
+              : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200'
+          }`}
+          onClick={() => {
+            setTab('lab');
+            setOpenId(null);
+          }}
+        >
+          Lab exam terms
         </button>
       </div>
 

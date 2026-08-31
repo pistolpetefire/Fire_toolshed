@@ -87,8 +87,8 @@ export function Dashboard() {
         <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">Exam 1 focus</p>
         <h2 className="mt-1 font-display text-lg font-semibold">Official Unit One study guide (Ch 1 &amp; 2)</h2>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-          32 lecture items from Senter’s Unit One sheet plus the 20-item body organization / membranes /
-          terminology worksheet. Walk the answers, then take the two-unit practice exam.
+          Official Unit 1 objectives (Ch 1, Ch 2 chemistry, Ch 24 pH), Unit One study guide, terminology worksheet,
+          and the anatomical terminology lab exam list. Walk the answers, then take the two-unit practice exam.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link to={p('/quizzes/exam/1/guide')} className="btn-primary text-sm">

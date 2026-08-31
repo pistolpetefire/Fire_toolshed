@@ -11,3 +11,6 @@ dist-ssr
 # Test artifacts
 test-results*.json
 
+# Unpacked lecture decks (local ingest only)
+apps/occc-bio-ap/_extract/
+
