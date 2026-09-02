@@ -1,0 +1,54 @@
+id: FPE-2027-A-004
+form: A
+number: 4
+status: released
+domain: 1
+subdomain: 1.A
+type: mcq4
+units: US
+handbook: HB §3.5 Flammable and Combustible Liquids Fires
+code: NFPA 30-2024 §4.3 / §6.4.1.3
+edition_lock: NFPA 30-2024
+cognitive: apply
+time_budget_s: 360
+figure: null
+stem: |
+  A process uses a liquid with closed-cup flash point 110 °F (43 °C) and boiling point 250 °F (121 °C). The liquid is stored at 70 °F. It is also pumped through a heater that raises it to 140 °F before a reactor.
+
+  NFPA 30-2024 (given for this item):
+
+  • Class is a property of the liquid from closed-cup flash point and, for Class I only, boiling point. Storage temperature and process temperature do not rewrite that class.
+  • Class I: flash point < 100 °F, with IA / IB / IC by flash point and boiling point
+  • Class II: 100 °F ≤ flash point < 140 °F
+  • Class IIIA: 140 °F ≤ flash point < 200 °F
+  • Class IIIB: flash point ≥ 200 °F
+  • §6.4.1.3: Storage, processing, handling, and use of Class II and Class III liquids heated at or above their flash points shall follow the requirements for Class I liquids, unless an engineering evaluation conducted in accordance with Chapter 6 justifies following the requirements for some other liquid class. That rule changes which safeguards apply to the operation; it does not reclassify the liquid.
+
+  Which statement is correct?
+choices:
+  - key: A
+    text: The liquid is Class II based on flash point. Storage at 70 °F remains under Class II requirements. The 140 °F process shall follow Class I requirements unless a Chapter 6 engineering evaluation justifies otherwise
+  - key: B
+    text: The liquid is Class IC because the boiling point is above 100 °F
+  - key: C
+    text: Heating to 140 °F reclassifies the liquid as Class I, and boiling point 250 °F makes the heated process Class IIIB
+  - key: D
+    text: The liquid remains Class II, so the heated process may be designed solely to Class II rules even though it is at or above the flash point
+answer: A
+solution:
+  outline: |
+    NFPA 30-2024 §4.3: class is from flash point (and boiling point only inside Class I).
+    FP = 110 °F ⇒ the liquid is Class II at 70 °F, at 140 °F, and in the drum.
+    IA/IB/IC do not apply (FP is not < 100 °F). BP 250 °F does not make it IIIB.
+    §6.4.1.3 does not rewrite the class. Storage at 70 °F is below FP, so Class II requirements apply to that storage.
+    The 140 °F process is at/above FP, so that operation shall follow Class I requirements unless a Chapter 6 engineering evaluation justifies otherwise.
+  miss_type: code-edition
+  repair_loci:
+    - NFPA 30-2024 §4.3
+    - NFPA 30-2024 §6.4.1.3
+    - HB §3.5 Flammable and Combustible Liquids Fires
+  whyWrong:
+    B: Class IC exists only inside Class I (flash point < 100 °F). This liquid’s flash point is 110 °F, so it is Class II. Boiling point is not the Class II vs IC discriminator.
+    C: Heating does not reclassify the liquid. It stays Class II. Class IIIB requires flash point ≥ 200 °F. §6.4.1.3 changes which requirements apply, not the class name.
+    D: The liquid does remain Class II, but “still Class II” is not “still design only to Class II.” §6.4.1.3 requires the 140 °F process to follow Class I requirements unless a Chapter 6 evaluation says otherwise.
+distractor_notes: "B uses the IA/IB/IC branch on FP ≥ 100 °F; C treats heating or boiling point as a reclassification; D treats unchanged class as unchanged safeguards."

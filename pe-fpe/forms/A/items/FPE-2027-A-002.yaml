@@ -1,0 +1,37 @@
+id: FPE-2027-A-002
+form: A
+number: 2
+status: style-lock
+domain: 1
+subdomain: 1.B
+type: mcq4
+units: SI
+handbook: HB §3.6 Compartment Fires
+code: null
+edition_lock: null
+cognitive: analyze
+time_budget_s: 360
+figure: figures/A/FPE-2027-A-002.svg
+stem: |
+  A 14 m tall hotel atrium is being analyzed with a two-zone (two-layer) model. The design fire is a 2.5 MW steady upholstered-seat fire on the lobby floor (see figure). Makeup air is required. Which modeling choice most invalidates the two-layer idealization?
+choices:
+  - key: A
+    text: Using a constant radiative fraction of 0.30 for the design fire
+  - key: B
+    text: Supplying makeup air as a high-velocity downward jet from a roof monitor aimed into the atrium void
+  - key: C
+    text: Sizing mechanical exhaust from plume mass flow evaluated at the smoke-layer interface
+  - key: D
+    text: Neglecting conduction through the atrium glass when estimating layer temperature for a 10-minute detection-and-notification window
+answer: B
+solution:
+  outline: |
+    HB §3.6 Compartment Fires (two-layer idealization) and HB §7.1 Smoke Control Fundamentals.
+    A two-zone model assumes a hot upper layer and a cooler lower layer with limited mixing.
+    A downward high-velocity makeup jet driven into the void mixes the atrium and destroys the layer interface, so the two-layer state variables are no longer meaningful.
+    A constant radiative fraction, plume-based exhaust, and short-time glass losses are ordinary simplifications; they do not, by themselves, mix the layers.
+  miss_type: concept
+  repair_loci:
+    - HB §3.6 Compartment Fires
+    - HB §7.1 Fundamentals
+distractor_notes: "A is a standard input; C is the usual exhaust-sizing approach; D is a second-order heat-loss omission on a short time scale."

@@ -1,0 +1,46 @@
+id: FPE-2027-A-014
+form: A
+number: 14
+status: style-lock
+domain: 2
+subdomain: 2.C
+type: mcq4
+units: SI
+handbook: HB §3.6 Compartment Fires
+code: null
+edition_lock: null
+cognitive: apply
+time_budget_s: 360
+figure: null
+stem: |
+  Estimate flashover using the Thomas correlation provided in the stem (handbook compartment-fire family):
+
+  Q_FO = 7.8 A_T + 378 A_o √H_o    (Q_FO in kW; areas in m²; H_o in m)
+
+  where A_T is the total internal surface area of the compartment (walls + ceiling + floor, door opening deducted) and A_o and H_o are the ventilation-opening area and height.
+
+  Compartment: 8.0 m × 6.0 m × 3.0 m high. One door 2.0 m wide × 2.0 m high. No other openings.
+
+  Predicted flashover heat-release rate, to the nearest 0.1 MW?
+choices:
+  - key: A
+    text: 3.5 MW
+  - key: B
+    text: 1.4 MW
+  - key: C
+    text: 2.1 MW
+  - key: D
+    text: 4.4 MW
+answer: A
+solution:
+  outline: |
+    HB §3.6 Compartment Fires; Thomas correlation given in the stem.
+    A_floor = A_ceiling = 48 m²
+    A_walls = 2 × (8 + 6) × 3 = 84 m²
+    Gross envelope = 180 m²; deduct door 4.0 m² → A_T = 176 m²
+    A_o = 2.0 × 2.0 = 4.0 m²; H_o = 2.0 m; √H_o = 1.414
+    Q_FO = 7.8 × 176 + 378 × 4.0 × 1.414 = 1,373 + 2,138 = 3,511 kW = 3.5 MW.
+  miss_type: arithmetic
+  repair_loci:
+    - HB §3.6 Compartment Fires
+distractor_notes: "B is the A_T term only (~1.4 MW); C is the opening term only (~2.1 MW); D uses H_o instead of √H_o in the opening term (≈ 4.4 MW)."

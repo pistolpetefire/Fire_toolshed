@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1b365d">
+  <meta name="description" content="Original timed PE Fire Protection CBT practice exams for the April 2027 NCEES sitting. Not an NCEES product.">
+  <title>PE Fire Protection Practice Exam</title>
+  <link rel="stylesheet" href="./css/cbt.css?v=20260902g">
+</head>
+<body>
+  <div id="view-home" class="view wrap">
+    <div class="hero">
+      <span class="badge" id="form-badge">Form A</span>
+      <h1>PE Fire Protection practice exam</h1>
+      <p>April 13, 2027 sitting · 2027 specifications · closed book · handbook + listed-code search. Not an NCEES product. No fake cut score.</p>
+      <p class="hero-actions">
+        <button class="ghost light" type="button" id="btn-manual">User manual</button>
+        <button class="ghost light" type="button" id="btn-refs">References</button>
+        <button class="ghost light" type="button" id="btn-reset-home">Reset this browser</button>
+      </p>
+    </div>
+    <div class="mode-grid">
+      <div class="card">
+        <h2>Form</h2>
+        <p>Three parallel 85-item forms. Same 2027 blueprint, different occupancies and numbers.</p>
+        <label class="legal">Active form
+          <select id="form-select">
+            <option value="A">Form A</option>
+            <option value="B">Form B</option>
+            <option value="C">Form C</option>
+          </select>
+        </label>
+        <p id="form-count" class="legal"></p>
+      </div>
+      <div class="card">
+        <h2>Exam mode</h2>
+        <p>NDA + tutorial, working clock, one optional 50-minute break, review, irreversible submit. Solutions after submit only.</p>
+        <button class="primary" id="btn-exam-scaled" type="button">Start timed form (6.0 min/item)</button>
+        <button class="ghost" id="btn-exam-full" type="button">Chrome rehearsal · 8:30:00</button>
+      </div>
+      <div class="card">
+        <h2>Coach mode</h2>
+        <p>Same items. Feedback after each item. Optional pacing toast if you average more than 7 min/item.</p>
+        <button class="primary" id="btn-coach" type="button">Start coach</button>
+      </div>
+      <div class="card">
+        <h2>Drill</h2>
+        <p>Untimed. Filter by domain. Immediate scoring.</p>
+        <label class="legal">Domain
+          <select id="drill-domain">
+            <option value="all">All released</option>
+            <option value="1">1 · Analysis</option>
+            <option value="2">2 · Fire Science</option>
+            <option value="3">3 · Smoke control</option>
+            <option value="4">4 · Fire alarm</option>
+            <option value="5">5 · Water-based</option>
+            <option value="6">6 · Special hazard</option>
+            <option value="7">7 · Passive / structural</option>
+            <option value="8">8 · Human behavior</option>
+          </select>
+        </label>
+        <button class="primary" id="btn-drill" type="button">Start drill</button>
+      </div>
+      <div class="card">
+        <h2>Keep sharp</h2>
+        <p>Reinforcement for topics you are <strong>not</strong> struggling with. Re-quiz items you already got right so they stay automatic. A miss here moves the item to repair.</p>
+        <p id="sharp-status" class="legal">No strong items yet — take a coach or exam first.</p>
+        <button class="primary" id="btn-keep-sharp" type="button">Reinforce strong topics</button>
+        <button class="ghost" id="btn-repair-weak" type="button">Repair struggling topics</button>
+      </div>
+      <div class="card">
+        <h2>Your reference PDFs</h2>
+        <p>Upload the NCEES PE Fire Protection Reference Handbook (and listed-code PDFs you own). They stay on this device. Search with Ctrl+F during the exam split view.</p>
+        <p id="pdf-status" class="legal">No PDF attached yet.</p>
+        <label class="primary file-btn">Upload PDF
+          <input id="pdf-file" type="file" accept="application/pdf" multiple hidden>
+        </label>
+        <button class="ghost" type="button" id="btn-pdf-clear">Remove uploaded PDFs</button>
+        <p style="margin-top:0.7rem">
+          <a class="ghost" href="https://account.ncees.org/reference-handbooks/" target="_blank" rel="noopener">MyNCEES handbook</a>
+          <a class="ghost" href="https://ncees.org/wp-content/uploads/2026/04/PE-FPE-2027-Specs.pdf" target="_blank" rel="noopener">2027 specs</a>
+        </p>
+      </div>
+    </div>
+    <p class="note">Forms A/B/C are 85-item 2027-blueprint exams. Keep sharp still reinforces items you already got right. Resume a saved session if offered.</p>
+    <p class="legal">Original stems. Do not copy NCEES practice-exam items. Do not commit NFPA or handbook body. Source-available for personal study — see LICENSE.</p>
+    <p id="resume-slot"></p>
+  </div>
+
+  <div id="view-nda" class="view wrap hidden">
+    <div class="legal-box">
+      <h1>Nondisclosure agreement</h1>
+      <p>This is a practice NDA so the appointment math matches Pearson: 2 minutes before the tutorial. The real NCEES NDA is a legal agreement with NCEES. This screen is not that agreement.</p>
+      <p>You will not disclose practice-item wording as if it were live exam content, and you will not treat this tool as an official NCEES exam.</p>
+      <p>Time remaining: <strong id="nda-clock">2:00</strong></p>
+      <label><input type="checkbox" id="nda-agree"> I have read this practice NDA and want to continue.</label>
+      <button class="primary" id="nda-continue" type="button" disabled>Continue to tutorial</button>
+    </div>
+  </div>
+
+  <div id="view-tutorial" class="view wrap hidden">
+    <div class="legal-box">
+      <h1>Tutorial</h1>
+      <p>Practice appointment: 8 minutes of tutorial before the working clock, same as NCEES. You may continue early.</p>
+      <ul>
+        <li>Flag items and strike out choices. Strikeout does not select an answer.</li>
+        <li>Split view: item on the left, handbook/code search and calculator on the right.</li>
+        <li>Every item is four-option multiple choice. Right-click or long-press a choice to strike it without selecting.</li>
+        <li>One optional 50:00 break pauses the working clock once. On the real appointment, sitting past 50 minutes eats remaining appointment time. Here the pause is clean.</li>
+        <li>Submit on the review screen is irreversible.</li>
+      </ul>
+      <p>Time remaining: <strong id="tut-clock">8:00</strong></p>
+      <button class="primary" id="tut-continue" type="button">Begin exam</button>
+    </div>
+  </div>
+
+  <div id="view-exam" class="view exam-shell hidden">
+    <header class="exam-header">
+      <div class="brand">NCEES-style practice · PE FPE</div>
+      <div class="meta" id="exam-meta"></div>
+      <button class="hdr-btn flag" id="btn-flag" type="button">Flag</button>
+      <button class="hdr-btn" id="btn-break" type="button">Break</button>
+      <button class="hdr-btn" id="btn-review" type="button">Review</button>
+      <div class="clock" id="exam-clock" aria-live="polite">8:30:00</div>
+    </header>
+    <div class="exam-body">
+      <section class="item-pane" id="item-pane"></section>
+      <aside class="ref-pane">
+        <div class="ref-tabs">
+          <button type="button" class="on" data-ref="search">Locus index</button>
+          <button type="button" data-ref="pdf">My PDFs</button>
+          <button type="button" data-ref="calc">Calculator</button>
+        </div>
+        <div id="ref-search">
+          <input id="search-q" type="search" placeholder="Search loci — e.g. plume, 855, voltage drop">
+          <p class="legal">Titles only. Open <strong>My PDFs</strong> to Ctrl+F your uploaded handbook.</p>
+          <div id="search-results"></div>
+        </div>
+        <div id="ref-pdf" class="hidden">
+          <p id="exam-pdf-status" class="legal">No PDF uploaded. Use Home → Your reference PDFs.</p>
+          <select id="exam-pdf-pick" class="hidden" aria-label="Choose uploaded PDF"></select>
+          <iframe id="exam-pdf-frame" title="Uploaded reference PDF" hidden></iframe>
+        </div>
+        <div id="ref-calc" class="hidden"></div>
+      </aside>
+    </div>
+    <footer class="exam-footer">
+      <button class="ghost" id="btn-prev" type="button">Previous</button>
+      <div class="nav-strip" id="nav-strip"></div>
+      <button class="primary" id="btn-next" type="button">Next</button>
+    </footer>
+  </div>
+
+  <div id="view-break" class="view wrap hidden">
+    <div class="legal-box">
+      <h1>Scheduled break</h1>
+      <p>Working clock is paused. This practice break is a clean 50:00 pause. On the real NCEES appointment the 50-minute break is optional and sitting past it consumes remaining appointment time.</p>
+      <p>Break remaining: <strong id="break-clock">50:00</strong></p>
+      <button class="primary" id="break-end" type="button">End break</button>
+    </div>
+  </div>
+
+  <div id="view-review" class="view wrap hidden">
+    <div class="legal-box" style="max-width:860px">
+      <h1>Review</h1>
+      <p>Submit is irreversible. Flagged items are yellow. Incomplete items have no saved response.</p>
+      <div class="review-grid" id="review-grid"></div>
+      <p style="margin-top:1rem">
+        <button class="ghost" id="review-back" type="button">Return to items</button>
+        <button class="primary" id="review-submit" type="button">Submit form</button>
+      </p>
+    </div>
+  </div>
+
+  <div id="view-results" class="view wrap hidden">
+    <div class="hero">
+      <span class="badge">Results · not an official cut score</span>
+      <h1 id="res-headline"></h1>
+      <p id="res-sub"></p>
+    </div>
+    <div class="card" id="res-heat"></div>
+    <div class="card" id="res-miss" style="margin-top:0.85rem"></div>
+    <div class="card" id="res-time" style="margin-top:0.85rem"></div>
+    <div class="card" id="res-repair" style="margin-top:0.85rem"></div>
+    <div class="card" id="res-reinforce" style="margin-top:0.85rem"></div>
+    <p style="margin-top:1rem">
+      <button class="primary" id="res-home" type="button">Home</button>
+      <button class="ghost" id="res-keep-sharp" type="button">Keep sharp (got these right)</button>
+      <button class="ghost" id="res-repair-weak" type="button">Repair misses</button>
+      <button class="ghost" id="res-review-items" type="button">Review all with solutions</button>
+    </p>
+  </div>
+
+  <div id="view-manual" class="view wrap hidden">
+    <div class="legal-box" style="max-width:860px">
+      <h1>User manual</h1>
+      <p class="legal">Practice tool for the April 13, 2027 PE Fire Protection CBT. Not an NCEES product.</p>
+      <h2>Modes</h2>
+      <ul>
+        <li><strong>Exam</strong> — NDA, tutorial, working clock, one optional 50:00 break, review, irreversible submit. Solutions after submit only.</li>
+        <li><strong>Coach</strong> — same items; check after each item; pacing toast if you average more than 7 min/item.</li>
+        <li><strong>Drill</strong> — untimed, filter by domain, immediate scoring.</li>
+        <li><strong>Keep sharp</strong> — reinforcement for topics you already hit. Same items, shuffled, coach feedback. Getting one wrong drops it onto the repair list.</li>
+        <li><strong>Repair</strong> — only the items you missed. Do not skip Keep sharp just because a domain looks green.</li>
+      </ul>
+      <h2>During an item</h2>
+      <ul>
+        <li>Every item is four-option multiple choice (A–D). Click to select. Right-click / long-press to strike out without selecting.</li>
+        <li><strong>Flag</strong> marks the item yellow on the navigator and review screen.</li>
+        <li>Split view: item left; <strong>Locus index</strong>, <strong>My PDFs</strong>, and <strong>Calculator</strong> on the right.</li>
+        <li>Break pauses the working clock once (practice default is a clean pause).</li>
+      </ul>
+      <h2>References</h2>
+      <ul>
+        <li>The locus index is handbook chapter titles plus listed-code section titles. It is not the NCEES handbook body.</li>
+        <li>Download the official handbook from MyNCEES, then <strong>Upload PDF</strong> on the home page. The file stays in this browser only.</li>
+        <li>Open the <strong>My PDFs</strong> tab and Ctrl+F / ⌘F — same habit as Pearson.</li>
+        <li><strong>SFPE Handbook of Fire Protection Engineering</strong> (5th or 6th Ed.) is further reading after a miss. It is not in the exam room and is not a scoring key. Solutions list the chapter to read, then send you back to the NCEES handbook locus or listed NFPA.</li>
+        <li>Do not confuse three books: NCEES PE Fire Protection Reference Handbook (exam day), SFPE Handbook of Fire Protection Engineering (study), NFPA Fire Protection Handbook (also not supplied on exam day).</li>
+      </ul>
+      <h2>Scoring</h2>
+      <ul>
+        <li>1 or 0 per item. No partial credit.</li>
+        <li>After submit: raw 0–n, domain heat, miss types, items over 9 minutes, repair list of at most 15 loci.</li>
+        <li>This tool does not invent an official cut score.</li>
+      </ul>
+      <h2>Reset</h2>
+      <p>Home → <strong>Reset this browser</strong> clears the saved session and results. You can also drop uploaded PDFs. Your files on disk are not deleted.</p>
+      <p><button class="primary" type="button" data-go-home>Back to home</button></p>
+    </div>
+  </div>
+
+  <div id="view-refs" class="view wrap hidden">
+    <div class="legal-box" style="max-width:860px">
+      <h1>Defined references</h1>
+      <div id="refs-body"></div>
+      <p><button class="primary" type="button" data-go-home>Back to home</button></p>
+    </div>
+  </div>
+
+  <div id="pacing-toast" class="pacing-toast hidden"></div>
+
+  <script src="./js/item-factory.js?v=20260902g"></script>
+  <script src="./js/bank.js?v=20260902g"></script>
+  <script src="./js/form-a-rest.js?v=20260902g"></script>
+  <script src="./js/form-a-rest2.js?v=20260902g"></script>
+  <script src="./js/form-a-rest3.js?v=20260902g"></script>
+  <script src="./js/form-b.js?v=20260902g"></script>
+  <script src="./js/form-c.js?v=20260902g"></script>
+  <script src="./js/boot.js?v=20260902g"></script>
+  <script src="./js/search-index.js?v=20260902g"></script>
+  <script src="./js/references.js?v=20260902g"></script>
+  <script src="./js/calculator.js?v=20260902g"></script>
+  <script src="./js/app.js?v=20260902g"></script>
+</body>
+</html>

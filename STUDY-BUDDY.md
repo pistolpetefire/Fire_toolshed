@@ -17,6 +17,8 @@ Both groups run as **live web apps** from one GitHub Pages deploy.
 | **Calc II Semester Study Buddy** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/calc2-study-buddy/ |
 | **FE General Math Practice** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/fe-math-study-buddy/ |
 | **FE Industrial Practice** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/fe-ie-study-buddy/ |
+| **PE Fire Protection practice exams** | https://pistolpetefire.github.io/Fire_toolshed/study-buddy/pe-fpe-study-buddy/ |
+| Direct fire-tool URL | https://pistolpetefire.github.io/Fire_toolshed/pe-fpe/ |
 | Example fire tool | https://pistolpetefire.github.io/Fire_toolshed/fire-pump-sizer/ |
 
 ## How it works

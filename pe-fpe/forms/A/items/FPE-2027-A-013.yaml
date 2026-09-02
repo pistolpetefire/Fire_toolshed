@@ -1,0 +1,39 @@
+id: FPE-2027-A-013
+form: A
+number: 13
+status: style-lock
+domain: 2
+subdomain: 2.A
+type: mcq4
+units: SI
+handbook: HB §3.3 Heat Transfer
+code: null
+edition_lock: null
+cognitive: apply
+time_budget_s: 360
+figure: null
+stem: |
+  Hot gas at 350 °C flows over the exterior of a steel duct. Ambient air is 20 °C. Exposed area A = 4.0 m². Convective coefficient h = 25 W/m²·K (given).
+
+  Newton’s law of cooling: q = h A (T_gas − T_∞).
+
+  Convective heat loss, in kW, to the nearest 1 kW?
+choices:
+  - key: A
+    text: 33 kW
+  - key: B
+    text: 8 kW
+  - key: C
+    text: 35 kW
+  - key: D
+    text: 83 kW
+answer: A
+solution:
+  outline: |
+    HB §3.3 Heat Transfer, convection (h given in the stem).
+    ΔT = 350 − 20 = 330 K
+    q = (25 W/m²·K)(4.0 m²)(330 K) = 33,000 W = 33 kW.
+  miss_type: arithmetic
+  repair_loci:
+    - HB §3.3 Heat Transfer
+distractor_notes: "C uses 350 °C as ΔT (forgets T_∞). D adds 460 as if converting to Rankine and then uses that as ΔT: 25×4×830 W ≈ 83 kW. B is an order-of-magnitude slip."

@@ -1,0 +1,40 @@
+id: FPE-2027-A-012
+form: A
+number: 12
+status: style-lock
+domain: 2
+subdomain: 2.B
+type: mcq4
+units: SI
+handbook: HB §3.2 Fire Growth and Heat Release Rates
+code: null
+edition_lock: null
+cognitive: apply
+time_budget_s: 360
+figure: null
+stem: |
+  A heptane pool fire has surface area 2.0 m². Mass burning flux is 0.055 kg/m²·s (given). Effective heat of combustion ΔH_c = 44.6 MJ/kg (given). Combustion efficiency χ = 0.85 (given).
+
+  Heat release rate Q = χ ṁ ΔH_c, with ṁ = (mass flux) × (area).
+
+  What is Q, reported to the nearest 0.1 MW?
+choices:
+  - key: A
+    text: 4.2 MW
+  - key: B
+    text: 4.9 MW
+  - key: C
+    text: 1.1 MW
+  - key: D
+    text: 0.085 MW
+answer: A
+solution:
+  outline: |
+    HB §3.2 Fire Growth and Heat Release Rates (and HB §11.3 fuel properties as a lookup locus; values are in the stem).
+    ṁ = 0.055 kg/m²·s × 2.0 m² = 0.110 kg/s
+    Q = 0.85 × 0.110 kg/s × 44.6 MJ/kg = 4.170 MW → 4.2 MW.
+  miss_type: arithmetic
+  repair_loci:
+    - HB §3.2 Fire Growth and Heat Release Rates
+    - HB §11.3 Physical and Combustion Properties of Selected Fuels
+distractor_notes: "B omits χ (4.9 MW); C treats MJ as if they were already MW-scale without the mass flux; D is ṁ × χ with no ΔH_c."

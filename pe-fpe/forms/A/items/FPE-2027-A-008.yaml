@@ -1,0 +1,36 @@
+id: FPE-2027-A-008
+form: A
+number: 8
+status: style-lock
+domain: 1
+subdomain: 1.B
+type: mcq4
+units: US
+handbook: HB §2.4 Fire Protection Analysis—Information Sources
+code: NFPA 13-2022
+edition_lock: NFPA 13-2022
+cognitive: analyze
+time_budget_s: 360
+figure: null
+stem: |
+  A warehouse 80 ft × 200 ft × 32 ft high is currently protected with ESFR sprinklers listed for the existing Class III commodity. The owner wants to change to cartoned unexpanded plastic. Which analysis is the most appropriate first screening tool for sprinkler adequacy?
+choices:
+  - key: A
+    text: A two-zone atrium smoke-fill model of the entire warehouse volume
+  - key: B
+    text: NFPA 13-2022 storage-commodity design criteria and the ESFR sprinkler listing limitations
+  - key: C
+    text: A hand calculation of ultrafast t² time to 20 MW with no sprinkler interaction, used as the acceptance criterion
+  - key: D
+    text: An FDS model of the entire 16,000 ft² building at a 2 in. grid as the only acceptable method
+answer: B
+solution:
+  outline: |
+    HB §2.4 Information Sources — listed water-based storage protection is scored against NFPA 13-2022 and the sprinkler listing, not against a smoke-filling model.
+    Cartoned unexpanded plastic is a commodity-class change. Check whether the existing ESFR K-factor, temperature rating, spacing, and storage height remain inside NFPA 13-2022 Chapter 20+ design tables and the manufacturer listing.
+    A zone atrium model does not evaluate sprinkler-commodity pairing. A free-burn t² fire ignores suppression. Full-building 2 in. LES is neither required nor a first screening tool.
+  miss_type: handbook-search
+  repair_loci:
+    - HB §2.4 Fire Protection Analysis—Information Sources
+    - NFPA 13-2022 storage commodity chapters
+distractor_notes: "A applies a smoke-control tool to a storage-sprinkler question; C ignores suppression; D treats CFD as mandatory first-pass design."

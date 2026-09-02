@@ -1,0 +1,42 @@
+id: FPE-2027-A-010
+form: A
+number: 10
+status: style-lock
+domain: 2
+subdomain: 2.A
+type: numeric
+units: US
+handbook: HB §3.3 Heat Transfer
+code: null
+edition_lock: null
+cognitive: apply
+time_budget_s: 360
+figure: null
+stem: |
+  A blackbody target views a large fire that may be treated as a black surface at 1,400 °F. Surroundings are 70 °F. Net radiative heat flux is
+
+  q″ = σ (T₁⁴ − T₂⁴)
+
+  with σ = 0.1714 × 10⁻⁸ Btu/h·ft²·R⁴ (given). Temperatures in Rankine: T(R) = T(°F) + 460.
+
+  Report q″ in Btu/h·ft² to the nearest 100.
+numeric:
+  value: 20400
+  unit: Btu/h·ft²
+  sig_figs: 3
+  tolerance_pct: 2
+  report_as: nearest 100 Btu/h·ft²
+answer: 20400
+solution:
+  outline: |
+    HB §3.3 Heat Transfer, Stefan–Boltzmann (σ given in the stem).
+    T₁ = 1,400 + 460 = 1,860 R
+    T₂ = 70 + 460 = 530 R
+    T₁⁴ = 1.19688 × 10¹³
+    T₂⁴ = 7.890 × 10¹⁰
+    ΔT⁴ = 1.1890 × 10¹³
+    q″ = (1.714 × 10⁻⁹)(1.1890 × 10¹³) = 20,380 Btu/h·ft² → 20,400 to the nearest 100.
+  miss_type: arithmetic
+  repair_loci:
+    - HB §3.3 Heat Transfer
+distractor_notes: "Using °F without converting to Rankine; dropping T₂; using SI σ = 5.67×10⁻⁸ with Fahrenheit temperatures."

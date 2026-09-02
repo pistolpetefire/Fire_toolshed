@@ -1,0 +1,47 @@
+id: FPE-2027-A-001
+form: A
+number: 1
+status: style-lock
+domain: 1
+subdomain: 1.A
+type: mcq4
+units: US
+handbook: HB §2.2 Risk Analysis
+code: null
+edition_lock: null
+cognitive: apply
+time_budget_s: 360
+figure: null
+stem: |
+  A 400-bed hospital is scoring an FMEA on the electric fire pump that supplies the high-rise standpipe. Severity (S), occurrence (O), and detection (D) are each 1–10. Risk priority number RPN = S × O × D.
+
+  | ID | Failure mode | S | O | D |
+  | --- | --- | ---: | ---: | ---: |
+  | F1 | Automatic transfer switch fails on loss of utility power | 9 | 3 | 4 |
+  | F2 | Weekly churn test skipped for one month | 4 | 6 | 2 |
+  | F3 | Controller inrush trips a shared feeder that is not supervised at the fire alarm | 10 | 2 | 8 |
+  | F4 | Packing-gland drip is heavier than last year | 3 | 5 | 3 |
+
+  Which row is the highest-priority risk, and what is its RPN?
+choices:
+  - key: A
+    text: F1, RPN 108
+  - key: B
+    text: F3, RPN 160
+  - key: C
+    text: F3, RPN 20
+  - key: D
+    text: F2, RPN 48
+answer: B
+solution:
+  outline: |
+    HB §2.2 Risk Analysis — RPN is the product S × O × D, not the sum.
+    F1 = 9×3×4 = 108
+    F2 = 4×6×2 = 48
+    F3 = 10×2×8 = 160
+    F4 = 3×5×3 = 45
+    Highest RPN is F3 at 160.
+  miss_type: arithmetic
+  repair_loci:
+    - HB §2.2 Risk Analysis
+distractor_notes: "A is the second-highest RPN; C added S+O+D; D is a high-occurrence / low-severity housekeeping item."

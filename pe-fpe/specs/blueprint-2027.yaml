@@ -1,0 +1,174 @@
+# PE Fire Protection — April 2027 blueprint
+# Source: https://ncees.org/wp-content/uploads/2026/04/PE-FPE-2027-Specs.pdf
+# Do not key items to the retired October 2020 / October 2022 list.
+
+exam:
+  name: PE Fire Protection
+  sitting: 2027-04-13
+  items_scored: 85
+  experimental_block: false
+  appointment_h: 9.5
+  nda_s: 120
+  tutorial_s: 480
+  working_s: 30600          # 8:30:00
+  break_s: 3000             # 50:00, optional, once, pauses working clock
+  pacing_s_per_item: 360
+  units: [US, SI]
+  closed_book: true
+
+edition_locks:
+  - key: NFPA 11-2024
+    title: Low-, Medium-, and High-Expansion Foam
+  - key: NFPA 13-2022
+    title: Installation of Sprinkler Systems
+  - key: NFPA 20-2022
+    title: Stationary Pumps for Fire Protection
+  - key: NFPA 30-2024
+    title: Flammable and Combustible Liquids Code
+  - key: NFPA 72-2022
+    title: National Fire Alarm and Signaling Code
+  - key: NFPA 92-2024
+    title: Smoke Control Systems
+  - key: NFPA 101-2024
+    title: Life Safety Code
+  - key: NFPA 400-2022
+    title: Hazardous Materials Code
+  - key: NFPA 855-2023
+    title: Stationary Energy Storage Systems
+  - key: NFPA 2001-2022
+    title: Clean Agent Fire Extinguishing Systems
+
+retired_locks_do_not_key:
+  - NFPA 12
+  - NFPA 25
+
+handbook:
+  name: NCEES PE Fire Protection Reference Handbook
+  cite_as: HB
+  download: https://account.ncees.org/reference-handbooks/
+  body_in_repo: false
+
+domains:
+  1:
+    name: Fire Protection Analysis
+    range: [10, 15]
+    target: 12
+    subdomains:
+      A: Performance-based design and fire risk assessment
+      B: Fire models (assumptions, limitations, input data)
+      C: Energy storage systems
+    must_appear:
+      - PBD / fire risk / FMEA-style scenario
+      - fire-model assumptions and limits
+      - ESS protection (NFPA 855-2023)
+  2:
+    name: Fire Science
+    range: [10, 15]
+    target: 12
+    subdomains:
+      A: Heat transfer
+      B: Fire chemistry
+      C: Fire dynamics
+    must_appear:
+      - conduction/convection/radiation numeric
+      - combustion / thermophysical property
+      - t-squared or enclosure fire-growth
+  3:
+    name: Smoke Control Systems
+    range: [6, 9]
+    target: 8
+    subdomains:
+      A: Basis of design
+      B: Calculations
+      C: Inspection, testing, and commissioning
+    must_appear:
+      - system type + design criterion
+      - plume/vent/pressure/exhaust calc
+      - ITM or commissioning check (NFPA 92-2024)
+  4:
+    name: Fire Alarm and Signaling Systems
+    range: [8, 12]
+    target: 10
+    subdomains:
+      A: System selection
+      B: Design criteria
+      C: Selection of principal components
+      D: Calculations
+    must_appear:
+      - system selection (addressable / ECS / releasing / MNS / ERCES)
+      - device location or sequence of operations
+      - voltage-drop or battery or notification or detector-response calc (NFPA 72-2022)
+  5:
+    name: Water-Based Fire Protection Systems
+    range: [12, 18]
+    target: 15
+    subdomains:
+      A: System selection
+      B: Design criteria
+      C: Selection of principal components
+      D: Calculations
+    must_appear:
+      - system type selection
+      - density/area or hose-stream criterion
+      - component pick (sprinkler, pump, tank, valve)
+      - hydraulic or support calc (NFPA 13-2022 and/or NFPA 20-2022)
+  6:
+    name: Special Hazard Systems
+    range: [7, 11]
+    target: 9
+    subdomains:
+      A: System selection
+      B: Design criteria
+      C: Selection of principal components
+      D: Calculations
+    must_appear:
+      - agent selection
+      - enclosure integrity / concentration / LFL
+      - component or flow calc (NFPA 2001-2022, NFPA 11-2024, NFPA 30-2024 as applicable)
+  7:
+    name: Passive and Structural Fire Protection
+    range: [8, 12]
+    target: 10
+    subdomains:
+      A: Building materials
+      B: Building geometry and compartmentalization
+      C: Structural fire protection
+      D: Protection of openings and penetrations
+    must_appear:
+      - rating or test
+      - compartmentation / geometry
+      - structural fire analysis or char / equivalency
+      - opening or penetration protection
+  8:
+    name: Human Behavior and Evacuation
+    range: [9, 14]
+    target: 9
+    subdomains:
+      A: Prescriptive egress and life safety design
+      B: Performance-based egress
+      C: Psychological and physiological response
+    must_appear:
+      - prescriptive occupant-load / capacity / travel
+      - performance egress (RSET-style)
+      - tenability or decision-making
+
+item_type_mix:
+  mcq4:    { min: 58, max: 64, scoring: all-or-nothing }
+  multi:   { min: 8,  max: 12, scoring: all-or-nothing }
+  numeric: { min: 6,  max: 10, scoring: "±2% or stem sig-fig band, whichever wider" }
+  match:   { min: 2,  max: 4,  scoring: all-or-nothing }
+  hotspot: { min: 2,  max: 4,  scoring: all-or-nothing }
+
+form_must:
+  - at least one NFPA 855-2023 item
+  - at least one NFPA 30-2024 item
+  - both SI and US present
+  - no mixed units inside one calculation
+  - every calc item has a handbook locus or listed-code section
+  - every code-scored item uses only the 2027 lock list and the exact year
+
+style_lock:
+  form: A
+  items: 1-15
+  domains: [1, 2]
+  note: Hold remaining 70 Form A items (and B/C) until these 15 pass QA gates.

@@ -1,0 +1,46 @@
+id: FPE-2027-A-003
+form: A
+number: 3
+status: style-lock
+domain: 1
+subdomain: 1.C
+type: mcq4
+units: US
+handbook: HB §2.1 General Fire Safety
+code: NFPA 855-2023 §4.4 / §4.9 / §9.6.5.6
+edition_lock: NFPA 855-2023
+cognitive: apply
+time_budget_s: 360
+figure: null
+stem: |
+  A dedicated indoor lithium-ion battery energy storage room is proposed inside a mixed-occupancy light-manufacturing building. Aggregated rated energy is 2.4 MWh. No UL 9540A installation-level test report is available.
+
+  The following NFPA 855-2023 criteria are provided for this item:
+
+  • Maximum stored energy in a single indoor control area for lithium-ion ESS, unless located in a dedicated-use ESS building or otherwise permitted: 600 kWh.
+  • Where explosion control is required and large-scale fire testing has not demonstrated that flammable gases remain below 25% of the LFL, provide explosion control by NFPA 68, NFPA 69, or an approved performance-based design.
+  • Water-based suppression shall be designed from fire-and-explosion testing; where testing is not available and groups exceed 50 kWh, an engineering analysis is required. Ordinary-hazard occupancy tables in NFPA 13-2022 are not, by themselves, a lithium-ion ESS density.
+
+  Which compliance path is consistent with NFPA 855-2023?
+choices:
+  - key: A
+    text: Keep 2.4 MWh in one fire area and protect with NFPA 13-2022 Light Hazard (0.10 gpm/ft² over 1,500 ft²)
+  - key: B
+    text: Subdivide into control areas of not more than 600 kWh each with the required fire-resistive separation, provide water-based suppression supported by an engineering analysis, and provide explosion control (NFPA 68, NFPA 69, or approved performance-based design)
+  - key: C
+    text: Install a total-flooding carbon dioxide system as the primary protection and omit sprinklers
+  - key: D
+    text: Classify the room as an outdoor installation because it has a roll-up door to the service yard
+answer: B
+solution:
+  outline: |
+    NFPA 855-2023 (edition lock). 2.4 MWh in one indoor control area of a mixed-occupancy building exceeds the 600 kWh cap given in the stem, so subdivision (or a dedicated-use building path) is required.
+    No UL 9540A installation-level report ⇒ explosion control is still required, and suppression density cannot be taken from Light Hazard tables.
+    NFPA 12 CO₂ is not a 2027 listed exam standard and is not a substitute for the 855 water-based + explosion-control path.
+    A door to a yard does not convert an indoor room into an outdoor ESS installation.
+  miss_type: code-edition
+  repair_loci:
+    - NFPA 855-2023 §4.4
+    - NFPA 855-2023 §4.9
+    - NFPA 855-2023 §9.6.5.6 Explosion Control
+distractor_notes: "A uses an NFPA 13 occupancy-hazard table as if it were an ESS density; C keys to retired NFPA 12; D misclassifies an indoor room."

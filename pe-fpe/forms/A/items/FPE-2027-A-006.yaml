@@ -1,0 +1,41 @@
+id: FPE-2027-A-006
+form: A
+number: 6
+status: style-lock
+domain: 1
+subdomain: 1.A
+type: numeric
+units: US
+handbook: HB §2.2 Risk Analysis
+code: null
+edition_lock: null
+cognitive: apply
+time_budget_s: 360
+figure: null
+stem: |
+  A solvent room has three independent layers of protection. Probability of a spill is 0.04 per year. Given a spill, ignition probability is 0.20. Given ignition, the probability that the deluge system fails is 0.05.
+
+  Expected loss:
+  • Ignition and deluge failure: $2,000,000
+  • Ignition and deluge success: $50,000
+  • Spill with no ignition: $10,000
+
+  Report the expected annual loss from this scenario, in dollars, to the nearest $100.
+numeric:
+  value: 1500
+  unit: USD/yr
+  sig_figs: 2
+  tolerance_pct: 2
+  report_as: nearest $100
+answer: 1500
+solution:
+  outline: |
+    HB §2.2 Risk Analysis — expected loss is the sum of (probability × consequence) over mutually exclusive branches.
+    P(spill ∩ ign ∩ fail) = 0.04 × 0.20 × 0.05 = 0.0004 → 0.0004 × 2,000,000 = $800
+    P(spill ∩ ign ∩ success) = 0.04 × 0.20 × 0.95 = 0.0076 → 0.0076 × 50,000 = $380
+    P(spill ∩ no ign) = 0.04 × 0.80 = 0.032 → 0.032 × 10,000 = $320
+    EAL = 800 + 380 + 320 = $1,500.
+  miss_type: arithmetic
+  repair_loci:
+    - HB §2.2 Risk Analysis
+distractor_notes: "Omitting the unignited-spill branch yields $1,180; using 0.05 on the success branch or adding probabilities instead of multiplying are common event-tree errors."

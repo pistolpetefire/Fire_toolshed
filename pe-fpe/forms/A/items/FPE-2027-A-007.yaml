@@ -1,0 +1,50 @@
+id: FPE-2027-A-007
+form: A
+number: 7
+status: style-lock
+domain: 1
+subdomain: 1.C
+type: match
+units: none
+handbook: HB §2.1 General Fire Safety
+code: NFPA 855-2023
+edition_lock: NFPA 855-2023
+cognitive: apply
+time_budget_s: 360
+figure: null
+stem: |
+  Match each document to the role it actually plays for a stationary lithium-ion energy storage installation. Scoring is all-or-nothing for the set.
+match:
+  prompts:
+    - UL 9540 listing
+    - UL 9540A test report
+    - NFPA 855-2023
+    - NFPA 13-2022 occupancy-hazard tables alone
+  options:
+    - key: W
+      text: Product safety listing of the ESS equipment (construction / electrical safety)
+    - key: X
+      text: Large-scale thermal-runaway fire-propagation data used to justify separations, suppression density, and explosion-control exceptions
+    - key: Y
+      text: Installation standard governing siting, maximum stored energy, suppression, detection, and explosion control
+    - key: Z
+      text: Do not, by themselves, establish a lithium-ion ESS sprinkler density
+  answer:
+    UL 9540 listing: W
+    UL 9540A test report: X
+    NFPA 855-2023: Y
+    NFPA 13-2022 occupancy-hazard tables alone: Z
+answer:
+  UL 9540 listing: W
+  UL 9540A test report: X
+  NFPA 855-2023: Y
+  NFPA 13-2022 occupancy-hazard tables alone: Z
+solution:
+  outline: |
+    NFPA 855-2023 distinguishes product listing (UL 9540), large-scale fire-and-explosion testing (UL 9540A), and the installation standard (855 itself).
+    NFPA 13-2022 occupancy-hazard densities (Light / Ordinary / Extra) are not a lithium-ion ESS design density without fire-and-explosion testing or an engineering analysis under 855.
+  miss_type: concept
+  repair_loci:
+    - NFPA 855-2023
+    - HB §2.1 General Fire Safety
+distractor_notes: "Swapping 9540 (listing) with 9540A (test method) is the usual miss; treating NFPA 13 OH/EH tables as an ESS density is the code-edition trap."

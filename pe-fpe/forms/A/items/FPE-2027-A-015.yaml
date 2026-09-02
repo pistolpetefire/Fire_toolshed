@@ -1,0 +1,41 @@
+id: FPE-2027-A-015
+form: A
+number: 15
+status: style-lock
+domain: 2
+subdomain: 2.C
+type: multi
+units: US
+handbook: HB §3.2 Fire Growth and Heat Release Rates
+code: null
+edition_lock: null
+cognitive: apply
+time_budget_s: 360
+figure: null
+stem: |
+  A storage-room fire is specified as a medium t² fire until sprinklers operate, then a constant 1.2 MW until burnout. Fuel load is 180 MJ/m² over 40 m². Medium growth coefficient α = 0.0117 kW/s² (given). Fast growth coefficient α = 0.0469 kW/s² (given).
+
+  Select the TWO correct statements.
+choices:
+  - key: A
+    text: Time to 1 MW for the medium t² fire is about 292 s
+  - key: B
+    text: Time to 1 MW for a fast t² fire (α = 0.0469 kW/s²) is about 50 s
+  - key: C
+    text: The 180 MJ/m² fuel load is numerically equal to the heat-release rate in MW
+  - key: D
+    text: Total fuel energy is 7.2 GJ, so a 1.2 MW steady fire would burn about 1.7 h
+  - key: E
+    text: Medium t² reaches 1 MW in about 75 s
+answer: [A, D]
+solution:
+  outline: |
+    HB §3.2 Fire Growth and Heat Release Rates.
+    Medium: t = √(1,000 / 0.0117) = √85,470 = 292 s (A).
+    Fast: t = √(1,000 / 0.0469) = 146 s, not 50 s (B is false). ~75 s is ultrafast, not medium (E false).
+    Fuel load is energy per area, not HRR (C false).
+    Energy = 180 MJ/m² × 40 m² = 7,200 MJ = 7.2 GJ. Duration at 1.2 MW = 7,200 / 1.2 = 6,000 s = 100 min ≈ 1.7 h (D).
+  miss_type: arithmetic
+  repair_loci:
+    - HB §3.2 Fire Growth and Heat Release Rates
+distractor_notes: "B uses a memorized 50 s that does not match α = 0.0469; C confuses MJ/m² with MW; E is the ultrafast time-to-1-MW ballpark."

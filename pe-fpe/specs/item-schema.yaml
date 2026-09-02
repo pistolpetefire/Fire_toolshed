@@ -1,0 +1,75 @@
+# PE-FPE item YAML schema (v1)
+# One file per item: forms/{A|B|C}/items/FPE-2027-{form}-{nnn}.yaml
+
+id: FPE-2027-A-001          # FPE-2027-{form}-{number:03d}
+form: A                     # A | B | C
+number: 1                   # 1–85
+status: style-lock          # style-lock | draft | qa | released
+domain: 1                   # 1–8 (blueprint-2027.yaml)
+subdomain: 1.A              # e.g. 1.A, 5.D
+type: mcq4                  # mcq4 | multi | numeric | match | hotspot
+units: US                   # US | SI | none  (never mix US and SI inside one calc)
+handbook: HB §2.2 Risk Analysis
+code: null                  # e.g. NFPA 13-2022 §19.3.3.1.1
+edition_lock: null          # required if code is set; must be on the 2027 lock list
+cognitive: apply            # recall | apply | analyze
+time_budget_s: 360
+figure: null                # repo-relative path under figures/
+
+stem: |
+  Question text. Put any constant that is not in the handbook here.
+  State the required output unit. State the reporting band for numeric items.
+
+# mcq4
+choices:
+  - key: A
+    text: ...
+  - key: B
+    text: ...
+  - key: C
+    text: ...
+  - key: D
+    text: ...
+answer: B                   # mcq4: letter; multi: list; numeric: see numeric; match: map; hotspot: region id
+
+# multi (2–3 correct of 4–6). Scoring: 1 or 0, no partial.
+# answer: [A, C]
+# choices: as mcq4, 4–6 entries
+
+# numeric
+numeric:
+  value: 10.2
+  unit: kW
+  sig_figs: 3
+  tolerance_pct: 2          # default 2; use the wider of ±2% and the stem band
+  report_as: nearest 0.1 kW
+
+# match / drag-and-drop. Scoring: 1 or 0 for the whole set.
+# match:
+#   prompts: ["UL 9540 listing", "..."]
+#   options:
+#     - key: W
+#       text: ...
+#   answer:
+#     "UL 9540 listing": W
+
+# hotspot
+# hotspot:
+#   figure: figures/A/FPE-2027-A-040.svg
+#   regions:
+#     - id: r1
+#       shape: rect
+#       x: 0.12
+#       y: 0.40
+#       w: 0.18
+#       h: 0.16
+#   answer: r1
+
+solution:
+  outline: |
+    HB locus or code section, then substitution using stem values only.
+  miss_type: concept        # handbook-search | code-edition | arithmetic | concept
+  repair_loci:
+    - HB §2.2 Risk Analysis
+
+distractor_notes: "A is the second-highest RPN; C added S+O+D instead of multiplying."

@@ -1,0 +1,36 @@
+id: FPE-2027-A-005
+form: A
+number: 5
+status: style-lock
+domain: 1
+subdomain: 1.B
+type: mcq4
+units: SI
+handbook: HB §6.2 Heat Detector RTI
+code: null
+edition_lock: null
+cognitive: analyze
+time_budget_s: 360
+figure: null
+stem: |
+  An engineer wants to estimate fixed-temperature heat-detector actuation time in a 3.0 m high open-plan office. The design fire is a fast t² fire under a smooth, unobstructed ceiling. A two-zone compartment model is already built for smoke-layer filling. Which statement about using that model for detector actuation is correct?
+choices:
+  - key: A
+    text: The two-zone model is the preferred tool for ceiling-jet detector actuation because it resolves ceiling-jet velocity and temperature as a function of radius from the plume
+  - key: B
+    text: Ceiling-jet correlations (or an algebraic detector-response model using RTI) are required; a two-layer zone model does not resolve the ceiling jet that bathes the detector
+  - key: C
+    text: Increasing the radiative fraction from 0.30 to 0.35 will always predict earlier heat-detector actuation in a zone model
+  - key: D
+    text: Zone models are prohibited for any detector question; only LES CFD is acceptable
+answer: B
+solution:
+  outline: |
+    HB §6.2 Heat Detector RTI and HB §3.6 Compartment Fires.
+    Detector actuation is driven by the ceiling jet (local gas temperature and velocity at the device), which a two-layer zone model does not spatially resolve.
+    Use the handbook ceiling-jet / RTI (or equivalent algebraic) method. Raising the radiative fraction actually reduces the convective fire plume strength, which would typically delay a heat detector. LES is not the only acceptable tool.
+  miss_type: concept
+  repair_loci:
+    - HB §6.2 Heat Detector RTI
+    - HB §3.6 Compartment Fires
+distractor_notes: "A attributes ceiling-jet resolution to a zone model; C has the radiative-fraction effect backwards for a heat detector; D overstates the tool requirement."

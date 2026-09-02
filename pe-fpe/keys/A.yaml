@@ -1,0 +1,21 @@
+# Form A keys + solution outlines + miss_type
+# Style lock: items 1–15 only. All items are 4-option MCQ.
+
+form: A
+status: style-lock
+items:
+  FPE-2027-A-001: { answer: B, miss_type: arithmetic }
+  FPE-2027-A-002: { answer: B, miss_type: concept }
+  FPE-2027-A-003: { answer: B, miss_type: code-edition }
+  FPE-2027-A-004: { answer: A, miss_type: code-edition }
+  FPE-2027-A-005: { answer: B, miss_type: concept }
+  FPE-2027-A-006: { answer: A, miss_type: arithmetic }
+  FPE-2027-A-007: { answer: A, miss_type: concept }
+  FPE-2027-A-008: { answer: B, miss_type: handbook-search }
+  FPE-2027-A-009: { answer: A, miss_type: arithmetic }
+  FPE-2027-A-010: { answer: A, miss_type: arithmetic }
+  FPE-2027-A-011: { answer: A, miss_type: arithmetic }
+  FPE-2027-A-012: { answer: A, miss_type: arithmetic }
+  FPE-2027-A-013: { answer: A, miss_type: arithmetic }
+  FPE-2027-A-014: { answer: A, miss_type: arithmetic }
+  FPE-2027-A-015: { answer: A, miss_type: arithmetic }

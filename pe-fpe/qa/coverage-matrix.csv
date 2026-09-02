@@ -1,0 +1,256 @@
+form,id,number,domain,subdomain,type,units,handbook,code,edition_lock,cognitive,answer,miss_type
+A,FPE-2027-A-001,1,1,1.A,mcq4,US,"HB §2.2 Risk Analysis","",,apply,B,arithmetic
+A,FPE-2027-A-002,2,1,1.B,mcq4,SI,"HB §3.6 Compartment Fires","",,analyze,B,concept
+A,FPE-2027-A-003,3,1,1.C,mcq4,US,"HB §2.1 General Fire Safety","NFPA 855-2023 §4.4 / §4.9 / §9.6.5.6",NFPA 855-2023,apply,B,code-edition
+A,FPE-2027-A-004,4,1,1.A,mcq4,US,"HB §3.5 Flammable and Combustible Liquids Fires","NFPA 30-2024 §4.3 / §6.4.1.3",NFPA 30-2024,apply,A,code-edition
+A,FPE-2027-A-005,5,1,1.B,mcq4,SI,"HB §6.2 Heat Detector RTI","",,analyze,B,concept
+A,FPE-2027-A-006,6,1,1.A,mcq4,US,"HB §2.2 Risk Analysis","",,apply,A,arithmetic
+A,FPE-2027-A-007,7,1,1.C,mcq4,none,"HB §2.1 General Fire Safety","NFPA 855-2023",NFPA 855-2023,apply,A,concept
+A,FPE-2027-A-008,8,1,1.B,mcq4,US,"HB §2.4 Fire Protection Analysis—Information Sources","NFPA 13-2022",NFPA 13-2022,analyze,B,handbook-search
+A,FPE-2027-A-009,9,2,2.A,mcq4,SI,"HB §3.3 Heat Transfer","",,apply,A,arithmetic
+A,FPE-2027-A-010,10,2,2.A,mcq4,US,"HB §3.3 Heat Transfer","",,apply,A,arithmetic
+A,FPE-2027-A-011,11,2,2.C,mcq4,US,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,A,arithmetic
+A,FPE-2027-A-012,12,2,2.B,mcq4,SI,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,A,arithmetic
+A,FPE-2027-A-013,13,2,2.A,mcq4,SI,"HB §3.3 Heat Transfer","",,apply,A,arithmetic
+A,FPE-2027-A-014,14,2,2.C,mcq4,SI,"HB §3.6 Compartment Fires","",,apply,A,arithmetic
+A,FPE-2027-A-015,15,2,2.C,mcq4,US,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,A,arithmetic
+A,FPE-2027-A-016,16,1,1.A,mcq4,none,"HB §2.1 General Fire Safety","NFPA 101-2024",NFPA 101-2024,analyze,D,concept
+A,FPE-2027-A-017,17,1,1.B,mcq4,SI,"HB §3.6 Compartment Fires","",,analyze,A,concept
+A,FPE-2027-A-018,18,1,1.C,mcq4,US,"HB §2.1 General Fire Safety","NFPA 855-2023 §9.6.5.6",NFPA 855-2023,apply,B,code-edition
+A,FPE-2027-A-019,19,1,1.A,mcq4,none,"HB §10.2 Evacuation Movement","NFPA 101-2024",NFPA 101-2024,analyze,C,concept
+A,FPE-2027-A-020,20,2,2.A,mcq4,SI,"HB §3.3 Heat Transfer","",,apply,D,arithmetic
+A,FPE-2027-A-021,21,2,2.B,mcq4,US,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,A,arithmetic
+A,FPE-2027-A-022,22,2,2.C,mcq4,SI,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,B,arithmetic
+A,FPE-2027-A-023,23,2,2.A,mcq4,US,"HB §3.3 Heat Transfer","",,apply,C,arithmetic
+A,FPE-2027-A-024,24,2,2.C,mcq4,SI,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,D,arithmetic
+A,FPE-2027-A-025,25,3,3.A,mcq4,none,"HB §7.1 Fundamentals","NFPA 92-2024 Ch. 4",NFPA 92-2024,apply,A,concept
+A,FPE-2027-A-026,26,3,3.A,mcq4,SI,"HB §7.1 Fundamentals","NFPA 92-2024",NFPA 92-2024,apply,B,concept
+A,FPE-2027-A-027,27,3,3.B,mcq4,SI,"HB §3.4 Plumes and Flames","NFPA 92-2024",NFPA 92-2024,apply,C,arithmetic
+A,FPE-2027-A-028,28,3,3.B,mcq4,US,"HB §7.1 Fundamentals","NFPA 92-2024",NFPA 92-2024,apply,D,arithmetic
+A,FPE-2027-A-029,29,3,3.B,mcq4,SI,"HB §7.3 Airflow","NFPA 92-2024",NFPA 92-2024,apply,A,arithmetic
+A,FPE-2027-A-030,30,3,3.B,mcq4,US,"HB §7.3 Airflow","NFPA 92-2024",NFPA 92-2024,apply,B,concept
+A,FPE-2027-A-031,31,3,3.C,mcq4,none,"HB §7.1 Fundamentals","NFPA 92-2024 Ch. 8",NFPA 92-2024,apply,C,code-edition
+A,FPE-2027-A-032,32,3,3.C,mcq4,none,"HB §7.1 Fundamentals","NFPA 92-2024",NFPA 92-2024,apply,D,concept
+A,FPE-2027-A-033,33,4,4.A,mcq4,none,"HB §6.1 General Information","NFPA 72-2022 Ch. 23 / Ch. 24",NFPA 72-2022,apply,A,concept
+A,FPE-2027-A-034,34,4,4.A,mcq4,none,"HB §6.1 General Information","NFPA 72-2022",NFPA 72-2022,apply,B,concept
+A,FPE-2027-A-035,35,4,4.B,mcq4,US,"HB §6.4 Heat Detector Spacing","NFPA 72-2022 Ch. 17",NFPA 72-2022,apply,C,code-edition
+A,FPE-2027-A-036,36,4,4.B,mcq4,none,"HB §6.1 General Information","NFPA 72-2022",NFPA 72-2022,apply,D,concept
+A,FPE-2027-A-037,37,4,4.C,mcq4,US,"HB §6.8 Voltage Drop Calculation","NFPA 72-2022",NFPA 72-2022,apply,A,arithmetic
+A,FPE-2027-A-038,38,4,4.D,mcq4,US,"HB §6.8 Voltage Drop Calculation","NFPA 72-2022",NFPA 72-2022,apply,B,arithmetic
+A,FPE-2027-A-039,39,4,4.D,mcq4,US,"HB §6.1 General Information","NFPA 72-2022",NFPA 72-2022,apply,C,arithmetic
+A,FPE-2027-A-040,40,4,4.D,mcq4,SI,"HB §6.6 Audibility Design","NFPA 72-2022 Ch. 18",NFPA 72-2022,apply,D,arithmetic
+A,FPE-2027-A-041,41,4,4.D,mcq4,SI,"HB §6.2 Heat Detector RTI","",,apply,A,arithmetic
+A,FPE-2027-A-042,42,4,4.B,mcq4,none,"HB §6.1 General Information","NFPA 72-2022 Ch. 21",NFPA 72-2022,apply,B,concept
+A,FPE-2027-A-043,43,5,5.A,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 Ch. 8",NFPA 13-2022,apply,C,concept
+A,FPE-2027-A-044,44,5,5.A,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,D,concept
+A,FPE-2027-A-045,45,5,5.B,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 §19.3",NFPA 13-2022,apply,A,arithmetic
+A,FPE-2027-A-046,46,5,5.B,mcq4,SI,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 §19.3",NFPA 13-2022,apply,B,arithmetic
+A,FPE-2027-A-047,47,5,5.B,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,C,arithmetic
+A,FPE-2027-A-048,48,5,5.C,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,D,arithmetic
+A,FPE-2027-A-049,49,5,5.C,mcq4,US,"HB §4.8 Fire Pumps","NFPA 20-2022 Ch. 4 / Ch. 5",NFPA 20-2022,apply,A,concept
+A,FPE-2027-A-050,50,5,5.C,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 / NFPA 20-2022",NFPA 13-2022,apply,B,arithmetic
+A,FPE-2027-A-051,51,5,5.C,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,C,concept
+A,FPE-2027-A-052,52,5,5.D,mcq4,US,"HB §4.1 Fluid Mechanics","NFPA 13-2022",NFPA 13-2022,apply,D,arithmetic
+A,FPE-2027-A-053,53,5,5.D,mcq4,SI,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,A,arithmetic
+A,FPE-2027-A-054,54,5,5.D,mcq4,US,"HB §4.8 Fire Pumps","NFPA 20-2022",NFPA 20-2022,apply,B,arithmetic
+A,FPE-2027-A-055,55,5,5.D,mcq4,US,"HB §4.5 Hydraulic Calculations","NFPA 13-2022",NFPA 13-2022,apply,C,arithmetic
+A,FPE-2027-A-056,56,5,5.B,mcq4,US,"HB §2.4 Fire Protection Analysis—Information Sources","NFPA 13-2022 Ch. 20+",NFPA 13-2022,apply,D,handbook-search
+A,FPE-2027-A-057,57,5,5.A,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,A,concept
+A,FPE-2027-A-058,58,6,6.A,mcq4,none,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,B,concept
+A,FPE-2027-A-059,59,6,6.A,mcq4,none,"HB §5.1 Foam Agents","NFPA 11-2024",NFPA 11-2024,apply,C,code-edition
+A,FPE-2027-A-060,60,6,6.B,mcq4,none,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,D,concept
+A,FPE-2027-A-061,61,6,6.B,mcq4,US,"HB §5.5 Clean Agents","NFPA 2001-2022 Ch. 5",NFPA 2001-2022,apply,A,arithmetic
+A,FPE-2027-A-062,62,6,6.D,mcq4,SI,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,B,arithmetic
+A,FPE-2027-A-063,63,6,6.D,mcq4,US,"HB §8.1 Flammability","",,apply,C,concept
+A,FPE-2027-A-064,64,6,6.A,mcq4,US,"HB §5.2 Low-Expansion Foam Systems","NFPA 11-2024",NFPA 11-2024,apply,D,arithmetic
+A,FPE-2027-A-065,65,6,6.C,mcq4,none,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,A,concept
+A,FPE-2027-A-066,66,6,6.A,mcq4,none,"HB §3.5 Flammable and Combustible Liquids Fires","NFPA 30-2024",NFPA 30-2024,apply,B,code-edition
+A,FPE-2027-A-067,67,7,7.A,mcq4,none,"HB §9.1 General","",,apply,C,concept
+A,FPE-2027-A-068,68,7,7.A,mcq4,none,"HB §9.1 General","",,apply,D,concept
+A,FPE-2027-A-069,69,7,7.B,mcq4,US,"HB §9.1 General","NFPA 101-2024 Ch. 8",NFPA 101-2024,apply,A,concept
+A,FPE-2027-A-070,70,7,7.B,mcq4,SI,"HB §10.5 Remoteness of Exits","NFPA 101-2024",NFPA 101-2024,apply,B,arithmetic
+A,FPE-2027-A-071,71,7,7.C,mcq4,US,"HB §9.2 Steel","",,apply,C,concept
+A,FPE-2027-A-072,72,7,7.C,mcq4,SI,"HB §9.4 Timber/Wood","",,apply,D,arithmetic
+A,FPE-2027-A-073,73,7,7.C,mcq4,none,"HB §9.1 General","",,apply,A,concept
+A,FPE-2027-A-074,74,7,7.D,mcq4,none,"HB §9.1 General","NFPA 101-2024",NFPA 101-2024,apply,B,concept
+A,FPE-2027-A-075,75,7,7.D,mcq4,none,"HB §9.1 General","NFPA 101-2024",NFPA 101-2024,apply,C,concept
+A,FPE-2027-A-076,76,7,7.D,mcq4,none,"HB §9.1 General","NFPA 101-2024",NFPA 101-2024,apply,D,code-edition
+A,FPE-2027-A-077,77,8,8.A,mcq4,US,"HB §10.1 General","NFPA 101-2024 Table 7.3.1.2",NFPA 101-2024,apply,A,arithmetic
+A,FPE-2027-A-078,78,8,8.A,mcq4,US,"HB §10.1 General","NFPA 101-2024",NFPA 101-2024,apply,B,arithmetic
+A,FPE-2027-A-079,79,8,8.A,mcq4,SI,"HB §10.1 General","NFPA 101-2024",NFPA 101-2024,apply,C,code-edition
+A,FPE-2027-A-080,80,8,8.A,mcq4,US,"HB §10.5 Remoteness of Exits","NFPA 101-2024",NFPA 101-2024,apply,D,arithmetic
+A,FPE-2027-A-081,81,8,8.B,mcq4,SI,"HB §10.2 Evacuation Movement","",,apply,A,arithmetic
+A,FPE-2027-A-082,82,8,8.B,mcq4,US,"HB §10.2 Evacuation Movement","",,apply,B,arithmetic
+A,FPE-2027-A-083,83,8,8.C,mcq4,SI,"HB §10.3 Egress Behavior in Smoke","NFPA 92-2024",NFPA 92-2024,apply,C,concept
+A,FPE-2027-A-084,84,8,8.C,mcq4,none,"HB §10.3 Egress Behavior in Smoke","",,apply,D,concept
+A,FPE-2027-A-085,85,8,8.A,mcq4,US,"HB §10.4 Emergency Lights","NFPA 101-2024",NFPA 101-2024,apply,A,concept
+B,FPE-2027-B-001,1,1,1.A,mcq4,US,"HB §2.2 Risk Analysis","",,apply,C,arithmetic
+B,FPE-2027-B-002,2,1,1.B,mcq4,SI,"HB §3.6 Compartment Fires","",,analyze,A,concept
+B,FPE-2027-B-003,3,1,1.C,mcq4,US,"HB §2.1 General Fire Safety","NFPA 855-2023 §4.4 / §4.9 / §9.6.5.6",NFPA 855-2023,apply,C,code-edition
+B,FPE-2027-B-004,4,1,1.A,mcq4,US,"HB §3.5 Flammable and Combustible Liquids Fires","NFPA 30-2024 §4.3 / §6.4.1.3",NFPA 30-2024,apply,C,code-edition
+B,FPE-2027-B-005,5,1,1.B,mcq4,SI,"HB §6.2 Heat Detector RTI","",,analyze,C,concept
+B,FPE-2027-B-006,6,1,1.A,mcq4,US,"HB §2.2 Risk Analysis","",,apply,C,arithmetic
+B,FPE-2027-B-007,7,1,1.C,mcq4,none,"HB §2.1 General Fire Safety","NFPA 855-2023",NFPA 855-2023,apply,B,concept
+B,FPE-2027-B-008,8,1,1.B,mcq4,US,"HB §2.4 Fire Protection Analysis—Information Sources","NFPA 13-2022",NFPA 13-2022,analyze,B,handbook-search
+B,FPE-2027-B-009,9,2,2.A,mcq4,SI,"HB §3.3 Heat Transfer","",,apply,A,arithmetic
+B,FPE-2027-B-010,10,2,2.A,mcq4,US,"HB §3.3 Heat Transfer","",,apply,C,arithmetic
+B,FPE-2027-B-011,11,2,2.C,mcq4,US,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,A,arithmetic
+B,FPE-2027-B-012,12,2,2.B,mcq4,SI,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,B,arithmetic
+B,FPE-2027-B-013,13,2,2.A,mcq4,SI,"HB §3.3 Heat Transfer","",,apply,B,arithmetic
+B,FPE-2027-B-014,14,2,2.C,mcq4,SI,"HB §3.6 Compartment Fires","",,apply,A,arithmetic
+B,FPE-2027-B-015,15,2,2.C,mcq4,US,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,B,arithmetic
+B,FPE-2027-B-016,16,1,1.A,mcq4,none,"HB §2.1 General Fire Safety","NFPA 101-2024",NFPA 101-2024,analyze,B,concept
+B,FPE-2027-B-017,17,1,1.B,mcq4,SI,"HB §3.6 Compartment Fires","",,analyze,C,concept
+B,FPE-2027-B-018,18,1,1.C,mcq4,US,"HB §2.1 General Fire Safety","NFPA 855-2023 §9.6.5.6",NFPA 855-2023,apply,B,code-edition
+B,FPE-2027-B-019,19,1,1.A,mcq4,none,"HB §10.2 Evacuation Movement","NFPA 101-2024",NFPA 101-2024,analyze,C,concept
+B,FPE-2027-B-020,20,2,2.A,mcq4,SI,"HB §3.3 Heat Transfer","",,apply,A,arithmetic
+B,FPE-2027-B-021,21,2,2.B,mcq4,US,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,C,arithmetic
+B,FPE-2027-B-022,22,2,2.C,mcq4,SI,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,A,arithmetic
+B,FPE-2027-B-023,23,2,2.A,mcq4,US,"HB §3.3 Heat Transfer","",,apply,C,arithmetic
+B,FPE-2027-B-024,24,2,2.C,mcq4,SI,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,B,arithmetic
+B,FPE-2027-B-025,25,3,3.A,mcq4,none,"HB §7.1 Fundamentals","NFPA 92-2024 Ch. 4",NFPA 92-2024,apply,A,concept
+B,FPE-2027-B-026,26,3,3.A,mcq4,SI,"HB §7.1 Fundamentals","NFPA 92-2024",NFPA 92-2024,apply,B,concept
+B,FPE-2027-B-027,27,3,3.B,mcq4,SI,"HB §3.4 Plumes and Flames","NFPA 92-2024",NFPA 92-2024,apply,B,arithmetic
+B,FPE-2027-B-028,28,3,3.B,mcq4,US,"HB §7.1 Fundamentals","NFPA 92-2024",NFPA 92-2024,apply,C,arithmetic
+B,FPE-2027-B-029,29,3,3.B,mcq4,SI,"HB §7.3 Airflow","NFPA 92-2024",NFPA 92-2024,apply,B,arithmetic
+B,FPE-2027-B-030,30,3,3.B,mcq4,US,"HB §7.3 Airflow","NFPA 92-2024",NFPA 92-2024,apply,C,concept
+B,FPE-2027-B-031,31,3,3.C,mcq4,none,"HB §7.1 Fundamentals","NFPA 92-2024 Ch. 8",NFPA 92-2024,apply,A,code-edition
+B,FPE-2027-B-032,32,3,3.C,mcq4,none,"HB §7.1 Fundamentals","NFPA 92-2024",NFPA 92-2024,apply,C,concept
+B,FPE-2027-B-033,33,4,4.A,mcq4,none,"HB §6.1 General Information","NFPA 72-2022 Ch. 23 / Ch. 24",NFPA 72-2022,apply,A,concept
+B,FPE-2027-B-034,34,4,4.A,mcq4,none,"HB §6.1 General Information","NFPA 72-2022",NFPA 72-2022,apply,C,concept
+B,FPE-2027-B-035,35,4,4.B,mcq4,US,"HB §6.4 Heat Detector Spacing","NFPA 72-2022 Ch. 17",NFPA 72-2022,apply,B,code-edition
+B,FPE-2027-B-036,36,4,4.B,mcq4,none,"HB §6.1 General Information","NFPA 72-2022",NFPA 72-2022,apply,A,concept
+B,FPE-2027-B-037,37,4,4.C,mcq4,US,"HB §6.8 Voltage Drop Calculation","NFPA 72-2022",NFPA 72-2022,apply,B,arithmetic
+B,FPE-2027-B-038,38,4,4.D,mcq4,US,"HB §6.8 Voltage Drop Calculation","NFPA 72-2022",NFPA 72-2022,apply,B,arithmetic
+B,FPE-2027-B-039,39,4,4.D,mcq4,US,"HB §6.1 General Information","NFPA 72-2022",NFPA 72-2022,apply,A,arithmetic
+B,FPE-2027-B-040,40,4,4.D,mcq4,SI,"HB §6.6 Audibility Design","NFPA 72-2022 Ch. 18",NFPA 72-2022,apply,B,arithmetic
+B,FPE-2027-B-041,41,4,4.D,mcq4,SI,"HB §6.2 Heat Detector RTI","",,apply,C,arithmetic
+B,FPE-2027-B-042,42,4,4.B,mcq4,none,"HB §6.1 General Information","NFPA 72-2022 Ch. 21",NFPA 72-2022,apply,A,concept
+B,FPE-2027-B-043,43,5,5.A,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 Ch. 8",NFPA 13-2022,apply,C,concept
+B,FPE-2027-B-044,44,5,5.A,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,A,concept
+B,FPE-2027-B-045,45,5,5.B,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 §19.3",NFPA 13-2022,apply,C,arithmetic
+B,FPE-2027-B-046,46,5,5.B,mcq4,SI,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 §19.3",NFPA 13-2022,apply,B,arithmetic
+B,FPE-2027-B-047,47,5,5.B,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,A,arithmetic
+B,FPE-2027-B-048,48,5,5.C,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,A,arithmetic
+B,FPE-2027-B-049,49,5,5.C,mcq4,US,"HB §4.8 Fire Pumps","NFPA 20-2022 Ch. 4 / Ch. 5",NFPA 20-2022,apply,B,concept
+B,FPE-2027-B-050,50,5,5.C,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 / NFPA 20-2022",NFPA 13-2022,apply,A,arithmetic
+B,FPE-2027-B-051,51,5,5.C,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,B,concept
+B,FPE-2027-B-052,52,5,5.D,mcq4,US,"HB §4.1 Fluid Mechanics","NFPA 13-2022",NFPA 13-2022,apply,C,arithmetic
+B,FPE-2027-B-053,53,5,5.D,mcq4,SI,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,A,arithmetic
+B,FPE-2027-B-054,54,5,5.D,mcq4,US,"HB §4.8 Fire Pumps","NFPA 20-2022",NFPA 20-2022,apply,C,arithmetic
+B,FPE-2027-B-055,55,5,5.D,mcq4,US,"HB §4.5 Hydraulic Calculations","NFPA 13-2022",NFPA 13-2022,apply,B,arithmetic
+B,FPE-2027-B-056,56,5,5.B,mcq4,US,"HB §2.4 Fire Protection Analysis—Information Sources","NFPA 13-2022 Ch. 20+",NFPA 13-2022,apply,C,handbook-search
+B,FPE-2027-B-057,57,5,5.A,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,B,concept
+B,FPE-2027-B-058,58,6,6.A,mcq4,none,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,C,concept
+B,FPE-2027-B-059,59,6,6.A,mcq4,none,"HB §5.1 Foam Agents","NFPA 11-2024",NFPA 11-2024,apply,A,code-edition
+B,FPE-2027-B-060,60,6,6.B,mcq4,none,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,B,concept
+B,FPE-2027-B-061,61,6,6.B,mcq4,US,"HB §5.5 Clean Agents","NFPA 2001-2022 Ch. 5",NFPA 2001-2022,apply,A,arithmetic
+B,FPE-2027-B-062,62,6,6.D,mcq4,SI,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,B,arithmetic
+B,FPE-2027-B-063,63,6,6.D,mcq4,US,"HB §8.1 Flammability","",,apply,C,concept
+B,FPE-2027-B-064,64,6,6.A,mcq4,US,"HB §5.2 Low-Expansion Foam Systems","NFPA 11-2024",NFPA 11-2024,apply,A,arithmetic
+B,FPE-2027-B-065,65,6,6.C,mcq4,none,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,C,concept
+B,FPE-2027-B-066,66,6,6.A,mcq4,none,"HB §3.5 Flammable and Combustible Liquids Fires","NFPA 30-2024",NFPA 30-2024,apply,B,code-edition
+B,FPE-2027-B-067,67,7,7.A,mcq4,none,"HB §9.1 General","",,apply,C,concept
+B,FPE-2027-B-068,68,7,7.A,mcq4,none,"HB §9.1 General","",,apply,B,concept
+B,FPE-2027-B-069,69,7,7.B,mcq4,US,"HB §9.1 General","NFPA 101-2024 Ch. 8",NFPA 101-2024,apply,C,concept
+B,FPE-2027-B-070,70,7,7.B,mcq4,SI,"HB §10.5 Remoteness of Exits","NFPA 101-2024",NFPA 101-2024,apply,A,arithmetic
+B,FPE-2027-B-071,71,7,7.C,mcq4,US,"HB §9.2 Steel","",,apply,B,concept
+B,FPE-2027-B-072,72,7,7.C,mcq4,SI,"HB §9.4 Timber/Wood","",,apply,A,arithmetic
+B,FPE-2027-B-073,73,7,7.C,mcq4,none,"HB §9.1 General","",,apply,A,concept
+B,FPE-2027-B-074,74,7,7.D,mcq4,none,"HB §9.1 General","NFPA 101-2024",NFPA 101-2024,apply,B,concept
+B,FPE-2027-B-075,75,7,7.D,mcq4,none,"HB §9.1 General","NFPA 101-2024",NFPA 101-2024,apply,D,concept
+B,FPE-2027-B-076,76,7,7.D,mcq4,none,"HB §9.1 General","NFPA 101-2024",NFPA 101-2024,apply,D,code-edition
+B,FPE-2027-B-077,77,8,8.A,mcq4,US,"HB §10.1 General","NFPA 101-2024 Table 7.3.1.2",NFPA 101-2024,apply,D,arithmetic
+B,FPE-2027-B-078,78,8,8.A,mcq4,US,"HB §10.1 General","NFPA 101-2024",NFPA 101-2024,apply,D,arithmetic
+B,FPE-2027-B-079,79,8,8.A,mcq4,SI,"HB §10.1 General","NFPA 101-2024",NFPA 101-2024,apply,D,code-edition
+B,FPE-2027-B-080,80,8,8.A,mcq4,US,"HB §10.5 Remoteness of Exits","NFPA 101-2024",NFPA 101-2024,apply,D,arithmetic
+B,FPE-2027-B-081,81,8,8.B,mcq4,SI,"HB §10.2 Evacuation Movement","",,apply,D,arithmetic
+B,FPE-2027-B-082,82,8,8.B,mcq4,US,"HB §10.2 Evacuation Movement","",,apply,D,arithmetic
+B,FPE-2027-B-083,83,8,8.C,mcq4,SI,"HB §10.3 Egress Behavior in Smoke","NFPA 92-2024",NFPA 92-2024,apply,D,concept
+B,FPE-2027-B-084,84,8,8.C,mcq4,none,"HB §10.3 Egress Behavior in Smoke","",,apply,D,concept
+B,FPE-2027-B-085,85,8,8.A,mcq4,US,"HB §10.4 Emergency Lights","NFPA 101-2024",NFPA 101-2024,apply,D,concept
+C,FPE-2027-C-001,1,1,1.A,mcq4,US,"HB §2.2 Risk Analysis","",,apply,A,arithmetic
+C,FPE-2027-C-002,2,1,1.B,mcq4,SI,"HB §3.6 Compartment Fires","",,analyze,C,concept
+C,FPE-2027-C-003,3,1,1.C,mcq4,US,"HB §2.1 General Fire Safety","NFPA 855-2023 §4.4 / §4.9 / §9.6.5.6",NFPA 855-2023,apply,B,code-edition
+C,FPE-2027-C-004,4,1,1.A,mcq4,US,"HB §3.5 Flammable and Combustible Liquids Fires","NFPA 30-2024 §4.3 / §6.4.1.3",NFPA 30-2024,apply,B,code-edition
+C,FPE-2027-C-005,5,1,1.B,mcq4,SI,"HB §6.2 Heat Detector RTI","",,analyze,B,concept
+C,FPE-2027-C-006,6,1,1.A,mcq4,US,"HB §2.2 Risk Analysis","",,apply,B,arithmetic
+C,FPE-2027-C-007,7,1,1.C,mcq4,none,"HB §2.1 General Fire Safety","NFPA 855-2023",NFPA 855-2023,apply,C,concept
+C,FPE-2027-C-008,8,1,1.B,mcq4,US,"HB §2.4 Fire Protection Analysis—Information Sources","NFPA 13-2022",NFPA 13-2022,analyze,C,handbook-search
+C,FPE-2027-C-009,9,2,2.A,mcq4,SI,"HB §3.3 Heat Transfer","",,apply,C,arithmetic
+C,FPE-2027-C-010,10,2,2.A,mcq4,US,"HB §3.3 Heat Transfer","",,apply,B,arithmetic
+C,FPE-2027-C-011,11,2,2.C,mcq4,US,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,C,arithmetic
+C,FPE-2027-C-012,12,2,2.B,mcq4,SI,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,B,arithmetic
+C,FPE-2027-C-013,13,2,2.A,mcq4,SI,"HB §3.3 Heat Transfer","",,apply,C,arithmetic
+C,FPE-2027-C-014,14,2,2.C,mcq4,SI,"HB §3.6 Compartment Fires","",,apply,A,arithmetic
+C,FPE-2027-C-015,15,2,2.C,mcq4,US,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,B,arithmetic
+C,FPE-2027-C-016,16,1,1.A,mcq4,none,"HB §2.1 General Fire Safety","NFPA 101-2024",NFPA 101-2024,analyze,A,concept
+C,FPE-2027-C-017,17,1,1.B,mcq4,SI,"HB §3.6 Compartment Fires","",,analyze,A,concept
+C,FPE-2027-C-018,18,1,1.C,mcq4,US,"HB §2.1 General Fire Safety","NFPA 855-2023 §9.6.5.6",NFPA 855-2023,apply,C,code-edition
+C,FPE-2027-C-019,19,1,1.A,mcq4,none,"HB §10.2 Evacuation Movement","NFPA 101-2024",NFPA 101-2024,analyze,A,concept
+C,FPE-2027-C-020,20,2,2.A,mcq4,SI,"HB §3.3 Heat Transfer","",,apply,C,arithmetic
+C,FPE-2027-C-021,21,2,2.B,mcq4,US,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,B,arithmetic
+C,FPE-2027-C-022,22,2,2.C,mcq4,SI,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,C,arithmetic
+C,FPE-2027-C-023,23,2,2.A,mcq4,US,"HB §3.3 Heat Transfer","",,apply,B,arithmetic
+C,FPE-2027-C-024,24,2,2.C,mcq4,SI,"HB §3.2 Fire Growth and Heat Release Rates","",,apply,C,arithmetic
+C,FPE-2027-C-025,25,3,3.A,mcq4,none,"HB §7.1 Fundamentals","NFPA 92-2024 Ch. 4",NFPA 92-2024,apply,A,concept
+C,FPE-2027-C-026,26,3,3.A,mcq4,SI,"HB §7.1 Fundamentals","NFPA 92-2024",NFPA 92-2024,apply,B,concept
+C,FPE-2027-C-027,27,3,3.B,mcq4,SI,"HB §3.4 Plumes and Flames","NFPA 92-2024",NFPA 92-2024,apply,A,arithmetic
+C,FPE-2027-C-028,28,3,3.B,mcq4,US,"HB §7.1 Fundamentals","NFPA 92-2024",NFPA 92-2024,apply,A,arithmetic
+C,FPE-2027-C-029,29,3,3.B,mcq4,SI,"HB §7.3 Airflow","NFPA 92-2024",NFPA 92-2024,apply,C,arithmetic
+C,FPE-2027-C-030,30,3,3.B,mcq4,US,"HB §7.3 Airflow","NFPA 92-2024",NFPA 92-2024,apply,A,concept
+C,FPE-2027-C-031,31,3,3.C,mcq4,none,"HB §7.1 Fundamentals","NFPA 92-2024 Ch. 8",NFPA 92-2024,apply,C,code-edition
+C,FPE-2027-C-032,32,3,3.C,mcq4,none,"HB §7.1 Fundamentals","NFPA 92-2024",NFPA 92-2024,apply,B,concept
+C,FPE-2027-C-033,33,4,4.A,mcq4,none,"HB §6.1 General Information","NFPA 72-2022 Ch. 23 / Ch. 24",NFPA 72-2022,apply,C,concept
+C,FPE-2027-C-034,34,4,4.A,mcq4,none,"HB §6.1 General Information","NFPA 72-2022",NFPA 72-2022,apply,B,concept
+C,FPE-2027-C-035,35,4,4.B,mcq4,US,"HB §6.4 Heat Detector Spacing","NFPA 72-2022 Ch. 17",NFPA 72-2022,apply,C,code-edition
+C,FPE-2027-C-036,36,4,4.B,mcq4,none,"HB §6.1 General Information","NFPA 72-2022",NFPA 72-2022,apply,A,concept
+C,FPE-2027-C-037,37,4,4.C,mcq4,US,"HB §6.8 Voltage Drop Calculation","NFPA 72-2022",NFPA 72-2022,apply,B,arithmetic
+C,FPE-2027-C-038,38,4,4.D,mcq4,US,"HB §6.8 Voltage Drop Calculation","NFPA 72-2022",NFPA 72-2022,apply,A,arithmetic
+C,FPE-2027-C-039,39,4,4.D,mcq4,US,"HB §6.1 General Information","NFPA 72-2022",NFPA 72-2022,apply,A,arithmetic
+C,FPE-2027-C-040,40,4,4.D,mcq4,SI,"HB §6.6 Audibility Design","NFPA 72-2022 Ch. 18",NFPA 72-2022,apply,D,arithmetic
+C,FPE-2027-C-041,41,4,4.D,mcq4,SI,"HB §6.2 Heat Detector RTI","",,apply,D,arithmetic
+C,FPE-2027-C-042,42,4,4.B,mcq4,none,"HB §6.1 General Information","NFPA 72-2022 Ch. 21",NFPA 72-2022,apply,D,concept
+C,FPE-2027-C-043,43,5,5.A,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 Ch. 8",NFPA 13-2022,apply,D,concept
+C,FPE-2027-C-044,44,5,5.A,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,D,concept
+C,FPE-2027-C-045,45,5,5.B,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 §19.3",NFPA 13-2022,apply,D,arithmetic
+C,FPE-2027-C-046,46,5,5.B,mcq4,SI,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 §19.3",NFPA 13-2022,apply,D,arithmetic
+C,FPE-2027-C-047,47,5,5.B,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,D,arithmetic
+C,FPE-2027-C-048,48,5,5.C,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,D,arithmetic
+C,FPE-2027-C-049,49,5,5.C,mcq4,US,"HB §4.8 Fire Pumps","NFPA 20-2022 Ch. 4 / Ch. 5",NFPA 20-2022,apply,D,concept
+C,FPE-2027-C-050,50,5,5.C,mcq4,US,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022 / NFPA 20-2022",NFPA 13-2022,apply,D,arithmetic
+C,FPE-2027-C-051,51,5,5.C,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,D,concept
+C,FPE-2027-C-052,52,5,5.D,mcq4,US,"HB §4.1 Fluid Mechanics","NFPA 13-2022",NFPA 13-2022,apply,D,arithmetic
+C,FPE-2027-C-053,53,5,5.D,mcq4,SI,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,D,arithmetic
+C,FPE-2027-C-054,54,5,5.D,mcq4,US,"HB §4.8 Fire Pumps","NFPA 20-2022",NFPA 20-2022,apply,D,arithmetic
+C,FPE-2027-C-055,55,5,5.D,mcq4,US,"HB §4.5 Hydraulic Calculations","NFPA 13-2022",NFPA 13-2022,apply,D,arithmetic
+C,FPE-2027-C-056,56,5,5.B,mcq4,US,"HB §2.4 Fire Protection Analysis—Information Sources","NFPA 13-2022 Ch. 20+",NFPA 13-2022,apply,D,handbook-search
+C,FPE-2027-C-057,57,5,5.A,mcq4,none,"HB §4.4 Fire Sprinkler Systems","NFPA 13-2022",NFPA 13-2022,apply,D,concept
+C,FPE-2027-C-058,58,6,6.A,mcq4,none,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,D,concept
+C,FPE-2027-C-059,59,6,6.A,mcq4,none,"HB §5.1 Foam Agents","NFPA 11-2024",NFPA 11-2024,apply,D,code-edition
+C,FPE-2027-C-060,60,6,6.B,mcq4,none,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,D,concept
+C,FPE-2027-C-061,61,6,6.B,mcq4,US,"HB §5.5 Clean Agents","NFPA 2001-2022 Ch. 5",NFPA 2001-2022,apply,D,arithmetic
+C,FPE-2027-C-062,62,6,6.D,mcq4,SI,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,D,arithmetic
+C,FPE-2027-C-063,63,6,6.D,mcq4,US,"HB §8.1 Flammability","",,apply,D,concept
+C,FPE-2027-C-064,64,6,6.A,mcq4,US,"HB §5.2 Low-Expansion Foam Systems","NFPA 11-2024",NFPA 11-2024,apply,D,arithmetic
+C,FPE-2027-C-065,65,6,6.C,mcq4,none,"HB §5.5 Clean Agents","NFPA 2001-2022",NFPA 2001-2022,apply,D,concept
+C,FPE-2027-C-066,66,6,6.A,mcq4,none,"HB §3.5 Flammable and Combustible Liquids Fires","NFPA 30-2024",NFPA 30-2024,apply,D,code-edition
+C,FPE-2027-C-067,67,7,7.A,mcq4,none,"HB §9.1 General","",,apply,D,concept
+C,FPE-2027-C-068,68,7,7.A,mcq4,none,"HB §9.1 General","",,apply,D,concept
+C,FPE-2027-C-069,69,7,7.B,mcq4,US,"HB §9.1 General","NFPA 101-2024 Ch. 8",NFPA 101-2024,apply,D,concept
+C,FPE-2027-C-070,70,7,7.B,mcq4,SI,"HB §10.5 Remoteness of Exits","NFPA 101-2024",NFPA 101-2024,apply,D,arithmetic
+C,FPE-2027-C-071,71,7,7.C,mcq4,US,"HB §9.2 Steel","",,apply,D,concept
+C,FPE-2027-C-072,72,7,7.C,mcq4,SI,"HB §9.4 Timber/Wood","",,apply,D,arithmetic
+C,FPE-2027-C-073,73,7,7.C,mcq4,none,"HB §9.1 General","",,apply,D,concept
+C,FPE-2027-C-074,74,7,7.D,mcq4,none,"HB §9.1 General","NFPA 101-2024",NFPA 101-2024,apply,D,concept
+C,FPE-2027-C-075,75,7,7.D,mcq4,none,"HB §9.1 General","NFPA 101-2024",NFPA 101-2024,apply,D,concept
+C,FPE-2027-C-076,76,7,7.D,mcq4,none,"HB §9.1 General","NFPA 101-2024",NFPA 101-2024,apply,D,code-edition
+C,FPE-2027-C-077,77,8,8.A,mcq4,US,"HB §10.1 General","NFPA 101-2024 Table 7.3.1.2",NFPA 101-2024,apply,D,arithmetic
+C,FPE-2027-C-078,78,8,8.A,mcq4,US,"HB §10.1 General","NFPA 101-2024",NFPA 101-2024,apply,A,arithmetic
+C,FPE-2027-C-079,79,8,8.A,mcq4,SI,"HB §10.1 General","NFPA 101-2024",NFPA 101-2024,apply,C,code-edition
+C,FPE-2027-C-080,80,8,8.A,mcq4,US,"HB §10.5 Remoteness of Exits","NFPA 101-2024",NFPA 101-2024,apply,A,arithmetic
+C,FPE-2027-C-081,81,8,8.B,mcq4,SI,"HB §10.2 Evacuation Movement","",,apply,C,arithmetic
+C,FPE-2027-C-082,82,8,8.B,mcq4,US,"HB §10.2 Evacuation Movement","",,apply,B,arithmetic
+C,FPE-2027-C-083,83,8,8.C,mcq4,SI,"HB §10.3 Egress Behavior in Smoke","NFPA 92-2024",NFPA 92-2024,apply,C,concept
+C,FPE-2027-C-084,84,8,8.C,mcq4,none,"HB §10.3 Egress Behavior in Smoke","",,apply,B,concept
+C,FPE-2027-C-085,85,8,8.A,mcq4,US,"HB §10.4 Emergency Lights","NFPA 101-2024",NFPA 101-2024,apply,B,concept

@@ -1,0 +1,33 @@
+id: FPE-2027-A-011
+form: A
+number: 11
+status: style-lock
+domain: 2
+subdomain: 2.C
+type: numeric
+units: US
+handbook: HB §3.2 Fire Growth and Heat Release Rates
+code: null
+edition_lock: null
+cognitive: apply
+time_budget_s: 360
+figure: null
+stem: |
+  A design fire is specified as a fast t² fire, Q = α t², with growth coefficient α = 0.0469 kW/s² (given). Time t is in seconds and Q is in kW.
+
+  Report the time, in seconds, at which the fire reaches 1.05 MW (1,050 kW). Report to the nearest 1 s.
+numeric:
+  value: 150
+  unit: s
+  sig_figs: 3
+  tolerance_pct: 2
+  report_as: nearest 1 s
+answer: 150
+solution:
+  outline: |
+    HB §3.2 Fire Growth and Heat Release Rates, t² relation (α given in the stem).
+    t = √(Q / α) = √(1,050 / 0.0469) = √22,388 = 149.6 s → 150 s.
+  miss_type: arithmetic
+  repair_loci:
+    - HB §3.2 Fire Growth and Heat Release Rates
+distractor_notes: "Using medium α = 0.0117 kW/s² yields ~300 s; using ultrafast α = 0.1876 kW/s² yields ~75 s; forgetting to convert 1.05 MW to 1,050 kW."
