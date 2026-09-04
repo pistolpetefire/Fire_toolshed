@@ -42,7 +42,8 @@ export const UNIT1_LEARNING_OBJECTIVES: StudyGuideItem[] = [
     unitId: U1,
     objective: 4,
     prompt: 'Name the components of a feedback system.',
-    answer: 'Variable, receptor (sensor), integrating/control center, effector. Often also a set point.',
+    answer:
+      'Variable: what is monitored. Receptor: what monitors. Integrating center: what decides what needs to be changed/amplified. Effector: what changes/effects the variable to solve the problem. Often also a set point.',
   },
   {
     id: 'lo-ch1-5',

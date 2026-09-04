@@ -74,7 +74,7 @@ export const UNIT_ONE_STUDY_GUIDE: StudyGuideItem[] = [
     objective: 4,
     prompt: 'Define variable, receptor, integrating center and effector with respect to a negative feedback loop.',
     answer:
-      'Variable: the regulated factor (e.g. temperature). Receptor: sensor that detects change. Integrating (control) center: compares to set point and decides. Effector: muscle or gland that carries out the response.',
+      'Variable: what is monitored. Receptor: what monitors. Integrating center: what decides what needs to be changed/amplified. Effector: what changes/effects the variable to solve the problem.',
   },
   {
     id: 'sg-07',
@@ -552,6 +552,21 @@ export const exam1StudyGuideQuestions: UnitQuestion[] = [
     explanation: 'Negative = oppose the change (temperature, glucose, BP). Positive = amplify (labor, clotting).',
   },
   {
+    id: 'e1-sg-06v',
+    unitId: 'unit-1',
+    objective: 4,
+    prompt: 'In a feedback loop, the variable is:',
+    options: [
+      'What monitors',
+      'What is monitored',
+      'What decides what needs to be changed/amplified',
+      'What changes/effects the variable to solve the problem',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Variable: what is monitored. Receptor: what monitors. Integrating center: what decides what needs to be changed/amplified. Effector: what changes/effects the variable to solve the problem.',
+  },
+  {
     id: 'e1-sg-06',
     unitId: 'unit-1',
     objective: 4,
@@ -559,11 +574,12 @@ export const exam1StudyGuideQuestions: UnitQuestion[] = [
     options: [
       'Is always a sweat gland',
       'Is the same thing as the variable',
-      'Compares the variable to the set point and decides the response',
+      'Decides what needs to be changed/amplified',
       'Detects the change at the skin only',
     ],
     correctIndex: 2,
-    explanation: 'Receptor detects → integrating center decides → effector acts. Variable is what is being regulated.',
+    explanation:
+      'Variable: what is monitored. Receptor: what monitors. Integrating center: what decides what needs to be changed/amplified. Effector: what changes/effects the variable to solve the problem.',
   },
   {
     id: 'e1-sg-07',

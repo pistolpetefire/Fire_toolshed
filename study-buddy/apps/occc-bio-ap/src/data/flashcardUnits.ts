@@ -19,7 +19,8 @@ export const UNIT_FLASHCARD_TOPICS: Record<UnitId, FlashcardTopicId[]> = {
 /** Syllabus gaps — ~10–12 cards each, matching existing topic size. */
 export const unitFlashcardExtras: Flashcard[] = [
   // Unit 1 — scientific method + systems (foundations already ~12)
-  { id: 'u1-fc-01', front: 'Name the parts of a feedback loop in order.', back: 'Receptor → control (integrating) center → effector.', systemId: 'foundations', tags: ['unit-1', 'feedback'], unitIds: ['unit-1'] },
+  { id: 'u1-fc-01', front: 'Name the parts of a feedback loop and define each.', back: 'Variable: what is monitored. Receptor: what monitors. Integrating center: what decides what needs to be changed/amplified. Effector: what changes/effects the variable to solve the problem.', systemId: 'foundations', tags: ['unit-1', 'feedback'], unitIds: ['unit-1'] },
+  { id: 'u1-fc-01v', front: 'In a feedback loop, what is the variable?', back: 'What is monitored.', systemId: 'foundations', tags: ['unit-1', 'feedback'], unitIds: ['unit-1'] },
   { id: 'u1-fc-02', front: 'Give one homeostasis example and one stress example.', back: 'Homeostasis: arterial pH near 7.4. Stress: hemorrhage, high fever, dehydration.', systemId: 'foundations', tags: ['unit-1', 'homeostasis'], unitIds: ['unit-1'] },
   { id: 'u1-fc-03', front: 'List the 11 organ systems.', back: 'Integumentary, skeletal, muscular, nervous, endocrine, cardiovascular, lymphatic, respiratory, digestive, urinary, reproductive.', systemId: 'foundations', tags: ['unit-1', 'systems'], unitIds: ['unit-1'] },
   { id: 'u1-fc-04', front: 'What is a hypothesis vs a theory vs peer review?', back: 'Hypothesis: testable prediction. Theory: well-supported explanation. Peer review: experts evaluate the work before/after publication.', systemId: 'foundations', tags: ['unit-1', 'method'], unitIds: ['unit-1'] },

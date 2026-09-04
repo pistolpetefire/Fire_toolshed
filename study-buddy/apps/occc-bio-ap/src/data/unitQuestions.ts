@@ -59,15 +59,16 @@ export const unitQuestions: UnitQuestion[] = [
     id: 'u1-04',
     unitId: 'unit-1',
     objective: 4,
-    prompt: 'The three components of a feedback system, in order of information flow, are:',
+    prompt: 'The components of a feedback system, in order, are:',
     options: [
       'Effector → receptor → control center',
-      'Receptor → control (integrating) center → effector',
+      'Variable → receptor → integrating center → effector',
       'Control center → stress → receptor',
       'Stimulus → effector → receptor',
     ],
     correctIndex: 1,
-    explanation: 'Receptor detects, control center decides, effector acts.',
+    explanation:
+      'Variable: what is monitored. Receptor: what monitors. Integrating center: what decides what needs to be changed/amplified. Effector: what changes/effects the variable to solve the problem.',
   },
   {
     id: 'u1-05',
@@ -662,7 +663,8 @@ export const unitQuestions: UnitQuestion[] = [
     prompt: 'In nervous-system terms, a muscle or gland that carries out the response is an:',
     options: ['Receptor', 'Integrating center', 'Effector', 'Ganglion'],
     correctIndex: 2,
-    explanation: 'Receptor detects, integrating center (CNS) decides, effector acts.',
+    explanation:
+      'Receptor: what monitors. Integrating center: what decides what needs to be changed/amplified (CNS). Effector: what changes/effects the variable to solve the problem (muscle or gland).',
   },
   {
     id: 'u7-02',

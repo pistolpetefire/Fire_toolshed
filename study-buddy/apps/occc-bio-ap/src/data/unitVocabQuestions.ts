@@ -39,10 +39,22 @@ export const vocabUnitQuestions: VocabQ[] = [
     unitId: 'unit-1',
     objective: 4,
     kind: 'vocab',
+    prompt: 'What is monitored in a feedback loop is the:',
+    options: ['effector', 'receptor', 'variable', 'placebo'],
+    correctIndex: 2,
+    explanation:
+      'Variable: what is monitored. Receptor: what monitors. Integrating center: what decides what needs to be changed/amplified. Effector: what changes/effects the variable to solve the problem.',
+  },
+  {
+    id: 'u1-v-03b',
+    unitId: 'unit-1',
+    objective: 4,
+    kind: 'vocab',
     prompt: 'The detector in a feedback loop is the:',
-    options: ['effector', 'receptor', 'set point', 'placebo'],
+    options: ['effector', 'receptor', 'variable', 'placebo'],
     correctIndex: 1,
-    explanation: 'Receptor detects; control center decides; effector acts.',
+    explanation:
+      'Receptor: what monitors. Variable: what is monitored. Integrating center: what decides what needs to be changed/amplified. Effector: what changes/effects the variable to solve the problem.',
   },
   {
     id: 'u1-v-04',

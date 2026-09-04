@@ -81,8 +81,8 @@ export const builtInFlashcards: Flashcard[] = [
   },
   {
     id: "fd-11",
-    front: "What is a receptor, control center, and effector in a feedback loop?",
-    back: "Receptor senses change; control center (often CNS/endocrine) decides response; effector (muscle/gland) carries out the response.",
+    front: "What is a variable, receptor, integrating center, and effector in a feedback loop?",
+    back: "Variable: what is monitored. Receptor: what monitors. Integrating center: what decides what needs to be changed/amplified. Effector: what changes/effects the variable to solve the problem.",
     systemId: "foundations",
     tags: ["homeostasis"],
   },

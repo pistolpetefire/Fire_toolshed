@@ -37,8 +37,9 @@ export const unitLessons: Record<UnitId, UnitLesson> = {
       },
       {
         heading: 'Homeostasis, stress, and feedback',
-        body: 'Homeostasis is a stable internal environment (dynamic equilibrium), not “nothing changing.” Stress is anything that pushes a variable off its set point. A feedback loop has a receptor (detects), a control/integrating center (decides), and an effector (acts).',
+        body: 'Homeostasis is a stable internal environment (dynamic equilibrium), not “nothing changing.” Stress is anything that pushes a variable off its set point. A feedback loop has four parts: variable, receptor, integrating center, and effector.',
         bullets: [
+          'Variable — what is monitored. Receptor — what monitors. Integrating center — what decides what needs to be changed/amplified. Effector — what changes/effects the variable to solve the problem.',
           'Negative feedback reverses the change — body temperature, blood glucose. This is everyday homeostasis.',
           'Positive feedback amplifies the change until a climax — childbirth (oxytocin), blood clotting.',
         ],
@@ -82,8 +83,9 @@ export const unitLessons: Record<UnitId, UnitLesson> = {
       'anatomy',
       'physiology',
       'homeostasis',
+      'variable',
       'receptor',
-      'control center',
+      'integrating center',
       'effector',
       'negative feedback',
       'positive feedback',
