@@ -7,6 +7,7 @@ import { ComingSoon } from './pages/ComingSoon';
 import OcccBioApApp from '../apps/occc-bio-ap/src/App';
 import OsuPlnt1213App from '../apps/osu-plnt-1213/src/App';
 import OsuEngl1213App from '../apps/osu-engl-1213/src/App';
+import OsuFpst1213App from '../apps/osu-fpst-1213/src/App';
 import { getRouterBasename } from './routerBase';
 
 /**
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/classes/occc-bio-ap/*" element={<OcccBioApApp />} />
         <Route path="/classes/osu-plnt-1213/*" element={<OsuPlnt1213App />} />
         <Route path="/classes/osu-engl-1213/*" element={<OsuEngl1213App />} />
+        <Route path="/classes/osu-fpst-1213/*" element={<OsuFpst1213App />} />
 
         <Route element={<HubLayout />}>
           <Route path="*" element={<HubNotFound />} />

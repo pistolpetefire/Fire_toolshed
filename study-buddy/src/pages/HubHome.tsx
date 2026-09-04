@@ -59,7 +59,7 @@ export function HubHome() {
           </h1>
           <p className="mt-3 text-sm text-indigo-100 sm:text-base">
             Each course lives in its own folder with its own progress, flashcards, and quizzes. Open a class below —
-            OSU Comp II, Anatomy &amp; Physiology, OSU PLNT 1213, OSU Micro for Business, OSU Macro for Business, Chemistry I, Calc I, Calc II, FE General Math, FE Industrial, and PE Fire Protection are ready; more subjects can plug in the same way.
+            OSU FPST 1213, OSU Comp II, Anatomy &amp; Physiology, OSU PLNT 1213, OSU Micro for Business, OSU Macro for Business, Chemistry I, Calc I, Calc II, FE General Math, FE Industrial, and PE Fire Protection are ready; more subjects can plug in the same way.
           </p>
         </div>
       </section>
