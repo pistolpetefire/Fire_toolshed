@@ -9,6 +9,7 @@
  */
 import { classAppMeta as occcBioAp } from '../apps/occc-bio-ap/meta';
 import { classAppMeta as osuPlnt1213 } from '../apps/osu-plnt-1213/meta';
+import { classAppMeta as osuEngl1213 } from '../apps/osu-engl-1213/meta';
 
 export type AppStatus = 'live' | 'coming-soon' | 'beta';
 
@@ -36,6 +37,7 @@ export interface ClassAppListing {
 
 /** Live + planned class apps shown on the Study Buddy home screen */
 export const CLASS_APPS: ClassAppListing[] = [
+  osuEngl1213,
   osuPlnt1213,
   occcBioAp,
   {

@@ -9,6 +9,7 @@ study-buddy/
     _template/            ← Copy this to start a new class
     occc-bio-ap/          ← OCCC BIO 1314 (Fall 2026, Senter)
     osu-plnt-1213/        ← OSU PLNT 1213 (Fall 2026, Haggard)
+    osu-engl-1213/        ← OSU ENGL 1213 Comp II (Fall 2026, Hughes)
   package.json
 ```
 
@@ -38,6 +39,7 @@ npm run dev
 - **Hub:** http://localhost:5173/  
 - **Anatomy Hub:** http://localhost:5173/classes/occc-bio-ap  
 - **PLNT 1213 Agronomy Hub:** http://localhost:5173/classes/osu-plnt-1213
+- **ENGL 1213 Comp II Hub:** http://localhost:5173/classes/osu-engl-1213
 - **OSU Micro:** http://localhost:5173/econ-micro-study-buddy/  
 - **OSU Macro:** http://localhost:5173/econ-macro-study-buddy/  
 
@@ -53,6 +55,7 @@ npm run test:cycles   # 5 automated verification cycles
 |-----|---------|------|
 | **Anatomy Hub** | BIO 1314 Fall 2026 (OCCC, Senter) | `/classes/occc-bio-ap` |
 | **PLNT 1213 Agronomy Hub** | PLNT 1213 Fall 2026 (OSU, Haggard) | `/classes/osu-plnt-1213` |
+| **ENGL 1213 Comp II Hub** | ENGL 1213 Fall 2026 (OSU, Hughes) | `/classes/osu-engl-1213` |
 | **OSU Micro for Business Study Buddy** | ECON 2003 | `/econ-micro-study-buddy/` (static vanilla under `public/econ-micro-study-buddy/`) |
 | **OSU Macro for Business Study Buddy** | ECON 2203 | `/econ-macro-study-buddy/` (static vanilla under `public/econ-macro-study-buddy/`) |
 | **Chemistry I Final Study Buddy** | CHEM 1214 / 1315 (OSU-OKC) | `/chem1-study-buddy/` (static vanilla under `public/chem1-study-buddy/`) |
