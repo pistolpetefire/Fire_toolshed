@@ -27,9 +27,9 @@ export const EXAM_BLOCKS: {
   {
     id: 1,
     title: 'Exam 1',
-    when: 'Mon Sep 14 · 8:00–9:50 a.m. · Noble 108',
+    when: 'Mon Sep 14 · 8:30–9:20 a.m. · NRC 108 · 50 min',
     unitIds: ['unit-1', 'unit-2', 'unit-3', 'unit-4', 'unit-5', 'unit-6', 'unit-7'],
-    note: 'Weeks 1–4 + FPHB 1-1, 1-3, 1-5, 1-7, 3-1, 3-3',
+    note: 'F26 review: OSU history, fire problem, WUI, historical fires, fire technologies, codes, prevention',
   },
   {
     id: 2,
@@ -73,13 +73,13 @@ export const courseUnits: CourseUnit[] = [
     chapter: 'FPHB 1-1 / Wk 1',
     title: 'The profession and this program',
     shortTitle: 'Profession & OSU FPSET',
-    topics: ['What an FP&S professional does', 'OSU FPSET / West Point nickname', 'NFPA, SFPE, ASSP, BLS', 'FPHB as the course handbook'],
+    topics: ['OA&M to OSU', '1937 A.S. origins', 'When safety was added (1972–73)', 'Degrees then vs now', 'FPE / safety / fire service careers', 'West Point nickname (Bond, 1943)'],
     examBlock: 1,
     ready: true,
     objectives: [
-      { number: 1, text: 'State the loss types an FP&S professional exists to reduce.' },
-      { number: 2, text: 'Explain why OSU FPSET is called the West Point of the Fire Service.' },
-      { number: 3, text: 'Match NFPA, SFPE, ASSP, and BLS to what they publish or measure.' },
+      { number: 1, text: 'Trace OA&M → OSU and the 1937 two-year fire program.' },
+      { number: 2, text: 'State when safety was added and what the degrees were/are.' },
+      { number: 3, text: 'Name the Bond 1943 nickname and the profession paths on the review.' },
     ],
   },
   {
@@ -88,12 +88,16 @@ export const courseUnits: CourseUnit[] = [
     chapter: 'Wk 2 history',
     title: 'History of fire-protection technologies',
     shortTitle: 'Technology history',
-    topics: ['Loss fires that drove codes', 'Water supply and hydrants', 'Automatic sprinklers', 'Detection and fire-resistive construction'],
+    topics: [
+      'Ancient suppression, water, brigades, engines, first codes',
+      'Insurance, fire marks, municipal water, alarm/detection',
+      'Seven review fires: Chicago, Peshtigo, Iroquois, Triangle, Cocoanut Grove, Beverly Hills, Station',
+    ],
     examBlock: 1,
     ready: true,
     objectives: [
-      { number: 1, text: 'Connect one historical fire or invention to a modern control.' },
-      { number: 2, text: 'State why history belongs on Exam 1: codes are written after specific events.' },
+      { number: 1, text: 'Walk the technology path from brigades and fire marks to municipal water and detection.' },
+      { number: 2, text: 'For each of the seven fires: year/location, building, ignition, life loss, code change.' },
     ],
   },
   {
@@ -116,7 +120,7 @@ export const courseUnits: CourseUnit[] = [
     chapter: 'FPHB 1-7',
     title: 'Wildland / urban interface',
     shortTitle: 'WUI',
-    topics: ['Definition of WUI', 'Why the problem is growing', 'Embers, radiant heat, direct flame', 'Defensible space'],
+    topics: ['WUI definition', 'Interface vs intermix', 'Embers, radiant heat, direct flame', 'Fire-adapted ecosystem', 'Wildfire disaster cycle'],
     examBlock: 1,
     ready: true,
     objectives: [
@@ -130,7 +134,7 @@ export const courseUnits: CourseUnit[] = [
     chapter: 'FPHB 1-3',
     title: 'Codes, standards, and regulations',
     shortTitle: 'Codes & acronyms',
-    topics: ['Code vs standard vs regulation vs guide', 'Model codes (ICC and NFPA)', 'Adoption and the AHJ', 'High-yield document numbers'],
+    topics: ['Code vs standard vs regulation', 'Prescriptive vs performance', 'AHJ, ICC, ANSI, ISO, SDO', 'NFPA 1 / 101 / 70 / 72', 'IBC / IFC / IWUIC'],
     examBlock: 1,
     ready: true,
     objectives: [
@@ -158,7 +162,7 @@ export const courseUnits: CourseUnit[] = [
     chapter: 'FPHB 1-5',
     title: 'Fire prevention and code enforcement',
     shortTitle: 'Prevention & enforcement',
-    topics: ['Engineering, education, enforcement, incentives', 'Adopt → review → permit → inspect', 'Violation / abatement at slide depth'],
+    topics: ['Engineering, education, enforcement, incentives', 'Fire marshal, permits, licenses, red tag', 'Certificate of occupancy', 'Adopt → review → permit → inspect'],
     examBlock: 1,
     ready: true,
     objectives: [
@@ -187,4 +191,4 @@ export function getUnitsForExam(blockId: ExamBlockId): CourseUnit[] {
 }
 
 export const COURSE_GOAL =
-  'Build the Week 1–4 vocabulary from the assigned FPHB chapters — fire problem, WUI, codes and the AHJ, fire data, and prevention — before Exam 1 on Monday, September 14.';
+  'Exam 1 is Monday, September 14, 8:30–9:20 a.m. in NRC 108 (50 minutes, 35–40 T/F + MC + short answer). Drill OSU FPST history, the seven historical fires, WUI terms, codes, and prevention from the F26 review.';

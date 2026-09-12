@@ -9,10 +9,10 @@ export const mcQuestions: MCQuestion[] = [
     ], correctIndex: 1, explanation: 'The course thesis is loss control.' },
   { id: 'mc-02', type: 'multiple-choice', unitId: 'unit-1', objective: 2, kind: 'vocab', prompt: 'OSU FPSET is nicknamed “the West Point of the Fire Service” because:', options: [
       'It is a federal military academy',
-      'It is the oldest U.S. fire-related baccalaureate program of its kind (1937)',
-      'It only trains municipal firefighters',
+      'Horatio Bond (NFPA) coined the name in 1943 after a summer on campus',
       'ABET forbids industrial careers',
-    ], correctIndex: 1, explanation: '1937 origin plus the campus fire-training ecosystem.' },
+      'The program has always been a four-year B.S. since 1937',
+    ], correctIndex: 1, explanation: 'Bond, NFPA Chief Engineer, 1943. The 1937 start was a two-year A.S. at OA&M.' },
   { id: 'mc-03', type: 'multiple-choice', unitId: 'unit-1', objective: 3, kind: 'vocab', prompt: 'Which organization writes model fire codes and the Fire Protection Handbook?', options: [
       'SFPE',
       'BLS',
@@ -145,6 +145,110 @@ export const mcQuestions: MCQuestion[] = [
       'Fire Alarm Code',
       'Fire Code',
     ], correctIndex: 1, explanation: '70 = NEC. 72 = alarm.' },
+  { id: 'mc-25', type: 'multiple-choice', unitId: 'unit-1', objective: 1, kind: 'vocab', prompt: 'The OSU fire program began in 1937 as:', options: [
+      'A four-year B.S. at Oklahoma State University',
+      'A two-year A.S. in Firemanship Training at Oklahoma A&M',
+      'An NFPA headquarters school in Boston',
+      'An OSHA inspector academy',
+    ], correctIndex: 1, explanation: 'OA&M, five students, two-year A.S. OSU name comes in 1957. Safety/B.S. comes in the early 1970s.' },
+  { id: 'mc-26', type: 'multiple-choice', unitId: 'unit-1', objective: 2, kind: 'vocab', prompt: 'Safety was added to the OSU fire program’s name in the:', options: [
+      '1930s, at the first class',
+      'Early 1970s (B.S. / department name Fire Protection and Safety)',
+      '1999, when the prefix became FPST',
+      '2013, when ABET was invented',
+    ], correctIndex: 1, explanation: '~1972 B.S. expansion; 1973–2013 department of Fire Protection and Safety Technology.' },
+  { id: 'mc-27', type: 'multiple-choice', unitId: 'unit-2', objective: 2, kind: 'vocab', prompt: 'The Great Chicago Fire and the Peshtigo Fire:', options: [
+      'Happened 50 years apart',
+      'Occurred on the same day in 1871',
+      'Were both nightclub fires',
+      'Were both started by pyrotechnics',
+    ], correctIndex: 1, explanation: 'October 8, 1871. Chicago is urban conflagration; Peshtigo is the deadlier wildfire.' },
+  { id: 'mc-28', type: 'multiple-choice', unitId: 'unit-2', objective: 2, kind: 'vocab', prompt: 'Which fire is the deadliest U.S. wildfire on the review list?', options: [
+      'Great Chicago Fire',
+      'Peshtigo',
+      'Station Nightclub',
+      'Iroquois Theatre',
+    ], correctIndex: 1, explanation: 'Peshtigo killed far more people than Chicago that day — logging town + slash into the settlement.' },
+  { id: 'mc-29', type: 'multiple-choice', unitId: 'unit-2', objective: 2, kind: 'application', prompt: 'Iroquois Theatre (1903) is the exam example of:', options: [
+      'Pyrotechnics on polyurethane foam',
+      'A “fireproof” assembly occupancy with failed exits/curtain',
+      'A locked garment-factory stair',
+      'A WUI ember storm',
+    ], correctIndex: 1, explanation: 'Chicago theatre, ~600 dead. Exit lighting, panic hardware, occupancy, fire curtains.' },
+  { id: 'mc-30', type: 'multiple-choice', unitId: 'unit-2', objective: 2, kind: 'application', prompt: 'Triangle Shirtwaist (1911) life loss is taught as driven mainly by:', options: [
+      'A revolving door that jammed',
+      'Locked/inadequate exits in a garment factory',
+      'A wildland flame front',
+      'Tour pyrotechnics',
+    ], correctIndex: 1, explanation: '146 dead, mostly young women. Factory/labor egress laws.' },
+  { id: 'mc-31', type: 'multiple-choice', unitId: 'unit-2', objective: 2, kind: 'vocab', prompt: 'Cocoanut Grove (1942) is the nightclub example of:', options: [
+      'Peshtigo-style wildland fire',
+      'Jammed revolving door, hidden exits, combustible interior finish',
+      'A high-rise sprinkler success story',
+      'An outdoor WUI defensible-space failure',
+    ], correctIndex: 1, explanation: 'Boston, ~492 dead. Interior finish + exit capacity + revolving-door rules.' },
+  { id: 'mc-32', type: 'multiple-choice', unitId: 'unit-2', objective: 2, kind: 'vocab', prompt: 'Station Nightclub (2003) started when:', options: [
+      'A cow kicked a lantern',
+      'Tour pyrotechnics ignited polyurethane foam, with no sprinklers',
+      'A fire curtain sealed the stage',
+      'Lightning hit a logging slash pile',
+    ], correctIndex: 1, explanation: 'West Warwick, RI. 100 dead. NFPA 101 nightclub sprinklers, foam, crowd managers, pyro permits.' },
+  { id: 'mc-33', type: 'multiple-choice', unitId: 'unit-2', objective: 1, kind: 'vocab', prompt: 'A fire mark on a building historically meant:', options: [
+      'The building had passed its sprinkler acceptance test',
+      'Which insurance company covered it — private brigades often fought only their own insureds',
+      'The AHJ had issued a certificate of occupancy',
+      'The occupancy was a theatre',
+    ], correctIndex: 1, explanation: 'Insurance + private fire companies, before municipal public fire service.' },
+  { id: 'mc-34', type: 'multiple-choice', unitId: 'unit-4', objective: 1, kind: 'vocab', prompt: 'Interface vs intermix:', options: [
+      'They are identical terms for any forest fire',
+      'Interface is a defined edge; intermix is homes scattered through wildland fuels',
+      'Interface is only in cities; intermix is only in deserts',
+      'Both mean the flame front has already arrived',
+    ], correctIndex: 1, explanation: 'Both are WUI. Review wants the distinction.' },
+  { id: 'mc-35', type: 'multiple-choice', unitId: 'unit-5', objective: 1, kind: 'concept', prompt: 'A prescriptive code provision:', options: [
+      'States an outcome and lets you prove any method',
+      'Tells you how — sizes, materials, spacing',
+      'Is never enforceable',
+      'Is the same as a guide',
+    ], correctIndex: 1, explanation: 'Performance = outcome. Prescriptive = recipe.' },
+  { id: 'mc-36', type: 'multiple-choice', unitId: 'unit-7', objective: 2, kind: 'vocab', prompt: 'A certificate of occupancy is issued by the AHJ to:', options: [
+      'Red-tag a sprinkler riser',
+      'Allow the building to be occupied after required inspections',
+      'Adopt the model code',
+      'Create NFIRS',
+    ], correctIndex: 1, explanation: 'End of the adopt → review → permit → inspect path.' },
+  { id: 'mc-37', type: 'multiple-choice', unitId: 'unit-7', objective: 2, kind: 'vocab', prompt: 'A red tag on fire-protection equipment usually means:', options: [
+      'The system passed and may be occupied',
+      'The equipment/system is impaired or do-not-use until restored',
+      'The model code has been adopted',
+      'EDITH drills are complete',
+    ], correctIndex: 1, explanation: 'Review vocabulary: red tag vs certificate of occupancy.' },
+  { id: 'mc-38', type: 'multiple-choice', unitId: 'unit-7', objective: 1, kind: 'vocab', prompt: 'EDITH stands for:', options: [
+      'Emergency Detection In The Hallway',
+      'Exit Drills In The Home',
+      'Egress Design In Theatre Housing',
+      'Engineer Designated In The Hierarchy',
+    ], correctIndex: 1, explanation: 'On the F26 acronym list — easy point if you memorized it.' },
+  { id: 'mc-39', type: 'multiple-choice', unitId: 'unit-1', objective: 1, kind: 'concept', prompt: 'True or false: You may bring your FPST 1213 composition book with handwritten notes into Exam 1.', options: [
+      'True',
+      'False',
+    ], correctIndex: 0, explanation: 'Handwritten notes in that book only. Printed packets and electronics stay out.' },
+  { id: 'mc-40', type: 'multiple-choice', unitId: 'unit-1', objective: 1, kind: 'concept', prompt: 'True or false: Calculators are required for on-campus Exam 1.', options: [
+      'True',
+      'False',
+    ], correctIndex: 1, explanation: 'Review: calculators not needed. No electronics on the desk.' },
+  { id: 'mc-41', type: 'multiple-choice', unitId: 'unit-3', objective: 1, kind: 'vocab', prompt: 'America Burning (1973) is important because it:', options: [
+      'Replaced NFPA 101',
+      'Framed fire as a national prevention problem and helped drive USFA / prevention policy',
+      'Was the Iroquois Theatre investigation',
+      'Banned wooden cities',
+    ], correctIndex: 1, explanation: 'National Commission on Fire Prevention and Control report — on the fire-problem key-term slide.' },
+  { id: 'mc-42', type: 'multiple-choice', unitId: 'unit-2', objective: 2, kind: 'vocab', prompt: 'Beverly Hills Supper Club (1977) was in:', options: [
+      'Boston, Massachusetts',
+      'Southgate, Kentucky',
+      'West Warwick, Rhode Island',
+      'Chicago, Illinois',
+    ], correctIndex: 1, explanation: 'Kentucky nightclub, 165 dead. Do not mix with Cocoanut Grove (Boston 1942) or Station (Rhode Island 2003).' },
 ];
 
 export const matchingQuestions: MatchingQuestion[] = [
@@ -172,6 +276,24 @@ export const matchingQuestions: MatchingQuestion[] = [
       { left: 'Enforcement', right: 'Inspection and notice of violation' },
       { left: 'Incentive', right: 'Insurance or liability pressure' },
     ], explanation: 'Reading-list pairing.' },
+  { id: 'match-5', type: 'matching', unitId: 'unit-2', prompt: 'Match the fire to the year and place.', pairs: [
+      { left: 'Great Chicago Fire', right: '1871 · Illinois (same day as Peshtigo)' },
+      { left: 'Iroquois Theatre', right: '1903 · Chicago theatre' },
+      { left: 'Triangle Shirtwaist', right: '1911 · New York garment factory' },
+      { left: 'Station Nightclub', right: '2003 · West Warwick, Rhode Island' },
+    ], explanation: 'F26 review seven-fire list.' },
+  { id: 'match-6', type: 'matching', unitId: 'unit-2', prompt: 'Match the fire to the code lesson.', pairs: [
+      { left: 'Peshtigo', right: 'Wildland fire into a town — WUI, not just downtown codes' },
+      { left: 'Cocoanut Grove', right: 'Interior finish, revolving doors, assembly exit capacity' },
+      { left: 'Triangle Shirtwaist', right: 'Locked factory exits / workplace life safety' },
+      { left: 'Station Nightclub', right: 'Nightclub sprinklers, foam, pyro, crowd managers' },
+    ], explanation: 'What building codes changed — the fifth fact for each fire.' },
+  { id: 'match-7', type: 'matching', unitId: 'unit-5', prompt: 'Match the review term to its meaning.', pairs: [
+      { left: 'AHJ', right: 'Who interprets and enforces the adopted code' },
+      { left: 'SDO', right: 'Organization that writes consensus standards' },
+      { left: 'Prescriptive', right: 'Tells you how (sizes, materials, spacing)' },
+      { left: 'Performance-based', right: 'States the required outcome; you show how' },
+    ], explanation: 'F26 codes/standards key-term slide.' },
 ];
 
 export const quizQuestions: QuizQuestion[] = [...mcQuestions, ...matchingQuestions];
@@ -233,7 +355,7 @@ export function getExamPracticeDeck(blockId: ExamBlockId): QuizQuestion[] {
 }
 
 export function examBlockLabel(blockId: ExamBlockId): string {
-  if (blockId === 1) return 'Exam 1 practice — Weeks 1–4 + FPHB set';
+  if (blockId === 1) return 'Exam 1 practice — F26 review (fires, OSU history, codes, WUI)';
   if (blockId === 2) return 'Exam 2 practice — later units';
   if (blockId === 3) return 'Exam 3 practice — later units';
   return 'Final practice — comprehensive';

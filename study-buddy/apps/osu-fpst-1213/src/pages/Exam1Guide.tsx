@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { p } from '../basePath';
 import { ArrowLeft, BookOpen, CheckCircle2, ChevronDown, ListChecks, RotateCcw } from 'lucide-react';
 import { EXAM1_STUDY_GUIDE } from '../data/exam1StudyGuide';
+import { EXAM1_LOGISTICS } from '../data/studyPlan';
+import { HISTORICAL_FIRES } from '../data/historicalFires';
 import { getUnitById } from '../data/courseUnits';
 import { useProgressContext } from '../context/ProgressContext';
 import { recordStudyDay } from '../lib/progress';
@@ -47,13 +49,61 @@ export function Exam1Guide() {
         <Link to={p('/quizzes')} className="mb-3 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-orange-700">
           <ArrowLeft className="h-4 w-4" /> Quizzes
         </Link>
-        <p className="text-sm font-medium text-orange-700 dark:text-orange-400">Exam 1 · Chs 1–4 · Fri Sep 4</p>
+        <p className="text-sm font-medium text-orange-700 dark:text-orange-400">
+          Exam 1 · {EXAM1_LOGISTICS.when} · {EXAM1_LOGISTICS.time} · {EXAM1_LOGISTICS.room}
+        </p>
         <h1 className="page-title">Exam 1 study guide</h1>
         <p className="page-subtitle">
-          24 prompts aligned to FPSET’s learning goals. Tap to reveal a model answer; check it off only when you can
-          say it without looking. Course notes win if they conflict.
+          Built from the F26 on-campus review. Tap to reveal a model answer; check it off only when you can say it
+          without looking. Canvas slides and the assigned FPHB 21st edition win if they conflict.
         </p>
       </div>
+
+      <section className="card border-orange-200 p-5 dark:border-orange-800">
+        <h2 className="font-display text-lg font-semibold">On-campus logistics</h2>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+          {EXAM1_LOGISTICS.duration} · {EXAM1_LOGISTICS.questions} questions · {EXAM1_LOGISTICS.formats}. {EXAM1_LOGISTICS.media}.
+        </p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">Bring</p>
+            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-slate-700 dark:text-slate-200">
+              {EXAM1_LOGISTICS.bring.map((b) => (
+                <li key={b}>{b}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-orange-700">Leave in the bag</p>
+            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-slate-700 dark:text-slate-200">
+              {EXAM1_LOGISTICS.banned.map((b) => (
+                <li key={b}>{b}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">{EXAM1_LOGISTICS.scantron}</p>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600 dark:text-slate-300">
+          {EXAM1_LOGISTICS.rules.map((r) => (
+            <li key={r}>{r}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="card p-5">
+        <h2 className="font-display text-lg font-semibold">Seven fires — five facts each</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Year/location · building type · what started it · what caused the loss of life · what codes changed.
+        </p>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+          {HISTORICAL_FIRES.map((f) => (
+            <li key={f.id} className="rounded-xl bg-slate-50 px-3 py-2 text-sm dark:bg-slate-800/60">
+              <span className="font-semibold">{f.name}</span>
+              <span className="mt-0.5 block text-xs text-slate-500">{f.year} · {f.location}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900">
         <p className="text-sm text-slate-600 dark:text-slate-300">

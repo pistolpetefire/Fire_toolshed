@@ -17,15 +17,16 @@ export const TAS: { name: string; email: string; office: string }[] = [];
 export const MATERIALS = {
   required: [
     'Canvas syllabus and modules',
-    'FPHB 1-1, 1-3, 1-5, 1-7, 3-1, 3-3 (assigned pages only)',
-    'Week 1 job-description links: NFPA, SFPE, ASSP, BLS',
+    'FPHB 21st edition: 1-1, 1-3, 1-5, 1-7, 3-1, 3-3 (assigned pages only)',
+    'Fire Protection & Safety job-description pages',
+    'Historical fire videos + F26 on-campus Exam 1 review',
   ],
   quizlet: 'https://canvas.okstate.edu/',
 };
 export interface GradeRow { item: string; detail: string; points: number; pct: string; }
 export const GRADE_ROWS: GradeRow[] = [
   { item: 'Quizzes / IC / assignments', detail: 'Q, A, IC — due dates on Canvas', points: 0, pct: 'See Canvas' },
-  { item: 'Exam 1', detail: 'Mon Sep 14, 2026 · 8:00–9:50 a.m. · Noble 108 · Weeks 1–4', points: 0, pct: 'See Canvas' },
+  { item: 'Exam 1', detail: 'Mon Sep 14, 2026 · 8:30–9:20 a.m. · NRC 108 · 50 min · 35–40 T/F, MC, short answer', points: 0, pct: 'See Canvas' },
   { item: 'Exam 2', detail: 'Mon Oct 26, 2026', points: 0, pct: 'See Canvas' },
   { item: 'Final exam', detail: 'Mon Dec 7, 2026 · 8:00–9:50 a.m. · Noble 108', points: 0, pct: 'See Canvas' },
 ];
@@ -39,25 +40,26 @@ export const LETTER_GRADES = [
   { letter: 'F', range: 'See syllabus' },
 ];
 export const EXAM_DATES = [
-  { id: 1, title: 'Exam 1', when: 'Monday, September 14, 2026 · 8:00–9:50 a.m. · Noble 108', format: 'In person', covers: 'Weeks 1–4 + assigned FPHB chapters' },
+  { id: 1, title: 'Exam 1', when: 'Monday, September 14, 2026 · 8:30–9:20 a.m. · NRC 108', format: 'In person · paper + green Scantron · handwritten composition book allowed', covers: 'F26 review: OSU history, fire problem, WUI, historical fires, fire technologies, codes, prevention' },
   { id: 2, title: 'Exam 2', when: 'Monday, October 26, 2026', format: 'In person', covers: 'After Exam 1' },
   { id: 3, title: 'Later unit tests', when: 'See Canvas', format: 'In person', covers: 'After Exam 2' },
   { id: 4, title: 'Final Exam', when: 'Monday, December 7, 2026 · 8:00–9:50 a.m. · Noble 108', format: 'In person', covers: 'Comprehensive wrap-up' },
 ];
 export const POLICY_HIGHLIGHTS = [
-  { title: 'Reading list for Exam 1', body: 'FPHB 1-1 (as assigned), 1-3 Codes/Standards/Regulations, 1-5 Prevention & Code Enforcement, 1-7 WUI, 3-1 Fire Problem, 3-3 Fire Incident Data. Plus Week 1–2 slides.' },
+  { title: 'Reading list for Exam 1', body: 'FPHB 21st edition: 1-1, 1-3, 1-5, 1-7, 3-1, 3-3. Fire Protection & Safety job-description pages. Historical fire videos. F26 on-campus review slides.' },
   { title: 'Labor Day', body: 'Monday September 7 — campus closed. Best catch-up day.' },
-  { title: 'Exam review', body: 'Friday September 11. Copy every hint.' },
+  { title: 'On-campus exam rules (F26 review)', body: 'Handwritten composition book, #2 / HB-0.7 pencil, eraser. No phones, watches, hats, calculators, or other electronics. Green Scantron provided. Do not write on the exam. Extra time will not be allowed.' },
   { title: 'Authority', body: 'Slides and the assigned FPHB edition win over any number in this app.' },
 ];
 export const LEARNING_GOALS_EXAM1 = [
-  'Describe the FP&S profession and why OSU FPSET exists.',
-  'Place today’s systems in the history of fire-protection technology.',
-  'State the fire problem using class / FPHB 3-1 facts.',
-  'Define WUI and three structure-ignition pathways (FPHB 1-7).',
-  'Distinguish code, standard, regulation, model code, and AHJ (FPHB 1-3).',
-  'Explain how fire data is collected and what it cannot tell you (FPHB 3-3).',
-  'Outline prevention tools and the code-enforcement cycle (FPHB 1-5).',
+  'Trace OA&M → OSU, 1937 origins, when safety was added, and the degrees then vs now.',
+  'Explain the Bond 1943 “West Point” nickname and FPST career paths (FPE, safety, fire service).',
+  'Walk fire-technology history: brigades, engines, fire marks, municipal water, detection.',
+  'For each of the seven review fires: year/location, building, ignition, life loss, code change.',
+  'State the fire problem, America Burning, and fire-loss / data / trend language.',
+  'Define WUI, interface vs intermix, three ignition pathways, fire-adapted ecosystem.',
+  'Distinguish code, standard, regulation, prescriptive vs performance, AHJ, ICC/NFPA families.',
+  'Use prevention/enforcement vocabulary: fire marshal, permit, red tag, certificate of occupancy.',
 ];
 export const DISCLAIMER =
   'Personal exam prep only. Not an official OSU or NFPA assessment. Original practice items — not your exam. Do not use during the exam. Canvas slides and the assigned FPHB edition are the authority.';

@@ -14,8 +14,7 @@ export function UnitsList() {
       <header>
         <h1 className="page-title">Chapter path</h1>
         <p className="page-subtitle">
-          One unit per FPSET course-notes chapter. Exam 1 (Chs 1–4) is fully built. Later chapters are mapped and will
-          fill in after Friday.
+          One unit per Exam 1 topic from the F26 review. Later chapters are mapped and stay stubbed until after Monday.
         </p>
       </header>
 

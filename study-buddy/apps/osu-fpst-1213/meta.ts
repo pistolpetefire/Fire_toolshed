@@ -10,11 +10,11 @@ export const classAppMeta = {
   school: 'Oklahoma State University',
   subject: 'Fundamentals of Fire Protection and Safety (Fall 2026)',
   description:
-    'Exam 1 Weeks 1–4: profession, technology history, FPHB 3-1 / 1-7 / 1-3 / 3-3 / 1-5. Tutorials, acronyms, vocab, quizzes, 10-day catch-up plan for Monday Sep 14.',
+    'Exam 1 (Mon Sep 14, 8:30–9:20, NRC 108): OSU history, seven historical fires, WUI, codes, prevention. F26 on-campus review.',
   status: 'live' as const,
   path: '/classes/osu-fpst-1213',
   color: 'red',
-  version: '0.2.0',
+  version: '0.3.0',
   tags: ['fire protection', 'FPST', 'OSU', 'FPHB', 'codes', 'WUI', 'NFPA', 'Exam 1'],
 };
 

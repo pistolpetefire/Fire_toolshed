@@ -22,7 +22,7 @@ const QUIZ_TYPES: {
   {
     type: 'matching',
     title: 'Matching',
-    description: 'Pair C3/C4, life cycles, flower parts, food-security pillars, and design terms.',
+    description: 'Pair codes, organizations, WUI terms, prevention tools, and the seven historical fires.',
     icon: GitCompare,
     color: 'bg-orange-50 text-orange-800 dark:bg-orange-950/50 dark:text-orange-300',
   },
@@ -37,8 +37,8 @@ export function Quizzes() {
       <header>
         <h1 className="page-title">Quizzes</h1>
         <p className="page-subtitle">
-          Chapter drills, matching, and a mixed Exam 1 practice exam. Scores stay in this browser. Do not open this
-          during the Canvas test.
+          Chapter drills, matching, and a mixed Exam 1 practice exam aligned to the F26 on-campus review. Scores stay
+          in this browser. Do not open this during the exam.
         </p>
       </header>
 

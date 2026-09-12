@@ -86,11 +86,13 @@ export function Dashboard() {
 
       <section className="card border-amber-200 p-5 dark:border-amber-900">
         <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">This week</p>
-        <h2 className="mt-1 font-display text-lg font-semibold">Exam 1 is Monday, September 14 — 8:00–9:50 a.m., Noble 108, Weeks 1–4</h2>
+        <h2 className="mt-1 font-display text-lg font-semibold">
+          Exam 1 is Monday, September 14 — 8:30–9:20 a.m., NRC 108, 50 minutes
+        </h2>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-          Profession, technology history, FPHB 3-1 fire problem, 1-7 WUI, 1-3 codes, 3-3 data, 1-5 prevention.
-          Plan includes <strong>class, Canvas, and assigned FPHB chapters</strong> — not just this app.
-          You missed Weeks 1–2; catch-up is the first job. {planDone}/{planTotal} tasks checked
+          35–40 T/F, multiple choice, and short answer. Paper + green Scantron. Handwritten composition book, #2
+          pencil, eraser. No phones, watches, hats, or calculators. Drill the seven historical fires and OSU program
+          history from the F26 review. {planDone}/{planTotal} tasks checked
           {catchOpen > 0 ? ` · ${catchOpen} catch-up items still open` : ''}.
         </p>
         <div className="mt-3 max-w-md">
@@ -184,7 +186,7 @@ export function Dashboard() {
 
       <section>
         <div className="mb-3 flex items-end justify-between">
-          <h2 className="font-display text-lg font-semibold">Exam 1 chapters ({unitsDone}/4 mastered)</h2>
+          <h2 className="font-display text-lg font-semibold">Exam 1 chapters ({unitsDone}/{exam1Units.length} mastered)</h2>
           <Link to={p('/units')} className="text-sm font-semibold text-orange-700 hover:underline dark:text-orange-400">
             All chapters
           </Link>

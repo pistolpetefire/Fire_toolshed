@@ -49,7 +49,7 @@ export function ExamPrep() {
         <div className="card p-8 text-center">
           <h1 className="font-display text-xl font-bold">{examBlockLabel(id)}</h1>
           <p className="mt-2 text-sm text-slate-500">
-            This bank fills in after Friday. Exam 1 (Chs 1–4) is the live practice exam.
+            This bank fills in after Exam 1. The live practice exam is the F26 on-campus review set.
           </p>
           <Link to={p('/quizzes/exam/1')} className="btn-primary mt-4 inline-flex">
             Open Exam 1 practice
@@ -262,7 +262,7 @@ function QuizRunner({ type, examBlock }: { type: QuizType; examBlock?: ExamBlock
 
         {examBlock === 1 && (
           <p className="mt-2 text-sm text-slate-500">
-            Mixed Chs 1–4 · ~50 items ·{' '}
+            Mixed F26 review · ~50 items ·{' '}
             <Link to={p('/quizzes/exam/1/guide')} className="text-orange-700 hover:underline">
               study guide
             </Link>

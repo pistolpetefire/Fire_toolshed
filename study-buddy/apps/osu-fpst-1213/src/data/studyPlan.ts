@@ -6,7 +6,34 @@ export interface PlanTask {
 export interface PlanDay {
   id: string; isoDate: string; dateLabel: string; weekday: string; title: string; why: string; tasks: PlanTask[];
 }
-export const EXAM_WHEN = 'Monday, September 14, 2026 · 8:00–9:50 a.m. · Noble Research Center 108 · Weeks 1–4';
+export const EXAM_WHEN =
+  'Monday, September 14, 2026 · 8:30–9:20 a.m. · NRC 108 · 50 minutes · 35–40 T/F, MC, short answer';
+
+export const EXAM1_LOGISTICS = {
+  when: 'Monday, September 14, 2026',
+  time: '8:30–9:20 a.m.',
+  duration: '50 minutes',
+  room: 'NRC 108 (Noble Research Center)',
+  questions: '35–40',
+  formats: 'True/False, multiple choice, and short answer',
+  media: 'Paper exam + green Scantron (instructor provides — do not buy)',
+  bring: [
+    'FPST 1213 composition book with handwritten notes only',
+    '#2 pencil (mechanical equivalent HB-0.7)',
+    'Eraser',
+  ],
+  banned: [
+    'Laptops, tablets, phones, watches, hats, other electronics',
+    'Calculators (not needed)',
+    'Electronic eyewear — instructor may inspect glasses',
+  ],
+  scantron: 'Last name, First name · Test No. A or B · do not write on the exam',
+  rules: [
+    'Desk: pencil, eraser, composition notebook only. Bags under the desk.',
+    'Do not ask for clarification during the exam — write concerns on the back of the cover page.',
+    'Extra time will not be allowed.',
+  ],
+};
 export const CANVAS_URL = 'https://canvas.okstate.edu/';
 export const QUIZLET_JOIN = CANVAS_URL;
 export const QUIZLET_SEARCH = CANVAS_URL;
@@ -52,25 +79,29 @@ export const PLAN_DAYS: PlanDay[] = [
       { id: 'd10-sheet', where: 'app', minutes: 90, label: 'Build the 1-page sheet from the study guide + acronyms.', href: '/quizzes/exam/1/guide' },
       { id: 'd10-teach', where: 'app', minutes: 30, label: 'Teach the sheet out loud.', href: '/acronyms' },
     ]},
-  { id: 'd-sep11', isoDate: '2026-09-11', dateLabel: 'Sep 11', weekday: 'Fri', title: 'Exam review class', why: 'Instructor emphasis beats the handbook.',
+  { id: 'd-sep11', isoDate: '2026-09-11', dateLabel: 'Sep 11', weekday: 'Fri', title: 'Exam review class', why: 'The F26 on-campus review is the exam map.',
     tasks: [
-      { id: 'd11-class', where: 'class', minutes: 50, label: 'Attend exam review. Copy every hint.' },
+      { id: 'd11-class', where: 'class', minutes: 50, label: 'Attend exam review. Copy every hint from the F26 slides.' },
+      { id: 'd11-guide', where: 'app', minutes: 40, label: 'Study guide: logistics + OSU history + seven fires.', href: '/quizzes/exam/1/guide' },
       { id: 'd11-quiz', where: 'app', minutes: 60, label: 'Exam 1 practice deck once. Study misses only.', href: '/quizzes/exam/1' },
     ]},
-  { id: 'd-sep12', isoDate: '2026-09-12', dateLabel: 'Sep 12', weekday: 'Sat', title: 'Retrieval Saturday', why: 'No new FPHB pages.',
+  { id: 'd-sep12', isoDate: '2026-09-12', dateLabel: 'Sep 12', weekday: 'Sat', title: 'Seven fires + composition book', why: 'Short-answer will ask year, building, ignition, deaths, code change.',
     tasks: [
-      { id: 'd12-mem', where: 'app', minutes: 45, label: 'Write the one-page sheet from memory.', href: '/quizzes/exam/1/guide' },
-      { id: 'd12-miss', where: 'app', minutes: 45, label: 'Re-quiz only missed units.', href: '/quizzes' },
+      { id: 'd12-fires', where: 'app', minutes: 60, label: 'Write the five facts for Chicago, Peshtigo, Iroquois, Triangle, Cocoanut Grove, Beverly Hills, Station.', href: '/quizzes/exam/1/guide' },
+      { id: 'd12-book', where: 'notes', minutes: 45, label: 'Handwrite those seven fires + acronyms into the composition book (printed pages are not allowed in).' },
+      { id: 'd12-miss', where: 'app', minutes: 40, label: 'Re-quiz only missed units.', href: '/quizzes' },
     ]},
-  { id: 'd-sep13', isoDate: '2026-09-13', dateLabel: 'Sep 13', weekday: 'Sun', title: 'Acronyms and sleep', why: 'Stop by 8 p.m.',
-    tasks: [{ id: 'd13-acr', where: 'app', minutes: 30, label: 'Acronyms + numbers only.', href: '/acronyms' }]},
+  { id: 'd-sep13', isoDate: '2026-09-13', dateLabel: 'Sep 13', weekday: 'Sun', title: 'Acronyms, pack the bag, sleep', why: 'Stop by 8 p.m. Exam is 50 minutes starting 8:30.',
+    tasks: [
+      { id: 'd13-acr', where: 'app', minutes: 30, label: 'Acronyms: NFPA, AHJ, ICC, IBC, IFC, NFIRS, OSHA, UL, FM, SFPE, ASSP, IFSTA, EDITH, FPE.', href: '/acronyms' },
+      { id: 'd13-pack', where: 'notes', minutes: 10, label: 'Pack composition book, #2 / HB-0.7 pencil, eraser. Phone and watch stay in the bag.' },
+    ]},
 ];
 export const PLAN_NOTES = [
-  'Authority order: Canvas slides and the assigned FPHB edition win if a number here disagrees.',
-  'Exam 1 is Monday, September 14, 2026, 8:00–9:50 a.m., Noble 108, Weeks 1–4.',
-  'Labor Day Monday September 7 is campus closed — best full catch-up day.',
-  'Friday September 11 is exam review. Copy every hint.',
-  'Assigned FPHB only: 1-1, 1-3, 1-5, 1-7, 3-1, 3-3. Do not wander the rest of the handbook yet.',
+  'Authority order: Canvas slides and the assigned FPHB 21st edition win if a number here disagrees.',
+  'Exam 1 is Monday, September 14, 2026, 8:30–9:20 a.m., NRC 108, 50 minutes, 35–40 T/F + MC + short answer.',
+  'Handwritten composition book is allowed. Printed notes, phones, watches, hats, and calculators are not.',
+  'Assigned FPHB (21st ed.) only: 1-1, 1-3, 1-5, 1-7, 3-1, 3-3. Plus job-description pages and historical-fire videos.',
   'This app is original drill. Do not open it during the exam.',
 ];
 

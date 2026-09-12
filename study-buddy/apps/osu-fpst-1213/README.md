@@ -6,7 +6,7 @@ Mounted at `/classes/osu-fpst-1213` inside the Study Buddy hub.
 
 ## What is live
 
-- **Exam 1 (Mon Sep 14, Noble 108, Weeks 1–4):** tutorials, acronyms, flashcards, MCQ + matching, mixed practice exam, study guide, 10-day catch-up plan.
+- **Exam 1 (Mon Sep 14, 8:30–9:20 a.m., NRC 108, 50 min, 35–40 T/F + MC + short answer):** F26 on-campus review — OSU history, seven historical fires, WUI, codes, prevention. Tutorials, acronyms, flashcards, quizzes, study guide, plan.
 - Assigned FPHB: 1-1, 1-3, 1-5, 1-7, 3-1, 3-3.
 - **Semester map:** later units stubbed (Exam 2 Oct 26, Final Dec 7).
 
