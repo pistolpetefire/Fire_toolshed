@@ -25,6 +25,10 @@ const DIAGRAM_CHAPTER: Record<string, string> = {
   eye: 'Ch 16 §16.5a–c',
   ear: 'Ch 16 §16.4b–d',
   cardiovascular: 'Ch 19–20',
+  'animal-cell': 'Ch 3 §3.1–3.4',
+  'plasma-membrane': 'Ch 3 §3.2–3.3',
+  mitosis: 'Ch 4 §4.3C–D',
+  epithelium: 'histology lecture / epithelial lab worksheet',
 };
 
 const SYSTEM_CHAPTER: Record<string, string> = {

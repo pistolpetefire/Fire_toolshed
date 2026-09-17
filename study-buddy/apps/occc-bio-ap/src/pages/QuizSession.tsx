@@ -287,9 +287,11 @@ function QuizRunner({
           {examBlock ? (
             <span className="text-sm text-slate-500">
               {getExamBlock(examBlock)?.note} · mixed MC
-              {getExamBlock(examBlock)?.unitIds.some((id) => (getUnitById(id)?.diagramIds.length ?? 0) > 0)
-                ? ' + diagram locate'
-                : ''}
+              {examBlock === 2
+                ? ' · MCQ + matching + diagram labeling'
+                : getExamBlock(examBlock)?.unitIds.some((id) => (getUnitById(id)?.diagramIds.length ?? 0) > 0)
+                  ? ' + diagram locate'
+                  : ''}
               {examBlock === 1 ? (
                 <>
                   {' · '}

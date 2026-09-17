@@ -3,6 +3,7 @@ import type { SystemId } from '../../types';
 import { DIAGRAM_CREDITS } from './diagramAssets';
 import skeletonHotspots from './skeletonHotspots.json';
 import { UNIT_DIAGRAMS } from './unitDiagrams';
+import { EXAM2_DIAGRAMS } from './exam2Diagrams';
 
 /** Skeleton — outlines extracted from LadyofHats SVG groups (not bounding boxes). */
 export const skeletalConfig: DiagramConfig = {
@@ -553,7 +554,7 @@ export const DIAGRAM_BY_SYSTEM: Partial<Record<SystemId, DiagramConfig>> = {
 };
 
 export function getDiagramConfig(systemId: string): DiagramConfig | undefined {
-  return DIAGRAM_BY_SYSTEM[systemId as SystemId] ?? UNIT_DIAGRAMS[systemId];
+  return DIAGRAM_BY_SYSTEM[systemId as SystemId] ?? UNIT_DIAGRAMS[systemId] ?? EXAM2_DIAGRAMS[systemId];
 }
 
 export function getDiagramsByIds(ids: string[]): DiagramConfig[] {

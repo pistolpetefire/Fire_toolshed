@@ -208,7 +208,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 3', 'Ch 24 §24.1–24.2'],
     examBlock: 2,
     systemIds: [],
-    diagramIds: [],
+    diagramIds: ['animal-cell', 'plasma-membrane', 'epithelium'],
     flashcardTopics: ['cells'],
     objectives: [
       {
@@ -269,7 +269,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 4'],
     examBlock: 2,
     systemIds: [],
-    diagramIds: [],
+    diagramIds: ['mitosis'],
     flashcardTopics: ['cells'],
     objectives: [
       {

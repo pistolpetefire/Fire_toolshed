@@ -63,9 +63,9 @@ export function Exam2Guide() {
         <p className="text-sm font-medium text-brand-600 dark:text-brand-400">Exam 2 · Units 3 &amp; 4</p>
         <h1 className="page-title">Official Unit Two study guide</h1>
         <p className="page-subtitle">
-          Unit Two study guide (Ch 3–4, 25 items), Unit 2 learning objectives (including Ch 24 fluids, meiosis, and
-          named conditions), plus the histology lecture and epithelial lab worksheet. Tap for a model answer; check
-          off when you can say it cold. Class slides win if a wording disagrees.
+          Unit Two study guide (Ch 3–4, 25 items), Unit 2 LOs, histology lecture, and epithelial lab. The live Exam 1
+          format was MCQ, matching, and diagram labeling — Exam 2 practice now uses that same mix. Tap for a model
+          answer; check off when you can say it cold. Class slides win if a wording disagrees.
         </p>
       </div>
 

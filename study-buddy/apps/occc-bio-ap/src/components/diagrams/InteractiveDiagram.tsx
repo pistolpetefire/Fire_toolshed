@@ -246,6 +246,18 @@ export function InteractiveDiagram({
             <path d={config.backdrop} className="fill-slate-100 dark:fill-slate-800/60" />
           )}
 
+          {quizMode && !bgSrc &&
+            config.regions.map((region) => (
+              <path
+                key={`quiz-shape-${region.id}`}
+                d={region.d}
+                className="fill-slate-200 stroke-slate-500 dark:fill-slate-700 dark:stroke-slate-400"
+                fillRule="evenodd"
+                strokeWidth={1.1}
+                pointerEvents="none"
+              />
+            ))}
+
           {quizMode
             ? locateTargets
                 .filter((t) => t.id === selectedId || highlightIds.includes(t.id))

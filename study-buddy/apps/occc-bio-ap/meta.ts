@@ -16,7 +16,7 @@ export const classAppMeta = {
   /** Hub route mount point */
   path: '/classes/occc-bio-ap',
   color: 'sky',
-  version: '2.3.0',
+  version: '2.3.1',
   tags: ['anatomy', 'physiology', 'OCCC', 'nursing', 'lab'],
 };
 

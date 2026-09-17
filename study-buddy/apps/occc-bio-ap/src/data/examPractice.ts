@@ -3,7 +3,11 @@ import { EXAM_BLOCKS, getUnitById, getUnitsForExam } from './courseUnits';
 import { quizQuestions, shuffle } from './quizQuestions';
 import { getQuestionsForUnit, type UnitQuestion } from './unitQuestions';
 import { exam1MatchingQuestions, exam1StudyGuideQuestions } from './exam1StudyGuide';
-import { exam2MatchingQuestions, exam2StudyGuideQuestions } from './exam2StudyGuide';
+import {
+  exam2LabelingQuestions,
+  exam2MatchingQuestions,
+  exam2StudyGuideQuestions,
+} from './exam2StudyGuide';
 
 export function getExamBlock(id: number) {
   return EXAM_BLOCKS.find((b) => b.id === id);
@@ -12,11 +16,15 @@ export function getExamBlock(id: number) {
 export function getDiagramQuestionsForUnit(unitId: string): LabelingQuestion[] {
   const unit = getUnitById(unitId);
   if (!unit) return [];
-  return quizQuestions.filter((q): q is LabelingQuestion => {
+  const fromBank = quizQuestions.filter((q): q is LabelingQuestion => {
     if (q.type !== 'diagram-labeling') return false;
     if (q.diagramId) return unit.diagramIds.includes(q.diagramId);
     return unit.systemIds.includes(q.systemId);
   });
+  const exam2 = exam2LabelingQuestions.filter(
+    (q) => q.diagramId && unit.diagramIds.includes(q.diagramId)
+  );
+  return [...fromBank, ...exam2];
 }
 
 function unitToMc(q: UnitQuestion): MCQuestion {
@@ -57,13 +65,16 @@ export function getExamPracticeDeck(blockId: 1 | 2 | 3 | 4 | 5): QuizQuestion[] 
     return shuffle(pool.slice(0, Math.min(60, Math.max(50, pool.length))));
   }
   if (blockId === 2) {
+    // Mirror the live Exam 1 format: MCQ + matching + diagram labeling (not MC-only).
     const guideIds = new Set(exam2StudyGuideQuestions.map((q) => q.id));
-    const guide = shuffle(exam2StudyGuideQuestions).map(unitToMc);
-    const concept = shuffle(rawMc.filter((q) => q.kind !== 'vocab' && !guideIds.has(q.id))).map(unitToMc);
-    const matching = shuffle(exam2MatchingQuestions);
-    const rest = shuffle([...concept, ...hubMc, ...diagrams, ...matching]);
-    const pool = [...guide, ...vocab, ...rest];
-    return shuffle(pool.slice(0, Math.min(60, Math.max(50, pool.length))));
+    const mc = shuffle([
+      ...exam2StudyGuideQuestions.map(unitToMc),
+      ...rawMc.filter((q) => q.kind !== 'vocab' && !guideIds.has(q.id)).map(unitToMc),
+      ...vocab,
+    ]).slice(0, 22);
+    const matching = shuffle(exam2MatchingQuestions).slice(0, 5);
+    const labels = shuffle(diagrams.length ? diagrams : exam2LabelingQuestions).slice(0, 16);
+    return shuffle([...mc, ...matching, ...labels]);
   }
   const concept = shuffle(rawMc.filter((q) => q.kind !== 'vocab')).map(unitToMc);
   const rest = shuffle([...concept, ...hubMc, ...diagrams]);
