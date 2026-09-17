@@ -2,7 +2,7 @@
 export function diagramUrl(filename: string): string {
   const base = import.meta.env.BASE_URL || '/';
   const normalized = base.endsWith('/') ? base : `${base}/`;
-  return `${normalized}diagrams/${filename}`;
+  return `${normalized}diagrams/${filename}?v=e2plates`;
 }
 
 export const DIAGRAM_CREDITS = {

@@ -35,7 +35,7 @@ export function ImageChoicePlate({
             onClick={() => onPick(opt.id, opt.label)}
             className={`overflow-hidden rounded-xl border bg-white text-left dark:bg-slate-900 ${ring}`}
           >
-            <img src={choiceSrc(opt.file)} alt="" className="aspect-[3/4] w-full object-contain bg-slate-50" />
+            <img src={choiceSrc(opt.file)} alt="" className="aspect-[4/3] w-full object-contain bg-slate-50" />
             {revealed && (
               <p className="px-2 py-1 text-xs font-medium text-slate-600 dark:text-slate-300">{opt.label}</p>
             )}

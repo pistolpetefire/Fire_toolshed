@@ -556,13 +556,13 @@ function LabelView({
         </div>
       )}
 
-      {!hasDiagram && (
+      {!hasDiagram && !imageChoices && (
         <div className="rounded-xl bg-slate-100 p-4 text-center text-sm text-slate-600 dark:bg-slate-800 dark:text-slate-300">
           No plate for this system yet — answer using the options below.
         </div>
       )}
 
-      {!hasDiagram && (
+      {!hasDiagram && !imageChoices && (
         <div className="grid gap-2 sm:grid-cols-2">
           {options.map((name) => {
             let cls = 'border-slate-200 hover:border-brand-300 dark:border-slate-700';

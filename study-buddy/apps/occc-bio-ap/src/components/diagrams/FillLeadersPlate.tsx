@@ -11,7 +11,7 @@ export function FillLeadersPlate() {
   const [imgOk, setImgOk] = useState(true);
   const names = useMemo(() => shuffle(NAMES), []);
   const plate = ANIMAL_CELL_LEADERS_PLATE;
-  const src = `${diagramUrl(plate.file)}?v=cell1`;
+  const src = diagramUrl(plate.file);
 
   const setPick = (id: string, value: string) => {
     setScore(null);
@@ -35,7 +35,7 @@ export function FillLeadersPlate() {
       <div className="relative mx-auto w-full max-w-md">
         <img
           src={src}
-          alt="Cropped instructor animal cell, names removed"
+          alt="Unlabeled instructor animal cell (Fig. 3.25)"
           className="block h-auto w-full rounded-xl border border-slate-300 bg-white"
           draggable={false}
           onError={() => setImgOk(false)}

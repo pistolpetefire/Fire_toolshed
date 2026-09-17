@@ -8,6 +8,7 @@ import {
   UNIT2_LEARNING_OBJECTIVES,
   UNIT_TWO_STUDY_GUIDE,
 } from '../data/exam2StudyGuide';
+import { FAMILY_LABEL, LAB_TISSUES } from '../data/histologyLab';
 
 const CHECK_KEY = 'study-buddy:occc-bio-ap:exam2-guide-checks';
 
@@ -81,6 +82,9 @@ export function Exam2Guide() {
           <Link to={p('/quizzes/exam/2/cell-leaders')} className="btn-secondary text-xs">
             Test: fill cell leaders
           </Link>
+          <Link to={p('/quizzes/exam/2/lab')} className="btn-secondary text-xs">
+            Unit 3/4 lab exam
+          </Link>
           <button type="button" className="btn-ghost text-xs" onClick={resetChecks}>
             <RotateCcw className="h-3.5 w-3.5" /> Clear checks
           </button>
@@ -129,6 +133,41 @@ export function Exam2Guide() {
           Histology + epithelial lab
         </button>
       </div>
+
+      {tab === 'histology' && (
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+          <p className="px-4 pt-3 text-sm font-semibold">Lab sheet — characteristic and function</p>
+          <p className="px-4 text-xs text-slate-500">
+            Lab exam format: name the unlabeled slide, then give a characteristic and a function. Instructor photos
+            only; no labeled tables as quiz plates.
+          </p>
+          <table className="mt-2 w-full min-w-[640px] text-left text-sm">
+            <thead>
+              <tr className="border-y border-slate-100 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800">
+                <th className="px-4 py-2 font-semibold">Tissue</th>
+                <th className="px-3 py-2 font-semibold">Characteristic</th>
+                <th className="px-3 py-2 font-semibold">Function</th>
+                <th className="px-4 py-2 font-semibold">Where</th>
+              </tr>
+            </thead>
+            <tbody>
+              {LAB_TISSUES.map((t) => (
+                <tr key={t.id} className="border-b border-slate-100 align-top dark:border-slate-800/80">
+                  <td className="px-4 py-2">
+                    <span className="font-medium">{t.name}</span>
+                    <span className="mt-0.5 block text-[11px] uppercase tracking-wide text-slate-400">
+                      {FAMILY_LABEL[t.family]}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2 text-slate-600 dark:text-slate-300">{t.characteristic}</td>
+                  <td className="px-3 py-2 text-slate-600 dark:text-slate-300">{t.function}</td>
+                  <td className="px-4 py-2 text-xs text-slate-500">{t.locations}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <ol className="space-y-2">
         {items.map((item) => (

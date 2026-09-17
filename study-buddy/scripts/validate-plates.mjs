@@ -25,11 +25,17 @@ if (!fs.existsSync(spec)) {
 
 const text = fs.readFileSync(spec, 'utf8');
 const choiceSpec = text;
-const leaderSpec = path.join(root, 'apps', 'occc-bio-ap', 'src', 'data', 'animalCellLeaders.ts');
+const extraSpecs = [
+  path.join(root, 'apps', 'occc-bio-ap', 'src', 'data', 'animalCellLeaders.ts'),
+  path.join(root, 'apps', 'occc-bio-ap', 'src', 'data', 'histologyLab.ts'),
+  path.join(root, 'apps', 'occc-bio-ap', 'src', 'data', 'labExam.ts'),
+];
 const files = [...choiceSpec.matchAll(/file:\s*'([^']+)'/g)].map((m) => m[1]);
-if (fs.existsSync(leaderSpec)) {
-  const lt = fs.readFileSync(leaderSpec, 'utf8');
-  files.push(...[...lt.matchAll(/file:\s*'([^']+)'/g)].map((m) => m[1]));
+for (const extra of extraSpecs) {
+  if (fs.existsSync(extra)) {
+    const lt = fs.readFileSync(extra, 'utf8');
+    files.push(...[...lt.matchAll(/file:\s*'([^']+)'/g)].map((m) => m[1]));
+  }
 }
 const unique = [...new Set(files)];
 let failed = 0;

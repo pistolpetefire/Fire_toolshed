@@ -13,6 +13,8 @@ import { QuizSession, ExamPrep } from './pages/QuizSession';
 import { Exam1Guide } from './pages/Exam1Guide';
 import { Exam2Guide } from './pages/Exam2Guide';
 import { FillLeadersQuiz } from './pages/FillLeadersQuiz';
+import { HistologyLabQuiz, LabExamRun } from './pages/HistologyLabQuiz';
+import { Unit34Lab } from './pages/Unit34Lab';
 import { Atlas } from './pages/Atlas';
 import { AtlasDetail } from './pages/AtlasDetail';
 import { Settings } from './pages/Settings';
@@ -39,6 +41,9 @@ export default function OcccBioApApp() {
           <Route path="quizzes/exam/1/guide" element={<Exam1Guide />} />
           <Route path="quizzes/exam/2/guide" element={<Exam2Guide />} />
           <Route path="quizzes/exam/2/cell-leaders" element={<FillLeadersQuiz />} />
+          <Route path="quizzes/exam/2/lab" element={<Unit34Lab />} />
+          <Route path="quizzes/exam/2/lab/:bankId" element={<LabExamRun />} />
+          <Route path="quizzes/exam/2/histology-lab" element={<HistologyLabQuiz />} />
           <Route path="quizzes/exam/:blockId" element={<ExamPrep />} />
           <Route path="quizzes/:quizType" element={<QuizSession />} />
           <Route path="atlas" element={<Atlas />} />

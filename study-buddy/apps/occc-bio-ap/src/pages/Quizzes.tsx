@@ -95,6 +95,14 @@ export function Quizzes() {
                     Test: fill animal-cell leaders <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 )}
+                {block.id === 2 && (
+                  <Link
+                    to={p('/quizzes/exam/2/lab')}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-brand-600 dark:text-slate-300"
+                  >
+                    Unit 3/4 lab exam (tissues, cell, tonicity) <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
               </div>
             );
           })}
