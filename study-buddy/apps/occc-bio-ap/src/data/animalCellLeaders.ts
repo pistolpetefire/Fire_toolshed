@@ -12,7 +12,7 @@ export interface LeaderBlank {
 export const ANIMAL_CELL_LEADERS_PLATE = {
   id: 'animal-cell-leaders',
   title: 'Animal cell — fill the leaders (test)',
-  file: 'unit/exam2-animal-cell-quiz.jpg',
+  file: 'unit/exam2-cell-drawing.jpg',
   width: 760,
   height: 1080,
   prompt:

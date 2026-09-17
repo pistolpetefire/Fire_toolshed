@@ -8,8 +8,10 @@ const NAMES = [...new Set(ANIMAL_CELL_LEADERS.map((l) => l.answer))];
 export function FillLeadersPlate() {
   const [picks, setPicks] = useState<Record<string, string>>({});
   const [score, setScore] = useState<{ ok: number; total: number } | null>(null);
+  const [imgOk, setImgOk] = useState(true);
   const names = useMemo(() => shuffle(NAMES), []);
   const plate = ANIMAL_CELL_LEADERS_PLATE;
+  const src = `${diagramUrl(plate.file)}?v=cell1`;
 
   const setPick = (id: string, value: string) => {
     setScore(null);
@@ -29,27 +31,38 @@ export function FillLeadersPlate() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-slate-600 dark:text-slate-300">{plate.prompt}</p>
-      <div
-        className="relative mx-auto w-full max-w-lg overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700"
-        style={{ aspectRatio: `${plate.width} / ${plate.height}` }}
-      >
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Plate — cell drawing</p>
+      <div className="relative mx-auto w-full max-w-md">
         <img
-          src={diagramUrl(plate.file)}
-          alt="Animal cell with lettered leaders"
-          className="absolute inset-0 h-full w-full object-contain"
+          src={src}
+          alt="Cropped instructor animal cell, names removed"
+          className="block h-auto w-full rounded-xl border border-slate-300 bg-white"
           draggable={false}
+          onError={() => setImgOk(false)}
+          onLoad={() => setImgOk(true)}
         />
-        {ANIMAL_CELL_LEADERS.map((l) => (
-          <span
-            key={l.id}
-            className="absolute z-10 flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white shadow"
-            style={{ left: `${l.nx * 100}%`, top: `${l.ny * 100}%` }}
-          >
-            {l.letter}
-          </span>
-        ))}
+        {imgOk &&
+          ANIMAL_CELL_LEADERS.map((l) => (
+            <span
+              key={l.id}
+              className="absolute z-10 flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white shadow"
+              style={{ left: `${l.nx * 100}%`, top: `${l.ny * 100}%` }}
+            >
+              {l.letter}
+            </span>
+          ))}
+        {!imgOk && (
+          <p className="mt-2 rounded bg-rose-600 px-2 py-1 text-sm text-white">
+            Cell photo failed to load. Open{' '}
+            <a className="underline" href={src} target="_blank" rel="noreferrer">
+              this file
+            </a>{' '}
+            directly.
+          </p>
+        )}
       </div>
 
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Answers — not the plate</p>
       <div className="grid gap-2 sm:grid-cols-2">
         {ANIMAL_CELL_LEADERS.map((l) => {
           const val = picks[l.id] ?? '';
