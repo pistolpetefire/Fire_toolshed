@@ -236,7 +236,7 @@ export function InteractiveDiagram({
             </linearGradient>
           </defs>
 
-          {!bgSrc &&}
+          {!bgSrc &&
             config.decor?.map((layer, i) => (
               <path
                 key={`decor-${i}`}
