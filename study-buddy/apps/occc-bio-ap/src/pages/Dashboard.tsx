@@ -105,7 +105,7 @@ export function Dashboard() {
         <h2 className="mt-1 font-display text-lg font-semibold">Official Unit Two study guide (Ch 3 &amp; 4)</h2>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
           25-item Unit Two guide, LOs, cell lecture, and histology. Practice exam matches the live Exam 1 format:
-          MCQ, matching, and diagram labeling (cell, membrane, mitosis, epithelium).
+          MCQ, matching, and diagram labeling on the instructor lecture figures (cell, membrane, osmosis, histology).
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Link to={p('/quizzes/exam/2/guide')} className="btn-primary text-sm">

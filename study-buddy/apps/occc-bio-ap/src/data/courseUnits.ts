@@ -208,7 +208,16 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 3', 'Ch 24 §24.1–24.2'],
     examBlock: 2,
     systemIds: [],
-    diagramIds: ['animal-cell', 'plasma-membrane', 'epithelium'],
+    diagramIds: [
+      'animal-cell',
+      'plasma-membrane',
+      'epithelium',
+      'areolar-ct',
+      'hyaline-cartilage',
+      'skeletal-muscle',
+      'cardiac-muscle',
+      'smooth-muscle',
+    ],
     flashcardTopics: ['cells'],
     objectives: [
       {
@@ -269,7 +278,7 @@ export const courseUnits: CourseUnit[] = [
     chapters: ['Ch 4'],
     examBlock: 2,
     systemIds: [],
-    diagramIds: ['mitosis'],
+    diagramIds: ['osmosis', 'na-k-pump'],
     flashcardTopics: ['cells'],
     objectives: [
       {

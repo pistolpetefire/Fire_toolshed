@@ -28,6 +28,7 @@ Procured for Study Buddy Anatomy Hub from free / open-license sources listed by 
 | `unit/spinal-cord.jpg` | OpenStax A&P 2e Fig. 13.17 Spinal Cord Cross-Section | **CC BY 4.0** — [13.2 CNS](https://openstax.org/books/anatomy-and-physiology-2e/pages/13-2-the-central-nervous-system) |
 | `unit/brain.jpg` | OpenStax A&P 2e Fig. 13.13 Lobes of the Cerebral Cortex | **CC BY 4.0** — same chapter |
 | `unit/diencephalon.jpg` | OpenStax A&P 2e Fig. 13.16 Diencephalon | **CC BY 4.0** — same chapter |
+| `unit/exam2-*.jpg` / `exam2-plasma-membrane.png` | Senter BIO 1314 Unit 3 + histology lecture Keynotes (Marieb/Pearson figures) | **Class study plates** for the OCCC Exam 2 hub — not original art |
 | `unit/cranial-nerves.jpg` | OpenStax A&P 2e Fig. 13.20 The Cranial Nerves | **CC BY 4.0** — [13.4 PNS](https://openstax.org/books/anatomy-and-physiology-2e/pages/13-4-the-peripheral-nervous-system) |
 | `unit/ans.jpg` | OpenStax A&P 2e Fig. 15.3 Sympathetic Connections | **CC BY 4.0** — [15.1 ANS](https://openstax.org/books/anatomy-and-physiology-2e/pages/15-1-divisions-of-the-autonomic-nervous-system) |
 | `unit/eye.jpg` | OpenStax A&P 2e Fig. 14.13 Structure of the Eye | **CC BY 4.0** — [14.1 Sensory Perception](https://openstax.org/books/anatomy-and-physiology-2e/pages/14-1-sensory-perception) |

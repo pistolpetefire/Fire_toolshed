@@ -64,7 +64,8 @@ export function Exam2Guide() {
         <h1 className="page-title">Official Unit Two study guide</h1>
         <p className="page-subtitle">
           Unit Two study guide (Ch 3–4, 25 items), Unit 2 LOs, histology lecture, and epithelial lab. The live Exam 1
-          format was MCQ, matching, and diagram labeling — Exam 2 practice now uses that same mix. Tap for a model
+          format was MCQ, matching, and diagram labeling — practice uses that mix on the instructor’s lecture
+          figures (cell, membrane, osmosis, histology slides), not cartoon schematics. Tap for a model
           answer; check off when you can say it cold. Class slides win if a wording disagrees.
         </p>
       </div>
