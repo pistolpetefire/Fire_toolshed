@@ -1,6 +1,19 @@
 import type { DiagramConfig, DiagramRegion } from './types';
 
-/** Instructor lecture figures from Senter Unit 3 + histology Keynotes (Exam 2 labeling). */
+/**
+ * Instructor lecture figures from Senter Unit 3 + histology Keynotes.
+ * Labeled textbook charts (cell + membrane + pump) are for the lesson page only.
+ * Quiz tap-plates are the unlabeled micrographs and the RBC tonicity figure.
+ */
+export const EXAM2_QUIZ_PLATE_IDS = [
+  'osmosis',
+  'epithelium',
+  'skeletal-muscle',
+  'cardiac-muscle',
+  'smooth-muscle',
+  'hyaline-cartilage',
+  'areolar-ct',
+] as const;
 
 function tap(id: string, label: string, x: number, y: number, r: number, detail: string, category: string): DiagramRegion {
   const d = `M ${x - r} ${y} A ${r} ${r} 0 1 1 ${x + r} ${y} A ${r} ${r} 0 1 1 ${x - r} ${y} Z`;

@@ -8,6 +8,7 @@ import {
   exam2MatchingQuestions,
   exam2StudyGuideQuestions,
 } from './exam2StudyGuide';
+import { EXAM2_QUIZ_PLATE_IDS } from '../components/diagrams/exam2Diagrams';
 
 export function getExamBlock(id: number) {
   return EXAM_BLOCKS.find((b) => b.id === id);
@@ -21,8 +22,9 @@ export function getDiagramQuestionsForUnit(unitId: string): LabelingQuestion[] {
     if (q.diagramId) return unit.diagramIds.includes(q.diagramId);
     return unit.systemIds.includes(q.systemId);
   });
+  const quizPlates = new Set<string>(EXAM2_QUIZ_PLATE_IDS);
   const exam2 = exam2LabelingQuestions.filter(
-    (q) => q.diagramId && unit.diagramIds.includes(q.diagramId)
+    (q) => q.diagramId && unit.diagramIds.includes(q.diagramId) && quizPlates.has(q.diagramId)
   );
   return [...fromBank, ...exam2];
 }
@@ -73,7 +75,10 @@ export function getExamPracticeDeck(blockId: 1 | 2 | 3 | 4 | 5): QuizQuestion[] 
       ...vocab,
     ]).slice(0, 22);
     const matching = shuffle(exam2MatchingQuestions).slice(0, 5);
-    const labels = shuffle(diagrams.length ? diagrams : exam2LabelingQuestions).slice(0, 16);
+    const quizPlates = new Set<string>(EXAM2_QUIZ_PLATE_IDS);
+    const labels = shuffle(
+      exam2LabelingQuestions.filter((q) => q.diagramId && quizPlates.has(q.diagramId))
+    ).slice(0, 16);
     return shuffle([...mc, ...matching, ...labels]);
   }
   const concept = shuffle(rawMc.filter((q) => q.kind !== 'vocab')).map(unitToMc);

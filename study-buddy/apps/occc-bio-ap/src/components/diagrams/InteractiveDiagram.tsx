@@ -192,19 +192,7 @@ export function InteractiveDiagram({
             </button>
           )}
         </div>
-        <div
-          className={`relative mx-auto w-full ${config.maxWidthClass ?? 'max-w-sm'}`}
-          style={
-            bgSrc
-              ? {
-                  backgroundImage: `url("${bgSrc}")`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'center',
-                  backgroundSize: 'contain',
-                }
-              : undefined
-          }
-        >
+        <div className={`relative mx-auto w-full ${config.maxWidthClass ?? 'max-w-sm'}`}>
           {bgSrc && (
             <img
               key={bgSrc}
