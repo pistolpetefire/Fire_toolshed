@@ -114,6 +114,9 @@ export function Dashboard() {
           <Link to={p('/quizzes/exam/2')} className="btn-secondary text-sm">
             Exam 2 practice
           </Link>
+          <Link to={p('/quizzes/exam/2/cell-leaders')} className="btn-ghost text-sm">
+            Test: fill cell leaders
+          </Link>
         </div>
       </section>
 

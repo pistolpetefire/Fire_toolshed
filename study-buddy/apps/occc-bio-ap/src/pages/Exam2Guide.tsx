@@ -78,6 +78,9 @@ export function Exam2Guide() {
           <Link to={p('/quizzes/exam/2')} className="btn-primary text-xs">
             <ListChecks className="h-3.5 w-3.5" /> Exam 2 practice quiz
           </Link>
+          <Link to={p('/quizzes/exam/2/cell-leaders')} className="btn-secondary text-xs">
+            Test: fill cell leaders
+          </Link>
           <button type="button" className="btn-ghost text-xs" onClick={resetChecks}>
             <RotateCcw className="h-3.5 w-3.5" /> Clear checks
           </button>
