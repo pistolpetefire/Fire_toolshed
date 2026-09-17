@@ -47,8 +47,8 @@ export const EXAM2_DIAGRAMS: Record<string, DiagramConfig> = {
     imageWidth: 1920,
     imageHeight: 1080,
     maxWidthClass: 'max-w-4xl',
-    backgroundImage: 'unit/exam2-plasma-membrane.png',
-    quizBackgroundImage: 'unit/exam2-plasma-membrane.png',
+    backgroundImage: 'unit/exam2-plasma-membrane.jpg',
+    quizBackgroundImage: 'unit/exam2-plasma-membrane.jpg',
     renderStyle: 'hotspot',
     credit: credit('Fluid mosaic plasma membrane'),
     regions: [

@@ -196,9 +196,18 @@ export function InteractiveDiagram({
             </button>
           )}
         </div>
+        <div className={`relative mx-auto w-full ${config.maxWidthClass ?? 'max-w-sm'}`}>
+          {bgSrc && !shouldZoom && (
+            <img
+              src={bgSrc}
+              alt={config.ariaLabel}
+              className="pointer-events-none block h-auto w-full select-none"
+              draggable={false}
+            />
+          )}
         <svg
           viewBox={liveViewBox}
-          className={`mx-auto w-full select-none touch-manipulation ${config.maxWidthClass ?? 'max-w-sm'} ${quizMode ? 'cursor-crosshair' : ''}`}
+          className={`${bgSrc && !shouldZoom ? 'absolute inset-0 h-full w-full' : 'w-full'} select-none touch-manipulation ${quizMode ? 'cursor-crosshair' : ''}`}
           role="img"
           aria-label={config.ariaLabel}
           style={{ WebkitTapHighlightColor: 'transparent' }}
@@ -212,17 +221,15 @@ export function InteractiveDiagram({
             </linearGradient>
           </defs>
 
-          {bgSrc && (() => {
-            // Draw image at its full pixel size; viewBox may crop (e.g. anterior-only muscles).
-            // Hotspot coordinates must use the same space as imageWidth × imageHeight.
+          {bgSrc && shouldZoom && (() => {
             const parts = config.viewBox.trim().split(/[\s,]+/).map(Number);
             const vbW = parts[2] || 1;
-            const vbH = parts[3] || 1;
             const imgW = config.imageWidth ?? vbW;
-            const imgH = config.imageHeight ?? vbH;
+            const imgH = config.imageHeight ?? (parts[3] || 1);
             return (
               <image
                 href={bgSrc}
+                xlinkHref={bgSrc}
                 x={0}
                 y={0}
                 width={imgW}
@@ -348,6 +355,7 @@ export function InteractiveDiagram({
             );
           })}
         </svg>
+        </div>
 
         {!quizMode && (
           <div
