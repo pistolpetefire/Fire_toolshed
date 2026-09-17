@@ -23,6 +23,8 @@ import { useProgressContext } from '../context/ProgressContext';
 import { addQuizAttempt } from '../lib/progress';
 import { citeForDiagram, citeForSystem, citeForUnitObjective } from '../data/syllabusCite';
 import { SystemDiagram, hasInteractiveDiagram } from '../components/diagrams/SystemDiagram';
+import { ImageChoicePlate } from '../components/diagrams/ImageChoicePlate';
+import { getImageChoiceSet } from '../components/diagrams/imageChoicePlates';
 import type {
   QuizType,
   MCQuestion,
@@ -500,7 +502,8 @@ function LabelView({
   onClickRegion: (regionId: string, label: string) => void;
 }) {
   const plateId = q.diagramId ?? q.systemId;
-  const hasDiagram = hasInteractiveDiagram(q.systemId, q.diagramId);
+  const imageChoices = getImageChoiceSet(q.diagramId);
+  const hasDiagram = !imageChoices && hasInteractiveDiagram(q.systemId, q.diagramId);
   const structure = getStructureById(q.structureId);
   const displayName = structure?.name ?? q.structureName;
 
@@ -518,9 +521,22 @@ function LabelView({
     <div className="mt-5 space-y-4">
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <span className="badge bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">
-          <MousePointerClick className="h-3 w-3" /> Tap where it is — unlabeled plate
+          <MousePointerClick className="h-3 w-3" />
+          {imageChoices ? 'Tap the matching photo' : 'Tap where it is — unlabeled plate'}
         </span>
       </div>
+
+      {imageChoices && (
+        <ImageChoicePlate
+          options={imageChoices}
+          correctId={q.structureId}
+          selectedId={selected}
+          revealed={revealed}
+          onPick={(id, label) => {
+            if (!revealed) onClickRegion(id, label);
+          }}
+        />
+      )}
 
       {hasDiagram && (
         <div className={revealed ? 'pointer-events-none' : ''}>
@@ -569,9 +585,18 @@ function LabelView({
         </div>
       )}
 
-      {hasDiagram && !revealed && (
+      {(hasDiagram || imageChoices) && !revealed && (
         <p className="text-center text-sm text-slate-600 dark:text-slate-300">
-          Where is <span className="font-semibold text-slate-900 dark:text-white">{displayName}</span>? Tap that spot.
+          {imageChoices ? (
+            <>
+              Tap the photo of <span className="font-semibold text-slate-900 dark:text-white">{displayName}</span>.
+            </>
+          ) : (
+            <>
+              Where is <span className="font-semibold text-slate-900 dark:text-white">{displayName}</span>? Tap that
+              spot.
+            </>
+          )}
         </p>
       )}
     </div>

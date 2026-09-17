@@ -6,9 +6,10 @@
   "description": "Study Buddy — multi-class study hub. Each course is an isolated app under apps/.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && node scripts/validate-plates.mjs && vite build",
     "preview": "vite preview",
-    "test:cycles": "node scripts/test-cycles-5.mjs"
+    "test:cycles": "node scripts/test-cycles-5.mjs",
+    "validate:plates": "node scripts/validate-plates.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
