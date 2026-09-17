@@ -176,7 +176,9 @@ export function InteractiveDiagram({
     <div className={`flex flex-col gap-4 ${compact ? '' : 'lg:flex-row'} ${className}`}>
       <div className="card flex-1 overflow-hidden p-1.5 sm:p-4">
         <div className="mb-1.5 flex items-center justify-between gap-2 px-1 sm:mb-2 sm:px-2">
-          <p className="min-w-0 flex-1 text-left text-[11px] leading-snug text-slate-500 dark:text-slate-400 sm:text-xs">{hint}</p>
+          <p className="min-w-0 flex-1 text-left text-[11px] leading-snug text-slate-500 dark:text-slate-400 sm:text-xs">
+            <span className="font-semibold text-slate-700 dark:text-slate-200">{config.title}.</span> {hint}
+          </p>
           {shouldZoom && (
             <button
               type="button"
@@ -199,8 +201,9 @@ export function InteractiveDiagram({
         <div className={`relative mx-auto w-full ${config.maxWidthClass ?? 'max-w-sm'}`}>
           {bgSrc && !shouldZoom && (
             <img
+              key={bgSrc}
               src={bgSrc}
-              alt={config.ariaLabel}
+              alt={config.title}
               className="pointer-events-none block h-auto w-full select-none"
               draggable={false}
             />

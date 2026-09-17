@@ -525,6 +525,7 @@ function LabelView({
       {hasDiagram && (
         <div className={revealed ? 'pointer-events-none' : ''}>
           <SystemDiagram
+            key={q.id}
             systemId={q.systemId}
             diagramId={plateId}
             compact
