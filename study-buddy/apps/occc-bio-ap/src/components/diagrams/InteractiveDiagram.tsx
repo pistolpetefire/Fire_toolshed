@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type MouseEvent } from 'react';
-import { X, Info, ExternalLink, Focus, RotateCcw } from 'lucide-react';
+import { X, Info, ExternalLink, RotateCcw } from 'lucide-react';
 import { getStructureById } from '../../data/structures';
 import type { Structure } from '../../types';
 import type { DiagramConfig, DiagramRenderStyle } from './types';
