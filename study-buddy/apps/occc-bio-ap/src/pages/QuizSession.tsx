@@ -298,6 +298,14 @@ function QuizRunner({
                   </Link>
                 </>
               ) : null}
+              {examBlock === 2 ? (
+                <>
+                  {' · '}
+                  <Link to={p('/quizzes/exam/2/guide')} className="text-brand-600 hover:underline">
+                    official study guide
+                  </Link>
+                </>
+              ) : null}
             </span>
           ) : unitFilter ? (
             <Link to={p(`/units/${unitFilter}`)} className="text-sm text-brand-600 hover:underline">

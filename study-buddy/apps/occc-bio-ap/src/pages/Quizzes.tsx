@@ -79,6 +79,14 @@ export function Quizzes() {
                     Official study guide + terminology sheet <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 )}
+                {block.id === 2 && (
+                  <Link
+                    to={p('/quizzes/exam/2/guide')}
+                    className="mt-3 inline-flex items-center gap-1 border-t border-slate-100 pt-3 text-xs font-semibold text-slate-600 hover:text-brand-600 dark:border-slate-800 dark:text-slate-300"
+                  >
+                    Official Unit Two study guide + histology <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
               </div>
             );
           })}

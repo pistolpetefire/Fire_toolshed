@@ -207,7 +207,11 @@ export const unitLessons: Record<UnitId, UnitLesson> = {
       },
       {
         heading: 'Ions and fluid compartments',
-        body: 'Ions: electrical activity, osmotic pull, and cofactors for enzymes. Memorize symbol and charge: Na+, K+, Ca2+, Mg2+, Cl−, HPO4 2− (phosphate), HCO3− (bicarbonate). ICF is about 2/3 of body water and is K+-rich. ECF (plasma + interstitial) is Na+- and Cl−-rich.',
+        body: 'Ions: electrical activity, osmotic pull, and cofactors for enzymes. Memorize symbol and charge: Na+, K+, Ca2+, Mg2+, Cl−, HPO4 2− (phosphate), HCO3− (bicarbonate). ICF is about 2/3 of body water and is K+-rich. ECF (plasma + interstitial) is Na+- and Cl−-rich. Intracellular = inside the cell; extracellular = outside; intercellular = between cells.',
+      },
+      {
+        heading: 'Histology — four tissues (lecture + epithelial lab)',
+        body: 'Histology is the study of tissues (cells with a common function). Epithelium: polar, avascular, regenerative, on a basement membrane. Classify by shape (squamous / cuboidal / columnar) and layers (simple / stratified / pseudostratified). Connective: cells + fibers (collagen, elastic, reticular) + ground substance — areolar, dense regular/irregular, adipose, cartilage, bone, blood. Muscle: skeletal (multinucleate, striated, somatic), cardiac (branched, intercalated discs), smooth (fusiform, ANS). Nervous: soma, dendrites, axon, glia.',
       },
     ],
     mustKnow: [
@@ -221,6 +225,9 @@ export const unitLessons: Record<UnitId, UnitLesson> = {
       'Na+/K+ pump',
       'ICF',
       'ECF',
+      'simple squamous',
+      'stratified squamous',
+      'pseudostratified',
     ],
     spelling: ['mitochondrion', 'endoplasmic reticulum', 'phagocytosis', 'crenate', 'bicarbonate'],
   },
@@ -250,6 +257,10 @@ export const unitLessons: Record<UnitId, UnitLesson> = {
       {
         heading: 'Cell cycle and cancer',
         body: 'Interphase: G1 (grow), S (DNA copy), G2 (prep), or G0 (rest, no division). Mitosis: prophase (chromosomes condense, spindle), metaphase (line up at equator), anaphase (sister chromatids separate), telophase (nuclei reform). Cytokinesis splits the cytoplasm. Mitosis keeps chromosome number constant (46 → two cells with 46) and grows/repairs tissues. Cancer is a cell-cycle checkpoint failure: too much division, too little death.',
+      },
+      {
+        heading: 'Unit Two LOs that overlap genetics (also Exam 3 / Unit 5)',
+        body: 'Gene vs chromosome; Punnett Aa×Aa = 1:2:1 genotype / 3:1 phenotype; autosomal vs X-linked; meiosis makes haploid gametes; metaphase I = homologous pairs vs mitotic metaphase = single file; nondisjunction → trisomy/monosomy. Named: Down 21, Patau 13, Edwards 18, Klinefelter XXY, Turner 45,X (sheet says “monosomy 23”), plus albinism, PKU, sickle cell, hemophilia, color blindness.',
       },
     ],
     mustKnow: [

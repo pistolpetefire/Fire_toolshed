@@ -12,6 +12,7 @@ Class app inside **Study Buddy**. Aligned to Robyn Senter’s official Fall 2026
 ## Features
 
 - Official 10-unit path: lesson → practice → quiz → review (from stated objectives)
+- Exam 2 official Unit Two study guide (Ch 3–4), fluids/meiosis LOs, histology lecture + epithelial lab
 - Syllabus page (grading, policies, instructor, exam blocks)
 - Body systems + interactive diagrams (skeletal, muscular, cardiovascular)
 - Flashcards with SRS + custom cards

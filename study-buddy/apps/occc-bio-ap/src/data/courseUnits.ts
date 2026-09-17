@@ -43,7 +43,7 @@ export const EXAM_BLOCKS: {
     id: 2,
     title: 'Exam 2',
     unitIds: ['unit-3', 'unit-4'],
-    note: 'Cell membranes / fluids + nucleic acids & cell cycle',
+    note: 'Official Unit Two study guide (Ch 3–4) + fluids, meiosis/genetics LOs, histology lecture',
   },
   {
     id: 3,
@@ -203,6 +203,7 @@ export const courseUnits: CourseUnit[] = [
       'Ions',
       'ICF vs ECF',
       'IV fluids',
+      'Histology (four tissues)',
     ],
     chapters: ['Ch 3', 'Ch 24 §24.1–24.2'],
     examBlock: 2,

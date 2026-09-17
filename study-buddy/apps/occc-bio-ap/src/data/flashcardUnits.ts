@@ -6,7 +6,7 @@ import { builtInFlashcards } from './flashcards';
 export const UNIT_FLASHCARD_TOPICS: Record<UnitId, FlashcardTopicId[]> = {
   'unit-1': ['foundations'],
   'unit-2': ['chemistry'],
-  'unit-3': ['cells'],
+  'unit-3': ['cells', 'tissues'],
   'unit-4': ['cells'],
   'unit-5': ['cells'],
   'unit-6': ['integumentary', 'skeletal', 'tissues'],
@@ -60,6 +60,12 @@ export const unitFlashcardExtras: Flashcard[] = [
   { id: 'u3-fc-04', front: 'What is normal saline and why is it used?', back: '0.9% NaCl — roughly isotonic to plasma, so it expands ECF without lysing RBCs.', systemId: 'cells', tags: ['unit-3', 'IV'], unitIds: ['unit-3'] },
   { id: 'u3-fc-05', front: 'What is lactated Ringer’s closer to than plain saline?', back: 'Plasma electrolyte mix (Na, K, Ca, Cl, lactate) — used as a more physiologic ECF replacement.', systemId: 'cells', tags: ['unit-3', 'IV'], unitIds: ['unit-3'] },
   { id: 'u3-fc-06', front: 'Phagocytosis vs pinocytosis vs exocytosis?', back: 'Phagocytosis: cell eating solids. Pinocytosis: cell drinking. Exocytosis: vesicle export.', systemId: 'cells', tags: ['unit-3', 'transport'], unitIds: ['unit-3'] },
+  { id: 'u3-fc-07', front: 'Primary vs secondary active transport?', back: 'Primary: the pump burns ATP (Na+/K+). Secondary: a solute rides the Na+ gradient that pump created (no ATP at that carrier).', systemId: 'cells', tags: ['unit-3', 'transport'], unitIds: ['unit-3'] },
+  { id: 'u3-fc-08', front: 'Filtration — driving force and a body example?', back: 'Physical pressure, not a concentration gradient. Glomerular capillaries in the kidney; also capillary beds.', systemId: 'cells', tags: ['unit-3', 'transport'], unitIds: ['unit-3'] },
+  { id: 'u3-fc-09', front: 'Four primary tissues?', back: 'Epithelial, connective, muscle, nervous. Histology = study of tissues.', systemId: 'tissues', tags: ['unit-3', 'histology'], unitIds: ['unit-3'] },
+  { id: 'u3-fc-10', front: 'Simple vs stratified vs pseudostratified epithelium?', back: 'Simple: one layer (exchange). Stratified: stacked (protection). Pseudostratified: looks layered but all cells touch the basement membrane (respiratory).', systemId: 'tissues', tags: ['unit-3', 'histology'], unitIds: ['unit-3'] },
+  { id: 'u3-fc-11', front: 'Squamous vs cuboidal vs columnar — look + a location?', back: 'Squamous: fried-egg flat (vessels / skin). Cuboidal: dice (kidney tubules). Columnar: tall (GI, often microvilli).', systemId: 'tissues', tags: ['unit-3', 'histology'], unitIds: ['unit-3'] },
+  { id: 'u3-fc-12', front: 'Skeletal vs cardiac vs smooth muscle?', back: 'Skeletal: multinucleate, striated, somatic. Cardiac: branched, intercalated discs, autorhythmic. Smooth: fusiform, one nucleus, ANS, viscera.', systemId: 'tissues', tags: ['unit-3', 'histology'], unitIds: ['unit-3'] },
 
   // Unit 4 — replication, cycle, cancer
   { id: 'u4-fc-01', front: 'Complementary DNA of AATG?', back: 'TTAC (A–T, G–C).', systemId: 'cells', tags: ['unit-4', 'DNA'], unitIds: ['unit-4'] },

@@ -2,6 +2,7 @@ import type { UnitId } from '../types';
 import { extraUnitQuestions } from './unitQuestionsExtra';
 import { vocabUnitQuestions } from './unitVocabQuestions';
 import { exam1StudyGuideQuestions } from './exam1StudyGuide';
+import { exam2StudyGuideQuestions } from './exam2StudyGuide';
 import { getUnitById } from './courseUnits';
 
 export interface UnitQuestion {
@@ -1110,9 +1111,13 @@ export const unitQuestions: UnitQuestion[] = [
 ];
 
 export function getQuestionsForUnit(unitId: UnitId): UnitQuestion[] {
-  return [...unitQuestions, ...extraUnitQuestions, ...vocabUnitQuestions, ...exam1StudyGuideQuestions].filter(
-    (q) => q.unitId === unitId
-  );
+  return [
+    ...unitQuestions,
+    ...extraUnitQuestions,
+    ...vocabUnitQuestions,
+    ...exam1StudyGuideQuestions,
+    ...exam2StudyGuideQuestions,
+  ].filter((q) => q.unitId === unitId);
 }
 
 export function getQuestionsForObjectives(unitId: UnitId, objectives: number[]): UnitQuestion[] {

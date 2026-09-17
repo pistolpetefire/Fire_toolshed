@@ -1,0 +1,813 @@
+import type { MatchingQuestion, UnitId } from '../types';
+import type { StudyGuideItem } from './exam1StudyGuide';
+import type { UnitQuestion } from './unitQuestions';
+
+/**
+ * Official BIO 1314 Exam 2 / Unit Two sources (Senter, student files 2026-09-16):
+ * - "BIO 1314 STUDY GUIDE UNIT TWO CHAPTER THREE & FOUR" (25 items) — Pages
+ * - "BIO 1314 (ONLINE) *UNIT 2 LEARNING OBJECTIVES*" (Ch 3, Ch 4, Ch 24/27/29) — photos
+ * - Keynote: A&P UNIT 3 CELLULAR FORM AND FUNCTION (pp. 75–110)
+ * - Keynote: HISTOLOGY LECTURE POWERPOINTS (four tissues)
+ * - Marieb epithelial-tissue lab worksheet (simple/stratified; squamous/cuboidal/columnar)
+ *
+ * App Exam 2 = Units 3–4. Genetics/meiosis items on the Unit Two LO sheet are included here
+ * even though Unit 5 (Exam 3) also covers named syndromes in more depth.
+ */
+
+export const UNIT_TWO_STUDY_GUIDE: StudyGuideItem[] = [
+  {
+    id: 'e2-sg-01',
+    number: '1',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Define cell. List and describe the basic parts of a cell.',
+    answer:
+      'A cell is the smallest living unit. Basic parts: plasma membrane (selective barrier), cytoplasm/cytosol (fluid + organelles), nucleus (DNA). Organelles (ER, Golgi, mitochondria, lysosomes, ribosomes, centrioles, cytoskeleton, cilia/flagella) sit in the cytoplasm.',
+  },
+  {
+    id: 'e2-sg-02',
+    number: '2',
+    unitId: 'unit-3',
+    objective: 2,
+    prompt: 'Describe the composition of a phospholipid molecule.',
+    answer:
+      'A phospholipid has a polar hydrophilic phosphate head and two nonpolar hydrophobic fatty-acid tails. In water they form a bilayer: heads face the ECF and ICF; tails face inward.',
+  },
+  {
+    id: 'e2-sg-03',
+    number: '3',
+    unitId: 'unit-3',
+    objective: 2,
+    prompt: 'Describe the components and the functions of the cell membrane.',
+    answer:
+      'Phospholipid bilayer + cholesterol (fluidity) + proteins (channels, carriers, pumps, receptors, enzymes, identity) + carbohydrates (glycocalyx). Functions: barrier, selective permeability, signaling, cell identity, attachments.',
+  },
+  {
+    id: 'e2-sg-04',
+    number: '4',
+    unitId: 'unit-3',
+    objective: 2,
+    prompt: 'What is meant by selective permeability?',
+    answer:
+      'The membrane is a gatekeeper: some substances cross freely (O2, CO2, small lipids), others need a protein, and some do not cross. That is how the cell controls its internal mix.',
+  },
+  {
+    id: 'e2-sg-05',
+    number: '5',
+    unitId: 'unit-3',
+    objective: 3,
+    prompt: 'Define diffusion. Define facilitated diffusion.',
+    answer:
+      'Diffusion is net movement of a solute from high to low concentration (down the gradient). Facilitated diffusion is the same direction but needs a channel or carrier protein; no ATP. Factors: molecular weight, steepness of gradient, temperature, membrane surface area.',
+  },
+  {
+    id: 'e2-sg-06',
+    number: '6',
+    unitId: 'unit-3',
+    objective: 4,
+    prompt: 'Define osmosis. Define isotonic, hypertonic, and hypotonic.',
+    answer:
+      'Osmosis is diffusion of water across a semipermeable membrane from high water (low solute) to low water (high solute). Isotonic: equal effective osmolarity, no net water shift. Hypertonic ECF: water leaves the cell (crenate). Hypotonic ECF: water enters (swell/lyse).',
+  },
+  {
+    id: 'e2-sg-07',
+    number: '7',
+    unitId: 'unit-3',
+    objective: 4,
+    prompt: 'Define edema, dehydration, turgor, lyse and crenate.',
+    answer:
+      'Edema: excess interstitial fluid. Dehydration: net body-water loss. Turgor: normal resiliency of tissue/cells. Lyse: cell splits/bursts (typical in hypotonic). Crenate: cell shrivels (typical in hypertonic).',
+  },
+  {
+    id: 'e2-sg-08',
+    number: '8',
+    unitId: 'unit-3',
+    objective: 3,
+    prompt: 'Describe filtration. Give examples of where found in the body.',
+    answer:
+      'Filtration is movement of fluid through a membrane driven by physical pressure (not a concentration gradient). Classic example: glomerular filtration in the kidney; also capillary beds (blood pressure pushing plasma out).',
+  },
+  {
+    id: 'e2-sg-09',
+    number: '9',
+    unitId: 'unit-3',
+    objective: 3,
+    prompt: 'Describe the process of primary active transport, and secondary active transport.',
+    answer:
+      'Primary active transport uses ATP at the pump (Na+/K+ pump: 3 Na+ out, 2 K+ in). Secondary active transport uses the Na+ (or other) gradient created by that pump to drag another solute (glucose, amino acids) — the carrier itself does not hydrolyze ATP.',
+  },
+  {
+    id: 'e2-sg-10',
+    number: '10',
+    unitId: 'unit-3',
+    objective: 3,
+    prompt: 'Define and describe the process of exocytosis and endocytosis.',
+    answer:
+      'Vesicular transport. Endocytosis brings material in (phagocytosis = solids/“eating”; pinocytosis = fluid/“drinking”). Exocytosis exports vesicle contents (neurotransmitters, proteins). Both require membrane and energy.',
+  },
+  {
+    id: 'e2-sg-11',
+    number: '11',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'List and describe the various cell organelles discussed in the text.',
+    answer:
+      'Nucleus (DNA) + nucleolus (rRNA/ribosome assembly) + nuclear membrane. Ribosomes: protein. Rough ER: protein folding/shipping. Smooth ER: lipids/detox. Golgi: packages. Lysosomes: digest. Mitochondria: ATP. Centrioles: spindle. Cytoskeleton: shape/transport. Cilia move fluid; flagella move sperm. Vacuole: storage.',
+  },
+  {
+    id: 'e2-sg-12',
+    number: '12',
+    unitId: 'unit-3',
+    objective: 7,
+    prompt: 'Define extracellular, intracellular and intercellular.',
+    answer:
+      'Intracellular: inside the cell (ICF). Extracellular: outside the cell (ECF = plasma + interstitial). Intercellular: between cells (junctions, interstitial space). Do not mix intercellular with intracellular.',
+  },
+  {
+    id: 'e2-sg-13',
+    number: '13',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'Define and differentiate between a chromosome and a gene.',
+    answer:
+      'A gene is a DNA segment that codes for a product (usually a protein). A chromosome is a packaged DNA molecule with many genes plus proteins (chromatin condensed for division). Many genes live on one chromosome.',
+  },
+  {
+    id: 'e2-sg-14',
+    number: '14',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'What is the relationship between a gene and a protein?',
+    answer:
+      'One gene’s sequence is transcribed to mRNA and translated to a polypeptide. A changed gene can make a changed protein (sickle cell is the classic example).',
+  },
+  {
+    id: 'e2-sg-15',
+    number: '15',
+    unitId: 'unit-4',
+    objective: 1,
+    prompt: 'Discuss the composition of DNA to include bases and which base pairs with which.',
+    answer:
+      'DNA nucleotide = deoxyribose + phosphate + base (A, T, G, C). Double helix. Complementary pairing: A–T (two H-bonds), G–C (three H-bonds).',
+  },
+  {
+    id: 'e2-sg-16',
+    number: '16',
+    unitId: 'unit-4',
+    objective: 3,
+    prompt: 'Define semiconservative replication.',
+    answer:
+      'Each new DNA duplex keeps one old (parent) strand and one new complementary strand. That is how the sequence is conserved through S phase.',
+  },
+  {
+    id: 'e2-sg-17',
+    number: '17',
+    unitId: 'unit-4',
+    objective: 3,
+    prompt: 'List the steps of replication. What is the master enzyme for replication?',
+    answer:
+      'Unzip (helicase) → RNA primer → DNA polymerase adds complementary DNA nucleotides 5′→3′ on both templates → ligase seals fragments. Master enzyme: DNA polymerase.',
+  },
+  {
+    id: 'e2-sg-18',
+    number: '18',
+    unitId: 'unit-4',
+    objective: 1,
+    prompt: 'Discuss the composition of RNA to include bases and which base pairs with which.',
+    answer:
+      'RNA nucleotide = ribose + phosphate + base (A, U, G, C). Usually single-stranded. Pairing: A–U, G–C (and A–T if pairing to DNA). Uracil replaces thymine.',
+  },
+  {
+    id: 'e2-sg-19',
+    number: '19',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'List and describe functions of the three types of RNA.',
+    answer:
+      'mRNA: message/codon copy of a gene, goes to the ribosome. tRNA: anticodon + amino acid delivery. rRNA: structural/catalytic part of the ribosome.',
+  },
+  {
+    id: 'e2-sg-20',
+    number: '20',
+    unitId: 'unit-4',
+    objective: 1,
+    prompt: 'List the similarities and differences between RNA and DNA.',
+    answer:
+      'Similar: nucleic acids, A/C/G, 5′–3′, complementary pairing. Different: DNA double-stranded / deoxyribose / T / stays in nucleus. RNA usually single-stranded / ribose / U / nucleus and cytoplasm.',
+  },
+  {
+    id: 'e2-sg-21',
+    number: '21',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'Define transcription.',
+    answer:
+      'Copying a DNA gene into complementary mRNA in the nucleus. DNA stays; the RNA copy leaves through nuclear pores.',
+  },
+  {
+    id: 'e2-sg-22',
+    number: '22',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'List the steps of transcription. What is the master enzyme for transcription?',
+    answer:
+      'RNA polymerase binds the promoter → unwinds DNA → builds mRNA complementary to the template (A→U, T→A, G→C, C→G) → terminator/release. Master enzyme: RNA polymerase.',
+  },
+  {
+    id: 'e2-sg-23',
+    number: '23',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'Define translation.',
+    answer:
+      'Ribosome reads mRNA codons and tRNA anticodons deliver amino acids; peptide bonds grow the protein. Happens in the cytoplasm (free or RER ribosomes).',
+  },
+  {
+    id: 'e2-sg-24',
+    number: '24',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'Define codon and anticodon.',
+    answer:
+      'Codon: three-base triplet on mRNA that specifies an amino acid (or start/stop). Anticodon: complementary three bases on tRNA that match the codon.',
+  },
+  {
+    id: 'e2-sg-25',
+    number: '25',
+    unitId: 'unit-4',
+    objective: 6,
+    prompt: 'Define mitosis. List the steps of mitosis and briefly describe what is happening during each step.',
+    answer:
+      'Mitosis is nuclear division that yields two diploid nuclei with the same chromosome number. Prophase: chromosomes condense, spindle forms, nuclear envelope breaks. Metaphase: chromosomes line up at the equator. Anaphase: sister chromatids separate. Telophase: nuclei reform. Cytokinesis splits the cytoplasm (not a mitotic phase, but finishes the cell).',
+  },
+];
+
+export const UNIT2_LEARNING_OBJECTIVES: StudyGuideItem[] = [
+  {
+    id: 'e2-lo-ions',
+    number: 'Ch24-1',
+    unitId: 'unit-3',
+    objective: 5,
+    prompt: 'List three general functions of ions in the body.',
+    answer: 'Electrical signaling (nerve/muscle), osmotic water balance, and enzyme/cofactor chemistry.',
+  },
+  {
+    id: 'e2-lo-symbols',
+    number: 'Ch24-2',
+    unitId: 'unit-3',
+    objective: 6,
+    prompt: 'Identify symbol and charge: sodium, potassium, calcium, magnesium, phosphate, chloride, bicarbonate.',
+    answer: 'Na+, K+, Ca2+, Mg2+, phosphate (HPO4 2−), Cl−, HCO3−.',
+  },
+  {
+    id: 'e2-lo-icf',
+    number: 'Ch24-3',
+    unitId: 'unit-3',
+    objective: 7,
+    prompt: 'ICF vs ECF: fluids, water amounts, predominant ions.',
+    answer:
+      'ICF ≈ 2/3 of body water, K+-rich (protein anions inside). ECF (plasma + interstitial) ≈ 1/3, Na+- and Cl−-rich.',
+  },
+  {
+    id: 'e2-lo-iv',
+    number: 'Ch24-4',
+    unitId: 'unit-3',
+    objective: 8,
+    prompt: 'Relevance of normal saline, physiological saline, and Ringer’s solution.',
+    answer:
+      'NS / physiological saline = 0.9% NaCl, roughly isotonic to plasma. Ringer’s (lactated) is a closer ECF electrolyte mix (Na, K, Ca, Cl, lactate).',
+  },
+  {
+    id: 'e2-lo-cycle',
+    number: 'Ch4-6',
+    unitId: 'unit-4',
+    objective: 6,
+    prompt: 'Main events of interphase (G1, S, G2, G0), mitosis, cytokinesis.',
+    answer:
+      'G1 grow; S DNA copy; G2 prep to divide; G0 nondividing rest. Mitosis = PMAT. Cytokinesis splits cytoplasm.',
+  },
+  {
+    id: 'e2-lo-cancer',
+    number: 'Ch4-8',
+    unitId: 'unit-4',
+    objective: 8,
+    prompt: 'Interpret cancer as a homeostatic imbalance of the cell cycle.',
+    answer: 'Checkpoints fail; cells divide without normal brakes (too much proliferation, too little death).',
+  },
+  {
+    id: 'e2-lo-gene',
+    number: 'Ch4-9',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'Use: gene, allele, dominant, recessive, heterozygous, homozygous, homologous chromosomes, genotype, phenotype, codominant, karyotype.',
+    answer:
+      'Gene = DNA segment. Allele = version. Dominant shows in heterozygotes; recessive needs two copies. Homozygous = same alleles; heterozygous = different. Homologous = matched pair. Genotype = alleles; phenotype = what you see. Codominant = both show (AB blood). Karyotype = chromosome picture.',
+  },
+  {
+    id: 'e2-lo-punnett',
+    number: 'Ch4-10',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'Construct a Punnett square (Aa × Aa) — genotypic and phenotypic ratios.',
+    answer: 'Genotypic 1 AA : 2 Aa : 1 aa. Phenotypic 3 dominant : 1 recessive if complete dominance.',
+  },
+  {
+    id: 'e2-lo-sex',
+    number: 'Ch4-11',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'Autosomal vs sex-linked inheritance. Sex chromosomes in male/female, sperm/ova.',
+    answer:
+      'Autosomal = chromosomes 1–22. Sex-linked usually X-linked (hemophilia, color blindness) — XY males express a single X allele. Female 46,XX; male 46,XY. Eggs carry X; sperm carry X or Y.',
+  },
+  {
+    id: 'e2-lo-mut',
+    number: 'Ch4-13',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'Define mutation. Three types. At least three mutagenic agents. Gene–code–disease.',
+    answer:
+      'Mutation = change in DNA. Types: substitution (point), insertion, deletion (frameshift if not ×3). Agents: radiation, chemicals, some viruses. A broken gene can make a broken protein (sickle cell).',
+  },
+  {
+    id: 'e2-lo-meiosis',
+    number: 'Ch27-5',
+    unitId: 'unit-4',
+    objective: 6,
+    prompt: 'Functions of meiosis. Mitosis vs meiosis, especially metaphase I vs mitotic metaphase.',
+    answer:
+      'Meiosis makes gametes: two divisions → four haploid, genetically unique cells. Mitosis: one division → two diploid clones. Metaphase I: homologous pairs line up. Mitotic metaphase: individual chromosomes line up at the equator.',
+  },
+  {
+    id: 'e2-lo-ndj',
+    number: 'Ch27-8',
+    unitId: 'unit-4',
+    objective: 6,
+    prompt: 'Nondisjunction and how it relates to monosomy and trisomy.',
+    answer:
+      'Nondisjunction = chromosomes fail to separate in meiosis → n+1 or n−1 gametes. After fertilization: trisomy (2n+1) or monosomy (2n−1).',
+  },
+  {
+    id: 'e2-lo-synd',
+    number: 'Ch27-9',
+    unitId: 'unit-4',
+    objective: 6,
+    prompt: 'Named conditions on the Unit Two LO sheet.',
+    answer:
+      'Normal female 46,XX; normal male 46,XY. Down trisomy 21. Patau trisomy 13. Edwards trisomy 18. Klinefelter XXY. Turner 45,X (sheet says “monosomy 23”). Albinism, PKU, sickle cell. Hemophilia and color blindness = X-linked.',
+  },
+];
+
+export const HISTOLOGY_WORKSHEET: StudyGuideItem[] = [
+  {
+    id: 'e2-his-01',
+    number: 'H1',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Define histology and tissue.',
+    answer: 'Histology is the study of tissues. A tissue is a group of similar cells with a common function.',
+  },
+  {
+    id: 'e2-his-02',
+    number: 'H2',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Name the four primary tissue types.',
+    answer: 'Epithelial, connective, muscle, nervous.',
+  },
+  {
+    id: 'e2-his-03',
+    number: 'H3',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Epithelial characteristics (lab + lecture).',
+    answer:
+      'Polarity (apical vs basal), avascular (no blood vessels — feeds from connective tissue below), high regeneration, sits on a basement membrane, cells tightly packed. Classifies by shape (squamous, cuboidal, columnar) and arrangement (simple, stratified, pseudostratified). Transitional is a special stratified type.',
+  },
+  {
+    id: 'e2-his-04',
+    number: 'H4',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Simple vs stratified — function and examples.',
+    answer:
+      'Simple = one layer: absorption/filtration/diffusion (alveoli, kidney tubules, endothelium). Stratified = stacked: protection (epidermis, esophagus). Pseudostratified looks layered but all cells touch the basement membrane (respiratory tract, often ciliated).',
+  },
+  {
+    id: 'e2-his-05',
+    number: 'H5',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Squamous, cuboidal, columnar — look and locations from lecture.',
+    answer:
+      'Squamous = fried-egg flat (simple: vessel intima; stratified: skin, esophagus). Cuboidal = dice, nucleus centered (kidney PCT/DCT, glands). Columnar = tall, nucleus basal (GI tract; often microvilli/goblet cells).',
+  },
+  {
+    id: 'e2-his-06',
+    number: 'H6',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Connective tissue: cells, fibers, ground substance. Name fibrous types.',
+    answer:
+      'Derived from mesenchyme. Living cells + extracellular matrix (fibers + ground substance). Fibers: collagen (thick/strong), elastic (springy), reticular (fine mesh). Loose: areolar, adipose, reticular. Dense: regular (tendons/ligaments), irregular (dermis), elastic. Also cartilage, bone, blood.',
+  },
+  {
+    id: 'e2-his-07',
+    number: 'H7',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Areolar vs dense regular vs hyaline cartilage vs bone vs blood.',
+    answer:
+      'Areolar: loose filler, basement support, vessels/nerves. Dense regular: parallel collagen — tendons/ligaments. Hyaline: chondrocytes in lacunae, glassy matrix. Bone: calcified, osteocytes in lacunae, osteons. Blood: liquid CT, plasma + cells (RBCs = erythrocytes).',
+  },
+  {
+    id: 'e2-his-08',
+    number: 'H8',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Smooth vs cardiac vs skeletal muscle.',
+    answer:
+      'Smooth: fusiform, one nucleus, no striations, ANS, viscera/vessels. Cardiac: branched, intercalated discs (gap junctions + desmosomes), autorhythmic. Skeletal: long multinucleate fibers, heavy striations, somatic (PNS) control, limbs/body wall.',
+  },
+  {
+    id: 'e2-his-09',
+    number: 'H9',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Nervous tissue parts.',
+    answer:
+      'Neuron: soma (cell body), dendrites (short “little trees” for incoming talk), axon (long output to muscle/gland/neuron). Glial cells support; you will see their nuclei around neurons on slides.',
+  },
+];
+
+export const EXAM2_GUIDE_ITEMS: StudyGuideItem[] = [
+  ...UNIT_TWO_STUDY_GUIDE,
+  ...UNIT2_LEARNING_OBJECTIVES,
+  ...HISTOLOGY_WORKSHEET,
+];
+
+export const exam2StudyGuideQuestions: UnitQuestion[] = [
+  {
+    id: 'e2-mc-01',
+    unitId: 'unit-3',
+    objective: 2,
+    prompt: 'A phospholipid molecule has:',
+    options: [
+      'Two hydrophilic tails and a hydrophobic head',
+      'A hydrophilic phosphate head and two hydrophobic fatty-acid tails',
+      'Only cholesterol',
+      'DNA bases A, T, G, C',
+    ],
+    correctIndex: 1,
+    explanation: 'Heads face water (ECF/ICF); tails face each other in the bilayer.',
+  },
+  {
+    id: 'e2-mc-02',
+    unitId: 'unit-3',
+    objective: 2,
+    prompt: 'Selective permeability means the plasma membrane:',
+    options: [
+      'Lets every solute through equally',
+      'Is a gatekeeper — some solutes cross freely, some need proteins, some do not cross',
+      'Is a cell wall of cellulose',
+      'Only exists in plants',
+    ],
+    correctIndex: 1,
+    explanation: 'Lecture: gatekeeper. O2/CO2/lipids vs ions/glucose vs macromolecules.',
+  },
+  {
+    id: 'e2-mc-03',
+    unitId: 'unit-3',
+    objective: 3,
+    prompt: 'Facilitated diffusion differs from simple diffusion because it:',
+    options: [
+      'Uses ATP to go against the gradient',
+      'Needs a channel or carrier but still goes down the gradient (no ATP)',
+      'Is filtration by blood pressure',
+      'Is phagocytosis',
+    ],
+    correctIndex: 1,
+    explanation: 'Passive + protein. Primary active transport is the ATP pump.',
+  },
+  {
+    id: 'e2-mc-04',
+    unitId: 'unit-3',
+    objective: 3,
+    prompt: 'Filtration in the body is driven by:',
+    options: [
+      'A concentration gradient of O2',
+      'Physical pressure (e.g., glomerular capillaries)',
+      'DNA polymerase',
+      'Codons',
+    ],
+    correctIndex: 1,
+    explanation: 'Study guide #8: pressure, not diffusion. Kidney glomerulus is the stock example.',
+  },
+  {
+    id: 'e2-mc-05',
+    unitId: 'unit-3',
+    objective: 3,
+    prompt: 'The Na+/K+ pump is _____ ; glucose riding Na+’s gradient is _____.',
+    options: [
+      'Osmosis; diffusion',
+      'Primary active transport; secondary active transport',
+      'Exocytosis; pinocytosis',
+      'Simple diffusion; filtration',
+    ],
+    correctIndex: 1,
+    explanation: 'Pump burns ATP (primary). Secondary uses the Na+ gradient the pump built.',
+  },
+  {
+    id: 'e2-mc-06',
+    unitId: 'unit-3',
+    objective: 3,
+    prompt: 'Phagocytosis vs pinocytosis vs exocytosis:',
+    options: [
+      'Phago = drinking; pino = eating; exo = DNA copy',
+      'Phago = eating solids; pino = drinking fluid; exo = vesicle export',
+      'All three are osmosis',
+      'All three are mitosis stages',
+    ],
+    correctIndex: 1,
+    explanation: 'Vesicular transport. Neutrophils/macrophages use phagocytosis and pseudopods.',
+  },
+  {
+    id: 'e2-mc-07',
+    unitId: 'unit-3',
+    objective: 4,
+    prompt: 'A red blood cell in a hypertonic solution will:',
+    options: ['Lyse as water enters', 'Crenate as water leaves', 'Undergo mitosis', 'Make more DNA'],
+    correctIndex: 1,
+    explanation: 'Hypertonic ECF pulls water out → crenation. Hypotonic → swell/lyse.',
+  },
+  {
+    id: 'e2-mc-08',
+    unitId: 'unit-3',
+    objective: 7,
+    prompt: 'Intracellular vs extracellular vs intercellular:',
+    options: [
+      'They are three names for plasma',
+      'Intra = inside the cell; extra = outside; inter = between cells',
+      'Intra = between cells; extra = DNA',
+      'Inter = inside the nucleus only',
+    ],
+    correctIndex: 1,
+    explanation: 'Study guide #12. Do not mix intercellular with intracellular.',
+  },
+  {
+    id: 'e2-mc-09',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Microvilli vs cilia vs flagella vs pseudopods (Unit 3 lecture):',
+    options: [
+      'Microvilli increase absorptive surface; cilia move fluid; flagella move sperm; pseudopods (WBCs) move/engulf',
+      'All four store DNA',
+      'All four are mitochondria',
+      'They only exist in plants',
+    ],
+    correctIndex: 0,
+    explanation: 'Lecture: microvilli = surface area; cilia = sense/move fluid; flagella = sperm; pseudopods = neutrophils/macrophages.',
+  },
+  {
+    id: 'e2-mc-10',
+    unitId: 'unit-4',
+    objective: 1,
+    prompt: 'DNA pairing is _____ ; RNA pairing is _____.',
+    options: ['A–U and G–C; A–T and G–C', 'A–T and G–C; A–U and G–C', 'A–A and T–T; G–G', 'U–T and A–C; G–G'],
+    correctIndex: 1,
+    explanation: 'DNA A–T, G–C. RNA A–U, G–C. Uracil replaces thymine.',
+  },
+  {
+    id: 'e2-mc-11',
+    unitId: 'unit-4',
+    objective: 3,
+    prompt: 'Semiconservative replication means:',
+    options: [
+      'Both strands of each daughter helix are brand new',
+      'Each daughter helix keeps one old strand and one new strand',
+      'RNA is copied into DNA',
+      'Only mRNA is duplicated',
+    ],
+    correctIndex: 1,
+    explanation: 'Study guide #16. Master enzyme is DNA polymerase (S phase).',
+  },
+  {
+    id: 'e2-mc-12',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'The master enzyme of transcription is:',
+    options: ['DNA polymerase', 'RNA polymerase', 'Helicase only', 'Pepsin'],
+    correctIndex: 1,
+    explanation: 'Study guide #22. DNA polymerase is replication.',
+  },
+  {
+    id: 'e2-mc-13',
+    unitId: 'unit-4',
+    objective: 4,
+    prompt: 'mRNA vs tRNA vs rRNA:',
+    options: [
+      'mRNA = anticodon; tRNA = codon; rRNA = DNA',
+      'mRNA carries the codon message; tRNA brings amino acids (anticodon); rRNA is the ribosome',
+      'All three stay in the mitochondrion only',
+      'They are three stages of mitosis',
+    ],
+    correctIndex: 1,
+    explanation: 'Study guide #19. Translation is codon–anticodon matching at the ribosome.',
+  },
+  {
+    id: 'e2-mc-14',
+    unitId: 'unit-4',
+    objective: 6,
+    prompt: 'Metaphase of mitosis is when:',
+    options: [
+      'Homologous pairs line up as tetrads',
+      'Chromosomes line up singly at the equator',
+      'DNA is copied in S phase',
+      'The cell is in G0',
+    ],
+    correctIndex: 1,
+    explanation: 'Mitotic metaphase = individual chromosomes. Metaphase I of meiosis = homologous pairs.',
+  },
+  {
+    id: 'e2-mc-15',
+    unitId: 'unit-4',
+    objective: 6,
+    prompt: 'Meiosis differs from mitosis because meiosis:',
+    options: [
+      'Makes two diploid clones',
+      'Makes four haploid, genetically unique gametes after two divisions',
+      'Occurs only in G0 neurons',
+      'Uses DNA polymerase to make protein',
+    ],
+    correctIndex: 1,
+    explanation: 'Unit Two LOs: meiosis for gametes; mitosis for growth/repair with constant chromosome number.',
+  },
+  {
+    id: 'e2-mc-16',
+    unitId: 'unit-4',
+    objective: 6,
+    prompt: 'Nondisjunction can produce:',
+    options: [
+      'Only a skin tan',
+      'Gametes with n+1 or n−1 → trisomy or monosomy after fertilization',
+      'Isotonic IV fluid',
+      'A phospholipid bilayer',
+    ],
+    correctIndex: 1,
+    explanation: 'Down = trisomy 21. Turner = 45,X (sheet: “monosomy 23”).',
+  },
+  {
+    id: 'e2-mc-17',
+    unitId: 'unit-4',
+    objective: 6,
+    prompt: 'Down syndrome is _____ ; Klinefelter is _____ ; Turner is _____.',
+    options: [
+      'Trisomy 13; XYY; trisomy 18',
+      'Trisomy 21; XXY; 45,X',
+      'X-linked only; autosomal recessive; mitosis',
+      'PKU; albinism; sickle cell',
+    ],
+    correctIndex: 1,
+    explanation: 'Patau 13, Edwards 18. Hemophilia and color blindness are X-linked, not karyotype syndromes.',
+  },
+  {
+    id: 'e2-mc-18',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Simple squamous epithelium is built for _____ ; stratified squamous is built for _____.',
+    options: [
+      'Protection; diffusion',
+      'Diffusion/filtration; protection',
+      'Contracting; conducting APs',
+      'Storing fat; making blood',
+    ],
+    correctIndex: 1,
+    explanation: 'Simple thin layers exchange; stacked layers protect (skin, esophagus).',
+  },
+  {
+    id: 'e2-mc-19',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Pseudostratified epithelium:',
+    options: [
+      'Has true multiple layers none of which touch the basement membrane',
+      'Looks layered but every cell touches the basement membrane (often ciliated respiratory tract)',
+      'Is cardiac muscle',
+      'Is liquid connective tissue',
+    ],
+    correctIndex: 1,
+    explanation: 'Lab worksheet: pseudostratified is a simple epithelium that looks stratified.',
+  },
+  {
+    id: 'e2-mc-20',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Dense regular connective tissue is the tissue of:',
+    options: ['Epidermis', 'Tendons and ligaments (parallel collagen)', 'Blood plasma', 'Neuron axons'],
+    correctIndex: 1,
+    explanation: 'Lecture: collagen fibers parallel; fibroblasts. Dense irregular = dermis (woven).',
+  },
+  {
+    id: 'e2-mc-21',
+    unitId: 'unit-3',
+    objective: 1,
+    prompt: 'Cardiac muscle is identified by:',
+    options: [
+      'No nuclei and no discs',
+      'Branched fibers, intercalated discs (gap junctions), autorhythmic',
+      'Multinucleate peripheral nuclei only, no discs',
+      'Fusiform cells with no striations',
+    ],
+    correctIndex: 1,
+    explanation: 'Smooth = fusiform, ANS, no striations. Skeletal = multinucleate, heavy striations, somatic.',
+  },
+  {
+    id: 'e2-mc-22',
+    unitId: 'unit-3',
+    objective: 8,
+    prompt: 'Normal saline (0.9% NaCl) is used because it is:',
+    options: [
+      'Pure water (hypotonic to RBCs)',
+      'Roughly isotonic to plasma, so it expands ECF without lysing RBCs',
+      'A DNA polymerase cofactor',
+      'Hypertonic 23% NaCl',
+    ],
+    correctIndex: 1,
+    explanation: 'Ringer’s is a closer full-electrolyte ECF match.',
+  },
+];
+
+export const exam2MatchingQuestions: MatchingQuestion[] = [
+  {
+    id: 'e2-mt-organelles',
+    type: 'matching',
+    systemId: 'integumentary',
+    prompt: 'Match the organelle to its job (Unit Two study guide / Ch 3).',
+    pairs: [
+      { left: 'Mitochondrion', right: 'ATP production' },
+      { left: 'Ribosome', right: 'Protein synthesis' },
+      { left: 'Golgi complex', right: 'Packages/ships proteins' },
+      { left: 'Lysosome', right: 'Digestive enzymes' },
+      { left: 'Nucleolus', right: 'Ribosome assembly' },
+    ],
+    explanation: 'Know the official organelle roster on the Unit 2 LO sheet.',
+  },
+  {
+    id: 'e2-mt-transport',
+    type: 'matching',
+    systemId: 'integumentary',
+    prompt: 'Match the membrane process.',
+    pairs: [
+      { left: 'Osmosis', right: 'Water down its gradient across a semipermeable membrane' },
+      { left: 'Filtration', right: 'Fluid pushed by pressure (glomerulus)' },
+      { left: 'Na+/K+ pump', right: 'Primary active transport (ATP)' },
+      { left: 'Phagocytosis', right: 'Cell eating of solids' },
+      { left: 'Exocytosis', right: 'Vesicle export' },
+    ],
+    explanation: 'Passive vs active vs vesicular — Unit Two items 5–10.',
+  },
+  {
+    id: 'e2-mt-epithelium',
+    type: 'matching',
+    systemId: 'integumentary',
+    prompt: 'Match the epithelium (histology lecture + lab worksheet).',
+    pairs: [
+      { left: 'Simple squamous', right: 'Thin exchange (vessels, alveoli)' },
+      { left: 'Stratified squamous', right: 'Protection (skin, esophagus)' },
+      { left: 'Simple cuboidal', right: 'Kidney tubules / glands' },
+      { left: 'Simple columnar', right: 'GI absorption (often microvilli)' },
+      { left: 'Pseudostratified', right: 'Respiratory tract; all cells touch basement membrane' },
+    ],
+    explanation: 'Shape + layers. Epithelium is avascular and polar.',
+  },
+  {
+    id: 'e2-mt-muscle',
+    type: 'matching',
+    systemId: 'integumentary',
+    prompt: 'Match the muscle type.',
+    pairs: [
+      { left: 'Skeletal', right: 'Multinucleate, striated, somatic control' },
+      { left: 'Cardiac', right: 'Branched, intercalated discs, autorhythmic' },
+      { left: 'Smooth', right: 'Fusiform, one nucleus, ANS, viscera/vessels' },
+    ],
+    explanation: 'Histology lecture muscle slides.',
+  },
+  {
+    id: 'e2-mt-syndromes',
+    type: 'matching',
+    systemId: 'integumentary',
+    prompt: 'Match the Unit Two LO condition.',
+    pairs: [
+      { left: 'Down syndrome', right: 'Trisomy 21' },
+      { left: 'Patau syndrome', right: 'Trisomy 13' },
+      { left: 'Edwards syndrome', right: 'Trisomy 18' },
+      { left: 'Klinefelter', right: 'XXY' },
+      { left: 'Turner', right: '45,X (sheet: monosomy 23)' },
+    ],
+    explanation: 'Hemophilia and color blindness are X-linked, not karyotype counts.',
+  },
+];
+
+export function getExam2StudyGuideQuestionsForUnit(unitId: UnitId): UnitQuestion[] {
+  return exam2StudyGuideQuestions.filter((q) => q.unitId === unitId);
+}

@@ -3,6 +3,7 @@ import { EXAM_BLOCKS, getUnitById, getUnitsForExam } from './courseUnits';
 import { quizQuestions, shuffle } from './quizQuestions';
 import { getQuestionsForUnit, type UnitQuestion } from './unitQuestions';
 import { exam1MatchingQuestions, exam1StudyGuideQuestions } from './exam1StudyGuide';
+import { exam2MatchingQuestions, exam2StudyGuideQuestions } from './exam2StudyGuide';
 
 export function getExamBlock(id: number) {
   return EXAM_BLOCKS.find((b) => b.id === id);
@@ -53,6 +54,15 @@ export function getExamPracticeDeck(blockId: 1 | 2 | 3 | 4 | 5): QuizQuestion[] 
     const matching = shuffle(exam1MatchingQuestions);
     const rest = shuffle([...concept, ...hubMc, ...diagrams, ...matching]);
     const pool = [...guide.slice(0, 28), ...vocab, ...rest];
+    return shuffle(pool.slice(0, Math.min(60, Math.max(50, pool.length))));
+  }
+  if (blockId === 2) {
+    const guideIds = new Set(exam2StudyGuideQuestions.map((q) => q.id));
+    const guide = shuffle(exam2StudyGuideQuestions).map(unitToMc);
+    const concept = shuffle(rawMc.filter((q) => q.kind !== 'vocab' && !guideIds.has(q.id))).map(unitToMc);
+    const matching = shuffle(exam2MatchingQuestions);
+    const rest = shuffle([...concept, ...hubMc, ...diagrams, ...matching]);
+    const pool = [...guide, ...vocab, ...rest];
     return shuffle(pool.slice(0, Math.min(60, Math.max(50, pool.length))));
   }
   const concept = shuffle(rawMc.filter((q) => q.kind !== 'vocab')).map(unitToMc);
