@@ -164,7 +164,7 @@ export function InteractiveDiagram({
   const focusRegion = focusId ? config.regions.find((r) => r.id === focusId) : undefined;
   const fullBox = useMemo(() => parseViewBox(config.viewBox), [config.viewBox]);
   const shouldZoom =
-    Boolean(focusRegion) && zoomOnFocus && !userZoomedOut && (narrow || compact);
+    !quizMode && Boolean(focusRegion) && zoomOnFocus && !userZoomedOut && (narrow || compact);
   const liveViewBox = useMemo(() => {
     if (!shouldZoom || !focusRegion) return config.viewBox;
     const box = pathBBox(focusRegion.d);
@@ -198,22 +198,34 @@ export function InteractiveDiagram({
             </button>
           )}
         </div>
-        <div className={`relative mx-auto w-full ${config.maxWidthClass ?? 'max-w-sm'}`}>
-          {bgSrc && !shouldZoom && (
+        <div
+          className={`relative mx-auto w-full ${config.maxWidthClass ?? 'max-w-sm'}`}
+          style={
+            bgSrc
+              ? {
+                  backgroundImage: `url("${bgSrc}")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center',
+                  backgroundSize: 'contain',
+                }
+              : undefined
+          }
+        >
+          {bgSrc && (
             <img
               key={bgSrc}
               src={bgSrc}
               alt={config.title}
-              className="pointer-events-none block h-auto w-full select-none"
+              className="pointer-events-none relative z-0 block h-auto w-full select-none"
               draggable={false}
             />
           )}
         <svg
-          viewBox={liveViewBox}
-          className={`${bgSrc && !shouldZoom ? 'absolute inset-0 h-full w-full' : 'w-full'} select-none touch-manipulation ${quizMode ? 'cursor-crosshair' : ''}`}
+          viewBox={config.viewBox}
+          className={`${bgSrc ? 'absolute inset-0 z-10 h-full w-full' : 'w-full'} select-none touch-manipulation ${quizMode ? 'cursor-crosshair' : ''}`}
           role="img"
           aria-label={config.ariaLabel}
-          style={{ WebkitTapHighlightColor: 'transparent' }}
+          style={{ WebkitTapHighlightColor: 'transparent', background: 'transparent' }}
           onClick={quizMode ? handleSvgClick : undefined}
         >
           <defs>
@@ -224,26 +236,7 @@ export function InteractiveDiagram({
             </linearGradient>
           </defs>
 
-          {bgSrc && shouldZoom && (() => {
-            const parts = config.viewBox.trim().split(/[\s,]+/).map(Number);
-            const vbW = parts[2] || 1;
-            const imgW = config.imageWidth ?? vbW;
-            const imgH = config.imageHeight ?? (parts[3] || 1);
-            return (
-              <image
-                href={bgSrc}
-                xlinkHref={bgSrc}
-                x={0}
-                y={0}
-                width={imgW}
-                height={imgH}
-                preserveAspectRatio="xMidYMid meet"
-                style={{ pointerEvents: 'none' }}
-              />
-            );
-          })()}
-
-          {!bgSrc &&
+          {!bgSrc &&}
             config.decor?.map((layer, i) => (
               <path
                 key={`decor-${i}`}
