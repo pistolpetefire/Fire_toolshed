@@ -1,19 +1,9 @@
 import { useMemo, useState } from 'react';
 import { diagramUrl } from './diagramAssets';
-import {
-  ANIMAL_CELL_LEADERS,
-  ANIMAL_CELL_LEADERS_PLATE,
-  type LeaderBlank,
-} from '../../data/animalCellLeaders';
+import { ANIMAL_CELL_LEADERS, ANIMAL_CELL_LEADERS_PLATE } from '../../data/animalCellLeaders';
 import { shuffle } from '../../data/quizQuestions';
 
 const NAMES = [...new Set(ANIMAL_CELL_LEADERS.map((l) => l.answer))];
-
-function translate(side: LeaderBlank['side']): string {
-  if (side === 'right') return 'translate(-100%, -50%)';
-  if (side === 'top') return 'translate(-50%, 0)';
-  return 'translate(0, -50%)';
-}
 
 export function FillLeadersPlate() {
   const [picks, setPicks] = useState<Record<string, string>>({});
@@ -40,39 +30,45 @@ export function FillLeadersPlate() {
     <div className="space-y-4">
       <p className="text-sm text-slate-600 dark:text-slate-300">{plate.prompt}</p>
       <div
-        className="relative mx-auto w-full max-w-4xl overflow-hidden rounded-xl bg-white"
+        className="relative mx-auto w-full max-w-lg overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700"
         style={{ aspectRatio: `${plate.width} / ${plate.height}` }}
       >
         <img
           src={diagramUrl(plate.file)}
-          alt={plate.title}
+          alt="Animal cell with lettered leaders"
           className="absolute inset-0 h-full w-full object-contain"
           draggable={false}
         />
+        {ANIMAL_CELL_LEADERS.map((l) => (
+          <span
+            key={l.id}
+            className="absolute z-10 flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white shadow"
+            style={{ left: `${l.nx * 100}%`, top: `${l.ny * 100}%` }}
+          >
+            {l.letter}
+          </span>
+        ))}
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2">
         {ANIMAL_CELL_LEADERS.map((l) => {
           const val = picks[l.id] ?? '';
           const graded = score !== null;
           const correct = val === l.answer;
-          let ring = 'border-slate-400';
-          if (graded) ring = correct ? 'border-emerald-500 bg-emerald-50' : 'border-rose-500 bg-rose-50';
+          let ring = 'border-slate-300 dark:border-slate-600';
+          if (graded) ring = correct ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40' : 'border-rose-500 bg-rose-50 dark:bg-rose-950/40';
           return (
-            <label
-              key={l.id}
-              className="absolute z-10"
-              style={{
-                left: `${l.nx * 100}%`,
-                top: `${l.ny * 100}%`,
-                transform: translate(l.side),
-              }}
-            >
-              <span className="sr-only">{l.answer}</span>
+            <label key={l.id} className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 ${ring}`}>
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">
+                {l.letter}
+              </span>
               <select
                 value={val}
                 disabled={graded}
                 onChange={(e) => setPick(l.id, e.target.value)}
-                className={`max-w-[9.5rem] cursor-pointer rounded border bg-white/95 px-1 py-0.5 text-[10px] font-medium shadow-sm sm:max-w-[11rem] sm:text-xs ${ring}`}
+                className="min-w-0 flex-1 bg-transparent text-sm"
               >
-                <option value="">—</option>
+                <option value="">Choose…</option>
                 {names.map((n) => (
                   <option key={n} value={n}>
                     {n}
@@ -83,14 +79,15 @@ export function FillLeadersPlate() {
           );
         })}
       </div>
+
       <div className="flex flex-wrap items-center gap-3">
         <button type="button" className="btn-primary" disabled={!filled || score !== null} onClick={submit}>
           Submit whole figure
         </button>
         {score && (
           <p className="text-sm font-semibold">
-            {score.ok} / {score.total} leaders correct
-            {score.ok === score.total ? ' — full plate.' : '. Red dropdowns are wrong; green are right.'}
+            {score.ok} / {score.total} correct
+            {score.ok === score.total ? ' — full plate.' : '. Red rows are wrong.'}
           </p>
         )}
         {score && (

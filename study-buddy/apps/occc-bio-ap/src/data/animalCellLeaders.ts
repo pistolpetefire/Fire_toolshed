@@ -1,42 +1,37 @@
-/** Fill-the-leaders test plate: instructor animal-cell figure (1839×1481).
- *  Dropdowns sit on the printed names so leaders stay visible.
- *  Positions are fractions of the image (0–1), measured from cropped label bands.
+/** Fill-the-leaders test: cropped instructor cell (names removed from the photo).
+ *  Letters sit on the drawing. Name dropdowns live UNDER the plate, not on it.
  */
 export interface LeaderBlank {
   id: string;
+  letter: string;
   answer: string;
   nx: number;
   ny: number;
-  /** Where the printed name sits relative to the leader. */
-  side: 'left' | 'right' | 'top';
 }
 
 export const ANIMAL_CELL_LEADERS_PLATE = {
   id: 'animal-cell-leaders',
   title: 'Animal cell — fill the leaders (test)',
-  file: 'unit/exam2-animal-cell-v2.jpg',
-  width: 1839,
-  height: 1481,
+  file: 'unit/exam2-animal-cell-quiz.jpg',
+  width: 760,
+  height: 1080,
   prompt:
-    'Each leader still points at a structure. The printed name is covered. Pick the name for every leader, then submit the whole figure.',
+    'Letters mark the instructor leaders on the cell. Names are not on the plate. Choose a name for every letter, then submit the whole figure.',
 };
 
 export const ANIMAL_CELL_LEADERS: LeaderBlank[] = [
-  { id: 'l-plasma', answer: 'Plasma membrane', nx: 0.05, ny: 0.14, side: 'left' },
-  { id: 'l-envelope', answer: 'Nuclear envelope', nx: 0.05, ny: 0.18, side: 'left' },
-  { id: 'l-pores', answer: 'Nuclear pores', nx: 0.05, ny: 0.22, side: 'left' },
-  { id: 'l-ser', answer: 'Smooth ER', nx: 0.05, ny: 0.26, side: 'left' },
-  { id: 'l-ribo', answer: 'Ribosomes', nx: 0.05, ny: 0.30, side: 'left' },
-  { id: 'l-perox', answer: 'Peroxisome', nx: 0.05, ny: 0.34, side: 'left' },
-  { id: 'l-nucleus', answer: 'Nucleus', nx: 0.19, ny: 0.40, side: 'left' },
-  { id: 'l-nucleolus', answer: 'Nucleolus', nx: 0.24, ny: 0.38, side: 'left' },
-  { id: 'l-chromatin', answer: 'Chromatin', nx: 0.16, ny: 0.44, side: 'left' },
-  { id: 'l-rer', answer: 'Rough ER', nx: 0.05, ny: 0.49, side: 'left' },
-  { id: 'l-golgi', answer: 'Golgi complex', nx: 0.08, ny: 0.60, side: 'left' },
-  { id: 'l-lyso', answer: 'Lysosome', nx: 0.08, ny: 0.64, side: 'left' },
-  { id: 'l-mito', answer: 'Mitochondria', nx: 0.11, ny: 0.71, side: 'left' },
-  { id: 'l-cyto', answer: 'Cytoplasm', nx: 0.07, ny: 0.76, side: 'left' },
-  { id: 'l-microvilli', answer: 'Microvilli', nx: 0.50, ny: 0.05, side: 'top' },
-  { id: 'l-cilia', answer: 'Cilia', nx: 0.86, ny: 0.08, side: 'right' },
-  { id: 'l-centrioles', answer: 'Centrioles', nx: 0.90, ny: 0.48, side: 'right' },
+  { id: 'l-plasma', letter: 'A', answer: 'Plasma membrane', nx: 0.08, ny: 0.48 },
+  { id: 'l-cyto', letter: 'B', answer: 'Cytoplasm', nx: 0.16, ny: 0.78 },
+  { id: 'l-nucleus', letter: 'C', answer: 'Nucleus', nx: 0.28, ny: 0.46 },
+  { id: 'l-nucleolus', letter: 'D', answer: 'Nucleolus', nx: 0.34, ny: 0.42 },
+  { id: 'l-envelope', letter: 'E', answer: 'Nuclear envelope', nx: 0.18, ny: 0.38 },
+  { id: 'l-rer', letter: 'F', answer: 'Rough ER', nx: 0.22, ny: 0.56 },
+  { id: 'l-ser', letter: 'G', answer: 'Smooth ER', nx: 0.12, ny: 0.36 },
+  { id: 'l-golgi', letter: 'H', answer: 'Golgi complex', nx: 0.48, ny: 0.62 },
+  { id: 'l-mito', letter: 'I', answer: 'Mitochondria', nx: 0.58, ny: 0.70 },
+  { id: 'l-lyso', letter: 'J', answer: 'Lysosome', nx: 0.40, ny: 0.74 },
+  { id: 'l-ribo', letter: 'K', answer: 'Ribosomes', nx: 0.26, ny: 0.52 },
+  { id: 'l-centrioles', letter: 'L', answer: 'Centrioles', nx: 0.72, ny: 0.55 },
+  { id: 'l-microvilli', letter: 'M', answer: 'Microvilli', nx: 0.52, ny: 0.10 },
+  { id: 'l-cilia', letter: 'N', answer: 'Cilia', nx: 0.78, ny: 0.14 },
 ];
