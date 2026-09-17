@@ -4,7 +4,7 @@ import { getStructureById } from '../../data/structures';
 import type { Structure } from '../../types';
 import type { DiagramConfig, DiagramRenderStyle } from './types';
 import { diagramUrl } from './diagramAssets';
-import { fitViewBox, parseViewBox, pathBBox, tapPoints } from './pathBBox';
+import { parseViewBox, pathBBox, tapPoints } from './pathBBox';
 
 export interface InteractiveDiagramProps {
   config: DiagramConfig;
@@ -165,12 +165,6 @@ export function InteractiveDiagram({
   const fullBox = useMemo(() => parseViewBox(config.viewBox), [config.viewBox]);
   const shouldZoom =
     !quizMode && Boolean(focusRegion) && zoomOnFocus && !userZoomedOut && (narrow || compact);
-  const liveViewBox = useMemo(() => {
-    if (!shouldZoom || !focusRegion) return config.viewBox;
-    const box = pathBBox(focusRegion.d);
-    if (!box) return config.viewBox;
-    return fitViewBox(box, fullBox);
-  }, [shouldZoom, focusRegion, config.viewBox, fullBox]);
 
   return (
     <div className={`flex flex-col gap-4 ${compact ? '' : 'lg:flex-row'} ${className}`}>
