@@ -83,8 +83,16 @@ export function InteractiveDiagram({
   const [internalSelected, setInternalSelected] = useState<string | null>(null);
   const [narrow, setNarrow] = useState(false);
   const [userZoomedOut, setUserZoomedOut] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
   const selectedId = controlledSelected !== undefined ? controlledSelected : internalSelected;
   const selected = selectedId ? getStructureById(selectedId) ?? null : null;
+  const plateFile =
+    quizMode && config.quizBackgroundImage
+      ? config.quizBackgroundImage
+      : config.backgroundImage;
+  const hasImage = Boolean(plateFile);
+  const palette = { ...styleClasses(config.renderStyle, hasImage), ...config.palette };
+  const bgSrc = plateFile ? diagramUrl(plateFile) : null;
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)');
@@ -97,13 +105,9 @@ export function InteractiveDiagram({
   useEffect(() => {
     setUserZoomedOut(false);
   }, [selectedId, highlightIds.join('|'), config.viewBox]);
-  const plateFile =
-    quizMode && config.quizBackgroundImage
-      ? config.quizBackgroundImage
-      : config.backgroundImage;
-  const hasImage = Boolean(plateFile);
-  const palette = { ...styleClasses(config.renderStyle, hasImage), ...config.palette };
-  const bgSrc = plateFile ? diagramUrl(plateFile) : null;
+  useEffect(() => {
+    setImgFailed(false);
+  }, [bgSrc]);
   const hint = quizMode
     ? 'Unlabeled plate — tap where that structure’s label / leader would be'
     : config.hint;
@@ -156,6 +160,8 @@ export function InteractiveDiagram({
         best = t;
       }
     }
+    const dist = Math.sqrt(bestD);
+    if (dist > Math.max(best.r * 2.2, 70)) return;
     handleClick(best.id);
   };
 
@@ -173,7 +179,7 @@ export function InteractiveDiagram({
           <p className="min-w-0 flex-1 text-left text-[11px] leading-snug text-slate-500 dark:text-slate-400 sm:text-xs">
             <span className="font-semibold text-slate-700 dark:text-slate-200">{config.title}.</span> {hint}
           </p>
-          {shouldZoom && (
+          {!quizMode && shouldZoom && (
             <button
               type="button"
               className="btn-ghost shrink-0 px-2 py-1 text-[11px]"
@@ -182,29 +188,30 @@ export function InteractiveDiagram({
               <RotateCcw className="h-3 w-3" /> Full plate
             </button>
           )}
-          {!shouldZoom && focusRegion && (narrow || compact) && (
-            <button
-              type="button"
-              className="btn-ghost shrink-0 px-2 py-1 text-[11px]"
-              onClick={() => setUserZoomedOut(false)}
-            >
-              <Focus className="h-3 w-3" /> Zoom
-            </button>
-          )}
         </div>
-        <div className={`relative mx-auto w-full ${config.maxWidthClass ?? 'max-w-sm'}`}>
+        <div
+          className={`relative mx-auto w-full overflow-hidden rounded-lg bg-slate-100 ${config.maxWidthClass ?? 'max-w-sm'}`}
+          style={{ aspectRatio: `${fullBox.width} / ${fullBox.height}` }}
+        >
           {bgSrc && (
             <img
               key={bgSrc}
               src={bgSrc}
               alt={config.title}
-              className="pointer-events-none relative z-0 block h-auto w-full select-none"
+              className="pointer-events-none absolute inset-0 z-0 h-full w-full object-contain"
               draggable={false}
+              onError={() => setImgFailed(true)}
+              onLoad={() => setImgFailed(false)}
             />
+          )}
+          {imgFailed && (
+            <p className="absolute inset-x-2 top-2 z-20 rounded bg-rose-600 px-2 py-1 text-xs text-white">
+              Plate image failed to load
+            </p>
           )}
         <svg
           viewBox={config.viewBox}
-          className={`${bgSrc ? 'absolute inset-0 z-10 h-full w-full' : 'w-full'} select-none touch-manipulation ${quizMode ? 'cursor-crosshair' : ''}`}
+          className="absolute inset-0 z-10 h-full w-full select-none touch-manipulation"
           role="img"
           aria-label={config.ariaLabel}
           style={{ WebkitTapHighlightColor: 'transparent', background: 'transparent' }}
