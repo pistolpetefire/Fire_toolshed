@@ -382,7 +382,7 @@ footer {
 footer a { color: var(--teal); font-weight: 700; }
 
 @media print {
-  .beta-banner, .top-actions, .no-print, button { display: none !important; }
+  .beta-banner, .top-actions, .no-print, .print-omit, button, #resultNote { display: none !important; }
   body { background: #fff; }
   .panel { box-shadow: none; break-inside: avoid; }
 }
@@ -498,7 +498,7 @@ footer a { color: var(--teal); font-weight: 700; }
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel print-omit">
           <h2>Gauge calibration (NFPA 291)</h2>
           <p class="hint">
             NFPA 291 recommends all pressure gauges be calibrated at least every <strong>12 months</strong> (or more often with heavy use).
@@ -641,7 +641,7 @@ footer a { color: var(--teal); font-weight: 700; }
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel print-omit">
           <h2>Procedure checklist (NFPA 291 4.5 / 4.6)</h2>
           <p class="hint">Mark each step completed in the field. Incomplete steps show as warnings on the requirements list.</p>
           <div class="check-grid" id="procedureChecks">
@@ -656,7 +656,7 @@ footer a { color: var(--teal); font-weight: 700; }
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel print-omit">
           <h2>Data sheet (NFPA 291 4.11 style)</h2>
           <p class="hint">Extra fields make the test useful beyond this report (marking, design handoff, retest schedule).</p>
           <div class="field-grid two">
@@ -717,7 +717,7 @@ footer a { color: var(--teal); font-weight: 700; }
       </div>
 
       <div>
-        <section class="panel">
+        <section class="panel print-omit">
           <h2>NFPA 291 test requirements</h2>
           <p class="hint" id="reqPurposeLabel">Requirements update with test purpose selection.</p>
           <ul class="req-list" id="reqList"></ul>
@@ -742,19 +742,19 @@ footer a { color: var(--teal); font-weight: 700; }
               <div class="label" id="mFireFlow20Label">Flow @ rating residual</div>
               <div class="value" id="mFireFlow20">—</div>
             </div>
-            <div class="metric">
+            <div class="metric print-omit">
               <div class="label">Pressure drop</div>
               <div class="value" id="mDrop">—</div>
             </div>
-            <div class="metric">
+            <div class="metric print-omit">
               <div class="label">Drop % of static</div>
               <div class="value" id="mDropPct">—</div>
             </div>
-            <div class="metric">
+            <div class="metric print-omit">
               <div class="label">Rated capacity (rounded)</div>
               <div class="value" id="mCapacityRound">—</div>
             </div>
-            <div class="metric">
+            <div class="metric print-omit">
               <div class="label">Hydrant class (AA–C)</div>
               <div class="value" id="mHydrantClass">—</div>
             </div>
@@ -2151,13 +2151,7 @@ footer a { color: var(--teal); font-weight: 700; }
       (state.residualHydrant ? " · Residual R " + state.residualHydrant : "") +
       (state.numFlowHydrants
         ? " · Flow F×" + state.numFlowHydrants + " [" + (state.flowHydrants || []).join(", ") + "]"
-        : " · Single-hydrant") +
-      (state.residualGaugeCalDate
-        ? " · Residual gauge cal " + state.residualGaugeCalDate
-        : "") +
-      (state.pitotGaugeCalDate ? " · Pitot gauge cal " + state.pitotGaugeCalDate : "") +
-      (state.mainSizeIn ? " · Main " + state.mainSizeIn + " in" : "") +
-      (state.weather ? " · " + state.weather : "");
+        : " · Single-hydrant");
 
     updateLayoutStatus();
     saveState();
@@ -2563,23 +2557,9 @@ footer a { color: var(--teal); font-weight: 700; }
     readForm();
     render();
     var c = calc();
-    var nfpa = evaluateNfpa291(c);
     var name =
       (state.projectName || "flow-test").replace(/[^\w\-]+/g, "_").slice(0, 40) ||
       "flow-test";
-    var reqHtml = nfpa.items
-      .map(function (it) {
-        return (
-          "<li><strong>[" +
-          it.status.toUpperCase() +
-          "] " +
-          escapeHtml(it.title) +
-          ":</strong> " +
-          escapeHtml(it.detail) +
-          "</li>"
-        );
-      })
-      .join("");
     var tableRows = "";
     if (c.valid) {
       tableRows +=
@@ -2592,12 +2572,6 @@ footer a { color: var(--teal); font-weight: 700; }
         " psi</td><td>" +
         round0(c.flowAtResidual) +
         " gpm</td></tr>";
-      tableRows +=
-        "<tr><td>Drop</td><td>" +
-        round1(c.pressureDrop) +
-        " psi (" +
-        round1(c.dropPct) +
-        "%)</td><td>—</td></tr>";
       if (Number.isFinite(c.fireFlowAt20)) {
         tableRows +=
           "<tr><td>Capacity @ " +
@@ -2648,34 +2622,9 @@ footer a { color: var(--teal); font-weight: 700; }
       "<br>" +
       escapeHtml(state.layoutNotes || "") +
       "</p>" +
-      "<h2>Gauges</h2><p>Residual gauge cal: " +
-      escapeHtml(state.residualGaugeCalDate || "—") +
-      " (" +
-      escapeHtml(state.residualGaugeId || "no ID") +
-      ")<br>Pitot gauge cal: " +
-      escapeHtml(state.pitotGaugeCalDate || "—") +
-      " (" +
-      escapeHtml(state.pitotGaugeId || "no ID") +
-      ")</p>" +
       "<h2>Test results</h2><table><thead><tr><th>Point</th><th>Pressure</th><th>Flow</th></tr></thead><tbody>" +
       tableRows +
       "</tbody></table>" +
-      "<h2>NFPA 291 checks</h2><ul>" +
-      reqHtml +
-      "</ul>" +
-      "<h2>Data sheet</h2><p>Main: " +
-      escapeHtml(state.mainSizeIn || "—") +
-      " in · Weather: " +
-      escapeHtml(state.weather || "—") +
-      " · Ordinary demand confirmed: " +
-      (state.ordinaryDemandConfirmed ? "Yes" : "No") +
-      "<br>Residual operator: " +
-      escapeHtml(state.residualOperator || "—") +
-      " · Pitot operator: " +
-      escapeHtml(state.pitotOperator || "—") +
-      "<br>Notes: " +
-      escapeHtml(state.unusualDemandNotes || state.generalNotes || "—") +
-      "</p>" +
       "<p class='muted'>Preliminary field documentation only. Not a substitute for stamped hydraulics or AHJ approval. System demand is calculated in the Sprinkler System Estimator.</p>" +
       "</body></html>";
     downloadFile(name + "_flow-test-report.html", html);
