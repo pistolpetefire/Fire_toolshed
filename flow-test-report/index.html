@@ -381,27 +381,25 @@ footer {
 }
 footer a { color: var(--teal); font-weight: 700; }
 
-@page {
-  size: letter;
-  margin: 0.55in;
-  @top-left { content: ""; }
-  @top-center { content: ""; }
-  @top-right { content: ""; }
-  @bottom-left { content: ""; }
-  @bottom-center { content: ""; }
-  @bottom-right { content: ""; }
-}
 @media print {
   .beta-banner, .top-actions, .no-print, .print-omit, button,
-  #resultNote, #layoutStatus, #pitotBandStatus, #printBlock, footer,
+  #resultNote, #layoutStatus, #pitotBandStatus, footer,
   .hint:not(.print-keep), .sub { display: none !important; }
   .hint.print-keep { display: block !important; }
   input::placeholder, textarea::placeholder { color: transparent !important; }
   body { background: #fff; }
-  .app-shell { padding: 0; }
   .layout { gap: 0.65rem; }
   .panel { box-shadow: none; break-inside: avoid; padding: 0.7rem 0.85rem; }
 }
+  </style>
+  <style media="print">
+    @page { size: letter; margin: 0; }
+    html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+    .app-shell { padding: 0.55in !important; }
+    .beta-banner, .top-actions, .no-print, .print-omit, button,
+    #resultNote, #layoutStatus, #pitotBandStatus, #printBlock, footer,
+    .hint:not(.print-keep), .sub, .wps-root { display: none !important; }
+    input::placeholder, textarea::placeholder { color: transparent !important; }
   </style>
 </head>
 <body>
@@ -820,23 +818,6 @@ footer a { color: var(--teal); font-weight: 700; }
         </section>
       </div>
     </div>
-
-    <!-- Print block -->
-    <section class="panel print-omit" id="printBlock" style="margin-top:1rem">
-      <div id="reportLogoPrint" class="report-logo-print"></div>
-      <h2>Flow test report summary</h2>
-      <p class="hint" id="printMeta">—</p>
-      <div class="metrics">
-        <div class="metric"><div class="label">Static</div><div class="value" id="pStatic">—</div></div>
-        <div class="metric"><div class="label">Residual</div><div class="value" id="pResidual">—</div></div>
-        <div class="metric"><div class="label">Test flow</div><div class="value" id="pFlow">—</div></div>
-        <div class="metric"><div class="label">Fire flow @ 20</div><div class="value" id="pFire20">—</div></div>
-      </div>
-      <div class="chart-frame" id="printChartHost"></div>
-      <p class="hint" style="margin-top:0.75rem">
-        Next step: capture results → Sprinkler System Estimator (demand + duration) → Fire Pump Sizer → Tank Sizer (planned).
-      </p>
-    </section>
 
     <footer class="print-omit">
       <p>
@@ -2118,8 +2099,6 @@ footer a { color: var(--teal); font-weight: 700; }
     var model = buildChart(c);
     var svgMarkup = renderSvg(model);
     $("supplySvg").innerHTML = svgMarkup;
-    $("printChartHost").innerHTML =
-      '<svg viewBox="0 0 640 320" style="width:100%;height:auto">' + svgMarkup + "</svg>";
 
     var rows = [];
     if (c.valid) {
@@ -2150,24 +2129,6 @@ footer a { color: var(--teal); font-weight: 700; }
         );
       })
       .join("");
-
-    $("pStatic").textContent = $("mStatic").textContent;
-    $("pResidual").textContent = $("mResidual").textContent;
-    $("pFlow").textContent = $("mFlow").textContent;
-    $("pFire20").textContent = $("mFireFlow20").textContent;
-    $("printMeta").textContent =
-      (state.projectName || "Hydrant flow test") +
-      " · " +
-      (state.testPurpose === "fireFlow"
-        ? "Fire flow / hydrant capacity (NFPA 291)"
-        : "Fire suppression supply (NFPA 291)") +
-      (state.address ? " · " + state.address : "") +
-      (state.testTime ? " · " + state.testTime.replace("T", " ") : "") +
-      (state.engineer ? " · " + state.engineer : "") +
-      (state.residualHydrant ? " · Residual R " + state.residualHydrant : "") +
-      (state.numFlowHydrants
-        ? " · Flow F×" + state.numFlowHydrants + " [" + (state.flowHydrants || []).join(", ") + "]"
-        : " · Single-hydrant");
 
     updateLayoutStatus();
     saveState();
