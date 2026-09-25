@@ -381,10 +381,26 @@ footer {
 }
 footer a { color: var(--teal); font-weight: 700; }
 
+@page {
+  size: letter;
+  margin: 0.55in;
+  @top-left { content: ""; }
+  @top-center { content: ""; }
+  @top-right { content: ""; }
+  @bottom-left { content: ""; }
+  @bottom-center { content: ""; }
+  @bottom-right { content: ""; }
+}
 @media print {
-  .beta-banner, .top-actions, .no-print, .print-omit, button, #resultNote { display: none !important; }
+  .beta-banner, .top-actions, .no-print, .print-omit, button,
+  #resultNote, #layoutStatus, #pitotBandStatus, #printBlock, footer,
+  .hint:not(.print-keep), .sub { display: none !important; }
+  .hint.print-keep { display: block !important; }
+  input::placeholder, textarea::placeholder { color: transparent !important; }
   body { background: #fff; }
-  .panel { box-shadow: none; break-inside: avoid; }
+  .app-shell { padding: 0; }
+  .layout { gap: 0.65rem; }
+  .panel { box-shadow: none; break-inside: avoid; padding: 0.7rem 0.85rem; }
 }
   </style>
 </head>
@@ -627,7 +643,7 @@ footer a { color: var(--teal); font-weight: 700; }
               </select>
             </div>
             <div id="outletRows" style="margin-top:0.5rem"></div>
-            <p class="hint" id="multiOutletSum" style="margin-top:0.5rem"></p>
+            <p class="hint print-keep" id="multiOutletSum" style="margin-top:0.5rem"></p>
           </div>
           <label class="switch-row" style="margin-top:0.75rem">
             <span>Monster Pitot Chart (forces C = 0.9, round to 5 gpm)</span>
@@ -775,7 +791,7 @@ footer a { color: var(--teal); font-weight: 700; }
 
         <section class="panel">
           <h2>Supply curve (N<sup>1.85</sup>)</h2>
-          <p class="hint">
+          <p class="hint print-keep">
             P = P<sub>static</sub> − (P<sub>static</sub> − P<sub>residual</sub>) × (Q / Q<sub>test</sub>)<sup>1.85</sup>.
             Horizontal axis uses hydraulic flow scale. System demand is plotted in the Sprinkler Estimator.
           </p>
@@ -794,7 +810,7 @@ footer a { color: var(--teal); font-weight: 700; }
           </table>
         </section>
 
-        <section class="panel">
+        <section class="panel print-omit">
           <h2>What this tool does / does not</h2>
           <ul class="hint" style="margin:0;padding-left:1.1rem">
             <li><strong>Does:</strong> record hydrant flow test, pitot GPM, supply curve, fire flow at 20 psi, PDF/print package, capture for Sprinkler Estimator.</li>
@@ -806,7 +822,7 @@ footer a { color: var(--teal); font-weight: 700; }
     </div>
 
     <!-- Print block -->
-    <section class="panel" id="printBlock" style="margin-top:1rem">
+    <section class="panel print-omit" id="printBlock" style="margin-top:1rem">
       <div id="reportLogoPrint" class="report-logo-print"></div>
       <h2>Flow test report summary</h2>
       <p class="hint" id="printMeta">—</p>
@@ -822,7 +838,7 @@ footer a { color: var(--teal); font-weight: 700; }
       </p>
     </section>
 
-    <footer>
+    <footer class="print-omit">
       <p>
         <strong>Version <span id="footerVersion">2.2.0</span></strong>
         · Hydrant flow test (NFPA 291) · Not a substitute for stamped hydraulics or AHJ approval.
@@ -2119,12 +2135,12 @@ footer a { color: var(--teal); font-weight: 700; }
           p: round0(c.minResidual),
         });
       }
-      rows.push({ n: "Min residual / rating reference", q: "—", p: round1(c.minResidual) });
+      rows.push({ n: "Min residual / rating reference", q: "—", p: round1(c.minResidual), omitPrint: true });
     }
     $("resultTable").innerHTML = rows
       .map(function (r) {
         return (
-          "<tr><td>" +
+          "<tr" + (r.omitPrint ? ' class="print-omit"' : "") + "><td>" +
           r.n +
           '</td><td class="num">' +
           r.q +
