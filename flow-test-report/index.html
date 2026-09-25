@@ -393,13 +393,53 @@ footer a { color: var(--teal); font-weight: 700; }
 }
   </style>
   <style media="print">
-    @page { size: letter; margin: 0; }
+    @page {
+      size: letter;
+      margin: 0.82in 0.55in 0.4in 0.55in;
+      @top-left {
+        content: "Flow Test Report";
+        white-space: pre;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        font-size: 11pt;
+        font-weight: 800;
+        line-height: 1.28;
+        color: #1d4e89;
+        vertical-align: bottom;
+        padding-bottom: 5pt;
+        border-bottom: 2.5px solid #1d4e89;
+      }
+      @top-center {
+        content: "";
+        vertical-align: bottom;
+        padding-bottom: 5pt;
+        border-bottom: 2.5px solid #1d4e89;
+      }
+      @top-right {
+        content: "";
+        vertical-align: bottom;
+        padding-bottom: 5pt;
+        border-bottom: 2.5px solid #1d4e89;
+      }
+      @bottom-left { content: ""; }
+      @bottom-center { content: ""; }
+      @bottom-right { content: ""; }
+    }
     html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
-    .app-shell { padding: 0.55in !important; }
-    .beta-banner, .top-actions, .no-print, .print-omit, button,
+    .app-shell { padding: 0 !important; }
+    .top-bar { border: 0 !important; margin: 0 !important; padding: 0 !important; }
+    .top-bar .eyebrow, .top-bar h1, .top-bar .version { display: none !important; }
+    .beta-banner, .top-actions, .no-print, .print-omit, .print-page-head, button,
     #resultNote, #layoutStatus, #pitotBandStatus, #printBlock, footer,
     .hint:not(.print-keep), .sub, .wps-root { display: none !important; }
     input::placeholder, textarea::placeholder { color: transparent !important; }
+    .panel h2 { color: #1d4e89 !important; }
+    .panel {
+      border: 1px solid #d3e2f4 !important;
+      border-top: 3px solid #1d4e89 !important;
+    }
+    .metric { background: #e7f0fb !important; }
+    .metric .value { color: #1d4e89 !important; }
+    table.data th { color: #1d4e89 !important; }
   </style>
 </head>
 <body>
@@ -2484,6 +2524,13 @@ footer a { color: var(--teal); font-weight: 700; }
     $("btnCapture2").addEventListener("click", capture);
     if ($("btnCaptureOpen")) $("btnCaptureOpen").addEventListener("click", captureOpen);
     if ($("btnCaptureOpenTop")) $("btnCaptureOpenTop").addEventListener("click", captureOpen);
+    var screenTitle = document.title;
+    window.addEventListener("beforeprint", function () {
+      document.title = "Flow Test Report";
+    });
+    window.addEventListener("afterprint", function () {
+      document.title = screenTitle;
+    });
     $("btnPrint").addEventListener("click", function () {
       render();
       window.print();
@@ -2570,7 +2617,7 @@ footer a { color: var(--teal); font-weight: 700; }
       "</title><style>body{font-family:system-ui,sans-serif;max-width:800px;margin:24px auto;padding:0 16px;color:#0f172a;line-height:1.45}h1{font-size:1.4rem}h2{font-size:1.05rem;margin-top:1.4rem}table{width:100%;border-collapse:collapse;font-size:0.9rem}th,td{border-bottom:1px solid #e2e8f0;padding:0.4rem;text-align:left}th{color:#64748b;font-size:0.75rem;text-transform:uppercase}.muted{color:#64748b;font-size:0.85rem}ul{padding-left:1.2rem}</style></head><body>" +
       logoHtml +
       "<h1>Hydrant Flow Test Report</h1>" +
-      "<p class='muted'>Fire Toolshed · Flow Test Report v" +
+      "<p class='muted'>Flow Test Report v" +
       APP_VERSION +
       " · NFPA 291 guidance · Generated " +
       new Date().toLocaleString() +
