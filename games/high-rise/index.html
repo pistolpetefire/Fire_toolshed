@@ -91,8 +91,9 @@ const ART = {
   const ladderX = [0.38, 0.46, 0.33];
   const winX = [0.22, 0.42, 0.62, 0.82];
   let state = "title", score = 0, high = 0, lives = 3, wave = 1, tick = 0;
+  let player = { f: 0, x: 0.5, dir: 1, climb: 0 };
   try { high = parseInt(localStorage.getItem("hr_high") || "0", 10) || 0; } catch (e) {}
-  let player, fires, embers, outs, puffs, shards, civs, bricks, keys = {};
+  let fires, embers, outs, puffs, shards, civs, bricks, keys = {};
   let spraying = false;
 
   function bld() {
@@ -345,7 +346,7 @@ const ART = {
       ctx.drawImage(imgs.glass, x - 16 * S, y, 28 * S, 42 * S);
       ctx.globalAlpha = 1;
     }
-    if (player && ready >= 34 && state !== "title") {
+    if (player && ready >= 34 && state !== "over" && state !== "win") {
       const px = b.x + b.w * player.x;
       const py = floorY(player.f) - 52 * S;
       const sprayingNow = spraying || keys.spray;
@@ -392,14 +393,14 @@ const ART = {
     } else text("LIVES " + lives, 12, 36, 8, "#ffb347", "left");
     if (state === "play" && player && player.f === 0) text(nearLadder() >= 0 ? "UP TO CLIMB" : "WALK TO ESCAPE", W / 2, H - 78, 8, "#ffe14a");
     if (state === "title") {
-      ctx.fillStyle = "rgba(8,4,12,.55)"; ctx.fillRect(0, 0, W, H);
-      if (imgs.title) {
-        const tw = Math.min(W * 0.88, 520 * S), th = tw * 0.67;
-        ctx.drawImage(imgs.title, (W - tw) / 2, H * 0.16, tw, th);
-      } else text("HIGH RISE", W / 2, H * 0.32, 22 * S, "#ffe14a");
-      text("CLIMB  SOAK  SAVE THE WAVER", W / 2, H * 0.7, 7 * S, "#fff");
-      text("5 FLOORS  TAP FLOW", W / 2, H * 0.78, 9 * S, "#9ad7ff");
-      if (high) text("BEST " + high, W / 2, H * 0.86, 7 * S, "#ffb347");
+      ctx.fillStyle = "rgba(8,4,12,.45)"; ctx.fillRect(0, 0, W, H);
+      text("HIGH RISE", W / 2, H * 0.28, 20 * S, "#ffe14a");
+      text("TAP THE RED FLOW BUTTON", W / 2, H * 0.4, 9 * S, "#fff");
+      ctx.fillStyle = "#e23b2f";
+      const bw = 160 * S, bh = 44 * S, bx = (W - bw) / 2, by = H * 0.48;
+      ctx.fillRect(bx, by, bw, bh);
+      text("START", W / 2, by + bh / 2, 14 * S, "#fff");
+      if (high) text("BEST " + high, W / 2, H * 0.66, 8 * S, "#ffb347");
     }
     if (state === "wave") {
       if (imgs.clear) {
@@ -439,11 +440,12 @@ const ART = {
   }
   bind("l", "left"); bind("r", "right"); bind("u", "up"); bind("d", "down");
   const spray = document.getElementById("spray");
-  spray.addEventListener("pointerdown", (e) => {
-    e.preventDefault();
-    spraying = true;
+  function begin(e) {
+    if (e) e.preventDefault();
     if (state === "title" || state === "over" || state === "win") start();
-  });
+  }
+  spray.addEventListener("pointerdown", (e) => { begin(e); spraying = true; });
+  document.getElementById("view").addEventListener("pointerdown", begin);
   spray.addEventListener("pointerup", () => spraying = false);
   spray.addEventListener("pointercancel", () => spraying = false);
   addEventListener("keydown", (e) => {
