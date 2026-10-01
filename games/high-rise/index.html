@@ -95,7 +95,7 @@ const ART = {
   const ladderX = [0.38, 0.46, 0.33];
   const winX = [0.22, 0.42, 0.62, 0.82];
   let state = "title", score = 0, high = 0, lives = 3, wave = 1, tick = 0;
-  let player = { f: 0, x: 0.5, dir: 1, climb: 0 };
+  let player = { f: 0, x: 0.2, dir: 1, climb: 0 };
   try { high = parseInt(localStorage.getItem("hr_high") || "0", 10) || 0; } catch (e) {}
   let fires, embers, outs, puffs, shards, civs, bricks, keys = {};
   let spraying = false;
@@ -157,7 +157,7 @@ const ART = {
   }
   function start() {
     score = 0; lives = 3; wave = 1;
-    player = { f: 0, x: 0.38, dir: 1, climb: 0 };
+    player = { f: 0, x: 0.2, dir: 1, climb: 0 };
     resetFires();
     state = "play";
   }
@@ -280,7 +280,7 @@ const ART = {
     if (ready >= 34) ctx.drawImage(imgs.building, b.x, b.y, b.w, b.h);
     if (imgs.hydrant) ctx.drawImage(imgs.hydrant, b.x - 8 * S, b.y + b.h - 78 * S, 36 * S, 56 * S);
     if (imgs.hose) ctx.drawImage(imgs.hose, b.x + 18 * S, b.y + b.h - 36 * S, 34 * S, 28 * S);
-    if (imgs.truck) ctx.drawImage(imgs.truck, b.x + b.w - 250 * S, b.y + b.h - 108 * S, 294 * S, 122 * S);
+    if (imgs.truck) ctx.drawImage(imgs.truck, b.x + b.w - 120 * S, b.y + b.h - 96 * S, 294 * S, 122 * S);
     if (imgs.chief) ctx.drawImage(imgs.chief, b.x + 46 * S, b.y + b.h - 78 * S, 28 * S, 52 * S);
     if (imgs.lamp) ctx.drawImage(imgs.lamp, b.x + b.w + 8 * S, b.y + b.h - 110 * S, 16 * S, 88 * S);
     if ((spraying || keys.spray) && player) {
@@ -350,18 +350,19 @@ const ART = {
       ctx.drawImage(imgs.glass, x - 16 * S, y, 28 * S, 42 * S);
       ctx.globalAlpha = 1;
     }
-    if (player && ready >= 34 && state !== "over" && state !== "win") {
+    if (player && state !== "over" && state !== "win") {
       const px = b.x + b.w * player.x;
-      const py = floorY(player.f) - 52 * S;
+      const py = floorY(player.f) - 64 * S;
       const sprayingNow = spraying || keys.spray;
       const onLadder = nearLadder() >= 0 && (keys.up || keys.down || player.climb > 0);
       const spr = sprayingNow ? imgs.spray : onLadder ? imgs.climb : imgs.walk;
-      const dw = sprayingNow ? 78 * S : onLadder ? 56 * S : 46 * S;
-      const dh = sprayingNow ? 64 * S : 70 * S;
+      const dw = sprayingNow ? 96 * S : onLadder ? 72 * S : 64 * S;
+      const dh = sprayingNow ? 80 * S : 96 * S;
       ctx.save();
       ctx.translate(px, py);
       if (player.dir < 0) ctx.scale(-1, 1);
-      ctx.drawImage(spr, -dw * 0.35, -dh * 0.2, dw, dh);
+      if (spr && spr.complete) ctx.drawImage(spr, -dw * 0.35, -dh * 0.2, dw, dh);
+        else { ctx.fillStyle = "#ffe14a"; ctx.fillRect(-10 * S, -20 * S, 20 * S, 36 * S); }
       if (sprayingNow && imgs.jet) {
         const jw = 118 * S, jh = 28 * S;
         ctx.drawImage(imgs.jet, dw * 0.28, -jh * 0.15, jw, jh);
@@ -436,6 +437,8 @@ const ART = {
     }
     requestAnimationFrame(frame);
   }
+  const _frame = frame;
+  frame = function () { try { _frame(); } catch (err) { requestAnimationFrame(frame); } };
   function setKey(k, v) { keys[k] = v; }
   function bind(id, k) {
     const el = document.getElementById(id);
