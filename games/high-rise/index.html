@@ -445,7 +445,7 @@ const ART = {
     if (state === "title" || state === "over" || state === "win") start();
   }
   spray.addEventListener("pointerdown", (e) => { begin(e); spraying = true; });
-  document.getElementById("view").addEventListener("pointerdown", begin);
+  document.getElementById("c").addEventListener("pointerdown", begin);
   spray.addEventListener("pointerup", () => spraying = false);
   spray.addEventListener("pointercancel", () => spraying = false);
   addEventListener("keydown", (e) => {
