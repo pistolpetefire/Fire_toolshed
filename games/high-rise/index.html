@@ -57,7 +57,7 @@ const ART = {
   addEventListener("resize", resize); resize();
 
   const FLOORS = 5, WINS = 4;
-  const ladderX = [0.28, 0.50, 0.74];
+  const ladderX = [0.40, 0.48, 0.56];
   const winX = [0.22, 0.42, 0.62, 0.82];
   let state = "title", score = 0, high = 0, lives = 3, wave = 1, tick = 0;
   try { high = parseInt(localStorage.getItem("hr_high") || "0", 10) || 0; } catch (e) {}
@@ -158,10 +158,7 @@ const ART = {
     for (let f = 0; f < FLOORS; f++) {
       const y = floorY(f);
       ctx.fillStyle = "rgba(90,42,32,.55)"; ctx.fillRect(b.x + 8, y, b.w - 16, 6);
-      for (const lx0 of ladderX) {
-        ctx.fillStyle = "rgba(20,16,14,.55)";
-        ctx.fillRect(b.x + b.w * lx0 - 2, y - b.h * 0.15, 4, b.h * 0.15);
-      }
+      /* fire escape is painted on the brownstone */
     }
     for (const fr of fires) {
       const x = wx(fr.c), y = floorY(fr.f) - 34 * S;
