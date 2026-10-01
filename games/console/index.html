@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Toolshed" />
+<meta name="theme-color" content="#2a2d32" />
+<title>TOOLSHED</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: #1a1c20; color: #f4efe4; font-family: "Press Start 2P", monospace; }
+  body { min-height: 100dvh; display: grid; place-items: center; padding: 16px; }
+  .unit { width: min(440px, 100%); background: linear-gradient(180deg, #3a3e45, #2a2d32 40%, #23262b); border-radius: 36px; padding: 22px 18px 26px; box-shadow: 0 24px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12); border: 2px solid #15171b; }
+  .slot { height: 14px; width: 46%; margin: -22px auto 14px; background: #14161a; border-radius: 0 0 8px 8px; }
+  .screen { background: #0c1a14; border-radius: 12px; border: 8px solid #1c1f24; min-height: 320px; position: relative; overflow: hidden; }
+  .screen:before { content: ""; pointer-events: none; position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, rgba(0,0,0,.18) 0 1px, transparent 1px 3px); z-index: 2; }
+  .boot, .menu { position: relative; z-index: 1; padding: 18px 14px 14px; }
+  .brand { color: #b6f25c; font-size: 13px; text-align: center; margin: 8px 0 4px; }
+  .sub { color: #7d8a72; font-size: 8px; text-align: center; line-height: 1.7; }
+  .cart { display: block; width: 100%; text-align: left; margin-top: 10px; background: #10261c; color: #e7f6c9; border: 2px solid #24523a; border-radius: 8px; padding: 12px 10px; font-family: inherit; font-size: 10px; }
+  .cart small { display: block; color: #8fbf72; font-size: 8px; margin-top: 6px; line-height: 1.5; }
+  .cart.on { background: #b6f25c; color: #14210f; border-color: #e7f6c9; }
+  .cart.on small { color: #24523a; }
+  .plate { text-align: center; font-size: 8px; letter-spacing: 2px; color: #c9ccd1; margin: 14px 0 8px; }
+  .controls { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  .pad { width: 84px; height: 84px; position: relative; }
+  .pad i { position: absolute; background: #e2b423; border-radius: 6px; }
+  .pad .h { left: 0; top: 30px; width: 84px; height: 24px; }
+  .pad .v { left: 30px; top: 0; width: 24px; height: 84px; }
+  .btns { display: flex; gap: 12px; align-items: center; }
+  .btn { border: 0; border-radius: 50%; font-family: inherit; }
+  .b { width: 54px; height: 54px; background: #e2b423; color: #1a1208; font-size: 10px; }
+  .a { width: 64px; height: 64px; background: #d23b2f; color: #fff; font-size: 12px; }
+  .led { width: 8px; height: 8px; border-radius: 50%; background: #ff2a2a; box-shadow: 0 0 10px #ff2a2a; margin: 14px auto 0; }
+</style>
+</head>
+<body>
+  <div class="unit">
+    <div class="slot"></div>
+    <div class="screen">
+      <div class="boot" id="boot"><div class="brand">TOOLSHED</div><div class="sub">PORTABLE ARCADE<br>INSERT CARTRIDGE</div></div>
+      <div class="menu" id="menu" hidden></div>
+    </div>
+    <div class="plate">TOOLSHED</div>
+    <div class="controls">
+      <div class="pad" aria-hidden="true"><i class="h"></i><i class="v"></i></div>
+      <div class="btns">
+        <button class="btn b" id="bBtn" type="button">B</button>
+        <button class="btn a" id="aBtn" type="button">A</button>
+      </div>
+    </div>
+    <div class="led"></div>
+  </div>
+<script>
+const games = [
+  { name: "HYDRANT DEFENSE", blurb: "Hold the hardstand. 500 gpm.", href: "../hydrant-defense/" },
+  { name: "WAND RAIDERS", blurb: "Halloween shooter. Tap to cast.", href: "../wand/" },
+  { name: "PUNCH-OUT", blurb: "Dodge, duck, counter.", href: "../punch-out/" },
+  { name: "FROGGER", blurb: "Cross the pads.", href: "../frogger/" },
+  { name: "MS PAC MAZE", blurb: "Pellets and ghosts.", href: "../ms-pac/" }
+];
+let idx = 0;
+const boot = document.getElementById("boot");
+const menu = document.getElementById("menu");
+function render() {
+  menu.innerHTML = games.map((g, i) => `<button class="cart${i === idx ? " on" : ""}" data-i="${i}" type="button">${g.name}<small>${g.blurb}</small></button>`).join("");
+}
+function showMenu() { boot.hidden = true; menu.hidden = false; render(); }
+setTimeout(showMenu, 700);
+menu.addEventListener("click", (e) => {
+  const btn = e.target.closest(".cart");
+  if (!btn) return;
+  idx = Number(btn.dataset.i);
+  render();
+});
+function launch() {
+  const g = games[idx];
+  boot.hidden = false; menu.hidden = true;
+  boot.innerHTML = `<div class="brand">LOADING</div><div class="sub">${g.name}</div>`;
+  setTimeout(() => { location.href = g.href; }, 350);
+}
+document.getElementById("aBtn").addEventListener("click", launch);
+document.getElementById("bBtn").addEventListener("click", () => { idx = (idx + 1) % games.length; if (!menu.hidden) render(); });
+</script>
+</body>
+</html>
