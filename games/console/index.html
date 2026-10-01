@@ -12,14 +12,39 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; height: 100%; background: #1a1c20; color: #f4efe4; font-family: "Press Start 2P", monospace; }
   body { min-height: 100dvh; display: grid; place-items: center; padding: 16px; }
-  .unit { width: min(440px, 100%); background: linear-gradient(180deg, #3a3e45, #2a2d32 40%, #23262b); border-radius: 36px; padding: 22px 18px 26px; box-shadow: 0 24px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12); border: 2px solid #15171b; }
+  .unit {
+    width: min(440px, 100%);
+    background: linear-gradient(180deg, #3a3e45, #2a2d32 40%, #23262b);
+    border-radius: 36px;
+    padding: 22px 18px 26px;
+    box-shadow: 0 24px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
+    border: 2px solid #15171b;
+  }
   .slot { height: 14px; width: 46%; margin: -22px auto 14px; background: #14161a; border-radius: 0 0 8px 8px; }
-  .screen { background: #0c1a14; border-radius: 12px; border: 8px solid #1c1f24; min-height: 320px; position: relative; overflow: hidden; }
-  .screen:before { content: ""; pointer-events: none; position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, rgba(0,0,0,.18) 0 1px, transparent 1px 3px); z-index: 2; }
+  .screen {
+    background: #0c1a14;
+    border-radius: 12px;
+    border: 8px solid #1c1f24;
+    min-height: 280px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 2px #0a0c0e;
+  }
+  .screen:before {
+    content: "";
+    pointer-events: none;
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(to bottom, rgba(0,0,0,.18) 0 1px, transparent 1px 3px);
+    z-index: 2;
+  }
   .boot, .menu { position: relative; z-index: 1; padding: 18px 14px 14px; }
-  .brand { color: #b6f25c; font-size: 13px; text-align: center; margin: 8px 0 4px; }
+  .brand { color: #b6f25c; font-size: 13px; letter-spacing: 1px; text-align: center; margin: 8px 0 4px; }
   .sub { color: #7d8a72; font-size: 8px; text-align: center; line-height: 1.7; }
-  .cart { display: block; width: 100%; text-align: left; margin-top: 10px; background: #10261c; color: #e7f6c9; border: 2px solid #24523a; border-radius: 8px; padding: 12px 10px; font-family: inherit; font-size: 10px; }
+  .cart {
+    display: block; width: 100%; text-align: left; margin-top: 10px;
+    background: #10261c; color: #e7f6c9; border: 2px solid #24523a;
+    border-radius: 8px; padding: 12px 10px; font-family: inherit; font-size: 10px;
+  }
   .cart small { display: block; color: #8fbf72; font-size: 8px; margin-top: 6px; line-height: 1.5; }
   .cart.on { background: #b6f25c; color: #14210f; border-color: #e7f6c9; }
   .cart.on small { color: #24523a; }
@@ -30,17 +55,21 @@
   .pad .h { left: 0; top: 30px; width: 84px; height: 24px; }
   .pad .v { left: 30px; top: 0; width: 24px; height: 84px; }
   .btns { display: flex; gap: 12px; align-items: center; }
-  .btn { border: 0; border-radius: 50%; font-family: inherit; }
-  .b { width: 54px; height: 54px; background: #e2b423; color: #1a1208; font-size: 10px; }
+  .btn { border: 0; border-radius: 50%; font-family: inherit; color: #1a1208; }
+  .b { width: 54px; height: 54px; background: #e2b423; font-size: 10px; }
   .a { width: 64px; height: 64px; background: #d23b2f; color: #fff; font-size: 12px; }
   .led { width: 8px; height: 8px; border-radius: 50%; background: #ff2a2a; box-shadow: 0 0 10px #ff2a2a; margin: 14px auto 0; }
+  #play { display: none; }
 </style>
 </head>
 <body>
   <div class="unit">
     <div class="slot"></div>
-    <div class="screen">
-      <div class="boot" id="boot"><div class="brand">TOOLSHED</div><div class="sub">PORTABLE ARCADE<br>INSERT CARTRIDGE</div></div>
+    <div class="screen" id="screen">
+      <div class="boot" id="boot">
+        <div class="brand">TOOLSHED</div>
+        <div class="sub">PORTABLE ARCADE<br>INSERT CARTRIDGE</div>
+      </div>
       <div class="menu" id="menu" hidden></div>
     </div>
     <div class="plate">TOOLSHED</div>
@@ -55,19 +84,26 @@
   </div>
 <script>
 const games = [
-  { name: "HYDRANT DEFENSE", blurb: "Hold the hardstand. 500 gpm.", href: "../hydrant-defense/" },
-  { name: "WAND RAIDERS", blurb: "Halloween shooter. Tap to cast.", href: "../wand/" },
-  { name: "PUNCH-OUT", blurb: "Dodge, duck, counter.", href: "../punch-out/" },
-  { name: "FROGGER", blurb: "Cross the pads.", href: "../frogger/" },
-  { name: "MS PAC MAZE", blurb: "Pellets and ghosts.", href: "../ms-pac/" }
+  { id: "rise", name: "HIGH RISE", blurb: "Climb. Switch ladders. Soak windows.", href: "../high-rise/" },
+  { id: "hydrant", name: "HYDRANT DEFENSE", blurb: "Hold the hardstand. 500 gpm.", href: "../hydrant-defense/" },
+  { id: "wand", name: "WAND RAIDERS", blurb: "Halloween shooter. Tap to cast.", href: "../wand/" },
+  { id: "punch", name: "PUNCH-OUT", blurb: "Dodge, duck, counter.", href: "../punch-out/" },
+  { id: "frog", name: "FROGGER", blurb: "Cross the pads.", href: "../frogger/" },
+  { id: "pac", name: "MS PAC MAZE", blurb: "Pellets and ghosts.", href: "../ms-pac/" }
 ];
 let idx = 0;
 const boot = document.getElementById("boot");
 const menu = document.getElementById("menu");
 function render() {
-  menu.innerHTML = games.map((g, i) => `<button class="cart${i === idx ? " on" : ""}" data-i="${i}" type="button">${g.name}<small>${g.blurb}</small></button>`).join("");
+  menu.innerHTML = games.map((g, i) =>
+    `<button class="cart${i === idx ? " on" : ""}" data-i="${i}" type="button">${g.name}<small>${g.blurb}</small></button>`
+  ).join("");
 }
-function showMenu() { boot.hidden = true; menu.hidden = false; render(); }
+function showMenu() {
+  boot.hidden = true;
+  menu.hidden = false;
+  render();
+}
 setTimeout(showMenu, 700);
 menu.addEventListener("click", (e) => {
   const btn = e.target.closest(".cart");
@@ -77,12 +113,13 @@ menu.addEventListener("click", (e) => {
 });
 function launch() {
   const g = games[idx];
-  boot.hidden = false; menu.hidden = true;
+  boot.hidden = false;
+  menu.hidden = true;
   boot.innerHTML = `<div class="brand">LOADING</div><div class="sub">${g.name}</div>`;
   setTimeout(() => { location.href = g.href; }, 350);
 }
 document.getElementById("aBtn").addEventListener("click", launch);
-document.getElementById("bBtn").addEventListener("click", () => { idx = (idx + 1) % games.length; if (!menu.hidden) render(); });
+document.getElementById("bBtn").addEventListener("click", () => { idx = (idx + 1) % games.length; render(); });
 </script>
 </body>
 </html>
