@@ -276,7 +276,7 @@ const ART = {
     if (ready >= 34) ctx.drawImage(imgs.building, b.x, b.y, b.w, b.h);
     if (imgs.hydrant) ctx.drawImage(imgs.hydrant, b.x - 8 * S, b.y + b.h - 78 * S, 36 * S, 56 * S);
     if (imgs.hose) ctx.drawImage(imgs.hose, b.x + 18 * S, b.y + b.h - 36 * S, 34 * S, 28 * S);
-    if (imgs.truck) ctx.drawImage(imgs.truck, b.x + b.w - 360 * S, b.y + b.h - 150 * S, 420 * S, 174 * S);
+    if (imgs.truck) ctx.drawImage(imgs.truck, b.x + b.w - 250 * S, b.y + b.h - 108 * S, 294 * S, 122 * S);
     if (imgs.chief) ctx.drawImage(imgs.chief, b.x + 46 * S, b.y + b.h - 78 * S, 28 * S, 52 * S);
     if (imgs.lamp) ctx.drawImage(imgs.lamp, b.x + b.w + 8 * S, b.y + b.h - 110 * S, 16 * S, 88 * S);
     if ((spraying || keys.spray) && player) {
@@ -385,6 +385,7 @@ const ART = {
       ctx.drawImage(imgs.plate, px, py, 28 * S, 28 * S);
       text(String(player.f + 1), px + 14 * S, py + 15 * S, 8 * S, "#3a2408");
     }
+    spray.textContent = state === "play" ? "FLOW" : "START";
     text("HIGH RISE", 12, 18, 10, "#ffe14a", "left");
     text(String(score).padStart(5, "0"), W - 12, 18, 10, "#fff", "right");
     text("FL " + Math.min(wave, LAST) + "/" + LAST, W - 12, 36, 7, "#9ad7ff", "right");
@@ -441,11 +442,19 @@ const ART = {
   bind("l", "left"); bind("r", "right"); bind("u", "up"); bind("d", "down");
   const spray = document.getElementById("spray");
   function begin(e) {
-    if (e) e.preventDefault();
-    if (state === "title" || state === "over" || state === "win") start();
+    if (state === "title" || state === "over" || state === "win") {
+      if (e) e.preventDefault();
+      start();
+      spraying = false;
+      return true;
+    }
+    return false;
   }
-  spray.addEventListener("pointerdown", (e) => { begin(e); spraying = true; });
+  spray.addEventListener("pointerdown", (e) => { if (!begin(e)) { e.preventDefault(); spraying = true; } });
+  spray.addEventListener("touchstart", (e) => { if (!begin(e)) spraying = true; }, { passive: false });
+  spray.addEventListener("click", begin);
   document.getElementById("c").addEventListener("pointerdown", begin);
+  document.getElementById("c").addEventListener("touchstart", begin, { passive: false });
   spray.addEventListener("pointerup", () => spraying = false);
   spray.addEventListener("pointercancel", () => spraying = false);
   addEventListener("keydown", (e) => {
