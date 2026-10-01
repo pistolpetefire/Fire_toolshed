@@ -30,7 +30,7 @@
   <button id="l" type="button">◀</button>
   <button id="r" type="button">▶</button>
 </div>
-<button id="spray" type="button">FLOW</button>
+<button id="spray" type="button">START</button>
 <button id="go" type="button">START</button>
 <script>
 const ART = {
@@ -389,7 +389,10 @@ const ART = {
       ctx.drawImage(imgs.plate, px, py, 28 * S, 28 * S);
       text(String(player.f + 1), px + 14 * S, py + 15 * S, 8 * S, "#3a2408");
     }
-    try { document.getElementById("go").style.display = state === "play" ? "none" : "block"; } catch (e) {}
+    try {
+      document.getElementById("go").style.display = state === "play" ? "none" : "block";
+      spray.textContent = state === "play" ? "FLOW" : "START";
+    } catch (e) {}
     text("HIGH RISE", 12, 18, 10, "#ffe14a", "left");
     text(String(score).padStart(5, "0"), W - 12, 18, 10, "#fff", "right");
     text("FL " + Math.min(wave, LAST) + "/" + LAST, W - 12, 36, 7, "#9ad7ff", "right");
@@ -450,6 +453,7 @@ const ART = {
       if (e && e.cancelable) e.preventDefault();
       start();
       spraying = false;
+      spray.textContent = "FLOW";
       const go = document.getElementById("go");
       if (go) go.style.display = "none";
       return true;
