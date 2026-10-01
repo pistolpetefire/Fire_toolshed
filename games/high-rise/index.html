@@ -57,7 +57,7 @@ const ART = {
   addEventListener("resize", resize); resize();
 
   const FLOORS = 5, WINS = 4;
-  const ladderX = [0.40, 0.48, 0.56];
+  const ladderX = [0.38, 0.46, 0.33];
   const winX = [0.22, 0.42, 0.62, 0.82];
   let state = "title", score = 0, high = 0, lives = 3, wave = 1, tick = 0;
   try { high = parseInt(localStorage.getItem("hr_high") || "0", 10) || 0; } catch (e) {}
@@ -95,12 +95,12 @@ const ART = {
   }
   function start() {
     score = 0; lives = 3; wave = 1;
-    player = { f: 0, x: 0.5, dir: 1, climb: 0 };
+    player = { f: 0, x: 0.38, dir: 1, climb: 0 };
     resetFires();
     state = "play";
   }
   function nearLadder() {
-    for (let i = 0; i < ladderX.length; i++) if (Math.abs(player.x - ladderX[i]) < 0.06) return i;
+    for (let i = 0; i < ladderX.length; i++) if (Math.abs(player.x - ladderX[i]) < 0.1) return i;
     return -1;
   }
   function nearestFire() {
@@ -185,6 +185,7 @@ const ART = {
     text("HIGH RISE", 12, 18, 10, "#ffe14a", "left");
     text(String(score).padStart(5, "0"), W - 12, 18, 10, "#fff", "right");
     text("LIVES " + lives, 12, 36, 8, "#ffb347", "left");
+    if (state === "play" && player && player.f === 0) text(nearLadder() >= 0 ? "UP TO CLIMB" : "WALK TO ESCAPE", W / 2, H - 78, 8, "#ffe14a");
     if (state === "title") {
       ctx.fillStyle = "rgba(8,4,12,.45)"; ctx.fillRect(0, 0, W, H);
       text("HIGH RISE", W / 2, H * 0.32, 22 * S, "#ffe14a");
