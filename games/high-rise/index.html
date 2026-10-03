@@ -288,20 +288,24 @@ const ART = {
     if (aim && state === "play") {
       const x1 = b.x + b.w - 70 * S, y1 = b.y + b.h - 78 * S;
       const x2 = wx(aim.c), y2 = floorY(aim.f) - 8 * S;
-      ctx.strokeStyle = "#d7dde6";
-      ctx.lineWidth = 7 * S;
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-      ctx.strokeStyle = "#8d97a3";
-      ctx.lineWidth = 2 * S;
-      const steps = 8;
+      const nx = -(y2 - y1), ny = (x2 - x1);
+      const len = Math.hypot(nx, ny) || 1;
+      const ox = nx / len * 8 * S, oy = ny / len * 8 * S;
+      ctx.strokeStyle = "#e8eef5";
+      ctx.lineWidth = 4 * S;
+      ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(x1 - ox, y1 - oy); ctx.lineTo(x2 - ox, y2 - oy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x1 + ox, y1 + oy); ctx.lineTo(x2 + ox, y2 + oy); ctx.stroke();
+      ctx.strokeStyle = "#b7c2ce";
+      ctx.lineWidth = 3 * S;
+      const span = Math.hypot(x2 - x1, y2 - y1);
+      const steps = Math.max(6, Math.round(span / (18 * S)));
       for (let i = 1; i < steps; i++) {
-        const t = i / steps;
-        const px = x1 + (x2 - x1) * t, py = y1 + (y2 - y1) * t;
-        const nx = -(y2 - y1), ny = (x2 - x1);
-        const len = Math.hypot(nx, ny) || 1;
+        const u = i / steps;
+        const px = x1 + (x2 - x1) * u, py = y1 + (y2 - y1) * u;
         ctx.beginPath();
-        ctx.moveTo(px - nx / len * 10 * S, py - ny / len * 10 * S);
-        ctx.lineTo(px + nx / len * 10 * S, py + ny / len * 10 * S);
+        ctx.moveTo(px - ox, py - oy);
+        ctx.lineTo(px + ox, py + oy);
         ctx.stroke();
       }
       ctx.strokeStyle = "#ffe14a";
