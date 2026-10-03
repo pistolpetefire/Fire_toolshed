@@ -102,9 +102,11 @@ function render() {
 function showMenu() {
   boot.hidden = true;
   menu.hidden = false;
+  boot.innerHTML = '<div class="brand">TOOLSHED</div><div class="sub">PORTABLE ARCADE<br>INSERT CARTRIDGE</div>';
   render();
 }
 setTimeout(showMenu, 700);
+window.addEventListener('pageshow', showMenu);
 menu.addEventListener("click", (e) => {
   const btn = e.target.closest(".cart");
   if (!btn) return;
