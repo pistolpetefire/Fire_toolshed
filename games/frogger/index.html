@@ -379,7 +379,7 @@
       if (e.sp > 0 && e.x > COLS + 3) e.x = -e.w - 1;
       if (e.sp < 0 && e.x + e.w < -3) e.x = COLS + 1;
       for (var j = 0; j < i; j++) {
-        var o = arr[j];
+        var o = list[j];
         if (o.row !== e.row) continue;
         if (e.x < o.x + o.w + 0.8 && e.x + e.w + 0.8 > o.x) e.x = o.x + o.w + 0.9;
       }
