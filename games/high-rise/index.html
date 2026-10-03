@@ -213,14 +213,14 @@ const ART = {
     if (player) player.safe = Math.max(0, (player.safe || 0) - 1);
     if (state !== "play") return;
     if (aim) { player.f = aim.f; player.x = winX[aim.c]; player.dir = 1; }
-    if ((spraying || keys.spray) && aim) {
-      const fr = fires.find(o => o.f === aim.f && o.c === aim.c);
+    const tgt = flowTarget();
+    if ((spraying || keys.spray) && tgt) {
+      const fr = fires.find(o => o.f === tgt.f && o.c === tgt.c);
       if (fr) douse(fr, 3.2);
-      const vi = (civs || []).findIndex(o => o.f === aim.f && o.c === aim.c);
-      if (vi >= 0) { score += 200 * wave; civs.splice(vi, 1); }
+      player.dir = winX[tgt.c] < player.x ? -1 : 1;
     }
     for (const fr of fires) {
-      const soaking = (spraying || keys.spray) && aim && fr.f === aim.f && fr.c === aim.c;
+      const soaking = (spraying || keys.spray) && tgt && fr.f === tgt.f && fr.c === tgt.c;
       if (!soaking) fr.hp = Math.min(fr.max, fr.hp + 0.045);
     }
     puffs = (puffs || []).filter(p => (p.age += 1) < 28);
@@ -267,7 +267,8 @@ const ART = {
       if (soakingNow) {
         const ex = bld().x + bld().w * e.x, ey = floorY(e.f);
         const x1 = bld().x + bld().w * player.x, y1 = floorY(player.f) + 2;
-        const x2 = wx(aim.c), y2 = floorY(aim.f) + 2;
+        const tgt = flowTarget();
+        const x2 = wx((tgt || aim).c), y2 = floorY((tgt || aim).f) + 2;
         const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy || 1;
         let u = ((ex - x1) * dx + (ey - y1) * dy) / l2;
         u = Math.max(0, Math.min(1, u));
@@ -410,9 +411,10 @@ const ART = {
         else { ctx.fillStyle = "#ffe14a"; ctx.fillRect(-10 * S, -20 * S, 20 * S, 36 * S); }
       ctx.restore();
       if (sprayingNow && aim) {
-        const x1 = px + 6 * S, y1 = py + 8 * S;
-        const flameY = floorY(aim.f) + 2;
-        const x2 = wx(aim.c), y2 = flameY;
+        const tgt = flowTarget();
+        const x1 = px + (player.dir < 0 ? -6 : 6) * S, y1 = py + 8 * S;
+        const flameY = floorY((tgt || aim).f) + 2;
+        const x2 = wx((tgt || aim).c), y2 = flameY;
         ctx.strokeStyle = "rgba(186,226,255,.9)";
         ctx.lineWidth = 8 * S;
         ctx.lineCap = "round";
@@ -453,7 +455,7 @@ const ART = {
     if (imgs.helm) {
       for (let i = 0; i < lives; i++) ctx.drawImage(imgs.helm, 10 + i * 22 * S, 26, 18 * S, 18 * S);
     } else text("LIVES " + lives, 12, 36, 8, "#ffb347", "left");
-    if (state === "play") text(aim ? "FLOW TO SOAK" : "TAP A WINDOW", W / 2, H - 78, 8, "#ffe14a");
+    if (state === "play") text(aim ? "FLOW AT NEAREST FLAME" : "TAP A WINDOW", W / 2, H - 78, 8, "#ffe14a");
     var boot=document.getElementById("boot"); if (boot) boot.textContent = "";
     if (state === "title") {
       ctx.fillStyle = "rgba(8,4,12,.45)"; ctx.fillRect(0, 0, W, H);
@@ -546,6 +548,18 @@ const ART = {
     aim = hit;
     player.f = hit.f;
     player.x = winX[hit.c];
+    const vi = (civs || []).findIndex(o => o.f === hit.f && o.c === hit.c);
+    if (vi >= 0) { score += 200 * wave; civs.splice(vi, 1); puffs.push({ f: hit.f, c: hit.c, age: 0 }); }
+  }
+  function flowTarget() {
+    if (!aim) return null;
+    let best = null, bd = 9;
+    for (const fr of fires) {
+      if (fr.f !== aim.f || Math.abs(fr.c - aim.c) > 1) continue;
+      const d = Math.abs(winX[fr.c] - winX[aim.c]);
+      if (d < bd) { bd = d; best = fr; }
+    }
+    return best || { f: aim.f, c: aim.c };
   }
   document.getElementById("c").addEventListener("pointerdown", aimAt);
   document.getElementById("c").addEventListener("touchstart", aimAt, { passive: false });
