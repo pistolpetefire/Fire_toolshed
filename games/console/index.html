@@ -10,94 +10,109 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; height: 100%; background: #1a1c20; color: #f4efe4; font-family: "Press Start 2P", monospace; }
+  html, body { margin: 0; height: 100%; background: #12141a; color: #f4efe4; font-family: "Press Start 2P", monospace; }
   body { min-height: 100dvh; display: grid; place-items: center; padding: 16px; }
+  .desk { width: min(460px, 100%); }
   .unit {
-    width: min(440px, 100%);
-    background: linear-gradient(180deg, #3a3e45, #2a2d32 40%, #23262b);
-    border-radius: 36px;
-    padding: 22px 18px 26px;
-    box-shadow: 0 24px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
-    border: 2px solid #15171b;
-  }
-  .slot { height: 14px; width: 46%; margin: -22px auto 14px; background: #14161a; border-radius: 0 0 8px 8px; }
-  .screen {
-    background: #0c1a14;
-    border-radius: 12px;
-    border: 8px solid #1c1f24;
-    min-height: 280px;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(255,255,255,.08), transparent 28%),
+      linear-gradient(180deg, #4a4f58, #2c3036 42%, #23262b);
+    border-radius: 42px 42px 36px 36px;
+    padding: 18px 16px 22px;
+    border: 2px solid #101216;
+    box-shadow: 0 28px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.16);
     position: relative;
-    overflow: hidden;
-    box-shadow: inset 0 0 0 2px #0a0c0e;
   }
-  .screen:before {
-    content: "";
-    pointer-events: none;
-    position: absolute; inset: 0;
-    background: repeating-linear-gradient(to bottom, rgba(0,0,0,.18) 0 1px, transparent 1px 3px);
-    z-index: 2;
+  .screw { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #8d929a; box-shadow: inset 0 0 0 2px #5c6168; }
+  .screw:before { content: ""; position: absolute; left: 2px; top: 4px; width: 6px; height: 1px; background: #3c4046; }
+  .s1 { left: 14px; top: 14px; } .s2 { right: 14px; top: 14px; } .s3 { left: 14px; bottom: 14px; } .s4 { right: 14px; bottom: 14px; }
+  .slot-well { margin: 8px 28px 12px; background: #0c0e12; border-radius: 0 0 10px 10px; padding: 0 8px 8px; box-shadow: inset 0 8px 10px rgba(0,0,0,.65); }
+  .inserted { height: 18px; border-radius: 0 0 6px 6px; background: repeating-linear-gradient(90deg, #1b1e24 0 8px, #12141a 8px 10px); border: 1px solid #2a2e36; border-top: 0; }
+  .screen-bezel { background: #15181d; border-radius: 16px; padding: 10px; box-shadow: inset 0 0 0 2px #0a0c10; }
+  .screen {
+    background: #07140e; border-radius: 8px; min-height: 300px; position: relative; overflow: hidden;
+    box-shadow: inset 0 0 0 3px #0b1c14, inset 0 0 24px rgba(0,0,0,.45);
   }
-  .boot, .menu { position: relative; z-index: 1; padding: 18px 14px 14px; }
-  .brand { color: #b6f25c; font-size: 13px; letter-spacing: 1px; text-align: center; margin: 8px 0 4px; }
+  .screen:before { content: ""; pointer-events: none; position: absolute; inset: 0; z-index: 3;
+    background: repeating-linear-gradient(to bottom, rgba(0,0,0,.16) 0 1px, transparent 1px 3px); }
+  .glass { pointer-events: none; position: absolute; inset: 0; z-index: 4; background: linear-gradient(115deg, rgba(255,255,255,.08), transparent 32%); }
+  .boot, .menu { position: relative; z-index: 1; padding: 14px 12px 12px; }
+  .brand { color: #b6f25c; font-size: 13px; letter-spacing: 1px; text-align: center; margin: 6px 0 4px; }
   .sub { color: #7d8a72; font-size: 8px; text-align: center; line-height: 1.7; }
   .cart {
-    display: block; width: 100%; text-align: left; margin-top: 10px;
-    background: #10261c; color: #e7f6c9; border: 2px solid #24523a;
-    border-radius: 8px; padding: 12px 10px; font-family: inherit; font-size: 10px;
+    display: grid; grid-template-columns: 18px 1fr; gap: 8px; width: 100%; text-align: left; margin-top: 8px;
+    background: var(--shell, #c23b3b); color: #1a120c; border: 0; border-radius: 4px 4px 7px 7px;
+    padding: 0; font-family: inherit; min-height: 54px; box-shadow: 0 3px 0 #1a120c;
   }
-  .cart small { display: block; color: #8fbf72; font-size: 8px; margin-top: 6px; line-height: 1.5; }
-  .cart.on { background: #b6f25c; color: #14210f; border-color: #e7f6c9; }
-  .cart.on small { color: #24523a; }
-  .plate { text-align: center; font-size: 8px; letter-spacing: 2px; color: #c9ccd1; margin: 14px 0 8px; }
-  .controls { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
-  .pad { width: 84px; height: 84px; position: relative; }
-  .pad i { position: absolute; background: #e2b423; border-radius: 6px; }
-  .pad .h { left: 0; top: 30px; width: 84px; height: 24px; }
-  .pad .v { left: 30px; top: 0; width: 24px; height: 84px; }
-  .btns { display: flex; gap: 12px; align-items: center; }
-  .btn { border: 0; border-radius: 50%; font-family: inherit; color: #1a1208; }
-  .b { width: 54px; height: 54px; background: #e2b423; font-size: 10px; }
-  .a { width: 64px; height: 64px; background: #d23b2f; color: #fff; font-size: 12px; }
-  .led { width: 8px; height: 8px; border-radius: 50%; background: #ff2a2a; box-shadow: 0 0 10px #ff2a2a; margin: 14px auto 0; }
-  #play { display: none; }
+  .ridge { background: repeating-linear-gradient(#1a120c 0 2px, transparent 2px 5px); border-radius: 3px 0 0 6px; }
+  .label { background: #f4efe4; margin: 6px 6px 6px 0; border-radius: 2px; padding: 6px 7px; text-align: left; }
+  .label b { display: block; font-size: 8px; font-weight: 400; }
+  .label small { display: block; color: #5c5348; font-size: 7px; margin-top: 4px; line-height: 1.45; }
+  .cart.on { outline: 2px solid #f4efe4; transform: translateY(-1px); }
+  .plate { display: flex; justify-content: space-between; align-items: center; font-size: 7px; letter-spacing: 1px; color: #d5d8de; margin: 12px 8px 8px; }
+  .grille { width: 54px; height: 16px; background: repeating-linear-gradient(90deg, #1a1d22 0 2px, transparent 2px 4px); border-radius: 3px; }
+  .controls { display: flex; align-items: center; justify-content: space-between; padding: 4px 10px 0; }
+  .pad { width: 86px; height: 86px; position: relative; }
+  .pad i { position: absolute; background: linear-gradient(#f0c44a, #c99216); border-radius: 6px; box-shadow: 0 3px 0 #6d5010; }
+  .pad .h { left: 0; top: 31px; width: 86px; height: 24px; }
+  .pad .v { left: 31px; top: 0; width: 24px; height: 86px; }
+  .mid { width: 14px; height: 14px; left: 36px; top: 36px; background: #8a6412; border-radius: 3px; position: absolute; }
+  .btns { display: flex; gap: 14px; align-items: end; }
+  .btn { border: 0; border-radius: 50%; font-family: inherit; box-shadow: 0 4px 0 #4a3010; }
+  .b { width: 52px; height: 52px; background: #e2b423; color: #1a1208; font-size: 10px; }
+  .a { width: 66px; height: 66px; background: #d23b2f; color: #fff; font-size: 12px; box-shadow: 0 4px 0 #6e1c16; }
+  .selects { display: flex; justify-content: center; gap: 18px; margin-top: 12px; }
+  .pill { border: 0; background: #3a3e45; color: #c9ccd1; font-family: inherit; font-size: 7px; border-radius: 8px; padding: 6px 10px; }
+  .led { width: 8px; height: 8px; border-radius: 50%; background: #ff2a2a; box-shadow: 0 0 10px #ff2a2a; }
 </style>
 </head>
 <body>
-  <div class="unit">
-    <div class="slot"></div>
-    <div class="screen" id="screen">
-      <div class="boot" id="boot">
-        <div class="brand">TOOLSHED</div>
-        <div class="sub">PORTABLE ARCADE<br>INSERT CARTRIDGE</div>
+  <div class="desk">
+    <div class="unit">
+      <i class="screw s1"></i><i class="screw s2"></i><i class="screw s3"></i><i class="screw s4"></i>
+      <div class="slot-well"><div class="inserted" id="inserted"></div></div>
+      <div class="screen-bezel">
+        <div class="screen" id="screen">
+          <div class="glass"></div>
+          <div class="boot" id="boot">
+            <div class="brand">TOOLSHED</div>
+            <div class="sub">PORTABLE ARCADE<br>INSERT CARTRIDGE</div>
+          </div>
+          <div class="menu" id="menu" hidden></div>
+        </div>
       </div>
-      <div class="menu" id="menu" hidden></div>
-    </div>
-    <div class="plate">TOOLSHED</div>
-    <div class="controls">
-      <div class="pad" aria-hidden="true"><i class="h"></i><i class="v"></i></div>
-      <div class="btns">
-        <button class="btn b" id="bBtn" type="button">B</button>
-        <button class="btn a" id="aBtn" type="button">A</button>
+      <div class="plate"><span>TOOLSHED</span><span class="grille"></span><i class="led"></i></div>
+      <div class="controls">
+        <div class="pad" aria-hidden="true"><i class="h"></i><i class="v"></i><i class="mid"></i></div>
+        <div class="btns">
+          <button class="btn b" id="bBtn" type="button">B</button>
+          <button class="btn a" id="aBtn" type="button">A</button>
+        </div>
+      </div>
+      <div class="selects">
+        <button class="pill" id="sel" type="button">SELECT</button>
+        <button class="pill" id="start" type="button">START</button>
       </div>
     </div>
-    <div class="led"></div>
   </div>
 <script>
 const games = [
-  { id: "rise", name: "HIGH RISE", blurb: "Climb. Switch ladders. Soak windows.", href: "../high-rise/?v=cross" },
-  { id: "hydrant", name: "HYDRANT DEFENSE", blurb: "Hold the hardstand. 500 gpm.", href: "../hydrant-defense/" },
-  { id: "wand", name: "WAND RAIDERS", blurb: "Halloween shooter. Tap to cast.", href: "../wand/" },
-  { id: "punch", name: "PUNCH-OUT", blurb: "Dodge, duck, counter.", href: "../punch-out/" },
-  { id: "frog", name: "FROGGER", blurb: "Cross the pads.", href: "../frogger/?v=go" },
-  { id: "pac", name: "MS PAC MAZE", blurb: "Pellets and ghosts.", href: "../ms-pac/" }
+  { id: "rise", name: "HIGH RISE", blurb: "Climb. Soak the windows.", href: "../high-rise/?v=cross", shell: "#c23b3b" },
+  { id: "hydrant", name: "HYDRANT", blurb: "Hold the hardstand.", href: "../hydrant-defense/", shell: "#d23b2f" },
+  { id: "wand", name: "WAND RAIDERS", blurb: "Tap to cast.", href: "../wand/", shell: "#6d28d9" },
+  { id: "punch", name: "PUNCH-OUT", blurb: "Dodge and counter.", href: "../punch-out/", shell: "#b45309" },
+  { id: "frog", name: "FROGGER", blurb: "Cross the pads.", href: "../frogger/?v=go", shell: "#15803d" },
+  { id: "pac", name: "MS PAC", blurb: "Pellets and ghosts.", href: "../ms-pac/", shell: "#be185d" }
 ];
 let idx = 0;
 const boot = document.getElementById("boot");
 const menu = document.getElementById("menu");
+const inserted = document.getElementById("inserted");
 function render() {
   menu.innerHTML = games.map((g, i) =>
-    `<button class="cart${i === idx ? " on" : ""}" data-i="${i}" type="button">${g.name}<small>${g.blurb}</small></button>`
+    `<button class="cart${i === idx ? " on" : ""}" data-i="${i}" type="button" style="--shell:${g.shell}"><i class="ridge"></i><span class="label"><b>${g.name}</b><small>${g.blurb}</small></span></button>`
   ).join("");
+  inserted.style.background = games[idx].shell;
 }
 function showMenu() {
   boot.hidden = true;
@@ -106,7 +121,7 @@ function showMenu() {
   render();
 }
 setTimeout(showMenu, 700);
-window.addEventListener('pageshow', showMenu);
+window.addEventListener("pageshow", showMenu);
 menu.addEventListener("click", (e) => {
   const btn = e.target.closest(".cart");
   if (!btn) return;
@@ -121,7 +136,9 @@ function launch() {
   setTimeout(() => { location.href = g.href; }, 350);
 }
 document.getElementById("aBtn").addEventListener("click", launch);
+document.getElementById("start").addEventListener("click", launch);
 document.getElementById("bBtn").addEventListener("click", () => { idx = (idx + 1) % games.length; render(); });
+document.getElementById("sel").addEventListener("click", () => { idx = (idx + 1) % games.length; render(); });
 </script>
 </body>
 </html>
