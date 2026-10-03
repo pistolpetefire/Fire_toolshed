@@ -266,8 +266,8 @@ const ART = {
       e.stun = Math.max(0, (e.stun || 0) - 1);
       if (soakingNow) {
         const ex = bld().x + bld().w * e.x, ey = floorY(e.f);
-        const x1 = bld().x + bld().w * player.x, y1 = floorY(player.f) - 10 * S;
-        const x2 = wx(aim.c), y2 = floorY(aim.f) - 10 * S;
+        const x1 = bld().x + bld().w * player.x, y1 = floorY(player.f) + 2;
+        const x2 = wx(aim.c), y2 = floorY(aim.f) + 2;
         const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy || 1;
         let u = ((ex - x1) * dx + (ey - y1) * dy) / l2;
         u = Math.max(0, Math.min(1, u));
@@ -410,10 +410,12 @@ const ART = {
         else { ctx.fillStyle = "#ffe14a"; ctx.fillRect(-10 * S, -20 * S, 20 * S, 36 * S); }
       ctx.restore();
       if (sprayingNow && aim) {
-        const x1 = px + 8 * S, y1 = py - 6 * S;
-        const x2 = wx(aim.c), y2 = floorY(aim.f) - 10 * S;
+        const x1 = px + 6 * S, y1 = py + 8 * S;
+        const flameY = floorY(aim.f) + 2;
+        const x2 = wx(aim.c), y2 = flameY;
         ctx.strokeStyle = "rgba(186,226,255,.9)";
         ctx.lineWidth = 8 * S;
+        ctx.lineCap = "round";
         ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
         ctx.strokeStyle = "rgba(255,255,255,.75)";
         ctx.lineWidth = 3 * S;
