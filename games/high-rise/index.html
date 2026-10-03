@@ -215,7 +215,7 @@ const ART = {
     if (aim) { player.f = aim.f; player.x = winX[aim.c]; player.dir = 1; }
     if ((spraying || keys.spray) && aim) {
       const fr = fires.find(o => o.f === aim.f && o.c === aim.c);
-      if (fr) douse(fr, 1.8);
+      if (fr) douse(fr, 3.2);
       const vi = (civs || []).findIndex(o => o.f === aim.f && o.c === aim.c);
       if (vi >= 0) { score += 200 * wave; civs.splice(vi, 1); }
     }
@@ -390,11 +390,17 @@ const ART = {
       if (player.dir < 0) ctx.scale(-1, 1);
       if (spr && spr.complete) ctx.drawImage(spr, -dw * 0.35, -dh * 0.2, dw, dh);
         else { ctx.fillStyle = "#ffe14a"; ctx.fillRect(-10 * S, -20 * S, 20 * S, 36 * S); }
-      if (sprayingNow && imgs.jet) {
-        const jw = 118 * S, jh = 28 * S;
-        ctx.drawImage(imgs.jet, dw * 0.28, -jh * 0.15, jw, jh);
-      }
       ctx.restore();
+      if (sprayingNow && aim) {
+        const x1 = px + 8 * S, y1 = py - 6 * S;
+        const x2 = wx(aim.c), y2 = floorY(aim.f) - 10 * S;
+        ctx.strokeStyle = "rgba(186,226,255,.9)";
+        ctx.lineWidth = 8 * S;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.strokeStyle = "rgba(255,255,255,.75)";
+        ctx.lineWidth = 3 * S;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      }
     }
     for (const e of embers || []) {
       const st = e.age > 420 ? 3 : e.age > 180 ? 2 : 1;
