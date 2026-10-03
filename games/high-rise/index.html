@@ -96,7 +96,6 @@ const ART = {
   const winX = [0.22, 0.42, 0.62, 0.82];
   let state = "title", score = 0, high = 0, lives = 3, wave = 1, tick = 0;
   let player = { f: 0, x: 0.2, dir: 1, climb: 0 };
-    aim = null;
   let aim = null;
   try { high = parseInt(localStorage.getItem("hr_high") || "0", 10) || 0; } catch (e) {}
   let fires, embers, outs, puffs, shards, civs, bricks, keys = {};
