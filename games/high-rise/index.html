@@ -10,7 +10,7 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: none; user-select: none; }
   html, body { margin: 0; height: 100%; background: #140818; overflow: hidden; font-family: "Press Start 2P", monospace; color: #ffe14a; }
   canvas { display: block; width: 100%; height: 100%; }
-  .pad { position: fixed; left: 12px; bottom: 18px; width: 148px; height: 148px; z-index: 3; }
+  .pad { display: none; }
   .pad button, #spray {
     position: absolute; width: 46px; height: 46px; border: 0; border-radius: 10px;
     background: rgba(255,255,255,.16); color: #fff; font-family: inherit; font-size: 14px;
@@ -96,6 +96,8 @@ const ART = {
   const winX = [0.22, 0.42, 0.62, 0.82];
   let state = "title", score = 0, high = 0, lives = 3, wave = 1, tick = 0;
   let player = { f: 0, x: 0.2, dir: 1, climb: 0 };
+    aim = null;
+  let aim = null;
   try { high = parseInt(localStorage.getItem("hr_high") || "0", 10) || 0; } catch (e) {}
   let fires, embers, outs, puffs, shards, civs, bricks, keys = {};
   let spraying = false;
@@ -158,6 +160,7 @@ const ART = {
   function start() {
     score = 0; lives = 3; wave = 1;
     player = { f: 0, x: 0.2, dir: 1, climb: 0 };
+    aim = null;
     resetFires();
     state = "play";
   }
@@ -207,18 +210,17 @@ const ART = {
     tick++;
     if (player) player.safe = Math.max(0, (player.safe || 0) - 1);
     if (state !== "play") return;
-    const lad = nearLadder();
-    if (keys.left) { player.x -= 0.006; player.dir = -1; player.climb = 0; }
-    if (keys.right) { player.x += 0.006; player.dir = 1; player.climb = 0; }
-    player.x = Math.max(0.12, Math.min(0.9, player.x));
-    if (keys.up && lad >= 0 && player.f < FLOORS - 1) { player.climb++; if (player.climb > 10) { player.f++; player.x = ladderX[lad]; player.climb = 0; } }
-    else if (keys.down && lad >= 0 && player.f > 0) { player.climb++; if (player.climb > 10) { player.f--; player.x = ladderX[lad]; player.climb = 0; } }
-    else player.climb = 0;
-    if (spraying || keys.spray) {
-      const fr = nearestFire();
-      if (fr) douse(fr, 1.4);
+    if (aim) { player.f = aim.f; player.x = winX[aim.c]; player.dir = 1; }
+    if ((spraying || keys.spray) && aim) {
+      const fr = fires.find(o => o.f === aim.f && o.c === aim.c);
+      if (fr) douse(fr, 1.8);
+      const vi = (civs || []).findIndex(o => o.f === aim.f && o.c === aim.c);
+      if (vi >= 0) { score += 200 * wave; civs.splice(vi, 1); }
     }
-    for (const fr of fires) { if (!(spraying || keys.spray) || nearestFire() !== fr) fr.hp = Math.min(fr.max, fr.hp + 0.045); }
+    for (const fr of fires) {
+      const soaking = (spraying || keys.spray) && aim && fr.f === aim.f && fr.c === aim.c;
+      if (!soaking) fr.hp = Math.min(fr.max, fr.hp + 0.045);
+    }
     puffs = (puffs || []).filter(p => (p.age += 1) < 28);
     shards = (shards || []).filter(s => (s.age += 1) < 46);
     for (const s of shards) s.y += 2.4 * S;
@@ -281,6 +283,29 @@ const ART = {
     if (imgs.hydrant) ctx.drawImage(imgs.hydrant, b.x - 8 * S, b.y + b.h - 78 * S, 36 * S, 56 * S);
     if (imgs.hose) ctx.drawImage(imgs.hose, b.x + 18 * S, b.y + b.h - 36 * S, 34 * S, 28 * S);
     if (imgs.truck) ctx.drawImage(imgs.truck, b.x + b.w - 120 * S, b.y + b.h - 96 * S, 294 * S, 122 * S);
+    if (aim && state === "play") {
+      const x1 = b.x + b.w - 70 * S, y1 = b.y + b.h - 78 * S;
+      const x2 = wx(aim.c), y2 = floorY(aim.f) - 8 * S;
+      ctx.strokeStyle = "#d7dde6";
+      ctx.lineWidth = 7 * S;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      ctx.strokeStyle = "#8d97a3";
+      ctx.lineWidth = 2 * S;
+      const steps = 8;
+      for (let i = 1; i < steps; i++) {
+        const t = i / steps;
+        const px = x1 + (x2 - x1) * t, py = y1 + (y2 - y1) * t;
+        const nx = -(y2 - y1), ny = (x2 - x1);
+        const len = Math.hypot(nx, ny) || 1;
+        ctx.beginPath();
+        ctx.moveTo(px - nx / len * 10 * S, py - ny / len * 10 * S);
+        ctx.lineTo(px + nx / len * 10 * S, py + ny / len * 10 * S);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = "#ffe14a";
+      ctx.lineWidth = 2 * S;
+      ctx.strokeRect(x2 - 22 * S, y2 - 26 * S, 44 * S, 36 * S);
+    }
     if (imgs.chief) ctx.drawImage(imgs.chief, b.x + 46 * S, b.y + b.h - 78 * S, 28 * S, 52 * S);
     if (imgs.lamp) ctx.drawImage(imgs.lamp, b.x + b.w + 8 * S, b.y + b.h - 110 * S, 16 * S, 88 * S);
     if ((spraying || keys.spray) && player) {
@@ -400,11 +425,11 @@ const ART = {
     if (imgs.helm) {
       for (let i = 0; i < lives; i++) ctx.drawImage(imgs.helm, 10 + i * 22 * S, 26, 18 * S, 18 * S);
     } else text("LIVES " + lives, 12, 36, 8, "#ffb347", "left");
-    if (state === "play" && player && player.f === 0) text(nearLadder() >= 0 ? "UP TO CLIMB" : "WALK TO ESCAPE", W / 2, H - 78, 8, "#ffe14a");
+    if (state === "play") text(aim ? "FLOW TO SOAK" : "TAP A WINDOW", W / 2, H - 78, 8, "#ffe14a");
     if (state === "title") {
       ctx.fillStyle = "rgba(8,4,12,.45)"; ctx.fillRect(0, 0, W, H);
       text("HIGH RISE", W / 2, H * 0.28, 20 * S, "#ffe14a");
-      text("TAP THE RED FLOW BUTTON", W / 2, H * 0.4, 9 * S, "#fff");
+      text("TAP A WINDOW, THEN FLOW", W / 2, H * 0.4, 8 * S, "#fff");
       ctx.fillStyle = "#e23b2f";
       const bw = 160 * S, bh = 44 * S, bx = (W - bw) / 2, by = H * 0.48;
       ctx.fillRect(bx, by, bw, bh);
@@ -470,8 +495,31 @@ const ART = {
   spray.addEventListener("pointerdown", (e) => { if (!begin(e)) { e.preventDefault(); spraying = true; } });
   spray.addEventListener("touchstart", (e) => { if (!begin(e)) spraying = true; }, { passive: false });
   spray.addEventListener("click", begin);
-  document.getElementById("c").addEventListener("pointerdown", begin);
-  document.getElementById("c").addEventListener("touchstart", begin, { passive: false });
+  function canvasPoint(e) {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - r.left) * (W / r.width), y: (src.clientY - r.top) * (H / r.height) };
+  }
+  function pickWindow(x, y) {
+    let best = null, bd = 78 * S;
+    for (let f = 0; f < FLOORS; f++) for (let c = 0; c < WINS; c++) {
+      const d = Math.hypot(x - wx(c), y - floorY(f));
+      if (d < bd) { bd = d; best = { f, c }; }
+    }
+    return best;
+  }
+  function aimAt(e) {
+    if (begin(e)) return;
+    if (state !== "play") return;
+    const p = canvasPoint(e);
+    const hit = pickWindow(p.x, p.y);
+    if (!hit) return;
+    aim = hit;
+    player.f = hit.f;
+    player.x = winX[hit.c];
+  }
+  document.getElementById("c").addEventListener("pointerdown", aimAt);
+  document.getElementById("c").addEventListener("touchstart", aimAt, { passive: false });
   spray.addEventListener("pointerup", () => spraying = false);
   spray.addEventListener("pointercancel", () => spraying = false);
   addEventListener("keydown", (e) => {
