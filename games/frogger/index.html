@@ -692,7 +692,14 @@
     btn.addEventListener('mouseleave', up);
   });
 
+  buildWorld();
   document.getElementById('startBtn').onclick = function () { sndInit(); startPlay(); };
+  document.getElementById('title').addEventListener('touchstart', function (ev) {
+    ev.preventDefault();
+    sndInit();
+    startPlay();
+  }, { passive: false });
+  document.getElementById('title').addEventListener('click', function () { sndInit(); startPlay(); });
   function tapHop(ev) {
     var src = ev.touches ? ev.touches[0] : ev;
     var rect = canvas.getBoundingClientRect();
