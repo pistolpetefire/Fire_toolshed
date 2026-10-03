@@ -455,7 +455,7 @@ const ART = {
     if (imgs.helm) {
       for (let i = 0; i < lives; i++) ctx.drawImage(imgs.helm, 10 + i * 22 * S, 26, 18 * S, 18 * S);
     } else text("LIVES " + lives, 12, 36, 8, "#ffb347", "left");
-    if (state === "play") text(aim ? "FLOW AT NEAREST FLAME" : "TAP A WINDOW", W / 2, H - 78, 8, "#ffe14a");
+    if (state === "play") text(aim ? "FLOW: RIGHT LEFT UP DOWN" : "TAP A WINDOW", W / 2, H - 78, 8, "#ffe14a");
     var boot=document.getElementById("boot"); if (boot) boot.textContent = "";
     if (state === "title") {
       ctx.fillStyle = "rgba(8,4,12,.45)"; ctx.fillRect(0, 0, W, H);
@@ -553,11 +553,20 @@ const ART = {
   }
   function flowTarget() {
     if (!aim) return null;
-    let best = null, bd = 9;
+    const rank = (fr) => {
+      const dc = fr.c - aim.c, df = fr.f - aim.f;
+      if (dc === 1 && df === 0) return 0;
+      if (dc === -1 && df === 0) return 1;
+      if (df === 1 && dc === 0) return 2;
+      if (df === -1 && dc === 0) return 3;
+      return 4;
+    };
+    let best = null, bd = 9, br = 9;
     for (const fr of fires) {
-      if (fr.f !== aim.f || Math.abs(fr.c - aim.c) > 1) continue;
-      const d = Math.abs(winX[fr.c] - winX[aim.c]);
-      if (d < bd) { bd = d; best = fr; }
+      const dc = Math.abs(fr.c - aim.c), df = Math.abs(fr.f - aim.f);
+      if (dc + df > 1) continue;
+      const d = dc + df, r = rank(fr);
+      if (d < bd || (d === bd && r < br)) { bd = d; br = r; best = fr; }
     }
     return best || { f: aim.f, c: aim.c };
   }
