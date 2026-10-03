@@ -259,11 +259,25 @@ const ART = {
       }
     }
     if (state === "play" && !fires.length && !(civs || []).length) nextWave();
-    const soak = (spraying || keys.spray) ? nearestFire() : null;
+    const soakingNow = (spraying || keys.spray) && aim;
+    embers = embers.filter(e => !e.dead);
     for (const e of embers) {
       e.age = (e.age || 0) + 1;
       e.stun = Math.max(0, (e.stun || 0) - 1);
-      if (soak && (e.f === soak.f || e.f === soak.f - 1) && Math.abs(e.x - winX[soak.c]) < 0.12) e.stun = 70;
+      if (soakingNow) {
+        const ex = bld().x + bld().w * e.x, ey = floorY(e.f);
+        const x1 = bld().x + bld().w * player.x, y1 = floorY(player.f) - 10 * S;
+        const x2 = wx(aim.c), y2 = floorY(aim.f) - 10 * S;
+        const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy || 1;
+        let u = ((ex - x1) * dx + (ey - y1) * dy) / l2;
+        u = Math.max(0, Math.min(1, u));
+        const dist = Math.hypot(ex - (x1 + u * dx), ey - (y1 + u * dy));
+        if (dist < 36 * S || (e.f === aim.f && Math.abs(e.x - winX[aim.c]) < 0.2)) {
+          e.hp = (e.hp || 16) - 4;
+          e.stun = 20;
+          if (e.hp <= 0) { score += 25 * wave; puffs.push({ f: e.f, c: aim.c, age: 0 }); e.dead = true; }
+        }
+      }
       if (!e.stun) {
         e.x += e.v;
         if (e.x < 0.16 || e.x > 0.86) e.v *= -1;
