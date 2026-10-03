@@ -643,7 +643,8 @@
       }
       draw();
     } catch (err) {
-      console.error(err);
+      var sl = document.getElementById('scoreLine');
+      if (sl) sl.textContent = 'ERR ' + err.message;
     }
   }
 
