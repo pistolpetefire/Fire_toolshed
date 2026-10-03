@@ -9,7 +9,8 @@
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: none; user-select: none; }
   html, body { margin: 0; height: 100%; background: #140818; overflow: hidden; font-family: "Press Start 2P", monospace; color: #ffe14a; }
-  canvas { display: block; width: 100%; height: 100%; }
+  canvas { display: block; width: 100%; height: 100%; background: #140818; }
+  #boot { position: fixed; left: 0; right: 0; top: 18px; z-index: 9; text-align: center; color: #ffe14a; font-size: 12px; }
   .pad { display: none; }
   .pad button, #spray {
     position: absolute; width: 46px; height: 46px; border: 0; border-radius: 10px;
@@ -24,6 +25,8 @@
 </head>
 <body>
 <canvas id="c"></canvas>
+<div id="boot">LOADING</div>
+<script>window.onerror=function(m){var b=document.getElementById("boot"); if(b) b.textContent=String(m);};</script>
 <div class="pad">
   <button id="u" type="button">▲</button>
   <button id="d" type="button">▼</button>
@@ -425,6 +428,7 @@ const ART = {
       for (let i = 0; i < lives; i++) ctx.drawImage(imgs.helm, 10 + i * 22 * S, 26, 18 * S, 18 * S);
     } else text("LIVES " + lives, 12, 36, 8, "#ffb347", "left");
     if (state === "play") text(aim ? "FLOW TO SOAK" : "TAP A WINDOW", W / 2, H - 78, 8, "#ffe14a");
+    var boot=document.getElementById("boot"); if (boot) boot.textContent = "";
     if (state === "title") {
       ctx.fillStyle = "rgba(8,4,12,.45)"; ctx.fillRect(0, 0, W, H);
       text("HIGH RISE", W / 2, H * 0.28, 20 * S, "#ffe14a");
