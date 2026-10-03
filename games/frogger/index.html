@@ -16,7 +16,9 @@
     .bar { display: flex; align-items: center; justify-content: space-between; gap: 8px;
       padding: 6px 10px; background: #071a0e; border-bottom: 2px solid #1a4d2e; flex-shrink: 0; z-index: 20; }
     .bar a { color: #86efac; font-size: 8px; text-decoration: none; font-weight: 700; }
-    .bar .brand { color: #64748b; font-size: 7px; }
+    .bar .brand { color: #fde047; font-size: 8px; }
+    #status { position: absolute; left: 8px; right: 8px; bottom: 6px; display: flex; justify-content: space-between; color: #bbf7d0; font-size: 8px; z-index: 5; pointer-events: none; }
+    #timeLine { height: 8px; width: 120px; background: #14532d; border: 1px solid #86efac; align-self: center; }
     .icon { min-width: 36px; min-height: 36px; border: 2px solid #334155; border-radius: 8px;
       background: #0f172a; color: #fff; font: inherit; font-size: 12px; cursor: pointer; }
     .icon.on { border-color: #fde047; color: #fde047; }
@@ -57,11 +59,12 @@
   <div id="app">
     <div class="bar">
       <a href="../">← Games</a>
-      <span class="brand">FIRE TOOLSHED · GAMES</span>
+      <span class="brand" id="scoreLine">00000  HI 00000</span>
       <button type="button" class="icon" id="muteBtn" aria-label="Mute">🔊</button>
     </div>
     <div id="stage">
       <canvas id="game" width="336" height="336"></canvas>
+      <div id="status"><span id="livesLine">♥ ♥ ♥</span><span id="timeLine"></span></div>
 
       <div id="title" class="overlay">
         <div class="title">FROGGER</div>
@@ -192,7 +195,7 @@
 
   function buildWorld() {
     cars = []; logs = [];
-    var s = 1 + (level - 1) * 0.15;
+    var s = (1 + (level - 1) * 0.15) * 0.94;
     // river
     lane(logs, 1, 'log', 0.04 * s, [3, 4, 5], 2, 3.5, '#8B5A2B', '#D2A679');
     lane(logs, 2, 'turtle', -0.045 * s, [2, 3], 2, 3, '#1B4332', '#52B788');
@@ -375,6 +378,11 @@
       e.x += e.sp * 60 * dt;
       if (e.sp > 0 && e.x > COLS + 3) e.x = -e.w - 1;
       if (e.sp < 0 && e.x + e.w < -3) e.x = COLS + 1;
+      for (var j = 0; j < i; j++) {
+        var o = arr[j];
+        if (o.row !== e.row) continue;
+        if (e.x < o.x + o.w + 0.8 && e.x + e.w + 0.8 > o.x) e.x = o.x + o.w + 0.9;
+      }
       if (e.kind === 'turtle') e.phase += dt * 1.3;
     }
 
@@ -461,10 +469,10 @@
         ctx.fillRect(0, y, W, T);
         ctx.fillStyle = '#1f2937';
         ctx.fillRect(0, y + 2, W, 3);
-        ctx.fillStyle = '#facc15';
-        ctx.fillRect(0, y + T - 3, W, 2);
-        ctx.fillStyle = '#fef9c3';
-        for (x = (tick * 3) % 24; x < W; x += 24) ctx.fillRect(x, y + T - 3, 10, 2);
+        ctx.fillStyle = 'rgba(250,204,21,0.22)';
+        ctx.fillRect(0, y + T - 2, W, 1);
+        ctx.fillStyle = 'rgba(254,249,195,0.18)';
+        for (x = (tick * 3) % 28; x < W; x += 28) ctx.fillRect(x, y + T - 2, 8, 1);
       } else {
         // start grass
         for (i = 0; i < COLS; i++) {
@@ -512,9 +520,15 @@
         var n = Math.max(1, e.w | 0);
         for (var t = 0; t < n; t++) {
           var tx = x + t * T;
-          if (!blit(spr.turtle, tx + 2, y + 4, T - 4, T - 8, e.sp > 0)) {
-            oval(tx + T / 2, y + T / 2, 10, 7, e.col);
+          if (!blit(spr.turtle, tx - 2, y - 1, T + 6, T + 2, e.sp > 0)) {
+            oval(tx + T / 2, y + T / 2, 11, 8, '#6b4423');
           }
+          ctx.fillStyle = 'rgba(122,74,36,0.72)';
+          ctx.beginPath();
+          ctx.ellipse(tx + T / 2, y + T / 2 + 1, 9, 5, 0, 0, 6.28);
+          ctx.fill();
+          ctx.strokeStyle = '#3f2a14';
+          ctx.stroke();
         }
         ctx.globalAlpha = 1;
       }
@@ -557,41 +571,14 @@
       ctx.fillRect(0, 0, W, H);
     }
 
-    // HUD on canvas
-    ctx.fillStyle = 'rgba(0,0,0,0.55)';
-    ctx.fillRect(0, 0, W, 16);
-    ctx.font = '8px "Press Start 2P", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(pad(score), 4, 11);
-    ctx.fillStyle = '#fde047';
-    ctx.fillText('HI ' + pad(hi), 72, 11);
-    ctx.fillStyle = '#86efac';
-    ctx.textAlign = 'right';
-    ctx.fillText('LV' + level, W - 4, 11);
-
-    // timer
-    var tw = Math.max(0, (timeLeft / timeMax) * (W - 70));
-    ctx.fillStyle = '#111';
-    ctx.fillRect(36, H - 9, W - 72, 5);
-    var tg = ctx.createLinearGradient(36, 0, 36 + (W - 72), 0);
-    tg.addColorStop(0, '#22c55e');
-    tg.addColorStop(0.55, '#eab308');
-    tg.addColorStop(1, '#ef4444');
-    ctx.fillStyle = tg;
-    ctx.fillRect(36, H - 9, tw, 5);
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(36, H - 9, W - 72, 5);
-
-    // lives as mini frogs
-    for (i = 0; i < lives; i++) drawFrog(10 + i * 14, H - 18, 0, 0.4);
-
-    // playing banner
-    if (playing && !frog.dead) {
-      ctx.fillStyle = 'rgba(0,0,0,0.25)';
-      ctx.fillRect(W / 2 - 30, H - 22, 60, 10);
-    }
+    var hearts = '';
+    for (i = 0; i < lives; i++) hearts += '♥ ';
+    var sl = document.getElementById('scoreLine');
+    if (sl) sl.textContent = pad(score) + '  HI ' + pad(hi) + '  LV' + level;
+    var ll = document.getElementById('livesLine');
+    if (ll) ll.textContent = hearts || 'OUT';
+    var tl = document.getElementById('timeLine');
+    if (tl) tl.style.boxShadow = 'inset ' + Math.max(0, (timeLeft / timeMax) * 118) + 'px 0 #86efac';
   }
 
   function drawFrog(cx, cy, face, sc) {
