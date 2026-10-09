@@ -8,6 +8,7 @@ import {
   exam2MatchingQuestions,
   exam2StudyGuideQuestions,
 } from './exam2StudyGuide';
+import { boneLabQuestions } from './boneLabExam';
 import { EXAM2_QUIZ_PLATE_IDS } from '../components/diagrams/exam2Diagrams';
 
 export function getExamBlock(id: number) {
@@ -80,6 +81,14 @@ export function getExamPracticeDeck(blockId: 1 | 2 | 3 | 4 | 5): QuizQuestion[] 
       exam2LabelingQuestions.filter((q) => q.diagramId && quizPlates.has(q.diagramId))
     ).slice(0, 16);
     return shuffle([...mc, ...matching, ...labels]);
+  }
+  if (blockId === 3) {
+    const boneIds = new Set(boneLabQuestions.map((item) => item.id));
+    const bone = shuffle(boneLabQuestions).slice(0, 14).map(unitToMc);
+    const concept = shuffle(rawMc.filter((item) => item.kind !== 'vocab' && !boneIds.has(item.id))).map(unitToMc);
+    const rest = shuffle([...concept, ...hubMc, ...diagrams]);
+    const pool = [...bone, ...vocab, ...rest];
+    return shuffle(pool.slice(0, Math.min(60, Math.max(50, pool.length))));
   }
   const concept = shuffle(rawMc.filter((q) => q.kind !== 'vocab')).map(unitToMc);
   const rest = shuffle([...concept, ...hubMc, ...diagrams]);

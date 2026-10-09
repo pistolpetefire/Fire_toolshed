@@ -148,6 +148,11 @@ function UnitQuizLinks({ unitId }: { unitId: UnitId }) {
             Official Exam 2 study guide
           </Link>
         )}
+        {unit.examBlock === 3 && (
+          <Link to={p('/quizzes/exam/3/bone-lab')} className="btn-secondary text-xs">
+            Bone lab exam list
+          </Link>
+        )}
       </div>
     </section>
   );

@@ -1,5 +1,6 @@
 import type { Flashcard } from '../types';
 import { labTermFlashcards } from './exam1LabTerms';
+import { boneLabFlashcards } from './boneLabExam';
 
 /**
  * Built-in flashcards for OCCC BIO 1314/1414 (A&P I).
@@ -1536,6 +1537,7 @@ export const builtInFlashcards: Flashcard[] = [
     tags: ["pregnancy","clinical"],
   },
   ...labTermFlashcards,
+  ...boneLabFlashcards,
 ];
 
 export function getFlashcardsBySystem(systemId: string): Flashcard[] {

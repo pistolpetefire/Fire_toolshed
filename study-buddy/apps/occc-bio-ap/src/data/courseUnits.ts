@@ -49,7 +49,7 @@ export const EXAM_BLOCKS: {
     id: 3,
     title: 'Exam 3',
     unitIds: ['unit-5', 'unit-6'],
-    note: 'Medical genetics + integument, skeleton, joints',
+    note: 'Medical genetics + integument, skeleton, joints. Bone lab ID list is separate.',
   },
   {
     id: 4,

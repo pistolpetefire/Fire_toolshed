@@ -12,6 +12,8 @@ import { Quizzes } from './pages/Quizzes';
 import { QuizSession, ExamPrep } from './pages/QuizSession';
 import { Exam1Guide } from './pages/Exam1Guide';
 import { Exam2Guide } from './pages/Exam2Guide';
+import { BoneLabGuide } from './pages/BoneLabGuide';
+import { BoneLabCards } from './pages/BoneLabCards';
 import { FillLeadersQuiz } from './pages/FillLeadersQuiz';
 import { HistologyLabQuiz, LabExamRun } from './pages/HistologyLabQuiz';
 import { Unit34Lab } from './pages/Unit34Lab';
@@ -40,6 +42,8 @@ export default function OcccBioApApp() {
           <Route path="quizzes" element={<Quizzes />} />
           <Route path="quizzes/exam/1/guide" element={<Exam1Guide />} />
           <Route path="quizzes/exam/2/guide" element={<Exam2Guide />} />
+          <Route path="quizzes/exam/3/bone-lab" element={<BoneLabGuide />} />
+          <Route path="quizzes/exam/3/bone-lab/cards" element={<BoneLabCards />} />
           <Route path="quizzes/exam/2/cell-leaders" element={<FillLeadersQuiz />} />
           <Route path="quizzes/exam/2/lab" element={<Unit34Lab />} />
           <Route path="quizzes/exam/2/lab/:bankId" element={<LabExamRun />} />

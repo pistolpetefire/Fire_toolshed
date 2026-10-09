@@ -37,6 +37,11 @@ export function UnitsList() {
                   Official study guide
                 </Link>
               )}
+              {block.id === 3 && (
+                <Link to={p('/quizzes/exam/3/bone-lab')} className="btn-ghost text-xs">
+                  Bone lab list
+                </Link>
+              )}
               <Link to={p(`/quizzes/exam/${block.id}`)} className="btn-secondary text-xs">
                 Two-unit practice exam
               </Link>

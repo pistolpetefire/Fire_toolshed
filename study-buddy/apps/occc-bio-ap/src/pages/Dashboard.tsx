@@ -120,6 +120,26 @@ export function Dashboard() {
         </div>
       </section>
 
+      <section className="card border-brand-200 p-5 dark:border-brand-800">
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">Exam 3 focus</p>
+        <h2 className="mt-1 font-display text-lg font-semibold">Bone lab exam</h2>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+          Bone Lab Exam Objectives sheet: compact bone, the long bone, and every axial and appendicular name,
+          including left or right on paired bones. Lecture genetics and skin stay on the two-unit practice quiz.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link to={p('/quizzes/exam/3/bone-lab')} className="btn-primary text-sm">
+            Open bone lab list
+          </Link>
+          <Link to={p('/quizzes/exam/3/bone-lab/cards')} className="btn-secondary text-sm">
+            Photo drill
+          </Link>
+          <Link to={p('/quizzes/exam/3')} className="btn-secondary text-sm">
+            Exam 3 practice
+          </Link>
+        </div>
+      </section>
+
       {/* Progress + quick start */}
       <div className="grid gap-6 lg:grid-cols-3">
         <section className="card p-5 lg:col-span-1">
