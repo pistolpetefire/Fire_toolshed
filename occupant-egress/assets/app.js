@@ -319,6 +319,34 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (_) { /* ignore */ }
+    publishAtriumHandoff();
+  }
+
+  function publishAtriumHandoff() {
+    if (typeof window.__atriumOnEgress !== "function") return;
+    if (!state.codePath) return;
+    var factors = widthFactors(state.sprinklered);
+    var exits = state.egress.map(function (eg) {
+      var cap = egressCapacity(eg, factors);
+      return {
+        id: eg.id,
+        name: eg.name,
+        clearWidth_m: num(eg.clearWidthIn, 0) * 0.0254 * Math.max(1, round0(num(eg.qty, 1))),
+        capacity: cap.capacity,
+      };
+    });
+    window.__atriumOnEgress({
+      projectName: state.projectName,
+      codePath: state.codePath,
+      totalOccupantLoad: totalLoad(),
+      totalExitWidth_m: exits.reduce(function (sum, item) {
+        return sum + item.clearWidth_m;
+      }, 0),
+      spaces: state.spaces.map(function (sp) {
+        return { id: sp.id, name: sp.name, occupantLoad: spaceOl(sp) };
+      }),
+      exits: exits,
+    });
   }
 
   function loadState() {
@@ -1095,6 +1123,7 @@
       }
     });
 
+    window.addEventListener("atrium-egress-ready", publishAtriumHandoff);
     $("btnPrintPdf") && $("btnPrintPdf").addEventListener("click", printToPdf);
     $("btnSave") && $("btnSave").addEventListener("click", saveReport);
     $("btnReset") &&

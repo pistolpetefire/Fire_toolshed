@@ -4,6 +4,10 @@
 
 The app currently implements a simplified steady axisymmetric plume calculation path with plugholing, makeup velocity, and pressure-helper checks.
 
+## Atrium jobs
+
+Atrium screening, the 4–6 scenario list, the zone and field checks, RSET, and the AHJ package are on the [atrium staff checklist](../../atrium-path/). Use this workbook for the plugholing check named in step 3. The atrium matrix does not run that equation. Transient layer fill for the atrium is the Atrium Zone Model, not this steady workbook.
+
 ## Not Yet Implemented
 
 - Wall plume calculations.

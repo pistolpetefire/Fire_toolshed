@@ -21,6 +21,12 @@ npm run build    # static production build → dist/
 
 See `HANDOFF.md` for the full transition notes, locked design decisions, and suggested polish order.
 
+## Atrium path
+
+On an atrium job this tool is steps 6 and 12 of the [staff checklist](../atrium-path/). Step 6 is the preliminary RSET you take to the AHJ kickoff: detection, notification, pre-movement, movement, the assumptions log, and a session export. Step 12 finalizes that hand method if the AHJ accepted it. A computer egress model, if they require one, is a separate commercial tool and has to be in place before the FDS phase.
+
+The atrium panel on this page reads occupant loads from the Occupant Load app, calculates RSET for the floor and each balcony, and compares ASET from the zone screen or a typed FDS time. Cite every pre-movement value and every walking speed. Send the result to the screening package before the kickoff.
+
 ---
 
 ## Core Philosophy

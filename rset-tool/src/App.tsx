@@ -6,6 +6,7 @@ import { movementValues } from './data/movement'
 import { calculateRset, formatTime, clampSeconds } from './lib/calculateRset'
 import { RsetSegment, SuggestiveValue, RsetComponent, AssumptionsEntry, RsetSession } from './types'
 import FullGuidePanel from './components/FullGuidePanel'
+import AtriumLevels from './components/AtriumLevels'
 
 /** Escape user/session text before embedding in the print-summary HTML document. */
 function escapeHtml(raw: string): string {
@@ -897,6 +898,13 @@ export default function App() {
       </section>
 
       {/* Tenability */}
+      <AtriumLevels
+        detection={segments.find((segment) => segment.component === 'detection')?.value ?? 0}
+        notification={segments.find((segment) => segment.component === 'notification')?.value ?? 0}
+        premovement={segments.find((segment) => segment.component === 'premovement')?.value ?? 0}
+        onAcceptPremovement={applySuggestive}
+      />
+
       <section style={{
         background: 'var(--panel)',
         border: '1px solid var(--border)',

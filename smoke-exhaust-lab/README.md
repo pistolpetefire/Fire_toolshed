@@ -6,6 +6,8 @@ This folder contains the current beta/testing build of the Smoke Exhaust Scenari
 
 ## What To Open First
 
+For an atrium smoke-control job, start at the [atrium staff checklist](../atrium-path/). This lab is step 3 of that path: the atrium matrix narrows the fires, and this workbook is where plugholing is checked. The PDF manual below is the workbook manual, not the atrium path.
+
 1. Open `app/index.html` in a browser.
 2. Open `app/smoke-exhaust-user-manual.pdf`.
 3. Read `docs/01_TEAM_TEST_PLAN.md`.

@@ -29,6 +29,20 @@ Details: [STUDY-BUDDY.md](./STUDY-BUDDY.md)
 3. **[Fire Pump Sizer](./fire-pump-sizer/)** — Import sprinkler flow/pressure/duration; NFPA 20 / UFC preliminary pump, driver, room.
 4. **[Fire Tank Sizer](./fire-tank-sizer/)** — Tank volume ≈ system/pump flow × duration + NFPA/UFC/FM safety; prefab steel catalog; max height/diameter; concrete pad plan.
 
+## Atrium smoke path
+
+**[Staff checklist](./atrium-path/)** — start here. The same step strip is on every atrium screen. Checks are saved in the shared project (`fireToolshed.atriumProject.v1`). Source text: [CHECKLIST.md](./atrium-path/CHECKLIST.md).
+
+Phase 1 screens the job and stops at the AHJ kickoff. Phase 2 is [FDS and Smokeview](https://pages.nist.gov/fds-smv/) for the submittal, with [CFAST](https://pages.nist.gov/cfast/) only as an optional cross-check. Phase 3 is the report, approval, construction documents, and the owner’s manual.
+
+1. **[Occupant Load & Egress Capacity](./occupant-egress/)** — loads and exit widths. Enter travel distance per level on the RSET screen.
+2. **[Atrium Smoke Exhaust](./atrium-smoke-exhaust/)** — NFPA 92 baseline. [Verification](./atrium-smoke-exhaust/verify.html).
+3. **[Atrium scenario matrix](./smoke-exhaust-lab/app/atrium-matrix.html)** — narrow to 4–6 fires. Plugholing stays in the [Scenario Lab workbook](./smoke-exhaust-lab/app/).
+4. **[Atrium Zone Model](./atrium-zone-model/)** — first-pass ASET. Not CFAST. [Verification](./atrium-zone-model/verify.html).
+5. **[Atrium Field Model](./atrium-field-model/)** — height sensitivity. Not FDS. [Verification](./atrium-field-model/verify.html).
+6. **[Transparent RSET Tool](./rset-tool/)** — preliminary RSET, then the final hand method if the AHJ accepted it.
+7. **[Screening package](./atrium-report/)** — baseline, matrix, ASET, RSET, and the AHJ handout.
+
 ## Other tools
 
 | Tool | Path |
