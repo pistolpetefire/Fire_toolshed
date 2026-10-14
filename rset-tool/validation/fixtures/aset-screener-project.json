@@ -1,0 +1,15 @@
+{
+  "app": "ASET Screener",
+  "appVersion": "1.1.1",
+  "schema": "fireToolshed.asetScreener.v1",
+  "created": "2026-10-14T23:55:00.000Z",
+  "units": "IP",
+  "fire": "t2",
+  "exhaust": false,
+  "tempCheck": false,
+  "inputsSI": { "H": 9.144, "A": 1858.06, "zf": 0, "cap": 5275.28, "Qs": 5275.28, "Ve": 23.597, "zc0": 1.8288, "zm": 0.3048, "TLim": 60, "T0": 20 },
+  "inputs": { "proj": "Smoke test space", "growth": "150", "tg": "150", "chi": "0.7", "lam": "0", "cite": "NFPA 92 t-squared fast", "tmax": "1800", "rDet": "", "rNot": "", "rPre": "", "rMov": "", "rsf": "1.0" },
+  "results": { "asetGoverning_s": 594.3, "governingCriterion": "Layer height (numerical)", "asetNfpa92_s": 716.2, "asetLayerNumerical_s": 594.3, "asetTemperature_s": null, "AoverH2": 22.222 },
+  "warnings": ["example warning"],
+  "note": "Screening only. Not the submittal basis."
+}
