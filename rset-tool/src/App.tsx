@@ -12,11 +12,11 @@ import AsetComparison from './components/AsetComparison'
 /** Escape user/session text before embedding in the print-summary HTML document. */
 function escapeHtml(raw: string): string {
   return String(raw)
-    .replace(/&/g, '&amp;amp;')
-    .replace(/</g, '&amp;lt;')
-    .replace(/>/g, '&amp;gt;')
-    .replace(/"/g, '&amp;quot;')
-    .replace(/'/g, '&amp;#39;')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 const ALL_VALUES: Record<RsetComponent, SuggestiveValue[]> = {
@@ -297,7 +297,7 @@ export default function App() {
   </table>
 
   <div class="total">Total RSET: ${escapeHtml(formatTime(rsetVal))}</div>
-  ${tenability !== undefined ? `<div class="total" style="font-size:15px;">Tenability limit (ASET): ${escapeHtml(formatTime(tenability))} &amp;nbsp;|&amp;nbsp; Margin: ${marginVal !== null && marginVal >= 0 ? '+' : ''}${marginVal !== null ? escapeHtml(formatTime(marginVal)) : '—'}</div>` : ''}
+  ${tenability !== undefined ? `<div class="total" style="font-size:15px;">Tenability limit (ASET): ${escapeHtml(formatTime(tenability))} &nbsp;|&nbsp; Margin: ${marginVal !== null && marginVal >= 0 ? '+' : ''}${marginVal !== null ? escapeHtml(formatTime(marginVal)) : '—'}</div>` : ''}
 
   <h2>Assumptions Log</h2>
   <table>
