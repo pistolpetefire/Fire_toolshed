@@ -101,7 +101,7 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
 <nav class="tabs noprint" role="tablist">
   <button role="tab" aria-selected="true" data-tab="inputs">Calculator</button>
   <button role="tab" aria-selected="false" data-tab="verify">Verification</button>
-  <button role="tab" aria-selected="false" data-tab="method">Method & limits</button>
+  <button role="tab" aria-selected="false" data-tab="method">Method and limits</button>
 </nav>
 
 <section id="tab-inputs">
@@ -446,7 +446,7 @@ function stamp(){
 function buildReport(){
   if(!LAST||!LAST.R){alert("Fix the inputs first.");return false}
   const {W}=LAST;
-  $("report").innerHTML=`<div class="card"><h2>ASET Screener report · screening only</h2><div class="stamp">${$("stamp").textContent.replace(/&/g,"&").replace(/</g,"<")}</div></div>
+  $("report").innerHTML=`<div class="card"><h2>ASET Screener report · screening only</h2><div class="stamp">${$("stamp").textContent.replace(/&/g,"\u0026amp;").replace(/</g,"\u0026lt;")}</div></div>
    <div class="card"><h2>Results</h2><div class="kpis">${$("kpis").innerHTML}</div>${rsetVals().ok?$("margin").innerHTML:"<p class=small>RSET not entered.</p>"}<h3>Checks and warnings</h3><ul class="warns">${W.map(w=>`<li class="${w[0]}">${w[1]}</li>`).join("")}</ul></div>
    <div class="card"><h2>Layer height vs time</h2>${$("chartZ").innerHTML}${$("chartT").innerHTML}</div>
    <div class="card"><h2>Time history</h2><div class="tblwrap"><table>${$("tbl").innerHTML}</table></div></div>
