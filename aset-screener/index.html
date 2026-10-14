@@ -73,6 +73,17 @@ code{background:var(--v-100);padding:0 .25rem;border-radius:.3rem;font-size:.85e
 .hidden{display:none!important}
 footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
 #report{display:none}
+.guide ol,.guide ul{padding-left:1.2rem;font-size:.9rem}
+.guide li{margin:.25rem 0}
+.gtbl{max-height:none}
+.gtbl td{white-space:normal;text-align:left;vertical-align:top;font-size:.84rem;min-width:9rem}
+.gtbl td:first-child{font-weight:700;color:var(--v-900);min-width:7rem}
+.gtbl th{text-align:left}
+.gtbl table{table-layout:fixed}
+.gtbl col.c1{width:13%}.gtbl col.c2{width:24%}.gtbl col.c3{width:33%}.gtbl col.c4{width:30%}
+@media(max-width:700px){.gtbl{overflow:visible;border:0}.gtbl table,.gtbl tbody,.gtbl tr,.gtbl td{display:block;width:100%}.gtbl thead{display:none}
+ .gtbl tr{border:1px solid var(--line);border-radius:.7rem;margin:.6rem 0;padding:.4rem .2rem;background:#fff}
+ .gtbl td{border:0;padding:.25rem .6rem;min-width:0}.gtbl td:not(:first-child)::before{content:attr(data-l);display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--v-700)}}
 @media print{
   body{background:#fff;padding:0;font-size:10.5pt}
   .tabs,.btns,#tab-inputs .grid>div:first-child,.noprint,footer,#tab-verify,#tab-method{display:none!important}
@@ -83,6 +94,13 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
   #report{display:block}
   #tab-inputs{display:none!important}
   .tblwrap{max-height:none;overflow:visible}
+  body.print-guide #report,body.print-guide #tab-inputs{display:none!important}
+  body.print-guide #tab-guide{display:block!important}
+  body:not(.print-guide) #tab-guide{display:none!important}
+  .gtbl th{position:static}
+  .gtbl{overflow:visible!important;border:0}
+  .gtbl table{width:100%!important}
+  .gtbl td{font-size:9pt}
   @page{margin:14mm}
 }
 </style>
@@ -93,7 +111,7 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
   <div class="logo" aria-hidden="true">ASET</div>
   <div>
     <h1>ASET Screener</h1>
-    <p class="sub"><span class="badge">Screening · v1.0.0</span>Smoke-filling ASET for any large space: single-story, atrium, assembly, warehouse. NFPA 92 filling equations plus a two-zone mass/energy-balance layer model. Runs offline in the browser.</p>
+    <p class="sub"><span class="badge">Screening · v1.1.0</span>Smoke-filling ASET for any large space: single-story, atrium, assembly, warehouse. NFPA 92 filling equations plus a two-zone mass/energy-balance layer model. Runs offline in the browser.</p>
   </div>
 </header>
 <div class="banner" role="note"><b>Screening only. Not the submittal basis.</b> Use FDS (NIST Fire Dynamics Simulator) or another AHJ-accepted method for the submittal. A licensed fire protection engineer must confirm the inputs, the design fire, the applicability of each correlation, and the tenability criteria with the AHJ.</div>
@@ -101,6 +119,7 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
 <nav class="tabs noprint" role="tablist">
   <button role="tab" aria-selected="true" data-tab="inputs">Calculator</button>
   <button role="tab" aria-selected="false" data-tab="verify">Verification</button>
+  <button role="tab" aria-selected="false" data-tab="guide">User guide</button>
   <button role="tab" aria-selected="false" data-tab="method">Method and limits</button>
 </nav>
 
@@ -220,6 +239,82 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
   </div>
 </section>
 
+<section id="tab-guide" class="hidden">
+  <div class="card guide">
+    <h2>User guide</h2>
+    <p class="small">How to choose every input, what the outputs mean, and how to hand ASET to the Transparent RSET Tool. Values below are typical starting points from the cited sources, not design values. Where values vary, they are <b>per project and AHJ</b>. Confirm the editions your AHJ has adopted.</p>
+    <div class="btns noprint" style="margin-top:.2rem"><button class="btn alt" id="bPrintGuide">Print guide</button></div>
+
+    <h3>Workflow</h3>
+    <ol>
+      <li>Hold an AHJ kickoff: agree on the design fire(s), the tenability criteria, the margin, the required ASET/RSET ratio, and the submittal method (FDS or another accepted method).</li>
+      <li>Choose units, then enter the space geometry (ceiling height, floor area, fuel elevation).</li>
+      <li>Enter the design fire (type, growth class or steady HRR, cap) and its <b>citation</b>.</li>
+      <li>Enter exhaust (if any), ambient temperature and the tenability criteria.</li>
+      <li>Read every warning. Fix any input that sits outside a correlation range, or plan to use FDS for that case.</li>
+      <li>Run the sensitivity cases agreed with the AHJ (faster growth, higher cap, exhaust impaired) and record each one.</li>
+      <li>Enter RSET (Detection, Notification, Pre-movement, Movement), or import an RSET Tool session JSON, and read the ASET − RSET margin.</li>
+      <li>Click <b>Export RSET Tool session</b>. In the Transparent RSET Tool, use <b>Load Session</b>; the governing ASET arrives as its tenability limit.</li>
+      <li>Export the project JSON and print the report for the file. Then build the submittal analysis in FDS or another AHJ-accepted method.</li>
+    </ol>
+
+    <h3>Inputs</h3>
+    <div class="tblwrap gtbl"><table><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
+      <thead><tr><th>Input</th><th>What it is</th><th>Typical / recommended (IP · SI)</th><th>Why</th></tr></thead>
+      <tbody>
+      <tr><td>Units</td><td>Display units, IP (ft, ft², Btu/s, cfm, °F) or SI (m, m², kW, m³/s, °C).</td><td>Use the units of your report.</td><td>The engine always runs in SI; toggling converts only the display, so results do not change.</td></tr>
+      <tr><td>Fire type</td><td>Steady (constant HRR) or t-squared (Q = 1,000 Btu/s × (t/t<sub>g</sub>)², i.e. 1,055 kW × (t/t<sub>g</sub>)², up to the cap).</td><td><b>t-squared</b> for most life-safety ASET screens. <b>Steady</b> when the AHJ-agreed design fire is a steady value (e.g., a sprinkler-controlled fire) or for a bounding check.</td><td>Early growth controls how fast the layer descends, so a steady fire at peak from t = 0 is conservative but can be very pessimistic for ASET. Use steady when it represents the agreed scenario.</td></tr>
+      <tr><td>Growth class</td><td>t² growth time t<sub>g</sub> to reach 1,000 Btu/s (1,055 kW).</td><td>Slow 600 s · Medium 300 s · Fast 150 s · Ultrafast 75 s (α ≈ 0.00293, 0.0117, 0.0469, 0.1876 kW/s²). Typical occupancy guidance (PD 7974-1): picture gallery slow; dwelling, office, hotel room and reception medium; shop / retail fast; industrial storage ultrafast. Assembly and warehouse fuels: per project and AHJ, from the actual fuel.</td><td>These are the standard t² classes in NFPA 92 and NFPA 72 annex material and the SFPE Handbook. Match the class to the actual fuel package, not only to the occupancy label. High-piled or rack storage is often ultrafast.</td></tr>
+      <tr><td>Custom t<sub>g</sub></td><td>Your own growth time, in seconds.</td><td>Only from cited fuel test data (for example, NIST Fire Calorimetry Database / FASTData).</td><td>Real fuels seldom follow a class exactly; a cited fit to test data is more defensible than a label.</td></tr>
+      <tr><td>Peak HRR cap / steady HRR</td><td>The maximum (or constant) heat release rate.</td><td>Commonly cited UK design fires (BRE BR 258/BR 368, CIBSE Guide E): sprinklered office ≈ 1 MW (≈ 950 Btu/s); sprinklered retail ≈ 5 MW (≈ 4,740 Btu/s). Unsprinklered retail, office, assembly, warehouse, and an atrium kiosk: per project and AHJ, from fuel test data (for example, NIST FASTData; SFPE Handbook heat-release chapters) and the NFPA 92 annex guidance on design fires.</td><td>The cap often governs ASET in large spaces. Unsprinklered caps are much higher and highly fuel-dependent, so they must be justified from data, not assumed.</td></tr>
+      <tr><td>Design-fire citation</td><td>Free text: the source, table, page and edition for the fire type, growth and cap.</td><td>Required. Example form: "NFPA 92 (adopted edition) Annex, t² fast; cap from [test report], Table X".</td><td>An uncited design fire is the most common reason screening results are rejected; the warning stays on until it is filled.</td></tr>
+      <tr><td>Convective fraction χ<sub>c</sub></td><td>Share of HRR carried by the plume.</td><td>0.7 (NFPA 92 default). Range checked 0.3–1.0.</td><td>The plume correlations use convective HRR; change it only with a cited fuel-specific value.</td></tr>
+      <tr><td>Heat-loss fraction λ</td><td>Share of convective heat lost to walls and ceiling (two-zone model only).</td><td>0 (adiabatic) for screening. Range 0–0.95.</td><td>λ = 0 gives the deepest, hottest layer, which is conservative for both criteria. A higher λ needs a cited basis.</td></tr>
+      <tr><td>Ceiling height H</td><td>Floor to the ceiling or smoke reservoir underside.</td><td>Per the drawings. Flagged above about 150 ft (45 m).</td><td>Ceiling height sets the filling volume and the plume entrainment height. In very tall spaces stratification and transport lag (not modeled) matter.</td></tr>
+      <tr><td>Floor area A</td><td>Plan area of the smoke-filling volume.</td><td>Per the drawings; use the area that actually fills.</td><td>The equations assume a uniform cross-section. Spaces that narrow or step need FDS.</td></tr>
+      <tr><td>A/H² check</td><td>Shape factor, computed with H above the fire base.</td><td>NFPA 92 filling-equation range: steady 0.9–14; t² 0.9–23 (confirm in the adopted edition).</td><td>Outside the experimental range the empirical equation is flagged; the numerical model still runs, but treat both as indicative only.</td></tr>
+      <tr><td>Fuel elevation</td><td>Height of the fire base above the floor.</td><td>0 ft (0 m) for floor-level fuel. Otherwise the floor of the platform, stage, or mezzanine where the fuel sits.</td><td>Plume heights are measured from the fire base, so an elevated fire entrains less air and fills faster at a given floor height.</td></tr>
+      <tr><td>Exhaust</td><td>Optional mechanical exhaust volumetric rate.</td><td>Per the smoke control design (cfm · m³/s).</td><td>The NFPA 92 filling equations do not apply with exhaust, so the two-zone model governs. Plugholing, inlet velocity and makeup air are not checked; see NFPA 92.</td></tr>
+      <tr><td>Ambient temperature</td><td>Initial air temperature.</td><td>68 °F (20 °C) typical. Range checked −40 to 122 °F (−40 to 50 °C).</td><td>It sets the air density and the starting point for the temperature rise; the effect on layer height is small.</td></tr>
+      <tr><td>Base layer height</td><td>Minimum smoke-layer interface height for tenability.</td><td>6 ft (1.83 m) above the highest walking surface of concern (IBC 909.8.1 atrium design goal; NFPA 92 practice). Confirm with the AHJ.</td><td>Keeps the smoke layer above head height for people still in or moving through the space.</td></tr>
+      <tr><td>Margin</td><td>Extra height added to the base layer height.</td><td>Default 1 ft (0.30 m); per project and AHJ.</td><td>Covers uncertainty in the screening correlations and layer-interface definition. Record it in the report.</td></tr>
+      <tr><td>Layer temperature limit</td><td>Optional upper-layer temperature criterion (two-zone model).</td><td>Per project and AHJ. Values are commonly derived from ISO 13571 and BS PD 7974-6 heat-exposure guidance, which distinguishes direct contact with hot gas from radiation from a layer overhead.</td><td>A hot layer above head height can still be untenable through radiation. This screen gives a single average layer temperature, not a heat-flux analysis.</td></tr>
+      <tr><td>Simulation end time</td><td>How long the two-zone model runs.</td><td>1,800 s default; range 10–7,200 s.</td><td>Must exceed the expected ASET; "not reached" means you need to extend it or the layer has stabilized above the criterion.</td></tr>
+      <tr><td>RSET segments and ratio</td><td>Detection, notification, pre-movement and movement (s), and the required ASET/RSET ratio.</td><td>From the Transparent RSET Tool; ratio per project and AHJ (1.0 means no extra margin).</td><td>The margin panel shows PASS, MARGINAL (below the required ratio) or FAIL (ASET below RSET).</td></tr>
+      </tbody></table></div>
+
+    <h3>Reading the warnings</h3>
+    <ul class="warns">
+      <li class="e">Error (red): inputs are missing or out of range, or the criterion is undefined. Nothing is computed until you fix them.</li>
+      <li class="w">Warning (amber): a correlation is outside its validity range (A/H², z/H below 0.2, HRR cap reached before the algebraic ASET, flame height near the criterion or the ceiling, very tall space), or the citation is missing. Rely on the numerical result or FDS for that case and record why.</li>
+      <li class="i">Note (gray): information, such as exhaust disabling the algebraic equation, a criterion not reached within the end time, non-default χ<sub>c</sub> or λ, and the reminder that visibility, toxicity and heat flux are not evaluated.</li>
+    </ul>
+
+    <h3>Common mistakes</h3>
+    <ul>
+      <li>Using the NFPA 92 filling equation after the HRR cap is reached, or with exhaust running.</li>
+      <li>Picking a growth class from the occupancy name without looking at the actual fuel (for example, high-piled storage in a "business" building).</li>
+      <li>Leaving the design-fire citation blank, or citing a value you cannot trace to a table or test report.</li>
+      <li>Measuring heights from the floor when the fire is elevated (enter the fuel elevation).</li>
+      <li>Applying the 6 ft criterion at the main floor when people are on a higher balcony or mezzanine open to the space.</li>
+      <li>Treating a "not reached" result as infinite ASET without checking the end time and the equilibrium height.</li>
+      <li>Raising the heat-loss fraction without a basis, which makes the layer thinner and cooler.</li>
+      <li>Treating this screen as the submittal; it does not evaluate visibility, toxicity, radiation, stratification or non-uniform geometry.</li>
+    </ul>
+
+    <h3>Sources</h3>
+    <ul class="cite">
+      <li>NFPA 92, <i>Standard for Smoke Control Systems</i> (adopted edition): smoke-filling equations, axisymmetric plume, design-fire annex guidance, plugholing.</li>
+      <li>SFPE Handbook of Fire Protection Engineering, 5th Ed. (2016): smoke control and smoke-filling chapters; heat release rate chapters; t² fire growth.</li>
+      <li>NFPA 72 (adopted edition), annex on engineering evaluation of detection: t² growth classes and growth times.</li>
+      <li>BSI PD 7974-1:2019 (fire growth rates by occupancy) and PD 7974-6:2019 (human factors and tenability); ISO 13571:2012 (life-threatening components of fire, heat exposure).</li>
+      <li>Hansell, G.O. and Morgan, H.P., BRE Report BR 258 (1994), and Morgan et al., BR 368 (1999): design fires for smoke control (sprinklered office 1 MW, retail 5 MW); CIBSE Guide E, <i>Fire Safety Engineering</i>.</li>
+      <li>NIST Fire Calorimetry Database (FASTData): measured HRR curves for furniture and other fuel packages.</li>
+      <li>International Building Code 909.8.1 (atrium smoke control: smoke layer at least 6 ft above the highest walking surface); section numbers vary by edition.</li>
+    </ul>
+  </div>
+</section>
+
 <section id="tab-method" class="hidden">
   <div class="card">
     <h2>Method</h2>
@@ -250,12 +345,12 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
 </section>
 
 <section id="report" aria-hidden="true"></section>
-<footer>Fire Toolshed · ASET Screener v1.0.0 · For qualified engineers only. Preliminary screening tool, not a substitute for stamped design or AHJ approval.</footer>
+<footer>Fire Toolshed · ASET Screener v1.1.0 · For qualified engineers only. Preliminary screening tool, not a substitute for stamped design or AHJ approval.</footer>
 </div>
 
 <script>
 "use strict";
-const APP={name:"ASET Screener",version:"1.0.0",schema:"fireToolshed.asetScreener.v1"};
+const APP={name:"ASET Screener",version:"1.1.0",schema:"fireToolshed.asetScreener.v1"};
 const CP=1.005,RG=287.05,P0=101325;
 const U={ // SI -> IP
   length:{IP:{f:v=>v/0.3048,b:v=>v*0.3048,u:"ft"},SI:{u:"m"}},
@@ -506,9 +601,11 @@ document.querySelectorAll("#fireSeg button").forEach(b=>b.onclick=()=>{fire=b.da
 window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setTimeout(()=>{if(LAST&&LAST.R)drawCharts(LAST.p,LAST.R)},200)});
 let deb; document.addEventListener("input",e=>{if(e.target.closest("#tab-inputs")){clearTimeout(deb);deb=setTimeout(()=>{if(["rDet","rNot","rPre","rMov","rsf"].includes(e.target.id))margin();else compute()},150)}});
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
-  ["inputs","verify","method"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab)); if(b.dataset.tab==="verify") runVerify();});
-$("bPrint").onclick=()=>{ if(buildReport()) window.print(); };
-window.addEventListener("beforeprint",()=>buildReport());
+  ["inputs","verify","guide","method"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab)); if(b.dataset.tab==="verify") runVerify();});
+$("bPrint").onclick=()=>{ document.body.classList.remove("print-guide"); if(buildReport()) window.print(); };
+$("bPrintGuide").onclick=()=>{ document.body.classList.add("print-guide"); window.print(); };
+window.addEventListener("afterprint",()=>document.body.classList.remove("print-guide"));
+window.addEventListener("beforeprint",()=>{ if(!document.body.classList.contains("print-guide")) buildReport(); });
 $("bExport").onclick=()=>{ if(!LAST||!LAST.R){$("ioMsg").textContent="Fix the inputs before exporting.";return} download(`aset-screener-${slug($("proj").value)}-${Date.now()}.json`,project()); $("ioMsg").textContent="Project JSON exported."; };
 $("bRset").onclick=()=>{ if(!LAST||!LAST.R||!LAST.R.gov){$("ioMsg").textContent="No governing ASET yet (criteria not reached or inputs invalid).";return}
   download(`rset-session-${slug($("proj").value)}-${Date.now()}.json`,rsetSession()); $("ioMsg").textContent="RSET Tool session exported: load it with “Load Session” in the Transparent RSET Tool; tenabilityLimit = ASET."; };
@@ -547,7 +644,10 @@ function runVerify(){
   window.__verify={pass,total:C.length,rows:C.map(c=>({id:c[0],app:c[2],py:c[3]}))};
   return window.__verify;
 }
+document.querySelectorAll(".gtbl tbody tr").forEach(tr=>{const L=["Input","What it is","Typical / recommended (IP · SI)","Why"];tr.querySelectorAll("td").forEach((td,i)=>td.setAttribute("data-l",L[i]))});
 syncUI(true);
+if(location.hash==="#guide") document.querySelector('[data-tab="guide"]').click();
+if(location.hash==="#printguide"){document.body.classList.add("print-guide");}
 if(location.hash==="#verify") document.querySelector('[data-tab="verify"]').click();
 if(location.hash==="#selftest"){const out=[];try{
   ["rDet","rNot","rPre","rMov"].forEach((i,k)=>$(i).value=[30,15,120,180][k]); margin();
