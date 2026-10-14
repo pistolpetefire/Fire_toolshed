@@ -65,7 +65,7 @@ table{border-collapse:collapse;width:100%;font-size:.84rem;font-variant-numeric:
 th,td{padding:.35rem .55rem;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
 th{background:var(--v-100);color:var(--v-900);position:sticky;top:0}
 td:first-child,th:first-child{text-align:left}
-.stamp{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;background:var(--v-50);border:1px dashed var(--v-300);border-radius:.6rem;padding:.7rem .8rem;white-space:pre-wrap;word-break:break-word}
+.runrec{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;background:var(--v-50);border:1px dashed var(--v-300);border-radius:.6rem;padding:.7rem .8rem;white-space:pre-wrap;word-break:break-word}
 .small{font-size:.8rem;color:var(--muted)}
 .cite li{margin:.25rem 0;font-size:.86rem}
 code{background:var(--v-100);padding:0 .25rem;border-radius:.3rem;font-size:.85em}
@@ -111,7 +111,7 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
   <div class="logo" aria-hidden="true">ASET</div>
   <div>
     <h1>ASET Screener</h1>
-    <p class="sub"><span class="badge">Screening · v1.1.0</span>Smoke-filling ASET for any large space: single-story, atrium, assembly, warehouse. NFPA 92 filling equations plus a two-zone mass/energy-balance layer model. Runs offline in the browser.</p>
+    <p class="sub"><span class="badge">Screening · v1.1.1</span>Smoke-filling ASET for any large space: single-story, atrium, assembly, warehouse. NFPA 92 filling equations plus a two-zone mass/energy-balance layer model. Runs offline in the browser.</p>
   </div>
 </header>
 <div class="banner" role="note"><b>Screening only. Not the submittal basis.</b> Use FDS (NIST Fire Dynamics Simulator) or another AHJ-accepted method for the submittal. A licensed fire protection engineer must confirm the inputs, the design fire, the applicability of each correlation, and the tenability criteria with the AHJ.</div>
@@ -216,8 +216,9 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
     <div class="tblwrap"><table id="tbl"></table></div>
   </div>
   <div class="card">
-    <h2>Stamped output</h2>
-    <div class="stamp" id="stamp"></div>
+    <h2>Run record</h2>
+    <div class="runrec" id="runrec"></div>
+    <p class="small">Run record for traceability only. Not a professional seal or certification.</p>
     <div class="btns">
       <button class="btn" id="bPrint">Print report</button>
       <button class="btn alt" id="bExport">Export project JSON</button>
@@ -345,12 +346,12 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
 </section>
 
 <section id="report" aria-hidden="true"></section>
-<footer>Fire Toolshed · ASET Screener v1.1.0 · For qualified engineers only. Preliminary screening tool, not a substitute for stamped design or AHJ approval.</footer>
+<footer>Fire Toolshed · ASET Screener v1.1.1 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
 </div>
 
 <script>
 "use strict";
-const APP={name:"ASET Screener",version:"1.1.0",schema:"fireToolshed.asetScreener.v1"};
+const APP={name:"ASET Screener",version:"1.1.1",schema:"fireToolshed.asetScreener.v1"};
 const CP=1.005,RG=287.05,P0=101325;
 const U={ // SI -> IP
   length:{IP:{f:v=>v/0.3048,b:v=>v*0.3048,u:"ft"},SI:{u:"m"}},
@@ -460,7 +461,7 @@ function kpi(k,v,s,cls=""){return `<div class="kpi ${cls}"><div class="k">${k}</
 function sec(v){return v==null?"not reached":fmt(v,0)+" s"}
 function renderAll(p,R,W){
   $("warns").innerHTML=W.map(w=>`<li class="${w[0]}">${w[0]==="e"?"Error: ":w[0]==="w"?"Warning: ":""}${w[1]}</li>`).join("");
-  if(!R){ $("kpis").innerHTML=kpi("Governing ASET","—","inputs invalid","gov"); $("chartZ").innerHTML=""; $("chartT").innerHTML=""; $("tbl").innerHTML=""; $("stamp").textContent="Inputs invalid. No stamped output."; $("margin").innerHTML=""; LAST=null; return; }
+  if(!R){ $("kpis").innerHTML=kpi("Governing ASET","—","inputs invalid","gov"); $("chartZ").innerHTML=""; $("chartT").innerHTML=""; $("tbl").innerHTML=""; $("runrec").textContent="Inputs invalid. No run record."; $("margin").innerHTML=""; LAST=null; return; }
   const s=R.sim;
   $("kpis").innerHTML=
     kpi("Governing ASET",R.gov?fmt(R.gov[1],0)+" s":"> "+fmt(p.tmax,0)+" s",R.gov?R.gov[0]+(R.gov[1]>=60?` · ${fmt(R.gov[1]/60,1)} min`:""):"criteria not reached","gov")+
@@ -469,7 +470,7 @@ function renderAll(p,R,W){
     kpi("ASET, numerical layer",sec(s.tz),"two-zone mass/energy balance")+
     (p.tOn?kpi("ASET, layer temperature",sec(s.tT),"limit "+dT(p.TLim)):"")+
     kpi("A/H² (shape factor)",fmt(R.AH,2),"H above fire base");
-  drawCharts(p,R); drawTable(p,R); LAST={p,R,W}; stamp(); margin();
+  drawCharts(p,R); drawTable(p,R); LAST={p,R,W}; runrec(); margin();
 }
 function niceMax(v){const e=Math.pow(10,Math.floor(Math.log10(v)));for(const m of[1,1.2,1.5,2,2.5,3,4,5,6,8,10])if(m*e>=v)return m*e;return 10*e}
 function svgChart({series,xMax,yMax,xLab,yLab,hlines=[],vlines=[],h=330}){
@@ -515,7 +516,7 @@ function margin(){
   if(aset==null){el.innerHTML=`<div class="kpis">${kpi("RSET",fmt(r.sum,0)+" s","sum of segments")}${kpi("ASET","> "+fmt(LAST.p.tmax,0)+" s","not reached; extend the end time")}</div>`;return}
   const m=aset-r.sum, req=(isFinite(f)&&f>0?f:1)*r.sum, st= aset<r.sum?"fail":aset<req?"warn":"pass", lab={fail:"FAIL · ASET < RSET",warn:"MARGINAL · below required ratio",pass:"PASS"}[st];
   el.innerHTML=`<div class="kpis">${kpi("ASET (governing)",fmt(aset,0)+" s",LAST.R.gov[0])}${kpi("RSET",fmt(r.sum,0)+" s","D + N + P + M")}${kpi("Margin ASET − RSET",fmt(m,0)+" s",`ratio ${fmt(aset/r.sum,2)} (required ${fmt(isFinite(f)?f:1,2)})`)}</div><p style="margin:.5rem 0 0"><span class="pill ${st}">${lab}</span> <span class="small">Screening comparison only. The RSET Tool is also screening-level.</span></p>`;
-  stamp();
+  runrec();
 }
 function inputsSummary(p){
   return [`Project: ${p.proj||"(unnamed)"}`,`Units shown: ${units}`,
@@ -526,22 +527,22 @@ function inputsSummary(p){
   `Criterion: layer ≥ ${dLen(p.zcrit,2)} (base ${dLen(p.zc0,2)} + margin ${dLen(p.zm,2)})${p.tOn?`; layer T ≤ ${dT(p.TLim)}`:""}`,
   `Design-fire citation: ${p.cite||"(none entered)"}`];
 }
-function stamp(){
+function runrec(){
   if(!LAST||!LAST.R) return; const {p,R,W}=LAST, r=rsetVals();
-  const lines=[`${APP.name} v${APP.version} · Fire Toolshed · SCREENING ONLY, not the submittal basis`,`Generated: ${new Date().toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})}`,"--- Inputs",...inputsSummary(p),"--- Results",
+  const lines=[`${APP.name} v${APP.version} · Fire Toolshed · SCREENING ONLY, not the submittal basis`,"Run record for traceability only. Not a professional seal or certification.",`Generated: ${new Date().toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})}`,"--- Inputs",...inputsSummary(p),"--- Results",
    `Governing ASET: ${R.gov?fmt(R.gov[1],0)+" s ("+R.gov[0]+")":"not reached within "+fmt(p.tmax,0)+" s"}`,
    `NFPA 92 filling-equation ASET: ${R.alg!=null?fmt(R.alg,0)+" s":"n/a"}   Numerical layer ASET: ${sec(R.sim.tz)}${p.tOn?"   Temperature ASET: "+sec(R.sim.tT):""}`,
    `A/H² = ${fmt(R.AH,2)}   criterion z/H = ${fmt(R.zH,2)}`,
    r.ok?`RSET (user): ${fmt(r.sum,0)} s   Margin: ${R.gov?fmt(R.gov[1]-r.sum,0)+" s":"n/a"}`:"RSET: not entered",
    `Warnings: ${W.filter(w=>w[0]!=="i").length}`,
    "Method: NFPA 92 smoke-filling equations + NFPA 92 axisymmetric plume; two-zone mass/energy balance (RK4). Use FDS or an AHJ-accepted method for the submittal."];
-  $("stamp").textContent=lines.join("\n");
+  $("runrec").textContent=lines.join("\n");
 }
 // ---------- report (print) ----------
 function buildReport(){
   if(!LAST||!LAST.R){alert("Fix the inputs first.");return false}
   const {W}=LAST;
-  $("report").innerHTML=`<div class="card"><h2>ASET Screener report · screening only</h2><div class="stamp">${$("stamp").textContent.replace(/&/g,"\u0026amp;").replace(/</g,"\u0026lt;")}</div></div>
+  $("report").innerHTML=`<div class="card"><h2>ASET Screener report · screening only</h2><div class="runrec">${$("runrec").textContent.replace(/&/g,"\u0026amp;").replace(/</g,"\u0026lt;")}</div></div>
    <div class="card"><h2>Results</h2><div class="kpis">${$("kpis").innerHTML}</div>${rsetVals().ok?$("margin").innerHTML:"<p class=small>RSET not entered.</p>"}<h3>Checks and warnings</h3><ul class="warns">${W.map(w=>`<li class="${w[0]}">${w[1]}</li>`).join("")}</ul></div>
    <div class="card"><h2>Layer height vs time</h2>${$("chartZ").innerHTML}${$("chartT").innerHTML}</div>
    <div class="card"><h2>Time history</h2><div class="tblwrap"><table>${$("tbl").innerHTML}</table></div></div>
