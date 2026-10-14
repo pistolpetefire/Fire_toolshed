@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ASET Screener · Fire Toolshed</title>
+<meta name="description" content="Screening-level smoke-filling ASET calculator: NFPA 92 filling equations and a two-zone mass/energy-balance layer model. Screening only.">
+<style>
+:root{
+  --v-50:#f7f5ff;--v-100:#efeafe;--v-200:#ddd3fb;--v-300:#c4b5f5;--v-500:#8b6fd6;--v-700:#5b3fb3;--v-800:#4a3392;--v-900:#2e1f63;
+  --ink:#1f1a33;--muted:#5a5370;--line:#e4def5;--card:#fff;
+  --pass:#1f7a4a;--warn:#8a5a00;--fail:#b4232c;
+  --c1:#5b3fb3;--c2:#b0359b;--c3:#2f6fb0;--c4:#c26a00;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--v-50);color:var(--ink);line-height:1.5;
+  padding:calc(1.25rem + var(--safe-top)) 1rem calc(2rem + var(--safe-bottom))}
+.wrap{max-width:1180px;margin:0 auto}
+header{display:flex;gap:.9rem;align-items:flex-start;margin-bottom:1rem}
+.logo{width:3rem;height:3rem;border-radius:1rem;background:var(--v-700);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0}
+h1{margin:0;font-size:1.65rem;letter-spacing:-.03em;line-height:1.15}
+h2{font-size:1.05rem;margin:0 0 .6rem;color:var(--v-800)}
+h3{font-size:.95rem;margin:.9rem 0 .4rem;color:var(--v-800)}
+.sub{margin:.25rem 0 0;color:var(--muted);font-size:.9rem}
+.badge{display:inline-block;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--v-100);color:var(--v-800);border:1px solid var(--v-200);padding:.15rem .5rem;border-radius:999px;margin-right:.35rem}
+.banner{background:#fff;border:1px solid var(--v-300);border-left:6px solid var(--v-700);border-radius:.9rem;padding:.75rem 1rem;margin-bottom:1rem;font-size:.9rem}
+.banner b{color:var(--v-800)}
+.tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem}
+.tabs button{font:inherit;font-size:.9rem;border:1px solid var(--v-200);background:#fff;color:var(--v-800);border-radius:999px;padding:.45rem 1rem;cursor:pointer;min-height:44px}
+.tabs button[aria-selected="true"]{background:var(--v-700);border-color:var(--v-700);color:#fff}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}
+.grid>*,.row>*{min-width:0}
+@media(min-width:900px){.grid{grid-template-columns:380px minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:1.1rem;padding:1rem 1.15rem;box-shadow:0 1px 2px rgba(46,31,99,.05)}
+.card+.card{margin-top:1rem}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin:.55rem 0 .2rem}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+input,select,textarea{font:inherit;font-size:16px;width:100%;padding:.45rem .6rem;border:1px solid var(--v-200);border-radius:.6rem;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--v-500);outline-offset:1px}
+input.bad{border-color:var(--fail);background:#fff5f5}
+.unit{font-weight:500;color:var(--v-700)}
+.chk{display:flex;gap:.5rem;align-items:center;font-size:.88rem;margin:.5rem 0;color:var(--ink);font-weight:500}
+.chk input{width:auto}
+.seg{display:inline-flex;border:1px solid var(--v-300);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:.85rem;border:0;background:#fff;color:var(--v-800);padding:.35rem .9rem;cursor:pointer;min-height:38px}
+.seg button.on{background:var(--v-700);color:#fff}
+.btns{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--v-700);background:var(--v-700);color:#fff;border-radius:.6rem;padding:.5rem .9rem;cursor:pointer;min-height:42px}
+.btn.alt{background:#fff;color:var(--v-800)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.7rem}
+.kpi{background:var(--v-50);border:1px solid var(--v-200);border-radius:.9rem;padding:.6rem .8rem}
+.kpi .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+.kpi .v{font-size:1.45rem;font-weight:750;color:var(--v-900);line-height:1.2}
+.kpi .s{font-size:.78rem;color:var(--muted)}
+.kpi.gov{border-color:var(--v-700);background:#fff;box-shadow:inset 0 0 0 1px var(--v-700)}
+.pill{display:inline-block;font-weight:700;font-size:.8rem;padding:.1rem .55rem;border-radius:999px}
+.pass{background:#e3f4ea;color:var(--pass)}.warn{background:#fff3d6;color:var(--warn)}.fail{background:#fde4e6;color:var(--fail)}
+ul.warns{margin:.3rem 0 0;padding-left:1.1rem;font-size:.86rem}
+ul.warns li{margin:.2rem 0}
+ul.warns li.w{color:var(--warn)}ul.warns li.e{color:var(--fail);font-weight:600}ul.warns li.i{color:var(--muted)}
+svg{width:100%;height:auto;display:block}
+.tblwrap{overflow-x:auto;max-height:360px;overflow-y:auto;border:1px solid var(--line);border-radius:.6rem}
+table{border-collapse:collapse;width:100%;font-size:.84rem;font-variant-numeric:tabular-nums}
+th,td{padding:.35rem .55rem;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{background:var(--v-100);color:var(--v-900);position:sticky;top:0}
+td:first-child,th:first-child{text-align:left}
+.stamp{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;background:var(--v-50);border:1px dashed var(--v-300);border-radius:.6rem;padding:.7rem .8rem;white-space:pre-wrap;word-break:break-word}
+.small{font-size:.8rem;color:var(--muted)}
+.cite li{margin:.25rem 0;font-size:.86rem}
+code{background:var(--v-100);padding:0 .25rem;border-radius:.3rem;font-size:.85em}
+.eq{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.86rem;background:var(--v-50);border-radius:.5rem;padding:.4rem .6rem;margin:.3rem 0;overflow-x:auto}
+.hidden{display:none!important}
+footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
+#report{display:none}
+@media print{
+  body{background:#fff;padding:0;font-size:10.5pt}
+  .tabs,.btns,#tab-inputs .grid>div:first-child,.noprint,footer,#tab-verify,#tab-method{display:none!important}
+  .card{box-shadow:none;border:1px solid #bbb;break-inside:auto;margin-top:.6rem!important}
+  svg,.kpi,tr,.chartbox{break-inside:avoid}
+  h2,h3{break-after:avoid}
+  .banner{margin-bottom:.4rem}
+  #report{display:block}
+  #tab-inputs{display:none!important}
+  .tblwrap{max-height:none;overflow:visible}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo" aria-hidden="true">ASET</div>
+  <div>
+    <h1>ASET Screener</h1>
+    <p class="sub"><span class="badge">Screening · v1.0.0</span>Smoke-filling ASET for any large space: single-story, atrium, assembly, warehouse. NFPA 92 filling equations plus a two-zone mass/energy-balance layer model. Runs offline in the browser.</p>
+  </div>
+</header>
+<div class="banner" role="note"><b>Screening only. Not the submittal basis.</b> Use FDS (NIST Fire Dynamics Simulator) or another AHJ-accepted method for the submittal. A licensed fire protection engineer must confirm the inputs, the design fire, the applicability of each correlation, and the tenability criteria with the AHJ.</div>
+
+<nav class="tabs noprint" role="tablist">
+  <button role="tab" aria-selected="true" data-tab="inputs">Calculator</button>
+  <button role="tab" aria-selected="false" data-tab="verify">Verification</button>
+  <button role="tab" aria-selected="false" data-tab="method">Method & limits</button>
+</nav>
+
+<section id="tab-inputs">
+<div class="grid">
+<div>
+  <div class="card">
+    <h2>Project</h2>
+    <label for="proj">Project / space name</label><input id="proj" value="Example large space">
+    <label>Units</label>
+    <div class="seg" id="unitsSeg"><button data-u="IP" class="on">IP (ft, Btu/s)</button><button data-u="SI">SI (m, kW)</button></div>
+  </div>
+  <div class="card">
+    <h2>Space geometry</h2>
+    <div class="row">
+      <div><label for="H">Ceiling height <span class="unit" data-q="length"></span></label><input id="H" inputmode="decimal" data-q="length" data-si="9.144"></div>
+      <div><label for="A">Floor area <span class="unit" data-q="area"></span></label><input id="A" inputmode="decimal" data-q="area" data-si="1858.06"></div>
+    </div>
+    <label for="zf">Fuel (fire base) elevation above floor <span class="unit" data-q="length"></span></label><input id="zf" inputmode="decimal" data-q="length" data-si="0">
+    <p class="small" id="shapeNote"></p>
+  </div>
+  <div class="card">
+    <h2>Design fire</h2>
+    <label>Fire type</label>
+    <div class="seg" id="fireSeg"><button data-f="t2" class="on">t-squared</button><button data-f="steady">Steady</button></div>
+    <div id="t2box">
+      <label for="growth">Growth rate (library)</label>
+      <select id="growth">
+        <option value="600">Slow · t<sub>g</sub> = 600 s (α ≈ 0.00293 kW/s²)</option>
+        <option value="300">Medium · t<sub>g</sub> = 300 s (α ≈ 0.0117 kW/s²)</option>
+        <option value="150" selected>Fast · t<sub>g</sub> = 150 s (α ≈ 0.0469 kW/s²)</option>
+        <option value="75">Ultrafast · t<sub>g</sub> = 75 s (α ≈ 0.1876 kW/s²)</option>
+        <option value="custom">Custom t<sub>g</sub></option>
+      </select>
+      <div id="tgCustomBox" class="hidden"><label for="tg">Growth time t<sub>g</sub> to 1,000 Btu/s (1,055 kW) [s]</label><input id="tg" inputmode="decimal" value="150"></div>
+      <label for="cap">Peak HRR cap <span class="unit" data-q="hrr"></span></label><input id="cap" inputmode="decimal" data-q="hrr" data-si="5275.28">
+    </div>
+    <div id="steadybox" class="hidden">
+      <label for="Qs">Steady HRR <span class="unit" data-q="hrr"></span></label><input id="Qs" inputmode="decimal" data-q="hrr" data-si="5275.28">
+    </div>
+    <div class="row">
+      <div><label for="chi">Convective fraction χ<sub>c</sub></label><input id="chi" inputmode="decimal" value="0.7"></div>
+      <div><label for="lam">Wall heat-loss fraction λ</label><input id="lam" inputmode="decimal" value="0"></div>
+    </div>
+    <label for="cite">Design-fire citation (required)</label>
+    <textarea id="cite" rows="2" placeholder="e.g. NFPA 92 t² growth rates; fuel-specific test data, source and page"></textarea>
+  </div>
+  <div class="card">
+    <h2>Exhaust (optional)</h2>
+    <label class="chk"><input type="checkbox" id="exOn"> Mechanical smoke exhaust</label>
+    <div id="exBox" class="hidden"><label for="Ve">Exhaust volumetric rate <span class="unit" data-q="flow"></span></label><input id="Ve" inputmode="decimal" data-q="flow" data-si="23.597"></div>
+    <p class="small">Exhaust is treated as removing layer gas at the layer temperature (no plugholing, no makeup-air velocity check). While the exhaust exceeds the plume supply, no layer accumulates (thin-layer floor of 1 mm, equilibrium temperature). The NFPA 92 filling equations do not apply with exhaust; the numerical model governs.</p>
+  </div>
+  <div class="card">
+    <h2>Tenability criteria</h2>
+    <div class="row">
+      <div><label for="zc0">Base smoke-layer height <span class="unit" data-q="length"></span></label><input id="zc0" inputmode="decimal" data-q="length" data-si="1.8288"></div>
+      <div><label for="zm">Added margin <span class="unit" data-q="length"></span></label><input id="zm" inputmode="decimal" data-q="length" data-si="0.3048"></div>
+    </div>
+    <p class="small">Base default 6 ft (1.83 m) above the highest occupied floor; margin is your adjustable allowance. Confirm both with the AHJ.</p>
+    <label class="chk"><input type="checkbox" id="tOn"> Also check layer temperature limit</label>
+    <div id="tBox" class="hidden"><label for="TLim">Layer temperature limit <span class="unit" data-q="temp"></span></label><input id="TLim" inputmode="decimal" data-q="temp" data-si="60"></div>
+    <label for="T0">Ambient temperature <span class="unit" data-q="temp"></span></label><input id="T0" inputmode="decimal" data-q="temp" data-si="20">
+    <label for="tmax">Simulation end time [s]</label><input id="tmax" inputmode="decimal" value="1800">
+  </div>
+</div>
+
+<div>
+  <div class="card">
+    <h2>Results</h2>
+    <div class="kpis" id="kpis"></div>
+    <h3>Checks and warnings</h3>
+    <ul class="warns" id="warns"></ul>
+  </div>
+  <div class="card">
+    <h2>Smoke layer interface height vs time</h2>
+    <div id="chartZ"></div>
+    <div id="chartT" class="noprint-alt"></div>
+  </div>
+  <div class="card">
+    <h2>ASET vs RSET margin</h2>
+    <p class="small">Enter RSET from the Transparent RSET Tool (or load its exported session JSON). Margin = ASET − RSET.</p>
+    <div class="row">
+      <div><label for="rDet">Detection [s]</label><input id="rDet" inputmode="decimal" value=""></div>
+      <div><label for="rNot">Notification [s]</label><input id="rNot" inputmode="decimal" value=""></div>
+      <div><label for="rPre">Pre-movement [s]</label><input id="rPre" inputmode="decimal" value=""></div>
+      <div><label for="rMov">Movement [s]</label><input id="rMov" inputmode="decimal" value=""></div>
+    </div>
+    <label for="rsf">Required ASET / RSET ratio (agreed with AHJ)</label><input id="rsf" inputmode="decimal" value="1.0">
+    <div id="margin" style="margin-top:.7rem"></div>
+  </div>
+  <div class="card">
+    <h2>Time history</h2>
+    <div class="tblwrap"><table id="tbl"></table></div>
+  </div>
+  <div class="card">
+    <h2>Stamped output</h2>
+    <div class="stamp" id="stamp"></div>
+    <div class="btns">
+      <button class="btn" id="bPrint">Print report</button>
+      <button class="btn alt" id="bExport">Export project JSON</button>
+      <label class="btn alt" style="display:inline-flex;align-items:center">Import JSON<input type="file" id="fImport" accept=".json,application/json" style="display:none"></label>
+      <button class="btn alt" id="bRset">Export RSET Tool session (ASET → tenability limit)</button>
+    </div>
+    <p class="small" id="ioMsg" role="status"></p>
+  </div>
+</div>
+</div>
+</section>
+
+<section id="tab-verify" class="hidden">
+  <div class="card">
+    <h2>Verification against independent Python hand calcs</h2>
+    <p class="small">Each case is run live in this page's engine and compared with an independent Python calculation (<code>verify_handcalc.py</code>: SciPy root-finding for the closed-form NFPA 92 equations, and SciPy LSODA with rtol 10⁻¹⁰ for the two-zone model, written in a different state formulation). Acceptance: within 1%.</p>
+    <div class="tblwrap" style="max-height:none"><table id="vtbl"></table></div>
+    <p id="vsum" style="margin-top:.6rem"></p>
+  </div>
+</section>
+
+<section id="tab-method" class="hidden">
+  <div class="card">
+    <h2>Method</h2>
+    <p>All calculations run internally in SI. Heights in the correlations are measured from the base of the fire (fuel elevation); H and z on screen are measured from the floor.</p>
+    <h3>1 · NFPA 92 filling equations (no exhaust, uniform cross-section)</h3>
+    <div class="eq">Steady:  z/H = 1.11 − 0.28 ln[ (t Q^(1/3) / H^(4/3)) / (A/H²) ]       valid 0.9 ≤ A/H² ≤ 14, z/H ≥ 0.2</div>
+    <div class="eq">t-squared:  z/H = 0.91 [ t / (t_g^(2/5) H^(4/5) (A/H²)^(3/5)) ]^(−1.45)   valid 0.9 ≤ A/H² ≤ 23, z/H ≥ 0.2</div>
+    <p class="small">z = layer interface height above the fire base [m]; H = ceiling height above the fire base [m]; t [s]; Q = HRR [kW]; t<sub>g</sub> = growth time to 1,055 kW [s]; A = cross-sectional area [m²]. Source: NFPA 92, <i>Standard for Smoke Control Systems</i>, smoke-filling equations (Annex/Chapter on calculation procedures); SFPE Handbook of Fire Protection Engineering, 5th Ed., smoke control / smoke-filling chapters (Milke). Confirm the edition adopted by the AHJ. The t-squared form is invalid after the HRR cap is reached.</p>
+    <h3>2 · NFPA 92 axisymmetric plume</h3>
+    <div class="eq">z_l = 0.166 Q_c^(2/5);  z > z_l: m = 0.071 Q_c^(1/3) z^(5/3) + 0.0018 Q_c;  z ≤ z_l: m = 0.032 Q_c^(3/5) z     [kg/s, kW, m]</div>
+    <p class="small">Q<sub>c</sub> = χ<sub>c</sub>·Q (default χ<sub>c</sub> = 0.7). Fire assumed away from walls and corners (axisymmetric). Balcony spill, window and wall/corner plumes are not modeled.</p>
+    <h3>3 · Two-zone mass/energy-balance layer model (numerical)</h3>
+    <div class="eq">dM/dt = m_p(z) − ρ_L V̇_e        dV_L/dt = [ m_p c_p T₀ + (1 − λ) Q_c ] / (c_p ρ₀ T₀) − V̇_e        z = H − V_L / A,  T_L = ρ₀ T₀ V_L / M</div>
+    <p class="small">Constant-pressure upper layer, ideal gas (ρT = ρ₀T₀), c<sub>p</sub> = 1.005 kJ/kg·K, ρ₀ = 101,325/(287.05·T₀). Plume entrainment from section 2 evaluated at the current interface height. λ = fraction of convective heat lost to boundaries (λ = 0 is adiabatic: deepest, hottest layer). Fourth-order Runge–Kutta, Δt = 0.1 s. Same physics as classic two-zone fill models (e.g., SFPE Handbook zone-model chapters; CFAST technical reference), simplified to a single compartment with no vents other than exhaust.</p>
+    <h3>4 · Tenability and ASET</h3>
+    <p class="small">ASET (layer) = first time the interface reaches (base height + margin) above the floor. Optional ASET (temperature) = first time T<sub>L</sub> reaches the limit (numerical model only). Governing ASET = the earliest applicable criterion from the governing method (the numerical model; the NFPA 92 algebraic result is shown alongside for comparison and is not used to govern). Visibility, toxicity (FED) and radiation are <b>not</b> evaluated: use FDS or another AHJ-accepted method.</p>
+    <h3>Limits</h3>
+    <ul class="cite">
+      <li>Uniform cross-section, flat ceiling, single well-mixed upper layer; no stratification, no smoke-layer lag in tall spaces, no ceiling-jet transport delay.</li>
+      <li>No sprinkler interaction (cooling, HRR control) unless reflected in your cited design fire and cap.</li>
+      <li>No leakage, no door openings, no makeup air; exhaust plugholing and inlet velocities are not checked (see NFPA 92).</li>
+      <li>The NFPA 92 filling equations are empirical: outside 0.9 ≤ A/H² ≤ 14 (steady) or 23 (t²), or below z/H = 0.2, results are flagged.</li>
+      <li>Not a visibility, toxicity, or heat-flux tenability analysis. Not the submittal basis.</li>
+    </ul>
+    <h3>RSET Tool handoff</h3>
+    <p class="small">"Export RSET Tool session" writes the Transparent RSET Tool (v0.1.7) session format: <code>version</code>, <code>created</code>, <code>updated</code>, four <code>segments</code> (detection, notification, premovement, movement; seconds), <code>assumptionsLog</code>, <code>tenabilityLimit</code> (= governing ASET, s), <code>projectName</code>, <code>notes</code>. Load it with "Load Session" in the RSET Tool; it fills the optional tenability limit for its ASET − RSET margin. Import here accepts either this app's project JSON or an RSET Tool session (RSET segments are read into the margin panel).</p>
+  </div>
+</section>
+
+<section id="report" aria-hidden="true"></section>
+<footer>Fire Toolshed · ASET Screener v1.0.0 · For qualified engineers only. Preliminary screening tool, not a substitute for stamped design or AHJ approval.</footer>
+</div>
+
+<script>
+"use strict";
+const APP={name:"ASET Screener",version:"1.0.0",schema:"fireToolshed.asetScreener.v1"};
+const CP=1.005,RG=287.05,P0=101325;
+const U={ // SI -> IP
+  length:{IP:{f:v=>v/0.3048,b:v=>v*0.3048,u:"ft"},SI:{u:"m"}},
+  area:{IP:{f:v=>v/0.09290304,b:v=>v*0.09290304,u:"ft²"},SI:{u:"m²"}},
+  hrr:{IP:{f:v=>v/1.055056,b:v=>v*1.055056,u:"Btu/s"},SI:{u:"kW"}},
+  flow:{IP:{f:v=>v/0.00047194745,b:v=>v*0.00047194745,u:"cfm"},SI:{u:"m³/s"}},
+  temp:{IP:{f:v=>v*9/5+32,b:v=>(v-32)*5/9,u:"°F"},SI:{u:"°C"}}
+};
+let units="IP",fire="t2",LAST=null;
+const $=id=>document.getElementById(id);
+function toDisp(q,si){return units==="IP"?U[q].IP.f(si):si}
+function toSI(q,v){return units==="IP"?U[q].IP.b(v):v}
+function uLab(q){return units==="IP"?U[q].IP.u:U[q].SI.u}
+function fmt(v,d=1){if(v==null||!isFinite(v))return"—";return Number(v).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function dLen(si,d=1){return fmt(toDisp("length",si),d)+" "+uLab("length")}
+function dT(si,d=0){return fmt(toDisp("temp",si),d)+" "+uLab("temp")}
+
+// ---------- engine (SI) ----------
+function plume(Qc,z){ if(z<=0||Qc<=0) return 0; const zl=0.166*Math.pow(Qc,0.4);
+  return z>zl? 0.071*Math.cbrt(Qc)*Math.pow(z,5/3)+0.0018*Qc : 0.032*Math.pow(Qc,0.6)*z; }
+function hrr(p,t){ if(p.fire==="steady") return p.Q; const q=1055*Math.pow(t/p.tg,2); return Math.min(q,p.cap); }
+function nfpaSteadyZ(Q,H,A,t){ if(t<=0) return H; const r=1.11-0.28*Math.log((t*Math.cbrt(Q)*Math.pow(H,-4/3))/(A/(H*H))); return Math.min(H,r*H); }
+function nfpaSteadyT(Q,H,A,z){ return (A/(H*H))*Math.pow(H,4/3)/Math.cbrt(Q)*Math.exp((1.11-z/H)/0.28); }
+function nfpaT2Z(tg,H,A,t){ if(t<=0) return H; const r=0.91*Math.pow(t*Math.pow(H,-0.8)*Math.pow(tg,-0.4)*Math.pow(A/(H*H),-0.6),-1.45); return Math.min(H,r*H); }
+function nfpaT2T(tg,H,A,z){ return Math.pow((z/H)/0.91,-1/1.45)*Math.pow(H,0.8)*Math.pow(tg,0.4)*Math.pow(A/(H*H),0.6); }
+function simulate(p,opts={}){ // returns samples and event times
+  const T0=p.T0+273.15, r0=P0/(RG*T0), He=p.H-p.zf, A=p.A, Ve=p.Ve||0, dt=opts.dt||0.1;
+  let Vl=A*0.001, M=r0*Vl, t=0; const out=[]; let tz=null,tT=null;
+  const zc=(p.zcrit!=null?p.zcrit-p.zf:null), TLimK=(p.TLim!=null?p.TLim+273.15:null);
+  const f=(t,Vl,M)=>{ const z=He-Vl/A, Qc=p.chi*hrr(p,t), mp=plume(Qc,z), TL=r0*T0*Vl/M;
+    return [ (mp*CP*T0+(1-p.lam)*Qc)/(CP*r0*T0)-Ve, mp-(r0*T0/TL)*Ve, mp ]; };
+  const every=Math.max(1,Math.round((opts.sample||5)/dt)); let k=0, prev=null;
+  while(t<=p.tmax+1e-9){
+    const z=He-Vl/A, TL=r0*T0*Vl/M;
+    const cur={t,z:z+p.zf,TL:TL-273.15,Q:hrr(p,t),mp:plume(p.chi*hrr(p,t),z)};
+    if(prev){
+      if(tz==null&&zc!=null&&z<=zc){ const zp=prev.z-p.zf; tz=prev.t+(zp-zc)/(zp-z)*(t-prev.t); }
+      if(tT==null&&TLimK!=null&&TL>=TLimK){ const Tp=prev.TL+273.15; tT=prev.t+(TLimK-Tp)/(TL-Tp)*(t-prev.t); }
+    }
+    if(k%every===0) out.push(cur);
+    if(opts.stopAt&&tz!=null&&(TLimK==null||tT!=null)) break;
+    if(z<=0.0005*He){ out.push(cur); break; }
+    prev=cur;
+    const a=f(t,Vl,M), b=f(t+dt/2,Vl+a[0]*dt/2,M+a[1]*dt/2), c=f(t+dt/2,Vl+b[0]*dt/2,M+b[1]*dt/2), d=f(t+dt,Vl+c[0]*dt,M+c[1]*dt);
+    Vl+=dt/6*(a[0]+2*b[0]+2*c[0]+d[0]); M+=dt/6*(a[1]+2*b[1]+2*c[1]+d[1]);
+    t+=dt; k++;
+    const Vth=A*0.001; // thin-layer floor: exhaust exceeds plume supply, so it draws ambient air and no layer accumulates
+    if(Vl<=Vth||M<=0){ const zz=He-Vth/A, Qc=p.chi*hrr(p,t), mp=plume(Qc,zz), TLeq=T0+(mp>0?(1-p.lam)*Qc/(mp*CP):0); Vl=Vth; M=r0*T0*Vl/TLeq; }
+    Vl=Math.min(Vl,A*He);
+  }
+  return {samples:out,tz,tT,zEnd:out.length?out[out.length-1].z:null,TEnd:out.length?out[out.length-1].TL:null};
+}
+function sampleAt(sim,t){const s=sim.samples;for(let i=1;i<s.length;i++){if(s[i].t>=t){const a=s[i-1],b=s[i],w=(t-a.t)/((b.t-a.t)||1);return{z:a.z+w*(b.z-a.z),TL:a.TL+w*(b.TL-a.TL)}}}return s[s.length-1]}
+
+// ---------- inputs ----------
+function num(id){const el=$(id); const v=parseFloat(String(el.value).replace(/,/g,"")); return isFinite(v)?v:NaN}
+const LBL={H:"ceiling height",A:"floor area",zf:"fuel elevation",tg:"growth time",cap:"HRR cap",Qs:"steady HRR",chi:"convective fraction (0.3–1)",lam:"heat-loss fraction (0–0.95)",Ve:"exhaust rate",zc0:"base layer height",zm:"margin",T0:"ambient temperature (−40 to 50 °C)",TLim:"temperature limit (must exceed ambient)",tmax:"end time (10–7200 s)"};
+function readInputs(){
+  const errs=[]; const g=(id,q,{min=-Infinity,max=Infinity,req=true,excl=false}={})=>{const el=$(id),raw=num(id),exact=q&&el.dataset.si!=null&&el.value===el.dataset.shown,v=exact?parseFloat(el.dataset.si):(q&&isFinite(raw)?toSI(q,raw):raw);
+    const bad=req&&(!isFinite(v)||(excl?v<=min:v<min)||v>max); el.classList.toggle("bad",bad); if(bad) errs.push(LBL[id]||id); return v;};
+  const p={fire,units};
+  p.H=g("H","length",{min:0,excl:true}); p.A=g("A","area",{min:0,excl:true}); p.zf=g("zf","length",{min:0});
+  if(fire==="t2"){ const gs=$("growth").value; p.tg= gs==="custom"? g("tg",null,{min:0,excl:true}) : parseFloat(gs); p.growth=gs; p.cap=g("cap","hrr",{min:0,excl:true}); }
+  else p.Q=g("Qs","hrr",{min:0,excl:true});
+  p.chi=g("chi",null,{min:0.3,max:1}); p.lam=g("lam",null,{min:0,max:0.95});
+  p.exOn=$("exOn").checked; p.Ve=p.exOn? g("Ve","flow",{min:0}):0;
+  p.zc0=g("zc0","length",{min:0}); p.zm=g("zm","length",{min:0}); p.zcrit=p.zc0+p.zm;
+  p.T0=g("T0","temp",{min:-40,max:50}); p.tOn=$("tOn").checked; p.TLim= p.tOn? g("TLim","temp",{min:-40,max:2000}) : null;
+  p.tmax=g("tmax",null,{min:10,max:7200}); p.cite=$("cite").value.trim(); p.proj=$("proj").value.trim();
+  if(isFinite(p.H)&&isFinite(p.zf)&&p.zf>=p.H){ $("zf").classList.add("bad"); errs.push("fuel elevation (must be below the ceiling)"); }
+  if(p.tOn&&isFinite(p.TLim)&&isFinite(p.T0)&&p.TLim<=p.T0){ $("TLim").classList.add("bad"); errs.push(LBL.TLim); }
+  p.errs=errs; return p;
+}
+
+// ---------- compute + render ----------
+function compute(){
+  const p=readInputs(); const W=[];
+  if(p.errs.length){ W.push(["e","Fix the highlighted inputs (missing, non-numeric, or out of range): "+p.errs.join(", ")+"."]); renderAll(p,null,W); return; }
+  const He=p.H-p.zf, zcE=p.zcrit-p.zf, AH=p.A/(He*He), zH=zcE/He;
+  const sim=simulate(p,{sample:Math.max(1,Math.round(p.tmax/360))});
+  let alg=null;
+  if(p.exOn&&p.Ve>0){ W.push(["i","Exhaust is on: the NFPA 92 filling equations assume no exhaust, so they are not shown. The numerical model governs."]); }
+  else if(zcE<=0){ W.push(["e","Criterion height is at or below the fire base; ASET is not defined."]); }
+  else { alg = p.fire==="steady"? nfpaSteadyT(p.Q,He,p.A,zcE) : nfpaT2T(p.tg,He,p.A,zcE);
+    const hi=p.fire==="steady"?14:23;
+    if(AH<0.9||AH>hi) W.push(["w",`A/H² = ${fmt(AH,2)} is outside the NFPA 92 ${p.fire==="steady"?"steady":"t-squared"} filling-equation range (0.9–${hi}). Treat the algebraic result as outside its validity; rely on the numerical model and confirm with FDS.`]);
+    if(zH<0.2) W.push(["w",`Criterion z/H = ${fmt(zH,2)} is below 0.2, the lower limit of the NFPA 92 filling equations.`]);
+    if(p.fire==="t2"){ const tcap=p.tg*Math.sqrt(p.cap/1055); if(alg>tcap) W.push(["w",`The HRR cap is reached at ${fmt(tcap,0)} s, before the algebraic ASET (${fmt(alg,0)} s). The t-squared filling equation is invalid after the cap; use the numerical result.`]); }
+  }
+  if(zH>=1) W.push(["e","Criterion height is at or above the ceiling: the space is untenable by definition for this criterion."]);
+  const Qref= p.fire==="steady"?p.Q:p.cap, zl=0.166*Math.pow(p.chi*Qref,0.4);
+  if(zl>zcE&&zcE>0) W.push(["w",`Mean flame height (≈${dLen(zl)} above the fire base at ${p.fire==="steady"?"the steady HRR":"the cap"}) exceeds the criterion height: the plume correlation is in its flame region near the criterion.`]);
+  if(zl>He) W.push(["w","Flames may reach the ceiling at this HRR; plume/filling correlations are not reliable. Use FDS."]);
+  if(He>45) W.push(["w","Very tall space (over ~45 m / 150 ft): smoke stratification and transport lag are not modeled."]);
+  if(!p.cite) W.push(["w","Add a design-fire citation. Uncited design fires are not acceptable in a report."]);
+  if(p.chi!==0.7) W.push(["i",`Convective fraction set to ${p.chi} (NFPA 92 default 0.7). Cite the basis.`]);
+  if(p.lam>0) W.push(["i",`Heat-loss fraction λ = ${p.lam}: cooler, thinner layer than adiabatic. Less conservative for layer height; cite the basis.`]);
+  if(sim.tz==null) W.push(["i",`The layer did not reach the criterion within ${fmt(p.tmax,0)} s (numerical). End layer height ${dLen(sim.zEnd)}.`]);
+  if(p.tOn&&sim.tT==null) W.push(["i",`The layer temperature did not reach the limit within ${fmt(p.tmax,0)} s.`]);
+  W.push(["i","Visibility, toxicity (FED) and radiant heat are not evaluated. Use FDS or another AHJ-accepted method for the submittal."]);
+  const cands=[["Layer height (numerical)",sim.tz]]; if(p.tOn) cands.push(["Layer temperature (numerical)",sim.tT]);
+  const valid=cands.filter(c=>c[1]!=null); const gov= valid.length? valid.reduce((a,b)=>b[1]<a[1]?b:a) : null;
+  const R={alg,AH,zH,sim,gov,zl};
+  renderAll(p,R,W);
+}
+function kpi(k,v,s,cls=""){return `<div class="kpi ${cls}"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s||""}</div></div>`}
+function sec(v){return v==null?"not reached":fmt(v,0)+" s"}
+function renderAll(p,R,W){
+  $("warns").innerHTML=W.map(w=>`<li class="${w[0]}">${w[0]==="e"?"Error: ":w[0]==="w"?"Warning: ":""}${w[1]}</li>`).join("");
+  if(!R){ $("kpis").innerHTML=kpi("Governing ASET","—","inputs invalid","gov"); $("chartZ").innerHTML=""; $("chartT").innerHTML=""; $("tbl").innerHTML=""; $("stamp").textContent="Inputs invalid. No stamped output."; $("margin").innerHTML=""; LAST=null; return; }
+  const s=R.sim;
+  $("kpis").innerHTML=
+    kpi("Governing ASET",R.gov?fmt(R.gov[1],0)+" s":"> "+fmt(p.tmax,0)+" s",R.gov?R.gov[0]+(R.gov[1]>=60?` · ${fmt(R.gov[1]/60,1)} min`:""):"criteria not reached","gov")+
+    kpi("Layer criterion",dLen(p.zcrit),"base "+dLen(p.zc0)+" + margin "+dLen(p.zm))+
+    kpi("ASET, NFPA 92 equation",R.alg!=null?fmt(R.alg,0)+" s":"n/a",p.fire==="steady"?"steady filling":"t-squared filling")+
+    kpi("ASET, numerical layer",sec(s.tz),"two-zone mass/energy balance")+
+    (p.tOn?kpi("ASET, layer temperature",sec(s.tT),"limit "+dT(p.TLim)):"")+
+    kpi("A/H² (shape factor)",fmt(R.AH,2),"H above fire base");
+  drawCharts(p,R); drawTable(p,R); LAST={p,R,W}; stamp(); margin();
+}
+function niceMax(v){const e=Math.pow(10,Math.floor(Math.log10(v)));for(const m of[1,1.2,1.5,2,2.5,3,4,5,6,8,10])if(m*e>=v)return m*e;return 10*e}
+function svgChart({series,xMax,yMax,xLab,yLab,hlines=[],vlines=[],h=330}){
+  const cw=($("chartZ")&&$("chartZ").clientWidth)||760, W=Math.max(340,Math.min(760,cw)); if(W<600) h=Math.round(h*0.85);
+  const L=64,Rm=18,T=16,B=48,pw=W-L-Rm,ph=h-T-B;
+  const X=x=>L+x/xMax*pw, Y=y=>T+ph-y/yMax*ph; let g="";
+  for(let i=0;i<=5;i++){const x=xMax*i/5,y=yMax*i/5;
+    g+=`<line x1="${X(x)}" y1="${T}" x2="${X(x)}" y2="${T+ph}" stroke="#ece7f8"/><text x="${X(x)}" y="${T+ph+18}" font-size="12" text-anchor="middle" fill="#5a5370">${fmt(x,0)}</text>`;
+    g+=`<line x1="${L}" y1="${Y(y)}" x2="${L+pw}" y2="${Y(y)}" stroke="#ece7f8"/><text x="${L-8}" y="${Y(y)+4}" font-size="12" text-anchor="end" fill="#5a5370">${fmt(y,yMax<10?1:0)}</text>`;}
+  g+=`<rect x="${L}" y="${T}" width="${pw}" height="${ph}" fill="none" stroke="#c4b5f5"/>`;
+  for(const hl of hlines) g+=`<line x1="${L}" y1="${Y(hl.y)}" x2="${L+pw}" y2="${Y(hl.y)}" stroke="${hl.c}" stroke-width="2" stroke-dasharray="6 5"/><text x="${L+pw-6}" y="${Y(hl.y)-6}" font-size="12" text-anchor="end" fill="${hl.c}" font-weight="700">${hl.label}</text>`;
+  for(const vl of vlines) if(vl.x!=null&&vl.x<=xMax) g+=`<line x1="${X(vl.x)}" y1="${T}" x2="${X(vl.x)}" y2="${T+ph}" stroke="${vl.c}" stroke-width="1.5" stroke-dasharray="3 4"/><circle cx="${X(vl.x)}" cy="${Y(vl.y)}" r="5" fill="${vl.c}"/>`;
+  for(const s of series){ const d=s.pts.filter(q=>isFinite(q[1])).map((q,i)=>(i?"L":"M")+X(Math.min(q[0],xMax)).toFixed(1)+","+Y(Math.max(0,Math.min(q[1],yMax))).toFixed(1)).join("");
+    g+=`<path d="${d}" fill="none" stroke="${s.c}" stroke-width="2.6" ${s.dash?`stroke-dasharray="${s.dash}"`:""}/>`; }
+  g+=`<text x="${L+pw/2}" y="${h-8}" font-size="13" text-anchor="middle" fill="#1f1a33">${xLab}</text><text transform="translate(16,${T+ph/2}) rotate(-90)" font-size="13" text-anchor="middle" fill="#1f1a33">${yLab}</text>`;
+  let lg=`<div style="display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;font-size:.82rem;margin:.2rem 0 .4rem">`+series.map(s=>`<span><svg width="26" height="10" style="display:inline;width:26px;vertical-align:middle"><line x1="0" y1="5" x2="26" y2="5" stroke="${s.c}" stroke-width="3" ${s.dash?`stroke-dasharray="${s.dash}"`:""}/></svg> ${s.name}</span>`).join("")+`</div>`;
+  return `<div class="chartbox">`+lg+`<svg viewBox="0 0 ${W} ${h}" role="img" aria-label="${yLab} versus ${xLab}">${g}</svg></div>`;
+}
+function drawCharts(p,R){
+  const s=R.sim, tEnd=s.samples[s.samples.length-1].t, xMax=niceMax(Math.max(tEnd,10)), He=p.H-p.zf;
+  const sz=[{name:"Numerical two-zone layer",c:"#5b3fb3",pts:s.samples.map(q=>[q.t,toDisp("length",q.z)])}];
+  if(R.alg!=null){ const pts=[]; const tEndA=p.fire==="t2"?Math.min(xMax,p.tg*Math.sqrt(p.cap/1055)):xMax; for(let i=0;i<=200;i++){const t=tEndA*i/200; const z=p.fire==="steady"?nfpaSteadyZ(p.Q,He,p.A,t):nfpaT2Z(p.tg,He,p.A,t); pts.push([t,toDisp("length",Math.max(0,z)+p.zf)]);} sz.push({name:p.fire==="t2"&&tEndA<xMax?"NFPA 92 filling equation (valid to HRR cap only)":"NFPA 92 filling equation",c:"#b0359b",dash:"7 5",pts}); }
+  $("chartZ").innerHTML=svgChart({series:sz,xMax,yMax:niceMax(toDisp("length",p.H)),xLab:"Time from ignition [s]",yLab:`Interface height above floor [${uLab("length")}]`,
+    hlines:[{y:toDisp("length",p.zcrit),c:"#c26a00",label:"Tenability criterion"}],vlines:[{x:s.tz,y:toDisp("length",p.zcrit),c:"#5b3fb3"},{x:R.alg,y:toDisp("length",p.zcrit),c:"#b0359b"}]});
+  const tmaxT=Math.max(...s.samples.map(q=>q.TL)); const yT=niceMax(toDisp("temp",Math.max(tmaxT,p.tOn?p.TLim:0,p.T0+10)));
+  $("chartT").innerHTML=`<h3>Upper-layer temperature (numerical)</h3>`+svgChart({series:[{name:"Layer temperature",c:"#2f6fb0",pts:s.samples.map(q=>[q.t,toDisp("temp",q.TL)])}],xMax,yMax:yT,h:240,
+    xLab:"Time from ignition [s]",yLab:`T [${uLab("temp")}]`,hlines:p.tOn?[{y:toDisp("temp",p.TLim),c:"#c26a00",label:"Temperature limit"}]:[],vlines:p.tOn?[{x:s.tT,y:toDisp("temp",p.TLim),c:"#2f6fb0"}]:[]});
+}
+function drawTable(p,R){
+  const s=R.sim, He=p.H-p.zf, tEnd=s.samples[s.samples.length-1].t, step=niceMax(tEnd/30);
+  let h=`<thead><tr><th>t [s]</th><th>HRR [${uLab("hrr")}]</th><th>Plume m at z [kg/s]</th><th>z numerical [${uLab("length")}]</th>${R.alg!=null?`<th>z NFPA 92 [${uLab("length")}]</th>`:""}<th>T layer [${uLab("temp")}]</th></tr></thead><tbody>`;
+  for(let t=0;t<=tEnd+1e-6;t+=step){ const q=sampleAt(s,t); const Q=hrr(p,t); const za=R.alg!=null?(p.fire==="steady"?nfpaSteadyZ(p.Q,He,p.A,t):nfpaT2Z(p.tg,He,p.A,t)):null;
+    h+=`<tr><td>${fmt(t,0)}</td><td>${fmt(toDisp("hrr",Q),0)}</td><td>${fmt(plume(p.chi*Q,q.z-p.zf),1)}</td><td>${fmt(toDisp("length",q.z),2)}</td>${za!=null?`<td>${fmt(toDisp("length",Math.max(0,za)+p.zf),2)}</td>`:""}<td>${fmt(toDisp("temp",q.TL),1)}</td></tr>`; }
+  $("tbl").innerHTML=h+"</tbody>";
+}
+function rsetVals(){const ids=["rDet","rNot","rPre","rMov"];const v=ids.map(i=>num(i));return{v,ok:v.every(isFinite),sum:v.every(isFinite)?v.reduce((a,b)=>a+b,0):null}}
+function margin(){
+  const r=rsetVals(), f=num("rsf"); const el=$("margin");
+  ["rDet","rNot","rPre","rMov"].forEach(i=>{const v=num(i);$(i).classList.toggle("bad",$(i).value!==""&&(!isFinite(v)||v<0))});
+  if(!LAST||!LAST.R){el.innerHTML="";return}
+  const aset=LAST.R.gov?LAST.R.gov[1]:null;
+  if(!r.ok){el.innerHTML=`<span class="small">Enter all four RSET segments to compute the margin.</span>`;return}
+  if(aset==null){el.innerHTML=`<div class="kpis">${kpi("RSET",fmt(r.sum,0)+" s","sum of segments")}${kpi("ASET","> "+fmt(LAST.p.tmax,0)+" s","not reached; extend the end time")}</div>`;return}
+  const m=aset-r.sum, req=(isFinite(f)&&f>0?f:1)*r.sum, st= aset<r.sum?"fail":aset<req?"warn":"pass", lab={fail:"FAIL · ASET < RSET",warn:"MARGINAL · below required ratio",pass:"PASS"}[st];
+  el.innerHTML=`<div class="kpis">${kpi("ASET (governing)",fmt(aset,0)+" s",LAST.R.gov[0])}${kpi("RSET",fmt(r.sum,0)+" s","D + N + P + M")}${kpi("Margin ASET − RSET",fmt(m,0)+" s",`ratio ${fmt(aset/r.sum,2)} (required ${fmt(isFinite(f)?f:1,2)})`)}</div><p style="margin:.5rem 0 0"><span class="pill ${st}">${lab}</span> <span class="small">Screening comparison only. The RSET Tool is also screening-level.</span></p>`;
+  stamp();
+}
+function inputsSummary(p){
+  return [`Project: ${p.proj||"(unnamed)"}`,`Units shown: ${units}`,
+  `Ceiling height H: ${dLen(p.H,2)}   Floor area A: ${fmt(toDisp("area",p.A),0)} ${uLab("area")}   Fire-base elevation: ${dLen(p.zf,2)}`,
+  p.fire==="steady"?`Design fire: steady, Q = ${fmt(toDisp("hrr",p.Q),0)} ${uLab("hrr")}`:`Design fire: t-squared, tg = ${fmt(p.tg,0)} s (${p.growth==="custom"?"custom":{600:"slow",300:"medium",150:"fast",75:"ultrafast"}[p.growth]}), cap = ${fmt(toDisp("hrr",p.cap),0)} ${uLab("hrr")}`,
+  `Convective fraction: ${p.chi}   Heat-loss fraction: ${p.lam}   Ambient: ${dT(p.T0,1)}`,
+  `Exhaust: ${p.exOn?fmt(toDisp("flow",p.Ve),0)+" "+uLab("flow"):"none"}`,
+  `Criterion: layer ≥ ${dLen(p.zcrit,2)} (base ${dLen(p.zc0,2)} + margin ${dLen(p.zm,2)})${p.tOn?`; layer T ≤ ${dT(p.TLim)}`:""}`,
+  `Design-fire citation: ${p.cite||"(none entered)"}`];
+}
+function stamp(){
+  if(!LAST||!LAST.R) return; const {p,R,W}=LAST, r=rsetVals();
+  const lines=[`${APP.name} v${APP.version} · Fire Toolshed · SCREENING ONLY, not the submittal basis`,`Generated: ${new Date().toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})}`,"--- Inputs",...inputsSummary(p),"--- Results",
+   `Governing ASET: ${R.gov?fmt(R.gov[1],0)+" s ("+R.gov[0]+")":"not reached within "+fmt(p.tmax,0)+" s"}`,
+   `NFPA 92 filling-equation ASET: ${R.alg!=null?fmt(R.alg,0)+" s":"n/a"}   Numerical layer ASET: ${sec(R.sim.tz)}${p.tOn?"   Temperature ASET: "+sec(R.sim.tT):""}`,
+   `A/H² = ${fmt(R.AH,2)}   criterion z/H = ${fmt(R.zH,2)}`,
+   r.ok?`RSET (user): ${fmt(r.sum,0)} s   Margin: ${R.gov?fmt(R.gov[1]-r.sum,0)+" s":"n/a"}`:"RSET: not entered",
+   `Warnings: ${W.filter(w=>w[0]!=="i").length}`,
+   "Method: NFPA 92 smoke-filling equations + NFPA 92 axisymmetric plume; two-zone mass/energy balance (RK4). Use FDS or an AHJ-accepted method for the submittal."];
+  $("stamp").textContent=lines.join("\n");
+}
+// ---------- report (print) ----------
+function buildReport(){
+  if(!LAST||!LAST.R){alert("Fix the inputs first.");return false}
+  const {W}=LAST;
+  $("report").innerHTML=`<div class="card"><h2>ASET Screener report · screening only</h2><div class="stamp">${$("stamp").textContent.replace(/&/g,"&").replace(/</g,"<")}</div></div>
+   <div class="card"><h2>Results</h2><div class="kpis">${$("kpis").innerHTML}</div>${rsetVals().ok?$("margin").innerHTML:"<p class=small>RSET not entered.</p>"}<h3>Checks and warnings</h3><ul class="warns">${W.map(w=>`<li class="${w[0]}">${w[1]}</li>`).join("")}</ul></div>
+   <div class="card"><h2>Layer height vs time</h2>${$("chartZ").innerHTML}${$("chartT").innerHTML}</div>
+   <div class="card"><h2>Time history</h2><div class="tblwrap"><table>${$("tbl").innerHTML}</table></div></div>
+   <div class="card"><p class="small">Screening only. Not the submittal basis. FDS or another AHJ-accepted method is required for the submittal. Correlations: NFPA 92 smoke-filling equations and axisymmetric plume (confirm adopted edition); SFPE Handbook, 5th Ed.</p></div>`;
+  return true;
+}
+// ---------- JSON I/O ----------
+function download(name,obj){const b=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500)}
+function slug(s){return (s||"untitled").replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"").toLowerCase()||"untitled"}
+const FIELDS=["proj","H","A","zf","growth","tg","cap","Qs","chi","lam","cite","Ve","zc0","zm","TLim","T0","tmax","rDet","rNot","rPre","rMov","rsf"];
+function project(){
+  const si={}; document.querySelectorAll("input[data-q]").forEach(el=>{const v=num(el.id);si[el.id]=(el.dataset.si!=null&&el.value===el.dataset.shown)?parseFloat(el.dataset.si):(isFinite(v)?toSI(el.dataset.q,v):null)});
+  const raw={}; ["proj","growth","tg","chi","lam","cite","tmax","rDet","rNot","rPre","rMov","rsf"].forEach(i=>raw[i]=$(i).value);
+  const R=LAST&&LAST.R;
+  return {app:APP.name,appVersion:APP.version,schema:APP.schema,created:new Date().toISOString(),units,fire,exhaust:$("exOn").checked,tempCheck:$("tOn").checked,inputsSI:si,inputs:raw,
+    results:R?{asetGoverning_s:R.gov?+R.gov[1].toFixed(1):null,governingCriterion:R.gov?R.gov[0]:null,asetNfpa92_s:R.alg!=null?+R.alg.toFixed(1):null,asetLayerNumerical_s:R.sim.tz!=null?+R.sim.tz.toFixed(1):null,asetTemperature_s:R.sim.tT!=null?+R.sim.tT.toFixed(1):null,AoverH2:+R.AH.toFixed(3)}:null,
+    warnings:LAST?LAST.W.map(w=>w[1]):[],note:"Screening only. Not the submittal basis."};
+}
+function applyProject(o){
+  units=o.units==="SI"?"SI":"IP"; fire=o.fire==="steady"?"steady":"t2";
+  $("exOn").checked=!!o.exhaust; $("tOn").checked=!!o.tempCheck;
+  for(const [k,v] of Object.entries(o.inputs||{})) if($(k)!=null&&v!=null) $(k).value=v;
+  for(const [k,v] of Object.entries(o.inputsSI||{})) if($(k)&&v!=null&&isFinite(v)) $(k).dataset.si=v;
+  syncUI(true);
+}
+function applyRset(o){
+  const map={detection:"rDet",notification:"rNot",premovement:"rPre",movement:"rMov"};
+  for(const sgm of o.segments){ if(map[sgm.component]) $(map[sgm.component]).value=Number(sgm.value)||0; }
+  if(o.projectName&&!$("proj").value) $("proj").value=o.projectName;
+}
+function rsetSession(){
+  const r=rsetVals(), R=LAST&&LAST.R; const now=new Date().toISOString();
+  const lab={detection:"Detection",notification:"Notification",premovement:"Pre-movement",movement:"Movement"};
+  const ids={detection:"rDet",notification:"rNot",premovement:"rPre",movement:"rMov"};
+  return {version:"0.1.7",created:now,updated:now,
+    segments:Object.keys(lab).map(c=>({component:c,label:lab[c],value:isFinite(num(ids[c]))?num(ids[c]):0,source:"user"})),
+    assumptionsLog:[],tenabilityLimit:R&&R.gov?Math.round(R.gov[1]):undefined,projectName:$("proj").value||undefined,
+    notes:`Tenability limit = governing ASET from ${APP.name} v${APP.version} (${R&&R.gov?R.gov[0]:"n/a"}), screening only. Segment values entered in the ASET Screener; review in the RSET Tool. All values require engineering review.`};
+}
+
+// ---------- UI ----------
+function syncUI(fromSI=false){
+  document.querySelectorAll("#unitsSeg button").forEach(b=>b.classList.toggle("on",b.dataset.u===units));
+  document.querySelectorAll("#fireSeg button").forEach(b=>b.classList.toggle("on",b.dataset.f===fire));
+  document.querySelectorAll(".unit[data-q]").forEach(s=>s.textContent="["+uLab(s.dataset.q)+"]");
+  if(fromSI) document.querySelectorAll("input[data-q]").forEach(el=>{const si=parseFloat(el.dataset.si); if(isFinite(si)){const d=toDisp(el.dataset.q,si); const dec=(el.dataset.q==="length"||el.dataset.q==="temp")?2:0; el.value=String(Math.round(d*10**dec)/10**dec); el.dataset.shown=el.value;}});
+  $("t2box").classList.toggle("hidden",fire!=="t2"); $("steadybox").classList.toggle("hidden",fire!=="steady");
+  $("tgCustomBox").classList.toggle("hidden",$("growth").value!=="custom");
+  $("exBox").classList.toggle("hidden",!$("exOn").checked); $("tBox").classList.toggle("hidden",!$("tOn").checked);
+  const hi=fire==="steady"?14:23; $("shapeNote").textContent=`NFPA 92 ${fire==="steady"?"steady":"t-squared"} filling equation valid for 0.9 ≤ A/H² ≤ ${hi} and z/H ≥ 0.2 (checked live). Uniform cross-section assumed.`;
+  compute();
+}
+document.querySelectorAll("input[data-q]").forEach(el=>el.addEventListener("input",()=>{const v=num(el.id); if(isFinite(v)) el.dataset.si=toSI(el.dataset.q,v);}));
+document.querySelectorAll("#unitsSeg button").forEach(b=>b.onclick=()=>{units=b.dataset.u;syncUI(true)});
+document.querySelectorAll("#fireSeg button").forEach(b=>b.onclick=()=>{fire=b.dataset.f;syncUI()});
+["growth","exOn","tOn"].forEach(i=>$(i).addEventListener("change",()=>syncUI()));
+window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setTimeout(()=>{if(LAST&&LAST.R)drawCharts(LAST.p,LAST.R)},200)});
+let deb; document.addEventListener("input",e=>{if(e.target.closest("#tab-inputs")){clearTimeout(deb);deb=setTimeout(()=>{if(["rDet","rNot","rPre","rMov","rsf"].includes(e.target.id))margin();else compute()},150)}});
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  ["inputs","verify","method"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab)); if(b.dataset.tab==="verify") runVerify();});
+$("bPrint").onclick=()=>{ if(buildReport()) window.print(); };
+window.addEventListener("beforeprint",()=>buildReport());
+$("bExport").onclick=()=>{ if(!LAST||!LAST.R){$("ioMsg").textContent="Fix the inputs before exporting.";return} download(`aset-screener-${slug($("proj").value)}-${Date.now()}.json`,project()); $("ioMsg").textContent="Project JSON exported."; };
+$("bRset").onclick=()=>{ if(!LAST||!LAST.R||!LAST.R.gov){$("ioMsg").textContent="No governing ASET yet (criteria not reached or inputs invalid).";return}
+  download(`rset-session-${slug($("proj").value)}-${Date.now()}.json`,rsetSession()); $("ioMsg").textContent="RSET Tool session exported: load it with “Load Session” in the Transparent RSET Tool; tenabilityLimit = ASET."; };
+$("fImport").onchange=e=>{const f=e.target.files&&e.target.files[0]; if(!f) return; const rd=new FileReader();
+  rd.onload=()=>{try{const o=JSON.parse(rd.result);
+     if(o.schema===APP.schema){applyProject(o);$("ioMsg").textContent="Project imported.";}
+     else if(Array.isArray(o.segments)&&o.segments.length===4){applyRset(o);margin();$("ioMsg").textContent="RSET Tool session imported into the margin panel (RSET = "+fmt(rsetVals().sum,0)+" s).";}
+     else throw new Error("Not an ASET Screener project or an RSET Tool session.");}
+   catch(err){$("ioMsg").textContent="Import failed: "+err.message}}; rd.readAsText(f); e.target.value="";};
+
+// ---------- verification ----------
+const REF=/*PYREF*/{"V1":214.8324203068346,"V2":412.2351926682052,"V3a":56.33582099766073,"V3b":4.281449293725018,"V4_t":220.91478213879063,"V4_TL_C":96.79112099637513,"V5_zeq":7.501263264298943,"V5_TL_C":74.9498843969605,"V6_t":452.3187007604708}/*END*/;
+function runVerify(){
+  const base={zf:0,chi:0.7,lam:0,T0:20,Ve:0,TLim:null};
+  const C=[];
+  C.push(["V1","NFPA 92 steady filling: Q = 5,000 kW, H = 20 m, A = 1,500 m², time to z = 6 m [s]",nfpaSteadyT(5000,20,1500,6),REF.V1]);
+  C.push(["V2","NFPA 92 t² filling: fast (t_g = 150 s), H = 15 m, A = 1,200 m², time to z = 4 m [s]",nfpaT2T(150,15,1200,4),REF.V2]);
+  C.push(["V3a","NFPA 92 plume above flame: Q_c = 3,500 kW, z = 10 m [kg/s]",plume(3500,10),REF.V3a]);
+  C.push(["V3b","NFPA 92 plume in flame region: Q_c = 3,500 kW, z = 1 m [kg/s]",plume(3500,1),REF.V3b]);
+  const s4=simulate({...base,fire:"steady",Q:2000,H:10,A:600,zcrit:3,tmax:2000},{stopAt:true});
+  C.push(["V4a","Two-zone model, steady 2,000 kW, H = 10 m, A = 600 m², no exhaust: time to z = 3 m [s]",s4.tz,REF.V4_t]);
+  const s4b=simulate({...base,fire:"steady",Q:2000,H:10,A:600,zcrit:null,tmax:Math.ceil(s4.tz)+1},{sample:0.1});
+  C.push(["V4b","Same: layer temperature at that time [°C]",sampleAt(s4b,s4.tz).TL,REF.V4_TL_C]);
+  const s5=simulate({...base,fire:"steady",Q:2000,H:12,A:800,Ve:25,zcrit:null,tmax:3600});
+  C.push(["V5a","Two-zone with exhaust 25 m³/s, 2,000 kW, H = 12 m, A = 800 m²: equilibrium layer height [m] (vs algebraic balance)",s5.zEnd,REF.V5_zeq]);
+  C.push(["V5b","Same: equilibrium layer temperature [°C]",s5.TEnd,REF.V5_TL_C]);
+  const s6=simulate({...base,fire:"t2",tg:150,cap:5000,H:9,A:2000,zcrit:4,tmax:3000},{stopAt:true});
+  C.push(["V6","Two-zone, fast t² capped at 5,000 kW, H = 9 m, A = 2,000 m²: time to z = 4 m [s]",s6.tz,REF.V6_t]);
+  // V7 unit round trip: V1 entered in IP
+  const Hft=20/0.3048, Aft=1500/0.09290304, Qb=5000/1.055056, zft=6/0.3048;
+  C.push(["V7","IP round-trip of V1 (H = 65.62 ft, A = 16,146 ft², Q = 4,739 Btu/s, z = 19.69 ft) converted to SI [s]",nfpaSteadyT(U.hrr.IP.b(Qb),U.length.IP.b(Hft),U.area.IP.b(Aft),U.length.IP.b(zft)),REF.V1]);
+  let pass=0, h="<thead><tr><th>Case</th><th style='text-align:left'>Description</th><th>App</th><th>Python</th><th>Diff</th><th>Result</th></tr></thead><tbody>";
+  for(const [id,desc,a,r] of C){ const d=Math.abs(a-r)/Math.abs(r)*100, ok=isFinite(d)&&d<=1; if(ok) pass++;
+    h+=`<tr><td>${id}</td><td style="text-align:left;white-space:normal;min-width:260px">${desc}</td><td>${fmt(a,3)}</td><td>${fmt(r,3)}</td><td>${fmt(d,3)}%</td><td><span class="pill ${ok?"pass":"fail"}">${ok?"PASS":"FAIL"}</span></td></tr>`; }
+  $("vtbl").innerHTML=h+"</tbody>"; $("vsum").innerHTML=`<span class="pill ${pass===C.length?"pass":"fail"}">${pass} / ${C.length} within 1%</span>`;
+  window.__verify={pass,total:C.length,rows:C.map(c=>({id:c[0],app:c[2],py:c[3]}))};
+  return window.__verify;
+}
+syncUI(true);
+if(location.hash==="#verify") document.querySelector('[data-tab="verify"]').click();
+if(location.hash==="#selftest"){const out=[];try{
+  ["rDet","rNot","rPre","rMov"].forEach((i,k)=>$(i).value=[30,15,120,180][k]); margin();
+  const ses=rsetSession(); const comps=["detection","notification","premovement","movement"];
+  out.push("rset4="+(ses.segments.length===4&&comps.every(c=>ses.segments.find(x=>x.component===c))));
+  out.push("tenLimit="+ses.tenabilityLimit+" gov="+Math.round(LAST.R.gov[1]));
+  const g0=LAST.R.gov[1]; const pj=JSON.parse(JSON.stringify(project()));
+  $("H").value="99"; $("H").dispatchEvent(new Event("input")); compute(); out.push("changed="+(Math.abs(LAST.R.gov[1]-g0)>1));
+  applyProject(pj); out.push("roundtrip="+(Math.abs(LAST.R.gov[1]-g0)<1e-6));
+  units="SI"; syncUI(true); const gSI=LAST.R.gov[1]; units="IP"; syncUI(true); out.push("unitToggle="+(Math.abs(gSI-g0)<0.5)+" "+gSI.toFixed(2)+"/"+g0.toFixed(2)+" H="+$("H").value);
+  ["rDet","rNot","rPre","rMov"].forEach(i=>$(i).value=""); applyRset(ses); margin(); out.push("rsetImport="+rsetVals().sum);
+  $("A").value="abc"; compute(); out.push("badInput="+(LAST===null)+" "+$("A").classList.contains("bad")); $("A").value="20000"; compute();
+  $("chi").value="2"; compute(); out.push("chiRange="+(LAST===null)); $("chi").value="0.7"; compute();
+  fire="steady"; syncUI(); out.push("steadyAlg="+Math.round(LAST.R.alg)+" num="+Math.round(LAST.R.sim.tz));
+  $("exOn").checked=true; syncUI(); out.push("exhaustAlgNull="+(LAST.R.alg==null));
+ }catch(e){out.push("ERR "+e.message)} document.title="SELFTEST "+out.join(" | ");}
+if(location.hash==="#steady"){fire="steady";syncUI();}
+if(location.hash==="#si"){units="SI";$("exOn").checked=true;$("tOn").checked=true;syncUI(true);}
+</script>
+</body>
+</html>
