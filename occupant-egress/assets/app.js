@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.2.0";
+  var APP_VERSION = "1.3.0";
   var STORAGE_KEY = "occupantEgress.v1";
 
   /** Shared egress component types */
@@ -17,7 +17,7 @@
   ];
 
   /**
-   * IBC path — Table 1004.5 load factors, §1005 capacity, Ch. 10 travel (simplified).
+   * IBC path — IBC 2024 Table 1004.5 load factors, §1005 capacity, Ch. 10 travel / common path / dead ends.
    */
   var IBC_LOAD_USES = [
     { id: "assembly_standing", label: "Assembly — standing space (5 net)", factor: 5, basis: "net" },
@@ -46,9 +46,13 @@
   ];
 
   /**
-   * Travel limits: IBC 2021 Table 1017.2 (subgroups per table; null = "Not Permitted"
-   * without sprinklers). F-1/S-1 400 ft increase per IBC 2021 1017.2.2 (opt-in checkbox).
-   * Common path / dead-end values are the app's simplified group values (unchanged in v1.2.0).
+   * IBC 2024 (ICC Digital Codes IBC2024V2.0, checked 2026-10-15). null = "Not Permitted".
+   * travel: Table 1017.2 (F-1/S-1 400 ft per 1017.2.2, opt-in).
+   * common: Table 1006.2.1 common path of egress travel (spaces with one exit); the
+   *   nonsprinklered value is the OL > 30 column (OL <= 30 is 100 ft for B, S, U).
+   *   The table's maximum occupant load for a one-exit space is not checked here.
+   * deadEnd: 1020.5 — 20 ft; 50 ft for B, E, F, I-1, M, R-1, R-2, S, U sprinklered (903.3.1.1).
+   *   I-3 Condition 2–4 (50 ft) and I-2 Condition 2 non-patient corridors (30 ft) are not applied.
    */
   var IBC_OCC_GROUPS = [
     { id: "A", label: "A — Assembly", travel: { yes: 250, no: 200 }, common: { yes: 75, no: 75 }, deadEnd: { yes: 20, no: 20 } },
@@ -56,22 +60,24 @@
     { id: "E", label: "E — Educational", travel: { yes: 250, no: 200 }, common: { yes: 75, no: 75 }, deadEnd: { yes: 50, no: 20 } },
     { id: "F-1", label: "F-1 — Factory, moderate hazard", travel: { yes: 250, no: 200 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 }, inc10172: true },
     { id: "F-2", label: "F-2 — Factory, low hazard", travel: { yes: 400, no: 300 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
-    { id: "H-1", label: "H-1 — High hazard", travel: { yes: 75, no: null }, common: { yes: 50, no: 50 }, deadEnd: { yes: 20, no: 20 } },
-    { id: "H-2", label: "H-2 — High hazard", travel: { yes: 100, no: null }, common: { yes: 50, no: 50 }, deadEnd: { yes: 20, no: 20 } },
-    { id: "H-3", label: "H-3 — High hazard", travel: { yes: 150, no: null }, common: { yes: 50, no: 50 }, deadEnd: { yes: 20, no: 20 } },
-    { id: "H-4", label: "H-4 — High hazard", travel: { yes: 175, no: null }, common: { yes: 50, no: 50 }, deadEnd: { yes: 20, no: 20 } },
-    { id: "H-5", label: "H-5 — High hazard (HPM)", travel: { yes: 200, no: null }, common: { yes: 50, no: 50 }, deadEnd: { yes: 20, no: 20 } },
-    { id: "I-1", label: "I-1 — Institutional (supervised living)", travel: { yes: 250, no: null }, common: { yes: 100, no: 75 }, deadEnd: { yes: 30, no: 20 } },
-    { id: "I-2/I-3", label: "I-2 / I-3 — Institutional (health care, detention)", travel: { yes: 200, no: null }, common: { yes: 100, no: 75 }, deadEnd: { yes: 30, no: 20 } },
-    { id: "I-4", label: "I-4 — Institutional (day care)", travel: { yes: 200, no: 150 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 30, no: 20 } },
-    { id: "M", label: "M — Mercantile", travel: { yes: 250, no: 200 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
-    { id: "R", label: "R — Residential", travel: { yes: 250, no: 200 }, common: { yes: 125, no: 75 }, deadEnd: { yes: 50, no: 20 } },
+    { id: "H-1", label: "H-1 — High hazard", travel: { yes: 75, no: null }, common: { yes: 25, no: null }, deadEnd: { yes: 20, no: 20 } },
+    { id: "H-2", label: "H-2 — High hazard", travel: { yes: 100, no: null }, common: { yes: 25, no: null }, deadEnd: { yes: 20, no: 20 } },
+    { id: "H-3", label: "H-3 — High hazard", travel: { yes: 150, no: null }, common: { yes: 25, no: null }, deadEnd: { yes: 20, no: 20 } },
+    { id: "H-4", label: "H-4 — High hazard", travel: { yes: 175, no: null }, common: { yes: 75, no: null }, deadEnd: { yes: 20, no: 20 } },
+    { id: "H-5", label: "H-5 — High hazard (HPM)", travel: { yes: 200, no: null }, common: { yes: 75, no: null }, deadEnd: { yes: 20, no: 20 } },
+    { id: "I-1", label: "I-1 — Institutional (supervised living)", travel: { yes: 250, no: null }, common: { yes: 75, no: null }, deadEnd: { yes: 50, no: 20 } },
+    { id: "I-2/I-3", label: "I-2 / I-3 — Institutional (health care, detention; I-2 common path governs)", travel: { yes: 200, no: null }, common: { yes: 75, no: null }, deadEnd: { yes: 20, no: 20 } },
+    { id: "I-4", label: "I-4 — Institutional (day care)", travel: { yes: 200, no: 150 }, common: { yes: 75, no: null }, deadEnd: { yes: 20, no: 20 } },
+    { id: "M", label: "M — Mercantile", travel: { yes: 250, no: 200 }, common: { yes: 75, no: 75 }, deadEnd: { yes: 50, no: 20 } },
+    { id: "R-1", label: "R-1 — Residential (transient)", travel: { yes: 250, no: 200 }, common: { yes: 75, no: null }, deadEnd: { yes: 50, no: 20 } },
+    { id: "R-2", label: "R-2 — Residential", travel: { yes: 250, no: 200 }, common: { yes: 125, no: null }, deadEnd: { yes: 50, no: 20 } },
+    { id: "R-3/R-4", label: "R-3 / R-4 — Residential (R-3 common path only in mixed-occupancy buildings)", travel: { yes: 250, no: 200 }, common: { yes: 125, no: null }, deadEnd: { yes: 20, no: 20 } },
     { id: "S-1", label: "S-1 — Storage, moderate hazard", travel: { yes: 250, no: 200 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 }, inc10172: true },
     { id: "S-2", label: "S-2 — Storage, low hazard", travel: { yes: 400, no: 300 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
-    { id: "U", label: "U — Utility / Miscellaneous", travel: { yes: 400, no: 300 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
+    { id: "U", label: "U — Utility / Miscellaneous", travel: { yes: 400, no: 300 }, common: { yes: 75, no: 75 }, deadEnd: { yes: 50, no: 20 } },
   ];
-  /** v1.1.0 saved groups → most restrictive v1.2.0 subgroup (conservative migration). */
-  var LEGACY_OCC_MAP = { F: "F-1", S: "S-1", H: "H-1", I: "I-2/I-3" };
+  /** Older saved groups → most restrictive current subgroup (conservative migration). */
+  var LEGACY_OCC_MAP = { F: "F-1", S: "S-1", H: "H-1", I: "I-2/I-3", R: "R-1" };
 
   /**
    * NFPA 101 path — Table 7.3.1.2 load factors, §7.3.3 capacity, occupancy travel (simplified).
@@ -126,7 +132,7 @@
       title: "International Building Code (IBC)",
       loadTable: "IBC Table 1004.5",
       capacityRef: "IBC §1005.3",
-      travelRef: "IBC 2021 Table 1017.2 travel; common path / dead-end simplified",
+      travelRef: "IBC 2024 Table 1017.2 travel · Table 1006.2.1 common path · 1020.5 dead ends",
       loadUses: IBC_LOAD_USES,
       occGroups: IBC_OCC_GROUPS,
       defaultOcc: "B",
@@ -511,7 +517,7 @@
     var travelOk =
       !Number.isFinite(travel) || travel <= 0 ? null : allow.travel == null ? false : travel <= allow.travel;
     var commonOk =
-      !Number.isFinite(common) || common <= 0 ? null : common <= allow.common;
+      !Number.isFinite(common) || common <= 0 ? null : allow.common == null ? false : common <= allow.common;
     var deadOk = !Number.isFinite(dead) || dead <= 0 ? null : dead <= allow.deadEnd;
 
     var capStatus = "incomplete";
@@ -707,9 +713,10 @@
           ? "Travel: <strong>Not permitted without sprinklers</strong>"
           : "Travel ≤ <strong>" + m.allow.travel + " ft</strong>") +
         (m.incApplied ? " (1017.2.2)" : "") +
-        " · Common path ≤ <strong>" +
-        m.allow.common +
-        " ft</strong> · Dead-end ≤ <strong>" +
+        (m.allow.common == null
+          ? " · Common path: <strong>Not permitted without sprinklers</strong>"
+          : " · Common path ≤ <strong>" + m.allow.common + " ft</strong>") +
+        " · Dead-end ≤ <strong>" +
         m.allow.deadEnd +
         " ft</strong><br><span class='sub' style='margin:0'>" +
         escapeHtml(m.group.label) +
@@ -734,7 +741,9 @@
         bits.push("Common path OK (" + m.common + " ≤ " + m.allow.common + " ft)");
       if (m.commonOk === false)
         bits.push(
-          "Common path EXCEEDS limit (" + m.common + " > " + m.allow.common + " ft)"
+          m.allow.common == null
+            ? "Common path not permitted without sprinklers (IBC Table 1006.2.1)"
+            : "Common path EXCEEDS limit (" + m.common + " > " + m.allow.common + " ft)"
         );
       if (m.deadOk === true)
         bits.push("Dead-end OK (" + m.dead + " ≤ " + m.allow.deadEnd + " ft)");
@@ -967,13 +976,13 @@
       "<th style='text-align:right;border-bottom:1px solid #e2e8f0'>Cap.</th></tr></thead><tbody>" +
       egRows +
       "</tbody></table>" +
-      "<h2>Travel limits (simplified)</h2>" +
+      "<h2>Travel limits (IBC 2024 screening)</h2>" +
       "<p>Allowable — Travel " +
       (m.allow.travel == null ? "not permitted without sprinklers" : m.allow.travel + " ft") +
       (m.incApplied ? " (IBC 1017.2.2)" : "") +
       " · Common path " +
-      m.allow.common +
-      " ft · Dead-end " +
+      (m.allow.common == null ? "not permitted without sprinklers" : m.allow.common + " ft") +
+      " · Dead-end " +
       m.allow.deadEnd +
       " ft<br>Entered — Travel " +
       (Number.isFinite(m.travel) ? m.travel + " ft" : "—") +
