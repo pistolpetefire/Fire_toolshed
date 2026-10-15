@@ -60,3 +60,14 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 - **IBC/IFC Hazard v1.5.0 (2026-10-14).** Oxidizers now map to H-1/H-2/H-3, since Class 4 is H-1. Pyrophorics now map to H-1/H-2: detonable materials are H-1 and nondetonable are H-2.
   - Basis: IBC (2024) 307.3 and 307.4, verified on ICC Digital Codes free access (IBC2024V2.0 Ch. 3).
   - The explosives review note still stands.
+
+- **Occupant Egress v1.3.0 (2026-10-15).** Rechecked against IBC 2024 on ICC Digital Codes free access (IBC2024V2.0 Ch. 10).
+  - Table 1017.2, 1017.2.2 and Table 1004.5 are unchanged; their citations now read 2024.
+  - Common path now follows Table 1006.2.1 by subgroup:
+    - M and U: 75 ft.
+    - H-1 to H-3: 25 ft. H-4, H-5, I and R-1: 75 ft. R-2 to R-4: 125 ft.
+    - H, I and R are not permitted without sprinklers.
+    - The nonsprinklered value uses the OL > 30 column.
+  - Dead ends now follow 1020.5: I-1 is 50 ft sprinklered; I-2/I-3, I-4 and R-3/R-4 are 20 ft.
+  - R is split into R-1, R-2 and R-3/R-4; a saved R project opens as R-1.
+  - Not modeled: the one-exit maximum occupant load, the I-3 Condition 2–4 and I-2 Condition 2 dead-end exceptions, and the 1017.2.3 H-5 increase.
