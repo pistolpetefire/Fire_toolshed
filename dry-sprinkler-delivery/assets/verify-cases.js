@@ -5,8 +5,7 @@ window.FT_VERIFY_CASES = {
  "versionSel": "#appVersion",
  "handcalc": "validation/verify/dry_sprinkler_delivery.py",
  "flags": [
-  "Trip-time units: the SFPE/FM equation takes V_T in ft3 and A_n in ft2. The app enters gallons and in2, which makes its trip time about 19 times too short (non-conservative). Not changed; for Kevin to review before this app is relied on.",
-  "Fitting equivalent lengths differ from NFPA 13 Table 28.2.3.1.1 in several cells: swing check is 2 to 6 ft high at every size (4 in: app 25, NFPA 22); 45 deg elbow is 1 ft low at 6 to 12 in; butterfly is low at 10 in (15 vs 19) and 12 in (18 vs 21); 12 in elbow 26 vs 27; 1-1/2 in tee 7 vs 8. Not changed; for Kevin to review.",
+  "Fixed in v1.4.0: trip time now converts V_T to ft3 and A_n to ft2 before the SFPE/FM equation (was gal and in2, about 19 times short); fitting equivalent lengths updated to NFPA 13 (2025) Table 28.2.3.1.1 (swing check, 45 deg elbow 6-12 in, butterfly 10/12 in, 12 in elbow, 1-1/2 in tee). Blank table cells keep the app planning values.",
   "Method note, not a math error: the fill rate lets the full DPV residual drive pipe friction only, with no loss through the open sprinklers, so the fill flow and transit time are optimistic."
  ],
  "cases": [
@@ -25,15 +24,13 @@ window.FT_VERIFY_CASES = {
      "sel": "#metricVolTotal",
      "label": "Total system volume",
      "unit": "gal",
-     "ref": 113.04,
-     "flag": "Fitting equivalent lengths differ from NFPA 13 Table 28.2.3.1.1 in several cells: swing check is 2 to 6 ft high at every size (4 in: app 25, NFPA 22); 45 deg elbow is 1 ft low at 6 to 12 in; butterfly is low at 10 in (15 vs 19) and 12 in (18 vs 21); 12 in elbow 26 vs 27; 1-1/2 in tee 7 vs 8. Not changed; for Kevin to review."
+     "ref": 113.04
     },
     {
      "sel": "#metricVolRemote",
      "label": "Volume to most remote",
      "unit": "gal",
-     "ref": 113.04,
-     "flag": "Fitting equivalent lengths differ from NFPA 13 Table 28.2.3.1.1 in several cells: swing check is 2 to 6 ft high at every size (4 in: app 25, NFPA 22); 45 deg elbow is 1 ft low at 6 to 12 in; butterfly is low at 10 in (15 vs 19) and 12 in (18 vs 21); 12 in elbow 26 vs 27; 1-1/2 in tee 7 vs 8. Not changed; for Kevin to review."
+     "ref": 113.04
     },
     {
      "sel": "#metricFlow",
@@ -45,22 +42,19 @@ window.FT_VERIFY_CASES = {
      "sel": "#metricTransit",
      "label": "Transit time 60 V / Q_fill",
      "unit": "s",
-     "ref": 31.5,
-     "flag": "Fitting equivalent lengths differ from NFPA 13 Table 28.2.3.1.1 in several cells: swing check is 2 to 6 ft high at every size (4 in: app 25, NFPA 22); 45 deg elbow is 1 ft low at 6 to 12 in; butterfly is low at 10 in (15 vs 19) and 12 in (18 vs 21); 12 in elbow 26 vs 27; 1-1/2 in tee 7 vs 8. Not changed; for Kevin to review."
+     "ref": 31.5
     },
     {
      "sel": "#metricTrip",
      "label": "Trip time (SFPE/FM equation)",
      "unit": "s",
-     "ref": 4.8,
-     "flag": "Trip-time units: the SFPE/FM equation takes V_T in ft3 and A_n in ft2. The app enters gallons and in2, which makes its trip time about 19 times too short (non-conservative). Not changed; for Kevin to review before this app is relied on."
+     "ref": 4.8
     },
     {
      "sel": "#metricDelivery",
      "label": "Water delivery time (trip + transit)",
      "unit": "s",
-     "ref": 36.4,
-     "flag": "Trip-time units: the SFPE/FM equation takes V_T in ft3 and A_n in ft2. The app enters gallons and in2, which makes its trip time about 19 times too short (non-conservative). Not changed; for Kevin to review before this app is relied on."
+     "ref": 36.4
     }
    ]
   }

@@ -8,11 +8,11 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.3.0-prelim";
+  const APP_VERSION = "1.4.0-prelim";
   const FIRST_RUN_KEY = "drySprinklerDelivery.firstRun.v1";
   const START_DISMISS_KEY = "drySprinklerDelivery.startDismissed.v1";
 
-  /** System types that use dry-pipe water delivery time criteria (NFPA 13 §8.2) */
+  /** System types that use dry-pipe water delivery time criteria (NFPA 13-2025 §8.2.4, Table 8.2.4.3.2) */
   const DELIVERY_ELIGIBLE = {
     dry: true,
     double_interlock: true,
@@ -27,7 +27,7 @@
   const KPA_PER_PSI = 6.894757;
   const LPM_PER_GPM = 3.785411784;
 
-  // ─── NFPA 13 water delivery table (hard-coded) ───────────────────────────
+  // ─── NFPA 13-2025 Table 8.2.4.3.2 water delivery (hard-coded) ───────────────────────────
   const HAZARD_TABLE = [
     { id: "dwelling", label: "Dwelling Unit", heads: 1, maxSec: 15 },
     { id: "light", label: "Light", heads: 1, maxSec: 60 },
@@ -76,27 +76,29 @@
   ];
 
   /**
-   * Equivalent length (ft) for fittings — NFPA 13 Table 27.2.3.1.1 style
-   * values for Schedule 40 steel (approximate; user may edit segment EL).
+   * Equivalent length (ft) for fittings — NFPA 13 (2025) Table 28.2.3.1.1,
+   * Schedule 40 steel, C = 120 (v1.4.0). Cells the table leaves blank keep the app's
+   * planning values (½ in 45° elbow; ½ and ¾ in swing check; 3½ in butterfly) — use
+   * manufacturer data. teeThru, coupling, reducer are app planning values, not table values.
    * Keys: elbow90, elbow45, teeThru, teeBranch, gate, butterfly, check, coupling, reducer
    */
   const FITTING_EL = {
     // nominal → { type: ft }
     "0.5": { elbow90: 1, elbow45: 1, teeThru: 1, teeBranch: 3, gate: 0, butterfly: 0, check: 4, coupling: 0, reducer: 1 },
     "0.75": { elbow90: 2, elbow45: 1, teeThru: 1, teeBranch: 4, gate: 0, butterfly: 0, check: 5, coupling: 0, reducer: 1 },
-    "1": { elbow90: 2, elbow45: 1, teeThru: 1, teeBranch: 5, gate: 0, butterfly: 0, check: 7, coupling: 0, reducer: 1 },
-    "1.25": { elbow90: 3, elbow45: 1, teeThru: 1, teeBranch: 6, gate: 0, butterfly: 0, check: 9, coupling: 0, reducer: 1 },
-    "1.5": { elbow90: 4, elbow45: 2, teeThru: 2, teeBranch: 7, gate: 0, butterfly: 0, check: 11, coupling: 0, reducer: 2 },
-    "2": { elbow90: 5, elbow45: 2, teeThru: 2, teeBranch: 10, gate: 1, butterfly: 6, check: 13, coupling: 0, reducer: 2 },
-    "2.5": { elbow90: 6, elbow45: 3, teeThru: 2, teeBranch: 12, gate: 1, butterfly: 7, check: 16, coupling: 0, reducer: 3 },
-    "3": { elbow90: 7, elbow45: 3, teeThru: 3, teeBranch: 15, gate: 1, butterfly: 10, check: 20, coupling: 0, reducer: 3 },
-    "3.5": { elbow90: 8, elbow45: 3, teeThru: 3, teeBranch: 17, gate: 1, butterfly: 12, check: 23, coupling: 0, reducer: 3 },
-    "4": { elbow90: 10, elbow45: 4, teeThru: 4, teeBranch: 20, gate: 2, butterfly: 12, check: 25, coupling: 0, reducer: 4 },
-    "5": { elbow90: 12, elbow45: 5, teeThru: 5, teeBranch: 25, gate: 2, butterfly: 9, check: 32, coupling: 0, reducer: 5 },
-    "6": { elbow90: 14, elbow45: 6, teeThru: 6, teeBranch: 30, gate: 3, butterfly: 10, check: 38, coupling: 0, reducer: 6 },
-    "8": { elbow90: 18, elbow45: 8, teeThru: 8, teeBranch: 35, gate: 4, butterfly: 12, check: 50, coupling: 0, reducer: 8 },
-    "10": { elbow90: 22, elbow45: 10, teeThru: 10, teeBranch: 50, gate: 5, butterfly: 15, check: 60, coupling: 0, reducer: 10 },
-    "12": { elbow90: 26, elbow45: 12, teeThru: 12, teeBranch: 60, gate: 6, butterfly: 18, check: 70, coupling: 0, reducer: 12 },
+    "1": { elbow90: 2, elbow45: 1, teeThru: 1, teeBranch: 5, gate: 0, butterfly: 0, check: 5, coupling: 0, reducer: 1 },
+    "1.25": { elbow90: 3, elbow45: 1, teeThru: 1, teeBranch: 6, gate: 0, butterfly: 0, check: 7, coupling: 0, reducer: 1 },
+    "1.5": { elbow90: 4, elbow45: 2, teeThru: 2, teeBranch: 8, gate: 0, butterfly: 0, check: 9, coupling: 0, reducer: 2 },
+    "2": { elbow90: 5, elbow45: 2, teeThru: 2, teeBranch: 10, gate: 1, butterfly: 6, check: 11, coupling: 0, reducer: 2 },
+    "2.5": { elbow90: 6, elbow45: 3, teeThru: 2, teeBranch: 12, gate: 1, butterfly: 7, check: 14, coupling: 0, reducer: 3 },
+    "3": { elbow90: 7, elbow45: 3, teeThru: 3, teeBranch: 15, gate: 1, butterfly: 10, check: 16, coupling: 0, reducer: 3 },
+    "3.5": { elbow90: 8, elbow45: 3, teeThru: 3, teeBranch: 17, gate: 1, butterfly: 12, check: 19, coupling: 0, reducer: 3 },
+    "4": { elbow90: 10, elbow45: 4, teeThru: 4, teeBranch: 20, gate: 2, butterfly: 12, check: 22, coupling: 0, reducer: 4 },
+    "5": { elbow90: 12, elbow45: 5, teeThru: 5, teeBranch: 25, gate: 2, butterfly: 9, check: 27, coupling: 0, reducer: 5 },
+    "6": { elbow90: 14, elbow45: 7, teeThru: 6, teeBranch: 30, gate: 3, butterfly: 10, check: 32, coupling: 0, reducer: 6 },
+    "8": { elbow90: 18, elbow45: 9, teeThru: 8, teeBranch: 35, gate: 4, butterfly: 12, check: 45, coupling: 0, reducer: 8 },
+    "10": { elbow90: 22, elbow45: 11, teeThru: 10, teeBranch: 50, gate: 5, butterfly: 19, check: 55, coupling: 0, reducer: 10 },
+    "12": { elbow90: 27, elbow45: 13, teeThru: 12, teeBranch: 60, gate: 6, butterfly: 21, check: 65, coupling: 0, reducer: 12 },
   };
 
   const FITTING_TYPES = [
@@ -607,12 +609,13 @@
    * t_trip ≈ 0.0352 × (V_T / (A_n × √T₀)) × ln(p_a0 / p_a)
    *
    * Documented unit set used here:
-   *   V_T  — system air volume, gallons
-   *   A_n  — total open orifice area, in²
+   *   V_T  — system air volume, ft³ (v1.4.0: converted from gal; was gal)
+   *   A_n  — total open orifice area, ft² (v1.4.0: converted from in²; was in²)
    *   T₀   — absolute temperature, °R (= °F + 460)
    *   p_a0, p_a — absolute air pressures (psia) = gauge + 14.7
    *
-   * Constant 0.0352 is the simplified FMRC-style coefficient for this unit set
+   * Constant 0.0352 is the SFPE Handbook / FM coefficient for ft³, ft², °R, psia
+   * (checked against the ASPE Pipeline worked example: 67.94 s)
    * (preliminary estimate only — not a listed method).
    *
    * QOD: when present, apply planning reduction of 50% to calculated trip
@@ -628,8 +631,8 @@
       };
     }
 
-    const VT = Math.max(0.01, totalVolGal);
-    const An = Math.max(1e-6, orificeAreaIn2(kFactor) * Math.max(1, openHeads));
+    const VT = Math.max(0.01, totalVolGal) / 7.48052; // ft³
+    const An = Math.max(1e-6, (orificeAreaIn2(kFactor) * Math.max(1, openHeads)) / 144); // ft²
     const T0 = Math.max(200, num(state.temperatureF, 70) + 460); // °R
     const pa0 = Math.max(0.1, num(state.airPressurePsi, 40) + 14.7);
     const pa = Math.max(0.1, num(state.tripPressurePsi, 15) + 14.7);
@@ -647,7 +650,7 @@
       formula: "t_trip = 0.0352 × (V_T / (A_n √T₀)) × ln(p_a0/p_a)",
       details: {
         VT: round(VT, 2),
-        An: round(An, 4),
+        An: round(An, 6),
         T0: round(T0, 1),
         pa0: round(pa0, 2),
         pa: round(pa, 2),
@@ -1743,7 +1746,7 @@
       const d = r.trip.details || {};
       $("tripFormulaDetail").innerHTML = r.trip.overridden
         ? "User override of trip time."
-        : `V<sub>T</sub>=${d.VT} gal · A<sub>n</sub>=${d.An} in² · T₀=${d.T0} °R · p<sub>a0</sub>=${d.pa0} psia · p<sub>a</sub>=${d.pa} psia · ln=${d.ln}` +
+        : `V<sub>T</sub>=${d.VT} ft³ · A<sub>n</sub>=${d.An} ft² · T₀=${d.T0} °R · p<sub>a0</sub>=${d.pa0} psia · p<sub>a</sub>=${d.pa} psia · ln=${d.ln}` +
           (d.qodNote ? `<br>${escapeHtml(d.qodNote)}` : "");
     }
     if ($("transitFormulaDetail")) {
