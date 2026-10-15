@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Project File Hub · Fire Toolshed</title>
+<meta name="description" content="One shared project file (fireToolshed.project.v1) across Occupant Load, ASET Screener, RSET Tool, Stair Merge and Travel Distance, with cross-app checks. Screening only.">
+<style>
+:root{
+  --v-50:#f7f5ff;--v-100:#efeafe;--v-200:#ddd3fb;--v-300:#c4b5f5;--v-500:#8b6fd6;--v-700:#5b3fb3;--v-800:#4a3392;--v-900:#2e1f63;
+  --ink:#1f1a33;--muted:#5a5370;--line:#e4def5;--card:#fff;
+  --pass:#1f7a4a;--warn:#8a5a00;--fail:#b4232c;
+  --c1:#5b3fb3;--c2:#b0359b;--c3:#2f6fb0;--c4:#c26a00;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--v-50);color:var(--ink);line-height:1.5;
+  padding:calc(1.25rem + var(--safe-top)) 1rem calc(2rem + var(--safe-bottom))}
+.wrap{max-width:1180px;margin:0 auto}
+header{display:flex;gap:.9rem;align-items:flex-start;margin-bottom:1rem}
+.logo{width:3rem;height:3rem;border-radius:1rem;background:var(--v-700);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0}
+h1{margin:0;font-size:1.65rem;letter-spacing:-.03em;line-height:1.15}
+h2{font-size:1.05rem;margin:0 0 .6rem;color:var(--v-800)}
+h3{font-size:.95rem;margin:.9rem 0 .4rem;color:var(--v-800)}
+.sub{margin:.25rem 0 0;color:var(--muted);font-size:.9rem}
+.badge{display:inline-block;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--v-100);color:var(--v-800);border:1px solid var(--v-200);padding:.15rem .5rem;border-radius:999px;margin-right:.35rem}
+.banner{background:#fff;border:1px solid var(--v-300);border-left:6px solid var(--v-700);border-radius:.9rem;padding:.75rem 1rem;margin-bottom:1rem;font-size:.9rem}
+.banner b{color:var(--v-800)}
+.tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem}
+.tabs button{font:inherit;font-size:.9rem;border:1px solid var(--v-200);background:#fff;color:var(--v-800);border-radius:999px;padding:.45rem 1rem;cursor:pointer;min-height:44px}
+.tabs button[aria-selected="true"]{background:var(--v-700);border-color:var(--v-700);color:#fff}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}
+.grid>*,.row>*{min-width:0}
+@media(min-width:900px){.grid{grid-template-columns:380px minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:1.1rem;padding:1rem 1.15rem;box-shadow:0 1px 2px rgba(46,31,99,.05)}
+.card+.card{margin-top:1rem}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin:.55rem 0 .2rem}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+input,select,textarea{font:inherit;font-size:16px;width:100%;padding:.45rem .6rem;border:1px solid var(--v-200);border-radius:.6rem;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--v-500);outline-offset:1px}
+input.bad{border-color:var(--fail);background:#fff5f5}
+.unit{font-weight:500;color:var(--v-700)}
+.chk{display:flex;gap:.5rem;align-items:center;font-size:.88rem;margin:.5rem 0;color:var(--ink);font-weight:500}
+.chk input{width:auto}
+.seg{display:inline-flex;border:1px solid var(--v-300);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:.85rem;border:0;background:#fff;color:var(--v-800);padding:.35rem .9rem;cursor:pointer;min-height:38px}
+.seg button.on{background:var(--v-700);color:#fff}
+.btns{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--v-700);background:var(--v-700);color:#fff;border-radius:.6rem;padding:.5rem .9rem;cursor:pointer;min-height:42px}
+.btn.alt{background:#fff;color:var(--v-800)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.7rem}
+.kpi{background:var(--v-50);border:1px solid var(--v-200);border-radius:.9rem;padding:.6rem .8rem}
+.kpi .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+.kpi .v{font-size:1.45rem;font-weight:750;color:var(--v-900);line-height:1.2}
+.kpi .s{font-size:.78rem;color:var(--muted)}
+.kpi.gov{border-color:var(--v-700);background:#fff;box-shadow:inset 0 0 0 1px var(--v-700)}
+.pill{display:inline-block;font-weight:700;font-size:.8rem;padding:.1rem .55rem;border-radius:999px}
+.pass{background:#e3f4ea;color:var(--pass)}.warn{background:#fff3d6;color:var(--warn)}.fail{background:#fde4e6;color:var(--fail)}
+ul.warns{margin:.3rem 0 0;padding-left:1.1rem;font-size:.86rem}
+ul.warns li{margin:.2rem 0}
+ul.warns li.w{color:var(--warn)}ul.warns li.e{color:var(--fail);font-weight:600}ul.warns li.i{color:var(--muted)}
+svg{width:100%;height:auto;display:block}
+.tblwrap{overflow-x:auto;max-height:360px;overflow-y:auto;border:1px solid var(--line);border-radius:.6rem}
+table{border-collapse:collapse;width:100%;font-size:.84rem;font-variant-numeric:tabular-nums}
+th,td{padding:.35rem .55rem;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{background:var(--v-100);color:var(--v-900);position:sticky;top:0}
+td:first-child,th:first-child{text-align:left}
+.runrec{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;background:var(--v-50);border:1px dashed var(--v-300);border-radius:.6rem;padding:.7rem .8rem;white-space:pre-wrap;word-break:break-word}
+.small{font-size:.8rem;color:var(--muted)}
+.cite li{margin:.25rem 0;font-size:.86rem}
+code{background:var(--v-100);padding:0 .25rem;border-radius:.3rem;font-size:.85em}
+.eq{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.86rem;background:var(--v-50);border-radius:.5rem;padding:.4rem .6rem;margin:.3rem 0;overflow-x:auto}
+.hidden{display:none!important}
+footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
+#report{display:none}
+.guide ol,.guide ul{padding-left:1.2rem;font-size:.9rem}
+.guide li{margin:.25rem 0}
+.gtbl{max-height:none}
+.gtbl td{white-space:normal;text-align:left;vertical-align:top;font-size:.84rem;min-width:9rem}
+.gtbl td:first-child{font-weight:700;color:var(--v-900);min-width:7rem}
+.gtbl th{text-align:left}
+.gtbl table{table-layout:fixed}
+.gtbl col.c1{width:13%}.gtbl col.c2{width:24%}.gtbl col.c3{width:33%}.gtbl col.c4{width:30%}
+@media(max-width:700px){.gtbl{overflow:visible;border:0}.gtbl table,.gtbl tbody,.gtbl tr,.gtbl td{display:block;width:100%}.gtbl thead{display:none}
+ .gtbl tr{border:1px solid var(--line);border-radius:.7rem;margin:.6rem 0;padding:.4rem .2rem;background:#fff}
+ .gtbl td{border:0;padding:.25rem .6rem;min-width:0}.gtbl td:not(:first-child)::before{content:attr(data-l);display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--v-700)}}
+@media print{
+  body{background:#fff;padding:0;font-size:10.5pt}
+  .tabs,.btns,#tab-inputs .grid>div:first-child,.noprint,footer,#tab-verify,#tab-method{display:none!important}
+  .card{box-shadow:none;border:1px solid #bbb;break-inside:auto;margin-top:.6rem!important}
+  svg,.kpi,tr,.chartbox{break-inside:avoid}
+  h2,h3{break-after:avoid}
+  .banner{margin-bottom:.4rem}
+  #report{display:block}
+  #tab-inputs{display:none!important}
+  .tblwrap{max-height:none;overflow:visible}
+  body.print-guide #report,body.print-guide #tab-inputs{display:none!important}
+  body.print-guide #tab-guide{display:block!important}
+  body:not(.print-guide) #tab-guide{display:none!important}
+  .gtbl th{position:static}
+  .gtbl{overflow:visible!important;border:0}
+  .gtbl table{width:100%!important}
+  .gtbl td{font-size:9pt}
+  @page{margin:14mm}
+}
+
+.drop{border:2px dashed var(--v-300);border-radius:.8rem;padding:1rem;text-align:center;color:var(--v-800);background:#faf8ff}
+.drop.on{background:#efe9ff}
+.secact button{font:inherit;font-size:.78rem;border:1px solid var(--v-300);background:#fff;color:var(--v-800);border-radius:.45rem;padding:.25rem .55rem;cursor:pointer;min-height:32px;margin:.1rem}
+pre.schema{white-space:pre-wrap;font-size:.75rem;background:#f7f5fc;border:1px solid #e4def5;border-radius:.5rem;padding:.7rem;max-height:420px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo" aria-hidden="true">JSON</div>
+  <div>
+    <h1>Project File Hub</h1>
+    <p class="sub"><span class="badge">Screening · v1.0.0</span>One shared project file for Occupant Load, the atrium tools, ASET Screener, the Transparent RSET Tool, Stair Merge and Travel Distance. Add each app's export, check that they agree, save one file, and pull any app's file back out. Runs offline; nothing leaves this page.</p>
+  </div>
+</header>
+<div class="banner" role="note"><b>Screening only. Not the submittal basis.</b> The hub stores each app's own file unchanged and compares a few headline values. It does not recalculate the apps or judge whether their inputs are right. A licensed fire protection engineer must review every section.</div>
+
+<nav class="tabs noprint" role="tablist">
+  <button role="tab" aria-selected="true" data-tab="inputs">Hub</button>
+  <button role="tab" aria-selected="false" data-tab="verify">Verification</button>
+  <button role="tab" aria-selected="false" data-tab="guide">User guide</button>
+  <button role="tab" aria-selected="false" data-tab="method">Schema and limits</button>
+</nav>
+
+<section id="tab-inputs">
+<div class="grid">
+<div>
+  <div class="card">
+    <h2>Project</h2>
+    <label for="proj">Project name</label><input id="proj" placeholder="e.g. Example mid-rise">
+    <label>Units for lengths shown here</label>
+    <div class="seg" id="unitsSeg"><button data-u="IP" class="on">IP (ft)</button><button data-u="SI">SI (m)</button></div>
+    <label for="notes">Notes</label><textarea id="notes" rows="3" placeholder="Scope, revision, reviewer"></textarea>
+  </div>
+  <div class="card">
+    <h2>Add files</h2>
+    <div class="drop" id="drop">Drop app exports or a shared project file here<br><label class="btn alt" style="display:inline-flex;margin-top:.5rem">Choose files<input type="file" id="fAdd" accept=".json,application/json" multiple style="display:none"></label></div>
+    <p class="small">Accepted: ASET Screener project, Stair Merge project, Travel Distance project, RSET Tool session, atrium project file, Occupant Load state, or a shared project file (its sections are merged in).</p>
+    <div class="btns"><button class="btn alt" id="bBrowser">Read Occupant Load and atrium data saved in this browser</button></div>
+    <p class="small">Read only. Those apps save their work in this browser for this site; the hub copies it and never changes it.</p>
+    <p class="small" id="addMsg" role="status"></p>
+  </div>
+</div>
+<div>
+  <div class="card">
+    <h2>Sections</h2>
+    <div class="tblwrap" style="max-height:none"><table id="secTbl"></table></div>
+    <p class="small">Extract saves that app's own file so you can open it with the app's Import or Load Session. ASET Screener, Stair Merge and Travel Distance also open the shared file directly.</p>
+  </div>
+  <div class="card">
+    <h2>Cross-app checks</h2>
+    <div class="kpis" id="kpis"></div>
+    <ul class="warns" id="warns"></ul>
+  </div>
+  <div class="card">
+    <h2>Run record</h2>
+    <div class="runrec" id="runrec"></div>
+    <p class="small">Run record for traceability only. Not a professional seal or certification.</p>
+    <div class="btns">
+      <button class="btn" id="bSave">Save shared project file</button>
+      <button class="btn alt" id="bPrint">Print summary</button>
+      <button class="btn alt" id="bClear">Clear all sections</button>
+    </div>
+    <p class="small" id="ioMsg" role="status"></p>
+  </div>
+</div>
+</div>
+</section>
+
+<section id="tab-verify" class="hidden">
+  <div class="card">
+    <h2>Verification against independent Python hand calcs</h2>
+    <p class="small">The page loads built-in example files into a scratch hub and compares its values with <code>verify_handcalc.py</code>: RSET total, ASET − RSET margin, ASET/RSET ratio, the movement difference between Stair Merge and the RSET session, the section count, and that every section comes back unchanged after save and reload. Acceptance: within 1%, or exact for counts.</p>
+    <div class="tblwrap" style="max-height:none"><table id="vtbl"></table></div>
+    <p id="vsum" style="margin-top:.6rem"></p>
+  </div>
+</section>
+
+<section id="tab-guide" class="hidden">
+  <div class="card guide">
+    <h2>User guide</h2>
+    <p class="small">What each input is, what is typical, and why. The hub adds no engineering values of its own; acceptance criteria stay <b>per project and AHJ</b>.</p>
+    <div class="btns noprint"><button class="btn alt" id="bPrintGuide">Print guide</button></div>
+    <h3>Workflow</h3>
+    <ol>
+      <li>Work in each app as usual and export its file (ASET Screener, Stair Merge and Travel Distance: Export project JSON; RSET Tool: Save Session).</li>
+      <li>Open the hub, name the project, and add the files. Use "Read ... saved in this browser" for Occupant Load and the atrium tools.</li>
+      <li>Read the cross-app checks: project names, ASET vs RSET margin, and whether the RSET movement matches the Stair Merge handoff.</li>
+      <li>Save the shared project file. Keep it with the project records.</li>
+      <li>Later, add the shared file back to the hub, or open it directly in ASET Screener, Stair Merge or Travel Distance. Use Extract for the RSET Tool and the others.</li>
+    </ol>
+    <h3>Inputs</h3>
+    <div class="tblwrap gtbl"><table><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
+    <thead><tr><th>Input</th><th>What it is</th><th>Typical / recommended (IP · SI)</th><th>Why</th></tr></thead><tbody>
+    <tr><td>Project name</td><td>Name stored in the shared file.</td><td>The same name used in every app.</td><td>The hub warns when sections carry different project names, a sign of mixed files.</td></tr>
+    <tr><td>Units</td><td>How the hub shows lengths (travel distance).</td><td>ft (IP) or m (SI).</td><td>Stored values stay in each app's own units and format; only the display changes.</td></tr>
+    <tr><td>Notes</td><td>Free text saved in the file.</td><td>Revision, scope, reviewer.</td><td>Traceability.</td></tr>
+    <tr><td>App files</td><td>Exports from each app.</td><td>The latest export of each app for this project.</td><td>One section per app; adding a newer file replaces that app's section (you are told).</td></tr>
+    <tr><td>Browser data</td><td>Occupant Load and atrium work saved by those apps in this browser.</td><td>Use on the same computer and browser where the work was done.</td><td>Those apps save locally rather than export JSON; the hub copies the saved state, read only.</td></tr>
+    <tr><td>Shared project file</td><td>A file saved by this hub.</td><td>One file per project and revision.</td><td>Its sections are merged in; apps that support it open their own section directly.</td></tr>
+    </tbody></table></div>
+    <h3>Reading the checks</h3>
+    <ul class="warns">
+      <li class="e">Error (red): a file that cannot be read or is not a Fire Toolshed file.</li>
+      <li class="w">Warning (amber): RSET above ASET, project names that differ, an RSET movement that differs from the Stair Merge handoff, or an RSET tenability limit that differs from the ASET result.</li>
+      <li class="i">Note (gray): sections that are missing, so a check could not run.</li>
+    </ul>
+    <h3>Common mistakes</h3>
+    <ul>
+      <li>Mixing files from different revisions or projects.</li>
+      <li>Updating an app but not re-adding its export, so the hub holds old values.</li>
+      <li>Reading browser data on a different computer, where it does not exist.</li>
+      <li>Treating the margin as an acceptance decision; the safety factor and criteria are per project and AHJ.</li>
+    </ul>
+    <h3>Sources</h3>
+    <ul class="cite">
+      <li>Each section's method and sources are those of its app (see each app's User guide).</li>
+      <li>ASET vs RSET comparison: SFPE Engineering Guide to Performance-Based Fire Protection, and the SFPE Handbook human behavior and egress chapters (5th Ed.).</li>
+      <li>JSON Schema draft 2020-12 (json-schema.org) for the file format.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="tab-method" class="hidden">
+  <div class="card">
+    <h2>Shared project file: fireToolshed.project.v1</h2>
+    <p class="small">An envelope with one section per app. Each section stores that app's export unchanged (<code>data</code>), with its native format, app version, source and time added. Apps read their own section and ignore the rest, so adding an app never changes another app's data. The same schema is published as <code>shared/fire-toolshed-project.v1.schema.json</code>.</p>
+    <table><thead><tr><th>Section key</th><th>App</th><th>Native format</th><th>Opens the shared file directly</th></tr></thead><tbody id="keyTbl"></tbody></table>
+    <h3>Schema</h3>
+    <pre class="schema" id="schemaPre"></pre>
+    <h3>Limits</h3>
+    <ul class="cite">
+      <li>The hub compares headline values only. It does not recalculate any app or check inputs.</li>
+      <li>Browser data exists only in the browser where it was saved.</li>
+      <li>Occupant Load and the RSET Tool are unchanged: use Extract to get their native files.</li>
+      <li>Screening only. Not the submittal basis.</li>
+    </ul>
+  </div>
+</section>
+<section id="report" aria-hidden="true"></section>
+<footer>Fire Toolshed · Project File Hub v1.0.0 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
+</div>
+<script>
+"use strict";
+const APP={name:"Project File Hub",version:"1.0.0",schema:"fireToolshed.project.v1",schemaVersion:"1.0.0"};
+const SCHEMA={"$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "fireToolshed.project.v1", "title": "Fire Toolshed shared project file", "description": "Envelope that carries each Fire Toolshed app's own project data unchanged, one section per app. Apps read their own section and ignore the rest. Screening data only.", "type": "object", "required": ["schema", "schemaVersion", "project", "apps"], "properties": {"schema": {"const": "fireToolshed.project.v1"}, "schemaVersion": {"type": "string", "description": "Version of this envelope format (semver)."}, "project": {"type": "object", "required": ["name", "created", "updated"], "properties": {"name": {"type": "string"}, "created": {"type": "string", "format": "date-time"}, "updated": {"type": "string", "format": "date-time"}, "notes": {"type": "string"}, "units": {"enum": ["IP", "SI"]}}}, "apps": {"type": "object", "description": "One section per app. Each data object is the app's own export, stored verbatim.", "propertyNames": {"enum": ["occupantLoad", "atriumProject", "asetScreener", "rsetTool", "stairMerge", "travelDistance"]}, "additionalProperties": {"type": "object", "required": ["data", "nativeFormat", "addedAt", "source"], "properties": {"nativeFormat": {"type": "string", "description": "Native schema id, e.g. fireToolshed.asetScreener.v1, rsetSession.v0.1.7, occupantEgress.v1."}, "appVersion": {"type": ["string", "null"]}, "addedAt": {"type": "string", "format": "date-time"}, "source": {"enum": ["file", "browser", "shared-file"]}, "fileName": {"type": ["string", "null"]}, "data": {"type": "object"}}}}, "checks": {"type": "array", "description": "Cross-app checks computed when the file was written (informational).", "items": {"type": "object", "properties": {"level": {"enum": ["e", "w", "i", "ok"]}, "text": {"type": "string"}}}}, "runRecord": {"type": "string", "description": "Run record for traceability only. Not a professional seal or certification."}}}, FIX={"aset-screener-project": {"app": "ASET Screener", "appVersion": "1.1.1", "schema": "fireToolshed.asetScreener.v1", "created": "2026-10-14T23:55:00.000Z", "units": "IP", "fire": "t2", "exhaust": false, "tempCheck": false, "inputsSI": {"H": 9.144, "A": 1858.06, "zf": 0, "cap": 5275.28, "Qs": 5275.28, "Ve": 23.597, "zc0": 1.8288, "zm": 0.3048, "TLim": 60, "T0": 20}, "inputs": {"proj": "Smoke test space", "growth": "150", "tg": "150", "chi": "0.7", "lam": "0", "cite": "NFPA 92 t-squared fast", "tmax": "1800", "rDet": "", "rNot": "", "rPre": "", "rMov": "", "rsf": "1.0"}, "results": {"asetGoverning_s": 594.3, "governingCriterion": "Layer height (numerical)", "asetNfpa92_s": 716.2, "asetLayerNumerical_s": 594.3, "asetTemperature_s": null, "AoverH2": 22.222}, "warnings": ["example warning"], "note": "Screening only. Not the submittal basis."}, "rset-session": {"version": "0.1.7", "created": "2026-10-14T19:30:00.000Z", "updated": "2026-10-14T19:30:00.000Z", "segments": [{"component": "detection", "label": "Detection", "value": 45, "source": "user"}, {"component": "notification", "label": "Notification", "value": 30, "source": "user"}, {"component": "premovement", "label": "Pre-movement", "value": 120, "source": "user"}, {"component": "movement", "label": "Movement", "value": 180, "source": "user"}], "assumptionsLog": [], "tenabilityLimit": 594.3, "projectName": "Smoke test space", "notes": "Fixture for verification."}, "stair-merge-project": {"app": "Stair Merge and Queue Screener", "appVersion": "1.0.1", "schema": "fireToolshed.stairMerge.v1", "created": "2026-10-14T19:30:00.000Z", "units": "IP", "inputsSI": {"proj": "Smoke test space", "klass": "7/11", "H": 3.6576, "land": 4, "merge": "even", "loss": -1, "cite": "fixture", "stairs": [{"w": 1.1176, "edge": "wall", "door": 0.9144, "dis": 0.9144}], "floors": [{"name": "Floor 2", "P": 100, "delay": 0, "pre": 60, "walk": 9.144}]}, "results": {"building_s": {"phased": 300, "simultaneous": 300, "loss": null}, "floors": [], "rsetHandoff": {"floor": "Floor 2", "case": "phased", "movement": 172.5, "pre": 60, "delay": 0}}, "warnings": [], "note": "Screening only. Not the submittal basis."}, "travel-distance-project": {"app": "Travel Distance and Nearest-Exit Checker", "appVersion": "1.0.1", "schema": "fireToolshed.travelDistance.v1", "created": "2026-10-14T19:30:00.000Z", "units": "IP", "inputsSI": {"proj": "Smoke test space", "cite": "fixture", "cell_m": 0.6096, "limit_m": 30.48, "cols": 5, "rows": 3, "plan": ["#####", "E...#", "#####"], "legend": "# wall/obstruction, . floor, E exit"}, "results": {"maxNearest_m": 1.8288, "pctOverNearest": 0, "maxIfBlocked_m": null, "pctOverIfBlocked": null, "exits": 1, "unreachableCells": 0}, "warnings": [], "note": "Screening only. Not the submittal basis."}, "occupant-egress-state": {"projectName": "Smoke test space", "codePath": "ibc", "sprinklered": true, "spaces": [{"id": "s1", "name": "Office", "useId": "business", "areaSqFt": 5000}], "egress": [{"id": "e1", "name": "Stair 1", "typeId": "stair", "clearWidthIn": 44, "qty": 1}]}}, REF={"V1_rset_total": 375, "V2_margin": 219.29999999999995, "V3_ratio": 1.5848, "V4_movement_diff": 7.5, "V5_sections": 5, "V6_roundtrip_equal": 1.0, "V7_travel_max_nearest_ft": 6.0};
+const $=id=>document.getElementById(id);
+let units="IP", HUB=null;
+const KEYS={
+ occupantLoad:{app:"Occupant Load and Egress Capacity",native:"occupantEgress.v1",path:"occupant-egress/",direct:false},
+ atriumProject:{app:"Atrium tools (hub, zone, field, report)",native:"fireToolshed.atriumProject.v1",path:"atrium-path/",direct:false},
+ asetScreener:{app:"ASET Screener",native:"fireToolshed.asetScreener.v1",path:"aset-screener/",direct:true},
+ rsetTool:{app:"Transparent RSET Tool",native:"rsetSession",path:"rset-tool/",direct:false},
+ stairMerge:{app:"Stair Merge and Queue Screener",native:"fireToolshed.stairMerge.v1",path:"stair-merge-queue/",direct:true},
+ travelDistance:{app:"Travel Distance and Nearest-Exit Checker",native:"fireToolshed.travelDistance.v1",path:"travel-distance/",direct:true}};
+function fmt(v,d=0){if(v==null||!isFinite(v))return"—";return Number(v).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+const esc=s=>String(s==null?"":s).replace(/&/g,"\u0026amp;").replace(/</g,"\u0026lt;").replace(/>/g,"\u0026gt;").replace(/"/g,"\u0026quot;");
+const nowIso=()=>new Date().toISOString();
+function blankHub(){return {schema:APP.schema,schemaVersion:APP.schemaVersion,project:{name:"",created:nowIso(),updated:nowIso(),notes:"",units},apps:{}}}
+function detect(o){
+  if(!o||typeof o!=="object"||Array.isArray(o)) return null;
+  if(o.schema==="fireToolshed.project.v1") return "shared";
+  if(o.schema==="fireToolshed.asetScreener.v1") return "asetScreener";
+  if(o.schema==="fireToolshed.stairMerge.v1") return "stairMerge";
+  if(o.schema==="fireToolshed.travelDistance.v1") return "travelDistance";
+  if(o.schema==="fireToolshed.atriumProject.v1") return "atriumProject";
+  if(Array.isArray(o.segments)&&o.segments.length&&o.segments.every(s=>s&&typeof s.component==="string"&&"value" in s)) return "rsetTool";
+  if(Array.isArray(o.spaces)&&Array.isArray(o.egress)) return "occupantLoad";
+  return null;
+}
+function nativeOf(key,o){return key==="rsetTool"?"rsetSession.v"+(o.version||"?"):KEYS[key].native}
+function addSection(h,key,data,source,fileName,msgs){
+  const had=!!h.apps[key];
+  h.apps[key]={nativeFormat:nativeOf(key,data),appVersion:data.appVersion||data.version||null,addedAt:nowIso(),source,fileName:fileName||null,data:JSON.parse(JSON.stringify(data))};
+  msgs.push(`${KEYS[key].app}: ${had?"section replaced":"section added"}${fileName?" from "+fileName:""}.`);
+}
+function ingest(h,o,fileName,msgs,source="file"){
+  const k=detect(o);
+  if(!k){msgs.push(`${fileName||"File"}: not a recognized Fire Toolshed file.`);return false}
+  if(k==="shared"){
+    if(!o.apps||typeof o.apps!=="object"){msgs.push(`${fileName}: shared file has no sections.`);return false}
+    let n=0;for(const key of Object.keys(o.apps)){const sec=o.apps[key];if(!KEYS[key]||!sec||typeof sec.data!=="object"){msgs.push(`${fileName}: skipped unknown section "${esc(key)}".`);continue}addSection(h,key,sec.data,"shared-file",fileName,msgs);n++}
+    if(o.project){if(!h.project.name&&o.project.name)h.project.name=String(o.project.name);if(!h.project.notes&&o.project.notes)h.project.notes=String(o.project.notes);if(o.project.created&&Object.keys(h.apps).length===n)h.project.created=o.project.created;}
+    return true;}
+  addSection(h,k,o,source,fileName,msgs);return true;
+}
+// ---- summaries ----
+function projName(key,d){if(!d)return"";if(key==="asetScreener")return d.inputs&&d.inputs.proj||"";if(key==="stairMerge"||key==="travelDistance")return d.inputsSI&&d.inputsSI.proj||"";return d.projectName||""}
+function rsetTotal(d){return d.segments.reduce((a,s)=>a+(+s.value||0),0)}
+function segVal(d,c){const s=d.segments.find(x=>x.component===c);return s?+s.value:null}
+const toD=m=>units==="IP"?m/0.3048:m, uL=()=>units==="IP"?"ft":"m";
+function summary(key,d){try{
+  if(key==="asetScreener"){const r=d.results||{};return `ASET ${fmt(r.asetGoverning_s)} s (${esc(r.governingCriterion||"")})`}
+  if(key==="rsetTool")return `RSET ${fmt(rsetTotal(d))} s = ${d.segments.map(s=>fmt(+s.value)).join(" + ")}${d.tenabilityLimit!=null?` · tenability ${fmt(d.tenabilityLimit)} s`:""}`;
+  if(key==="stairMerge"){const b=d.results&&d.results.building_s||{},m=d.results&&d.results.rsetHandoff;return `Building: phased ${fmt(b.phased)} s, simultaneous ${fmt(b.simultaneous)} s${b.loss!=null?`, loss ${fmt(b.loss)} s`:""}${m?` · handoff movement ${fmt(m.movement)} s (${esc(m.floor)})`:""}`}
+  if(key==="travelDistance"){const r=d.results||{};return `Max to nearest exit ${fmt(toD(r.maxNearest_m),1)} ${uL()}${r.maxIfBlocked_m!=null?`, if blocked ${fmt(toD(r.maxIfBlocked_m),1)} ${uL()}`:""} · limit ${fmt(toD(d.inputsSI&&d.inputsSI.limit_m),1)} ${uL()} · ${fmt(r.exits)} exit(s)`}
+  if(key==="occupantLoad")return `${d.spaces.length} space(s), ${d.egress.length} egress component(s), code path ${esc(d.codePath||"not set")}${d.sprinklered!=null?", sprinklered: "+(d.sprinklered?"yes":"no"):""}`;
+  if(key==="atriumProject")return `${(d.locations||[]).length} location(s), ${(d.scenarios||[]).length} scenario(s)${d.geometry?` · ${fmt(toD(d.geometry.length_m),1)} × ${fmt(toD(d.geometry.width_m),1)} × ${fmt(toD(d.geometry.height_m),1)} ${uL()}`:""}`;
+ }catch(e){return "Could not summarize: "+esc(e.message)}return ""}
+function checks(h){
+  const C=[],A=h.apps,v={};
+  const names=Object.entries(A).map(([k,s])=>[k,String(projName(k,s.data)).trim()]).filter(x=>x[1]);
+  const uniq=[...new Set(names.map(x=>x[1].toLowerCase()))];
+  if(uniq.length>1) C.push(["w",`Sections carry different project names: ${names.map(x=>`${KEYS[x[0]].app} "${esc(x[1])}"`).join("; ")}.`]);
+  else if(uniq.length===1) C.push(["ok",`All named sections use project "${esc(names[0][1])}".`]);
+  if(A.asetScreener&&A.rsetTool){const aset=+(A.asetScreener.data.results||{}).asetGoverning_s, rset=rsetTotal(A.rsetTool.data);
+    v.aset=aset;v.rset=rset;v.margin=aset-rset;v.ratio=aset/rset;
+    if(!isFinite(aset)) C.push(["w","The ASET section has no governing ASET result."]);
+    else{C.push([v.margin<0?"w":"ok",`ASET − RSET = ${fmt(v.margin)} s (ASET/RSET = ${fmt(v.ratio,2)}). The required margin or safety factor is per project and AHJ.`]);
+      const tl=A.rsetTool.data.tenabilityLimit; if(tl!=null&&Math.abs(tl-aset)>0.5) C.push(["w",`RSET session tenability limit (${fmt(tl)} s) differs from the ASET result (${fmt(aset)} s).`]);}
+  } else C.push(["i","Add both ASET Screener and RSET Tool sections to compare ASET and RSET."]);
+  if(A.stairMerge&&A.rsetTool){const m=A.stairMerge.data.results&&A.stairMerge.data.results.rsetHandoff, mv=segVal(A.rsetTool.data,"movement");
+    if(m&&mv!=null){v.movDiff=mv-m.movement;C.push([Math.abs(v.movDiff)>0.5?"w":"ok",Math.abs(v.movDiff)>0.5?`RSET movement (${fmt(mv)} s) differs from the Stair Merge handoff (${fmt(m.movement)} s, ${esc(m.floor)}, ${esc(m.case)}) by ${fmt(v.movDiff,1)} s.`:`RSET movement matches the Stair Merge handoff (${fmt(m.movement)} s).`]);}}
+  for(const k of Object.keys(KEYS)) if(!A[k]) C.push(["i",`No ${KEYS[k].app} section.`]);
+  return {C,v};
+}
+// ---- render ----
+function render(){
+  const h=HUB, keys=Object.keys(KEYS).filter(k=>h.apps[k]);
+  $("secTbl").innerHTML=`<thead><tr><th>App</th><th style="text-align:left">Summary</th><th>Format · version</th><th>Source</th><th></th></tr></thead><tbody>`+
+   (keys.length?keys.map(k=>{const s=h.apps[k];return `<tr><td style="text-align:left">${KEYS[k].app}</td><td style="text-align:left;white-space:normal;min-width:220px">${summary(k,s.data)}</td><td>${esc(s.nativeFormat)}${s.appVersion?" · "+esc(s.appVersion):""}</td><td>${esc(s.source)}${s.fileName?"<br><span class='small'>"+esc(s.fileName)+"</span>":""}</td><td class="secact"><button data-x="${k}">Extract</button><button data-r="${k}">Remove</button></td></tr>`}).join(""):`<tr><td colspan="5">No sections yet. Add files or read browser data.</td></tr>`)+"</tbody>";
+  $("secTbl").querySelectorAll("[data-x]").forEach(b=>b.onclick=()=>extract(b.dataset.x));
+  $("secTbl").querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{delete HUB.apps[b.dataset.r];touch();render()});
+  const {C,v}=checks(h); HUB.__v=v; HUB.__C=C;
+  $("kpis").innerHTML=`<div class="kpi gov"><div class="k">Sections</div><div class="v">${keys.length} / ${Object.keys(KEYS).length}</div><div class="s">apps in this file</div></div>`+
+   `<div class="kpi"><div class="k">ASET − RSET</div><div class="v">${v.margin!=null&&isFinite(v.margin)?fmt(v.margin)+" s":"—"}</div><div class="s">${v.ratio!=null&&isFinite(v.ratio)?"ratio "+fmt(v.ratio,2):"needs both sections"}</div></div>`;
+  $("warns").innerHTML=C.map(c=>`<li class="${c[0]==="ok"?"i":c[0]}">${c[0]==="w"?"Warning: ":c[0]==="ok"?"OK: ":""}${c[1]}</li>`).join("");
+  runrec();
+}
+function runrec(){const h=HUB,keys=Object.keys(KEYS).filter(k=>h.apps[k]);
+  const L=[`${APP.name} v${APP.version} · Fire Toolshed · SCREENING ONLY, not the submittal basis`,"Run record for traceability only. Not a professional seal or certification.",`Generated: ${new Date().toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})}`,
+   `Project: ${h.project.name||"(unnamed)"}   File format: ${APP.schema} ${APP.schemaVersion}`,"--- Sections",
+   ...(keys.length?keys.map(k=>`  ${KEYS[k].app}: ${h.apps[k].nativeFormat}${h.apps[k].appVersion?" v"+h.apps[k].appVersion:""}, ${h.apps[k].source}${h.apps[k].fileName?" ("+h.apps[k].fileName+")":""}`):["  (none)"]),
+   "--- Checks",...(h.__C||[]).filter(c=>c[0]!=="i").map(c=>"  "+(c[0]==="w"?"Warning: ":"OK: ")+c[1].replace(/<[^>]+>/g,"").replace(/\u0026quot;/g,'"').replace(/\u0026amp;/g,"\u0026").replace(/\u0026lt;/g,"<").replace(/\u0026gt;/g,">"))];
+  $("runrec").textContent=L.join("\n");}
+function touch(){HUB.project.updated=nowIso()}
+function download(name,obj){const b=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500)}
+const slug=s=>(s||"untitled").replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"").toLowerCase()||"untitled";
+function sharedFile(){const h=HUB;h.project.name=$("proj").value.trim();h.project.notes=$("notes").value;h.project.units=units;
+  const out={schema:h.schema,schemaVersion:h.schemaVersion,project:{...h.project},apps:JSON.parse(JSON.stringify(h.apps)),checks:(h.__C||[]).map(c=>({level:c[0],text:c[1].replace(/<[^>]+>/g,"")})),runRecord:$("runrec").textContent};
+  return out;}
+function extract(k){const s=HUB.apps[k];download(`${slug($("proj").value)}-${k}.json`,s.data);$("ioMsg").textContent=`${KEYS[k].app} file extracted. Open it with that app's Import${k==="rsetTool"?" / Load Session":""}.`}
+async function readFiles(files){const msgs=[];for(const f of files){try{const o=JSON.parse(await f.text());ingest(HUB,o,f.name,msgs)}catch(e){msgs.push(`${f.name}: could not read (${esc(e.message)}).`)}}
+  if(!$("proj").value&&HUB.project.name)$("proj").value=HUB.project.name;if(!$("notes").value&&HUB.project.notes)$("notes").value=HUB.project.notes;touch();render();$("addMsg").innerHTML=msgs.join("<br>");}
+function readBrowser(){const msgs=[];const keys=[["occupantEgress.v1","Occupant Load"],["fireToolshed.atriumProject.v1","Atrium tools"]];
+  for(const [sk,label] of keys){let raw=null;try{raw=localStorage.getItem(sk)}catch(e){msgs.push(`${label}: browser storage is not available here.`);continue}
+    if(!raw){msgs.push(`${label}: nothing saved in this browser.`);continue}
+    try{const o=JSON.parse(raw);if(!ingest(HUB,o,"browser: "+sk,msgs,"browser"))msgs.push(`${label}: saved data not recognized.`)}catch(e){msgs.push(`${label}: saved data could not be read.`)}}
+  touch();render();$("addMsg").innerHTML=msgs.join("<br>");}
+
+// ---- UI ----
+document.querySelectorAll("#unitsSeg button").forEach(b=>b.onclick=()=>{units=b.dataset.u;document.querySelectorAll("#unitsSeg button").forEach(x=>x.classList.toggle("on",x===b));render()});
+$("fAdd").onchange=e=>{readFiles([...e.target.files]);e.target.value=""};
+const dz=$("drop");["dragenter","dragover"].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.add("on")}));["dragleave","drop"].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.remove("on")}));
+dz.addEventListener("drop",e=>{if(e.dataTransfer&&e.dataTransfer.files.length)readFiles([...e.dataTransfer.files])});
+$("bBrowser").onclick=readBrowser;
+$("bSave").onclick=()=>{if(!Object.keys(HUB.apps).length){$("ioMsg").textContent="Add at least one section first.";return}render();download(`fire-toolshed-project-${slug($("proj").value)}-${Date.now()}.json`,sharedFile());$("ioMsg").textContent="Shared project file saved."};
+$("bClear").onclick=()=>{if(confirm("Remove all sections from the hub? Files you saved are not affected.")){HUB=blankHub();render()}};
+["proj","notes"].forEach(id=>$(id).addEventListener("input",()=>{HUB.project.name=$("proj").value.trim();HUB.project.notes=$("notes").value;runrec()}));
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));["inputs","verify","guide","method"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab));if(b.dataset.tab==="verify")runVerify();});
+function buildReport(){$("report").innerHTML=`<div class="card"><h2>${APP.name} summary · screening only</h2><div class="runrec">${esc($("runrec").textContent)}</div></div><div class="card"><h2>Sections</h2><div class="tblwrap"><table>${$("secTbl").innerHTML.replace(/<td class="secact">[\s\S]*?<\/td>/g,"<td></td>")}</table></div></div><div class="card"><h2>Cross-app checks</h2><ul class="warns">${$("warns").innerHTML}</ul></div>`;}
+$("bPrint").onclick=()=>{document.body.classList.remove("print-guide");buildReport();window.print()};
+$("bPrintGuide").onclick=()=>{document.body.classList.add("print-guide");window.print()};
+window.addEventListener("afterprint",()=>document.body.classList.remove("print-guide"));
+window.addEventListener("beforeprint",()=>{if(!document.body.classList.contains("print-guide"))buildReport()});
+$("keyTbl").innerHTML=Object.entries(KEYS).map(([k,v])=>`<tr><td><code>${k}</code></td><td>${v.app}</td><td>${v.native}</td><td>${v.direct?"Yes":"Use Extract"}</td></tr>`).join("");
+$("schemaPre").textContent=JSON.stringify(SCHEMA,null,2);
+// ---- verification ----
+function deepEq(a,b){return JSON.stringify(a)===JSON.stringify(b)}
+function runVerify(){
+  const h=blankHub(),m=[];const files=[["aset-screener-project","asetScreener"],["rset-session","rsetTool"],["stair-merge-project","stairMerge"],["travel-distance-project","travelDistance"],["occupant-egress-state","occupantLoad"]];
+  for(const [f] of files) ingest(h,FIX[f],f+".json",m);
+  const {v}=checks(h);
+  const saved=JSON.parse(JSON.stringify({schema:h.schema,schemaVersion:h.schemaVersion,project:h.project,apps:h.apps}));const h2=blankHub();ingest(h2,saved,"saved.json",[]);
+  const rt=files.every(([f,k])=>h2.apps[k]&&deepEq(h2.apps[k].data,FIX[f]))?1:0;
+  const detected=files.every(([f,k])=>detect(FIX[f])===k);
+  const C=[["V1","RSET total from the RSET session segments [s]",rsetTotal(h.apps.rsetTool.data),REF.V1_rset_total],["V2","ASET − RSET margin [s]",v.margin,REF.V2_margin],["V3","ASET / RSET ratio [–]",v.ratio,REF.V3_ratio],
+   ["V4","RSET movement − Stair Merge handoff movement [s]",v.movDiff,REF.V4_movement_diff],["V5","Sections after loading 5 app files [count]",Object.keys(h.apps).length,REF.V5_sections],
+   ["V6","Every section unchanged after save and reload [1 = yes]",rt,REF.V6_roundtrip_equal],["V7","Travel distance summary, max to nearest exit [ft]",h.apps.travelDistance.data.results.maxNearest_m/0.3048,REF.V7_travel_max_nearest_ft],
+   ["V8","Each example file detected as the right app [1 = yes]",detected?1:0,1]];
+  let pass=0,t="<thead><tr><th>Case</th><th style='text-align:left'>Description</th><th>App</th><th>Python</th><th>Diff</th><th>Result</th></tr></thead><tbody>";
+  for(const [id,d,a,r] of C){const df=Math.abs(a-r)/Math.max(1e-12,Math.abs(r))*100,ok=isFinite(df)&&df<=1;if(ok)pass++;t+=`<tr><td>${id}</td><td style="text-align:left;white-space:normal;min-width:260px">${d}</td><td>${fmt(a,3)}</td><td>${fmt(r,3)}</td><td>${fmt(df,3)}%</td><td><span class="pill ${ok?"pass":"fail"}">${ok?"PASS":"FAIL"}</span></td></tr>`}
+  $("vtbl").innerHTML=t+"</tbody>";$("vsum").innerHTML=`<span class="pill ${pass===C.length?"pass":"fail"}">${pass} / ${C.length} within tolerance</span>`;return {pass,total:C.length};}
+document.querySelectorAll(".gtbl tbody tr").forEach(tr=>{const L=["Input","What it is","Typical / recommended (IP · SI)","Why"];tr.querySelectorAll("td").forEach((td,i)=>td.setAttribute("data-l",L[i]))});
+HUB=blankHub();render();
+if(location.hash==="#guide")document.querySelector('[data-tab="guide"]').click();
+if(location.hash==="#printguide")document.body.classList.add("print-guide");
+if(location.hash==="#verify")document.querySelector('[data-tab="verify"]').click();
+if(location.hash==="#example"){const m=[];for(const f of Object.keys(FIX))ingest(HUB,FIX[f],f+".json",m);$("proj").value="Smoke test space";HUB.project.name="Smoke test space";render();$("addMsg").innerHTML=m.join("<br>");}
+if(location.hash==="#selftest"){const out=[];try{
+  const m=[];for(const f of Object.keys(FIX))ingest(HUB,FIX[f],f+".json",m);render();out.push("sections="+Object.keys(HUB.apps).length);
+  const sf=sharedFile();out.push("schemaOk="+(sf.schema==="fireToolshed.project.v1"&&SCHEMA.required.every(k=>k in sf)));
+  const h2=blankHub();ingest(h2,JSON.parse(JSON.stringify(sf)),"s.json",[]);out.push("roundtrip="+Object.keys(FIX).every(f=>{const k=detect(FIX[f]);return deepEq(h2.apps[k].data,FIX[f])}));
+  const bad=[];out.push("rejectsUnknown="+(ingest(blankHub(),{hello:1},"x.json",bad)===false));
+  const mm=FIX["stair-merge-project"];const alt=JSON.parse(JSON.stringify(mm));alt.inputsSI.proj="Other";ingest(HUB,alt,"alt.json",[]);render();out.push("nameWarn="+/different project names/.test($("warns").textContent));
+  try{localStorage.setItem("occupantEgress.v1.__hubtest","1");localStorage.removeItem("occupantEgress.v1.__hubtest");out.push("storage=ok")}catch(e){out.push("storage=na")}
+  const v=runVerify();out.push("verify="+v.pass+"/"+v.total);
+  out.push("forbiddenWord="+document.body.innerText.toLowerCase().includes(["st","amp"].join("")));
+}catch(e){out.push("ERR "+e.message)}document.title="SELFTEST "+out.join(" | ");}
+</script>
+</body>
+</html>

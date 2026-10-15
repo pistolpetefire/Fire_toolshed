@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fireToolshed.project.v1",
+  "title": "Fire Toolshed shared project file",
+  "description": "Envelope that carries each Fire Toolshed app's own project data unchanged, one section per app. Apps read their own section and ignore the rest. Screening data only.",
+  "type": "object",
+  "required": [
+    "schema",
+    "schemaVersion",
+    "project",
+    "apps"
+  ],
+  "properties": {
+    "schema": {
+      "const": "fireToolshed.project.v1"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "description": "Version of this envelope format (semver)."
+    },
+    "project": {
+      "type": "object",
+      "required": [
+        "name",
+        "created",
+        "updated"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "units": {
+          "enum": [
+            "IP",
+            "SI"
+          ]
+        }
+      }
+    },
+    "apps": {
+      "type": "object",
+      "description": "One section per app. Each data object is the app's own export, stored verbatim.",
+      "propertyNames": {
+        "enum": [
+          "occupantLoad",
+          "atriumProject",
+          "asetScreener",
+          "rsetTool",
+          "stairMerge",
+          "travelDistance"
+        ]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "data",
+          "nativeFormat",
+          "addedAt",
+          "source"
+        ],
+        "properties": {
+          "nativeFormat": {
+            "type": "string",
+            "description": "Native schema id, e.g. fireToolshed.asetScreener.v1, rsetSession.v0.1.7, occupantEgress.v1."
+          },
+          "appVersion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "addedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source": {
+            "enum": [
+              "file",
+              "browser",
+              "shared-file"
+            ]
+          },
+          "fileName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "description": "Cross-app checks computed when the file was written (informational).",
+      "items": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "enum": [
+              "e",
+              "w",
+              "i",
+              "ok"
+            ]
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "runRecord": {
+      "type": "string",
+      "description": "Run record for traceability only. Not a professional seal or certification."
+    }
+  }
+}
