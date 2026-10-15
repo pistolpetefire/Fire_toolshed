@@ -20,7 +20,6 @@ a professional seal or certification.
 | App | Item | Effect |
 |---|---|---|
 | Deflagration Vent | Dust and gas vent equations do not match NFPA 68 (dust: V^(2/3) Pred^(-1/2), no Pmax/Pred term; gas: exponents on wrong pressures) | Dust under-sized about 70%; gas over-sized 3 to 4 times in the test cases |
-| IBC/IFC Hazard | Class 4 oxidizers and detonable pyrophorics not mapped to H-1 (IBC 307.3) | H-1 not suggested |
 | Smoke Exhaust Lab | Plugholing Vmax uses a temperature rise from 0.5 Qc rather than the layer temperature | Vmax about 29% low (conservative) |
 
 Review notes, not math errors: FA Power Extenders UFC standby duration not confirmed; Dry Sprinkler fill rate
@@ -57,3 +56,7 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 - **Concrete Fire Rating v1.1.0 (2026-10-14).** CMU expanded shale, clay or slate at 1 hr is now 2.6 in per IBC (2024) Table 722.3.2; it was 2.2 in, the 3/4 hr value.
   - All other wall, slab and CMU values were checked against the ICC Digital Codes 2024 IBC Chapter 7 (Tables 722.2.1.1, 722.2.2.1, 722.3.2) and are unchanged.
   - Slab rows now cite Table 722.2.2.1.
+
+- **IBC/IFC Hazard v1.5.0 (2026-10-14).** Oxidizers now map to H-1/H-2/H-3, since Class 4 is H-1. Pyrophorics now map to H-1/H-2: detonable materials are H-1 and nondetonable are H-2.
+  - Basis: IBC (2024) 307.3 and 307.4, verified on ICC Digital Codes free access (IBC2024V2.0 Ch. 3).
+  - The explosives review note still stands.
