@@ -130,7 +130,7 @@ Use CFAST to support the screening. The submitted smoke results are the FDS runs
 - [ ] RSET from step 12, with citations.
 - [ ] ASET versus RSET comparison from step 13, with the safety factor.
 - [ ] Limitations.
-- [ ] Toolshed pages only as screening and cross-checks. Stamp them with the version, the date, the input summary, and the screening note.
+- [ ] Toolshed pages only as screening and cross-checks. Label them with a run record: the version, the date, the input summary, and the screening note.
 
 ### 15. Review and approval
 

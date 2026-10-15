@@ -77,7 +77,7 @@ export const WALKTHROUGH_STEPS: WalkStep[] = [
     pointsTo: 'Orange/warning strip near the top under the header',
     body: [
       'Read this every time you open the tool.',
-      'It says the honest thing: numbers here are starting points or your own typing. They are not automatic truth. They are not legal or stamped engineering advice.',
+      'It says the honest thing: numbers here are starting points or your own typing. They are not automatic truth. They are not legal advice or sealed engineering work.',
       'If you use this on a real building, a qualified fire protection engineer must review, justify, and accept every value.',
     ],
   },
