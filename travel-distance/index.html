@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Travel Distance and Nearest-Exit Checker · Fire Toolshed</title>
+<meta name="description" content="Screening-level travel distance on a plan grid: shortest real path to the nearest exit and to the next exit if it is blocked, with areas over the limit shaded. Screening only.">
+<style>
+:root{
+  --v-50:#f7f5ff;--v-100:#efeafe;--v-200:#ddd3fb;--v-300:#c4b5f5;--v-500:#8b6fd6;--v-700:#5b3fb3;--v-800:#4a3392;--v-900:#2e1f63;
+  --ink:#1f1a33;--muted:#5a5370;--line:#e4def5;--card:#fff;
+  --pass:#1f7a4a;--warn:#8a5a00;--fail:#b4232c;
+  --c1:#5b3fb3;--c2:#b0359b;--c3:#2f6fb0;--c4:#c26a00;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--v-50);color:var(--ink);line-height:1.5;
+  padding:calc(1.25rem + var(--safe-top)) 1rem calc(2rem + var(--safe-bottom))}
+.wrap{max-width:1180px;margin:0 auto}
+header{display:flex;gap:.9rem;align-items:flex-start;margin-bottom:1rem}
+.logo{width:3rem;height:3rem;border-radius:1rem;background:var(--v-700);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0}
+h1{margin:0;font-size:1.65rem;letter-spacing:-.03em;line-height:1.15}
+h2{font-size:1.05rem;margin:0 0 .6rem;color:var(--v-800)}
+h3{font-size:.95rem;margin:.9rem 0 .4rem;color:var(--v-800)}
+.sub{margin:.25rem 0 0;color:var(--muted);font-size:.9rem}
+.badge{display:inline-block;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--v-100);color:var(--v-800);border:1px solid var(--v-200);padding:.15rem .5rem;border-radius:999px;margin-right:.35rem}
+.banner{background:#fff;border:1px solid var(--v-300);border-left:6px solid var(--v-700);border-radius:.9rem;padding:.75rem 1rem;margin-bottom:1rem;font-size:.9rem}
+.banner b{color:var(--v-800)}
+.tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem}
+.tabs button{font:inherit;font-size:.9rem;border:1px solid var(--v-200);background:#fff;color:var(--v-800);border-radius:999px;padding:.45rem 1rem;cursor:pointer;min-height:44px}
+.tabs button[aria-selected="true"]{background:var(--v-700);border-color:var(--v-700);color:#fff}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}
+.grid>*,.row>*{min-width:0}
+@media(min-width:900px){.grid{grid-template-columns:380px minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:1.1rem;padding:1rem 1.15rem;box-shadow:0 1px 2px rgba(46,31,99,.05)}
+.card+.card{margin-top:1rem}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin:.55rem 0 .2rem}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+input,select,textarea{font:inherit;font-size:16px;width:100%;padding:.45rem .6rem;border:1px solid var(--v-200);border-radius:.6rem;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--v-500);outline-offset:1px}
+input.bad{border-color:var(--fail);background:#fff5f5}
+.unit{font-weight:500;color:var(--v-700)}
+.chk{display:flex;gap:.5rem;align-items:center;font-size:.88rem;margin:.5rem 0;color:var(--ink);font-weight:500}
+.chk input{width:auto}
+.seg{display:inline-flex;border:1px solid var(--v-300);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:.85rem;border:0;background:#fff;color:var(--v-800);padding:.35rem .9rem;cursor:pointer;min-height:38px}
+.seg button.on{background:var(--v-700);color:#fff}
+.btns{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--v-700);background:var(--v-700);color:#fff;border-radius:.6rem;padding:.5rem .9rem;cursor:pointer;min-height:42px}
+.btn.alt{background:#fff;color:var(--v-800)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.7rem}
+.kpi{background:var(--v-50);border:1px solid var(--v-200);border-radius:.9rem;padding:.6rem .8rem}
+.kpi .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+.kpi .v{font-size:1.45rem;font-weight:750;color:var(--v-900);line-height:1.2}
+.kpi .s{font-size:.78rem;color:var(--muted)}
+.kpi.gov{border-color:var(--v-700);background:#fff;box-shadow:inset 0 0 0 1px var(--v-700)}
+.pill{display:inline-block;font-weight:700;font-size:.8rem;padding:.1rem .55rem;border-radius:999px}
+.pass{background:#e3f4ea;color:var(--pass)}.warn{background:#fff3d6;color:var(--warn)}.fail{background:#fde4e6;color:var(--fail)}
+ul.warns{margin:.3rem 0 0;padding-left:1.1rem;font-size:.86rem}
+ul.warns li{margin:.2rem 0}
+ul.warns li.w{color:var(--warn)}ul.warns li.e{color:var(--fail);font-weight:600}ul.warns li.i{color:var(--muted)}
+svg{width:100%;height:auto;display:block}
+.tblwrap{overflow-x:auto;max-height:360px;overflow-y:auto;border:1px solid var(--line);border-radius:.6rem}
+table{border-collapse:collapse;width:100%;font-size:.84rem;font-variant-numeric:tabular-nums}
+th,td{padding:.35rem .55rem;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{background:var(--v-100);color:var(--v-900);position:sticky;top:0}
+td:first-child,th:first-child{text-align:left}
+.runrec{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;background:var(--v-50);border:1px dashed var(--v-300);border-radius:.6rem;padding:.7rem .8rem;white-space:pre-wrap;word-break:break-word}
+.small{font-size:.8rem;color:var(--muted)}
+.cite li{margin:.25rem 0;font-size:.86rem}
+code{background:var(--v-100);padding:0 .25rem;border-radius:.3rem;font-size:.85em}
+.eq{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.86rem;background:var(--v-50);border-radius:.5rem;padding:.4rem .6rem;margin:.3rem 0;overflow-x:auto}
+.hidden{display:none!important}
+footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
+#report{display:none}
+.guide ol,.guide ul{padding-left:1.2rem;font-size:.9rem}
+.guide li{margin:.25rem 0}
+.gtbl{max-height:none}
+.gtbl td{white-space:normal;text-align:left;vertical-align:top;font-size:.84rem;min-width:9rem}
+.gtbl td:first-child{font-weight:700;color:var(--v-900);min-width:7rem}
+.gtbl th{text-align:left}
+.gtbl table{table-layout:fixed}
+.gtbl col.c1{width:13%}.gtbl col.c2{width:24%}.gtbl col.c3{width:33%}.gtbl col.c4{width:30%}
+@media(max-width:700px){.gtbl{overflow:visible;border:0}.gtbl table,.gtbl tbody,.gtbl tr,.gtbl td{display:block;width:100%}.gtbl thead{display:none}
+ .gtbl tr{border:1px solid var(--line);border-radius:.7rem;margin:.6rem 0;padding:.4rem .2rem;background:#fff}
+ .gtbl td{border:0;padding:.25rem .6rem;min-width:0}.gtbl td:not(:first-child)::before{content:attr(data-l);display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--v-700)}}
+@media print{
+  body{background:#fff;padding:0;font-size:10.5pt}
+  .tabs,.btns,#tab-inputs .grid>div:first-child,.noprint,footer,#tab-verify,#tab-method{display:none!important}
+  .card{box-shadow:none;border:1px solid #bbb;break-inside:auto;margin-top:.6rem!important}
+  svg,.kpi,tr,.chartbox{break-inside:avoid}
+  h2,h3{break-after:avoid}
+  .banner{margin-bottom:.4rem}
+  #report{display:block}
+  #tab-inputs{display:none!important}
+  .tblwrap{max-height:none;overflow:visible}
+  body.print-guide #report,body.print-guide #tab-inputs{display:none!important}
+  body.print-guide #tab-guide{display:block!important}
+  body:not(.print-guide) #tab-guide{display:none!important}
+  .gtbl th{position:static}
+  .gtbl{overflow:visible!important;border:0}
+  .gtbl table{width:100%!important}
+  .gtbl td{font-size:9pt}
+  @page{margin:14mm}
+}
+
+.tools{display:flex;flex-wrap:wrap;gap:.35rem;margin:.4rem 0}
+.tools button{font:inherit;font-size:.82rem;border:1px solid var(--v-300);background:#fff;color:var(--v-800);border-radius:.5rem;padding:.35rem .7rem;cursor:pointer;min-height:36px}
+.tools button.on{background:var(--v-700);color:#fff;border-color:var(--v-700)}
+#plan{width:100%;height:auto;border:1px solid var(--v-300);border-radius:.5rem;touch-action:none;background:#fff;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1rem;font-size:.8rem;margin:.4rem 0}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1px solid #0002}
+.planwide{grid-column:1/-1}
+@media print{#plan{max-width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo" aria-hidden="true">EXIT</div>
+  <div>
+    <h1>Travel Distance and Nearest-Exit Checker</h1>
+    <p class="sub"><span class="badge">Screening · v1.0.0</span>Draw or import a plan with walls and obstructions, mark exits, and get the shortest real walking path from every point to the nearest exit and to the next exit if that one is blocked. Areas over your limit are shaded. Runs offline.</p>
+  </div>
+</header>
+<div class="banner" role="note"><b>Screening only. Not the submittal basis.</b> Distances are measured on a grid between cell centers and depend on the plan you draw. The applicable limit, the measurement rules and the point where travel ends come from the adopted code and the AHJ. A licensed fire protection engineer must confirm them, and the code compliance drawings remain the record.</div>
+
+<nav class="tabs noprint" role="tablist">
+  <button role="tab" aria-selected="true" data-tab="inputs">Calculator</button>
+  <button role="tab" aria-selected="false" data-tab="verify">Verification</button>
+  <button role="tab" aria-selected="false" data-tab="guide">User guide</button>
+  <button role="tab" aria-selected="false" data-tab="method">Method and limits</button>
+</nav>
+
+<section id="tab-inputs">
+<div class="grid">
+<div>
+  <div class="card">
+    <h2>Project and limit</h2>
+    <label for="proj">Project / area name</label><input id="proj" value="Example office floor">
+    <label>Units</label>
+    <div class="seg" id="unitsSeg"><button data-u="IP" class="on">IP (ft)</button><button data-u="SI">SI (m)</button></div>
+    <label for="limit">Travel distance limit <span class="unit" data-q="len"></span></label>
+    <input id="limit" inputmode="decimal" data-q="len" data-si="30.48">
+    <p class="small">Example value only. Enter the limit from the adopted code for this occupancy and sprinkler status (for example IBC Table 1017.2 or the NFPA 101 occupancy chapter, per edition), per project and AHJ.</p>
+    <label for="cite">Limit basis / citation (required)</label>
+    <input id="cite" placeholder="e.g. IBC 20xx Table 1017.2, Group B, sprinklered">
+  </div>
+  <div class="card">
+    <h2>Plan grid</h2>
+    <div class="row">
+      <div><label for="cell">Cell size <span class="unit" data-q="len"></span></label><input id="cell" inputmode="decimal" data-q="len" data-si="0.6096"></div>
+      <div><label for="gw">Columns</label><input id="gw" inputmode="numeric" value="62"></div>
+      <div><label for="gh">Rows</label><input id="gh" inputmode="numeric" value="42"></div>
+    </div>
+    <div class="btns"><button class="mini btn alt" id="bResize">Apply size (keeps drawing)</button><button class="btn alt" id="bExample">Load example plan</button><button class="btn alt" id="bClear">Blank room</button></div>
+    <p class="small">Smaller cells are more accurate but slower. 2 ft (0.6 m) cells suit most floors; up to 250 × 250 cells.</p>
+  </div>
+  <div class="card">
+    <h2>Polygon input (optional)</h2>
+    <p class="small">Coordinates in the units shown, origin at the top-left, y downward. This replaces the grid drawing.</p>
+    <label for="poly">Floor outline vertices, one "x, y" per line</label>
+    <textarea id="poly" rows="5">0, 0
+120, 0
+120, 80
+0, 80</textarea>
+    <label for="obs">Obstructions, one rectangle "x1, y1, x2, y2" per line</label>
+    <textarea id="obs" rows="3">40, 30, 70, 50</textarea>
+    <label for="exs">Exits, one rectangle "x1, y1, x2, y2" per line (place on the outline)</label>
+    <textarea id="exs" rows="3">0, 36, 2, 40
+118, 60, 120, 64</textarea>
+    <div class="btns"><button class="btn alt" id="bPoly">Build grid from polygon</button></div>
+    <p class="small" id="polyMsg" role="status"></p>
+  </div>
+</div>
+
+<div>
+  <div class="card">
+    <h2>Plan and results</h2>
+    <div class="tools" id="tools" role="toolbar" aria-label="Drawing tools">
+      <button data-t="wall" class="on">Wall / obstruction</button><button data-t="floor">Floor (erase)</button><button data-t="exit">Exit</button><button data-t="probe">Probe a point</button>
+      <span style="flex:1"></span>
+      <label for="brush" style="margin:0;align-self:center">Brush</label><select id="brush" style="width:auto"><option value="1">1 cell</option><option value="2">2 cells</option><option value="3">3 cells</option></select>
+    </div>
+    <div class="row">
+      <div><label for="view">Shading</label><select id="view"><option value="near">Distance to nearest exit</option><option value="blocked">Distance if the nearest exit is blocked</option><option value="which">Which exit is nearest</option></select></div>
+    </div>
+    <canvas id="plan" width="800" height="540" aria-label="Plan grid with travel distance shading"></canvas>
+    <div class="legend" id="legend"></div>
+    <p class="small" id="probeOut" role="status">Choose "Probe a point" and tap the plan to draw the path to the nearest exit and to the next exit.</p>
+  </div>
+  <div class="card">
+    <h2>Results</h2>
+    <div class="kpis" id="kpis"></div>
+    <h3>Checks and warnings</h3>
+    <ul class="warns" id="warns"></ul>
+  </div>
+  <div class="card">
+    <h2>Run record</h2>
+    <div class="runrec" id="runrec"></div>
+    <p class="small">Run record for traceability only. Not a professional seal or certification.</p>
+    <div class="btns">
+      <button class="btn" id="bPrint">Print report</button>
+      <button class="btn alt" id="bExport">Export project JSON</button>
+      <label class="btn alt" style="display:inline-flex;align-items:center">Import JSON<input type="file" id="fImport" accept=".json,application/json" style="display:none"></label>
+      <button class="btn alt" id="bPng">Save plan image (PNG)</button>
+    </div>
+    <p class="small" id="ioMsg" role="status"></p>
+  </div>
+</div>
+</div>
+</section>
+
+<section id="tab-verify" class="hidden">
+  <div class="card">
+    <h2>Verification against independent Python hand calcs</h2>
+    <p class="small">Each case runs live in this page's engine and is compared with <code>verify_handcalc.py</code>: exact straight-line geometry (T1, T2), an exact any-angle shortest path on a visibility graph (T3, T4), and an independent re-implementation for the example plan (T5, T6). Acceptance: within 1% (percent-of-area cases: within 1 percentage point).</p>
+    <div class="tblwrap" style="max-height:none"><table id="vtbl"></table></div>
+    <p id="vsum" style="margin-top:.6rem"></p>
+  </div>
+</section>
+
+<section id="tab-guide" class="hidden">
+  <div class="card guide">
+    <h2>User guide</h2>
+    <p class="small">What each input is, typical starting values, and why. Limits and measurement rules come from the adopted code; where they vary they are <b>per project and AHJ</b>.</p>
+    <div class="btns noprint"><button class="btn alt" id="bPrintGuide">Print guide</button></div>
+    <h3>Workflow</h3>
+    <ol>
+      <li>Find the travel distance limit for the occupancy and sprinkler status in the adopted code, and enter it with its citation.</li>
+      <li>Set the cell size and grid size so the plan fits (columns × cell size = plan width).</li>
+      <li>Draw the plan: walls and fixed obstructions (cores, shafts, fixed casework, racks), floor, and exits. Or enter the outline, obstructions and exits as a polygon and build the grid.</li>
+      <li>Read the shading for the nearest exit, then switch to "if the nearest exit is blocked".</li>
+      <li>Probe the worst points to see the paths. Check that each path is a route people can actually use.</li>
+      <li>Export the project JSON, save the plan image and print the report. Confirm on the code compliance drawings.</li>
+    </ol>
+    <h3>Inputs</h3>
+    <div class="tblwrap gtbl"><table><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
+    <thead><tr><th>Input</th><th>What it is</th><th>Typical / recommended (IP · SI)</th><th>Why</th></tr></thead><tbody>
+    <tr><td>Units</td><td>IP (ft) or SI (m).</td><td>The units of your drawings.</td><td>The engine works in cells; the toggle only converts the display.</td></tr>
+    <tr><td>Travel distance limit</td><td>Maximum allowed travel distance to an exit.</td><td>From the adopted code table for the occupancy and sprinkler status (e.g. IBC Table 1017.2; NFPA 101 occupancy chapters). The 100 ft (30.5 m) default is an example only.</td><td>Limits vary by occupancy, sprinklers and edition, so the tool never assumes one.</td></tr>
+    <tr><td>Limit citation</td><td>Code section, edition and table row.</td><td>Required.</td><td>The shading means nothing without the basis of the limit.</td></tr>
+    <tr><td>Cell size</td><td>Size of one grid square.</td><td>2 ft (0.6 m) for most floors; 1 ft (0.3 m) for tight layouts.</td><td>Walls and doors snap to cells. Openings narrower than one cell close, and results shift by up to about half a cell.</td></tr>
+    <tr><td>Columns / rows</td><td>Grid extent.</td><td>Plan width and depth ÷ cell size.</td><td>Must cover the whole floor, including the exits.</td></tr>
+    <tr><td>Walls / obstructions</td><td>Cells people cannot walk through.</td><td>Walls, cores, shafts and fixed furniture or racks shown on the plans.</td><td>Paths go around them, which is why real travel is longer than straight-line distance.</td></tr>
+    <tr><td>Exits</td><td>Cells where travel distance ends. Touching exit cells count as one exit.</td><td>The point where measurement ends under the adopted code (e.g. the exit door, an exit stair enclosure or exit passageway entrance); per AHJ.</td><td>Each separate exit is labeled (A, B, ...) and used for the blocked-exit case.</td></tr>
+    <tr><td>Polygon input</td><td>Outline vertices, obstruction rectangles and exit rectangles in plan units.</td><td>From the plan dimensions.</td><td>Faster than drawing for simple shapes; you can edit the grid afterwards.</td></tr>
+    <tr><td>Shading view</td><td>Nearest exit, nearest exit blocked, or which exit is nearest.</td><td>Review all three.</td><td>The blocked view shows how far people travel if the nearest exit is lost.</td></tr>
+    <tr><td>Probe</td><td>Draws the shortest paths from a point.</td><td>Probe the farthest corners and dead-end rooms.</td><td>Confirms the path is real and the exit is reachable.</td></tr>
+    </tbody></table></div>
+    <h3>Reading the warnings</h3>
+    <ul class="warns">
+      <li class="e">Error (red): invalid inputs, no exits, or a grid that is too large. Nothing is computed.</li>
+      <li class="w">Warning (amber): areas over the limit, floor cells that cannot reach any exit, only one exit, a coarse cell size, or a missing citation.</li>
+      <li class="i">Note (gray): measurement assumptions.</li>
+    </ul>
+    <h3>Common mistakes</h3>
+    <ul>
+      <li>Using straight-line distance instead of the walking path.</li>
+      <li>Forgetting furniture, racks or casework that set the real path.</li>
+      <li>Cells too large, which closes narrow openings or doors.</li>
+      <li>Ending travel at the wrong point (for example at a door that is not an exit).</li>
+      <li>Ignoring common path of travel and dead-end limits, which this tool does not check.</li>
+    </ul>
+    <h3>Sources</h3>
+    <ul class="cite">
+      <li>International Building Code (adopted edition), Section 1017 (exit access travel distance) and Table 1017.2.</li>
+      <li>NFPA 101 Life Safety Code (adopted edition), Section 7.6 (measurement of travel distance) and the occupancy chapters.</li>
+      <li>Dijkstra, E.W., "A note on two problems in connexion with graphs," Numerische Mathematik 1 (1959): the shortest path method.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="tab-method" class="hidden">
+  <div class="card">
+    <h2>Method</h2>
+    <h3>1 · Grid and line of sight</h3>
+    <p class="small">The plan is a grid of floor, wall and exit cells. A straight step between two cell centers is allowed only if the segment does not pass through or touch a wall cell. Touching a wall corner counts as blocked, a conservative rule that keeps paths off wall corners.</p>
+    <h3>2 · Shortest real path</h3>
+    <div class="eq">d(cell) = min over allowed steps ( d(neighbor) + step length ),   steps (dx, dy) with |dx|, |dy| ≤ 5 and no common factor</div>
+    <p class="small">Dijkstra's method from each exit (adjacent exit cells form one exit) gives the walking distance from every cell. The 5-cell step set allows near-any-angle paths: compared with the exact geodesic the error is under about 0.5% in open areas (see Verification). Distance runs from the cell center to the exit cell center.</p>
+    <h3>3 · Nearest and blocked-exit distance</h3>
+    <p class="small">Nearest = smallest distance over all exits. If the nearest exit is blocked = the smallest distance over the remaining exits. Cells over the limit are shaded.</p>
+    <h3>Limits</h3>
+    <ul class="cite">
+      <li>2D only: no stairs, ramps or travel within exit stairs; multi-level travel must be added by hand per the code.</li>
+      <li>Grid resolution: walls and doors snap to cells; results are accurate to about half a cell plus the step error.</li>
+      <li>Does not check common path of travel, dead ends, exit separation, egress width or capacity.</li>
+      <li>The user sets where travel ends; the tool does not judge which doors are exits.</li>
+      <li>Screening only. Not the submittal basis.</li>
+    </ul>
+  </div>
+</section>
+<section id="report" aria-hidden="true"></section>
+<footer>Fire Toolshed · Travel Distance and Nearest-Exit Checker v1.0.0 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
+</div>
+<script>
+"use strict";
+const APP={name:"Travel Distance and Nearest-Exit Checker",version:"1.0.0",schema:"fireToolshed.travelDistance.v1"};
+const REFD={"results": {"T1_app_alg": 30.0, "T1_exact": 30.0, "T2_app_alg": 30.495097567963924, "T2_exact": 30.4138126514911, "T3_app_alg": 39.75463257346233, "T3_visgraph": 39.698866482558415, "T4_blocked_app_alg": 31.786515587188706, "T4_blocked_visgraph": 31.76476034853718, "T6_pct_over_100": 0.0, "T6_pct_over_blocked_100": 44.710669077757686, "T5_max_nearest": 91.57608611539246, "T5_max_blocked": 136.1208022698386, "T5_pct_over": 0.0, "T5_pct_over_blocked": 0.0, "T5_cells": 2212}, "defaultPlan": ["##################################################EE##########", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "######..############..############..####.....................#", "#............................................................#", "#............................................................#", "#............................................................#", "E............................................................#", "E............................................................#", "#............................................................#", "#............................................................#", "#............................................................#", "#............................................................#", "######..############..############..####.....................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "##############################################################"]}, DEFAULT_PLAN=REFD.defaultPlan, REF=REFD.results;
+const $=id=>document.getElementById(id);
+let units="IP", tool="wall", LAST=null, probe=null;
+let W=0,H=0,G=null; // Uint8: 0 floor, 1 wall, 2 exit
+const U={len:{IP:{f:v=>v/0.3048,b:v=>v*0.3048,u:"ft"},SI:{u:"m"}}};
+const toD=v=>units==="IP"?v/0.3048:v, toS=v=>units==="IP"?v*0.3048:v, uL=()=>units==="IP"?"ft":"m";
+function fmt(v,d=0){if(v==null||!isFinite(v))return"—";return Number(v).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function num(el){const v=parseFloat(String(el.value).replace(/,/g,""));return isFinite(v)?v:NaN}
+function gcd(a,b){return b?gcd(b,a%b):a}
+
+// ---------------- engine ----------------
+const RN=5, OFFS=[];
+for(let dx=-RN;dx<=RN;dx++)for(let dy=-RN;dy<=RN;dy++){if((dx||dy)&&gcd(Math.abs(dx),Math.abs(dy))===1){
+  const s=new Set(), n=60, e=1e-6; for(let i=0;i<=n;i++){const t=i/n,x=0.5+dx*t,y=0.5+dy*t;for(const cx of new Set([Math.floor(x-e),Math.floor(x+e)]))for(const cy of new Set([Math.floor(y-e),Math.floor(y+e)]))s.add(cx+","+cy);}
+  const cells=[...s].map(k=>k.split(",").map(Number)).filter(([a,b])=>!(a===0&&b===0));
+  OFFS.push({dx,dy,len:Math.hypot(dx,dy),cells});}}
+class Heap{constructor(){this.k=[];this.v=[]}push(key,val){const k=this.k,v=this.v;let i=k.length;k.push(key);v.push(val);while(i>0){const p=(i-1)>>1;if(k[p]<=key)break;k[i]=k[p];v[i]=v[p];i=p}k[i]=key;v[i]=val}
+  pop(){const k=this.k,v=this.v,top=v[0],tk=k[0],lk=k.pop(),lv=v.pop();const n=k.length;if(n){let i=0;while(true){let l=2*i+1;if(l>=n)break;let r=l+1;if(r<n&&k[r]<k[l])l=r;if(k[l]>=lk)break;k[i]=k[l];v[i]=v[l];i=l}k[i]=lk;v[i]=lv}this.lastKey=tk;return top}get size(){return this.k.length}}
+function field(g,w,h,sources){
+  const D=new Float64Array(w*h).fill(Infinity), par=new Int32Array(w*h).fill(-1), hp=new Heap();
+  const bl=(x,y)=>x<0||y<0||x>=w||y>=h||g[y*w+x]===1;
+  for(const s of sources){D[s]=0;hp.push(0,s);}
+  while(hp.size){const u=hp.pop(),d=hp.lastKey;if(d>D[u])continue;const x=u%w,y=(u/w)|0;
+    for(const o of OFFS){const nx=x+o.dx,ny=y+o.dy;if(bl(nx,ny))continue;const nd=d+o.len,vi=ny*w+nx;if(nd>=D[vi])continue;
+      let ok=true;for(const c of o.cells){if(bl(x+c[0],y+c[1])){ok=false;break}}if(!ok)continue;D[vi]=nd;par[vi]=u;hp.push(nd,vi);}}
+  return {D,par};
+}
+function labelExits(g,w,h){const lab=new Int32Array(w*h).fill(-1);let k=0;const groups=[];
+  for(let i=0;i<w*h;i++){if(g[i]!==2||lab[i]>=0)continue;const st=[i],grp=[];lab[i]=k;while(st.length){const u=st.pop();grp.push(u);const x=u%w,y=(u/w)|0;
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=w||ny>=h)continue;const v=ny*w+nx;if(g[v]===2&&lab[v]<0){lab[v]=k;st.push(v)}}}groups.push(grp);k++;}
+  return groups;}
+function analyze(g,w,h,cell,limit){
+  const groups=labelExits(g,w,h), F=groups.map(gr=>field(g,w,h,gr)), n=w*h;
+  const d1=new Float64Array(n).fill(Infinity), d2=new Float64Array(n).fill(Infinity), e1=new Int16Array(n).fill(-1), e2=new Int16Array(n).fill(-1);
+  for(let i=0;i<n;i++){if(g[i]!==0)continue;for(let k=0;k<F.length;k++){const d=F[k].D[i];if(d<d1[i]){d2[i]=d1[i];e2[i]=e1[i];d1[i]=d;e1[i]=k}else if(d<d2[i]){d2[i]=d;e2[i]=k}}}
+  let cells=0,unreach=0,over1=0,over2=0,mx1=0,mx2=0,w1=-1,w2=-1,unreach2=0;
+  for(let i=0;i<n;i++){if(g[i]!==0)continue;cells++;if(!isFinite(d1[i])){unreach++;continue}
+    const a=d1[i]*cell;if(a>limit)over1++;if(a>mx1){mx1=a;w1=i}
+    if(F.length>1){if(!isFinite(d2[i])){unreach2++;over2++;continue}const b=d2[i]*cell;if(b>limit)over2++;if(b>mx2){mx2=b;w2=i}}}
+  const reach=cells-unreach;
+  return {groups,F,d1,d2,e1,e2,cells,unreach,unreach2,mx1,mx2,w1,w2,pct1:reach?100*over1/reach:0,pct2:F.length>1&&reach?100*over2/reach:null,nEx:groups.length,cell,limit};
+}
+function pathFrom(F,i){const p=[];let u=i,guard=0;while(u>=0&&guard++<100000){p.push(u);u=F.par[u]}return p}
+
+// ---------------- plan ----------------
+function fromRows(rows){H=rows.length;W=rows[0].length;G=new Uint8Array(W*H);for(let y=0;y<H;y++)for(let x=0;x<W;x++){const c=rows[y][x]||"#";G[y*W+x]=c==="#"?1:c==="E"?2:0}$("gw").value=W;$("gh").value=H;}
+function toRows(){const r=[];for(let y=0;y<H;y++){let s="";for(let x=0;x<W;x++){const v=G[y*W+x];s+=v===1?"#":v===2?"E":"."}r.push(s)}return r}
+function resize(nw,nh){const ng=new Uint8Array(nw*nh).fill(1);for(let y=0;y<Math.min(H,nh);y++)for(let x=0;x<Math.min(W,nw);x++)ng[y*nw+x]=G[y*W+x];W=nw;H=nh;G=ng;}
+function blankRoom(){const r=[];for(let y=0;y<H;y++){let s="";for(let x=0;x<W;x++)s+=(x===0||y===0||x===W-1||y===H-1)?"#":".";r.push(s)}fromRows(r);}
+function parseLines(txt,n){const out=[];for(const raw of txt.split(/\n/)){const l=raw.trim();if(!l)continue;const v=l.split(/[,\s;]+/).filter(Boolean).map(Number);if(v.length!==n||v.some(x=>!isFinite(x)))throw new Error(`Cannot read "${l.slice(0,40)}": expected ${n} numbers.`);out.push(v)}return out}
+function inPoly(px,py,P){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const [xi,yi]=P[i],[xj,yj]=P[j];if(((yi>py)!==(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi))c=!c}return c}
+function buildPoly(){
+  try{const cs=toD(cellSI());if(!(cs>0))throw new Error("Set a valid cell size first.");
+    const P=parseLines($("poly").value,2);if(P.length<3)throw new Error("The outline needs at least 3 vertices.");
+    const O=parseLines($("obs").value,4),E=parseLines($("exs").value,4);if(!E.length)throw new Error("Add at least one exit rectangle.");
+    const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys);
+    const nw=Math.ceil((Math.max(...xs)-x0)/cs)+2,nh=Math.ceil((Math.max(...ys)-y0)/cs)+2;if(nw*nh>62500)throw new Error(`That needs ${nw} × ${nh} cells; use a larger cell size.`);
+    W=nw;H=nh;G=new Uint8Array(W*H);
+    const inR=(x,y,r)=>x>=Math.min(r[0],r[2])&&x<=Math.max(r[0],r[2])&&y>=Math.min(r[1],r[3])&&y<=Math.max(r[1],r[3]);
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){const px=x0+(x-0.5)*cs,py=y0+(y-0.5)*cs;let v=inPoly(px,py,P)?0:1;if(v===0&&O.some(r=>inR(px,py,r)))v=1;G[y*W+x]=v;}
+    let ne=0;for(let y=0;y<H;y++)for(let x=0;x<W;x++){const px=x0+(x-0.5)*cs,py=y0+(y-0.5)*cs;if(E.some(r=>inR(px,py,r))){G[y*W+x]=2;ne++}}
+    // exits must touch floor: snap exit rectangles that fall fully outside to the nearest ring
+    if(!ne){for(const r of E){const cx=Math.round(((r[0]+r[2])/2-x0)/cs+0.5),cy=Math.round(((r[1]+r[3])/2-y0)/cs+0.5);if(cx>=0&&cy>=0&&cx<W&&cy<H){G[cy*W+cx]=2;ne++}}}
+    $("gw").value=W;$("gh").value=H;probe=null;$("polyMsg").textContent=`Grid built: ${W} × ${H} cells, ${ne} exit cell(s).`;compute();
+  }catch(e){$("polyMsg").textContent="Polygon not built: "+e.message}
+}
+function cellSI(){const el=$("cell");return (el.value===el.dataset.shown&&isFinite(parseFloat(el.dataset.si)))?parseFloat(el.dataset.si):toS(num(el))}
+
+// ---------------- compute + render ----------------
+function readInputs(){const errs=[];
+  const cs=cellSI(), el=$("limit"), lim=(el.value===el.dataset.shown&&isFinite(parseFloat(el.dataset.si)))?parseFloat(el.dataset.si):toS(num(el));
+  const bc=!(cs>=0.05&&cs<=5);$("cell").classList.toggle("bad",bc);if(bc)errs.push("cell size (0.05–5 m)");
+  const bl=!(lim>0&&lim<=2000);$("limit").classList.toggle("bad",bl);if(bl)errs.push("travel distance limit");
+  return {cs,lim,errs,proj:$("proj").value.trim(),cite:$("cite").value.trim()};}
+function compute(){
+  const p=readInputs(),Wn=[];
+  let ex=0;for(let i=0;i<G.length;i++)if(G[i]===2)ex++;
+  if(!ex) p.errs.push("mark at least one exit");
+  if(p.errs.length){Wn.push(["e","Fix: "+p.errs.join("; ")+"."]);LAST=null;render(p,null,Wn);return}
+  const A=analyze(G,W,H,p.cs,p.lim);
+  if(A.pct1>0) Wn.push(["w",`${fmt(A.pct1,1)}% of the reachable floor is over the limit to the nearest exit (max ${fmt(toD(A.mx1),1)} ${uL()}).`]);
+  if(A.nEx>1&&A.pct2>0) Wn.push(["w",`If the nearest exit is blocked, ${fmt(A.pct2,1)}% of the floor is over the limit (max ${fmt(toD(A.mx2),1)} ${uL()}).`]);
+  if(A.nEx<2) Wn.push(["w","Only one exit: the blocked-exit case cannot be checked. Confirm the required number of exits per the adopted code."]);
+  if(A.unreach) Wn.push(["w",`${A.unreach} floor cell(s) cannot reach any exit (enclosed or sealed by walls). Check the drawing or the cell size.`]);
+  if(A.nEx>1&&A.unreach2>A.unreach) Wn.push(["w",`${A.unreach2-A.unreach} floor cell(s) can reach only one exit.`]);
+  if(p.cs>0.61+1e-9) Wn.push(["w","Cell size above 2 ft (0.6 m): doors and narrow openings may close or snap; refine for final checks."]);
+  if(!p.cite) Wn.push(["w","Add the citation for the travel distance limit."]);
+  if(A.nEx>12) Wn.push(["w","More than 12 separate exits: check that adjacent exit cells were meant to be separate exits."]);
+  Wn.push(["i","Distances run between cell centers to the exit cell center along the shortest unobstructed path (near any angle). Common path, dead ends and multi-level travel are not checked."]);
+  LAST={p,A,W:Wn,rows:toRows()};render(p,A,Wn);
+}
+function kpi(k,v,s,cls=""){return `<div class="kpi ${cls}"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s||""}</div></div>`}
+const EXC=["#2e7d4f","#1f6fb0","#a0522d","#7b3fb3","#b0359b","#5a7d1f","#00777a","#8a6d00","#b3401f","#3f51b5","#6d4c41","#00838f"];
+function render(p,A,Wn){
+  $("warns").innerHTML=Wn.map(w=>`<li class="${w[0]}">${w[0]==="e"?"Error: ":w[0]==="w"?"Warning: ":""}${w[1]}</li>`).join("");
+  if(!A){$("kpis").innerHTML=kpi("Max travel to nearest exit","—","inputs invalid","gov");$("runrec").textContent="Inputs invalid. No run record.";draw();return}
+  const pt=i=>i<0?"—":`col ${i%W+1}, row ${((i/W)|0)+1}`;
+  $("kpis").innerHTML=kpi("Max travel to nearest exit",fmt(toD(A.mx1),1)+" "+uL(),`worst at ${pt(A.w1)} · limit ${fmt(toD(p.lim),1)} ${uL()}`,A.mx1>p.lim?"gov":"")+
+   kpi("Floor over limit",fmt(A.pct1,1)+"%","nearest exit")+
+   kpi("Max if nearest exit blocked",A.nEx>1?fmt(toD(A.mx2),1)+" "+uL():"n/a",A.nEx>1?`worst at ${pt(A.w2)}`:"only one exit")+
+   kpi("Floor over limit, blocked",A.nEx>1?fmt(A.pct2,1)+"%":"n/a","next exit")+
+   kpi("Exits",String(A.nEx),A.groups.map((g,i)=>String.fromCharCode(65+i)+": "+g.length+" cell"+(g.length>1?"s":"")).join(" · ").slice(0,80));
+  draw(); runrec();
+}
+function lerp(a,b,t){return a+(b-a)*t}
+function colorFor(d,lim){ // light lavender -> deep violet up to limit
+  const t=Math.min(1,d/lim);return `rgb(${Math.round(lerp(243,124,t))},${Math.round(lerp(239,92,t))},${Math.round(lerp(255,214,t))})`;}
+function draw(){
+  const cv=$("plan"), box=cv.parentElement.clientWidth||800, s=Math.max(3,Math.floor(Math.min(1400,Math.max(320,box))/W));
+  cv.width=W*s;cv.height=H*s;const c=cv.getContext("2d");c.fillStyle="#fff";c.fillRect(0,0,cv.width,cv.height);
+  const A=LAST&&LAST.A, view=$("view").value, lim=LAST?LAST.p.lim:Infinity;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=y*W+x,v=G[i];let col;
+    if(v===1)col="#2b2540";else if(v===2)col="#16a34a";
+    else if(!A)col="#f6f4fb";
+    else{const d=(view==="blocked"?A.d2[i]:A.d1[i])*A.cell;
+      if(view==="which")col=A.e1[i]>=0?EXC[A.e1[i]%EXC.length]+"55":"#d1d5db";
+      else if(!isFinite(d))col=view==="blocked"&&A.nEx<2?"#f6f4fb":"#9ca3af";
+      else if(d>lim)col=view==="blocked"?"#f59e0b":"#dc2626";else col=colorFor(d,lim);}
+    c.fillStyle=col;c.fillRect(x*s,y*s,s,s);}
+  if(s>=6){c.strokeStyle="rgba(0,0,0,.05)";c.lineWidth=1;c.beginPath();for(let x=0;x<=W;x++){c.moveTo(x*s+.5,0);c.lineTo(x*s+.5,H*s)}for(let y=0;y<=H;y++){c.moveTo(0,y*s+.5);c.lineTo(W*s,y*s+.5)}c.stroke();}
+  if(A){c.font=`bold ${Math.max(10,Math.min(16,s*1.6))}px system-ui,sans-serif`;c.textAlign="center";c.textBaseline="middle";
+    A.groups.forEach((g,k)=>{let sx=0,sy=0;for(const i of g){sx+=i%W;sy+=(i/W)|0}const cx=(sx/g.length+.5)*s,cy=(sy/g.length+.5)*s;c.fillStyle="#fff";c.beginPath();c.arc(cx,cy,Math.max(8,s*1.1),0,7);c.fill();c.strokeStyle="#16a34a";c.lineWidth=2;c.stroke();c.fillStyle="#14532d";c.fillText(String.fromCharCode(65+k),cx,cy+1);});
+    if(probe!=null&&G[probe]===0){const lines=[[A.e1[probe],"#111827",[]],[A.e2[probe],"#b45309",[7,5]]];
+      for(const [k,col,dash] of lines){if(k<0||!isFinite(A.F[k].D[probe]))continue;const pth=pathFrom(A.F[k],probe);c.strokeStyle=col;c.lineWidth=Math.max(2,s/3);c.setLineDash(dash.map(v=>v*Math.max(1,s/6)));c.beginPath();pth.forEach((u,j)=>{const X=(u%W+.5)*s,Y=(((u/W)|0)+.5)*s;j?c.lineTo(X,Y):c.moveTo(X,Y)});c.stroke();c.setLineDash([]);}
+      c.fillStyle="#111827";c.beginPath();c.arc((probe%W+.5)*s,(((probe/W)|0)+.5)*s,Math.max(4,s/2),0,7);c.fill();}}
+  const lg=view==="which"?(A?A.groups.map((g,k)=>`<span><i style="background:${EXC[k%EXC.length]}55"></i>nearest is exit ${String.fromCharCode(65+k)}</span>`).join(""):""):
+    `<span><i style="background:${colorFor(0,1)}"></i>near exit</span><span><i style="background:${colorFor(1,1)}"></i>at the limit</span><span><i style="background:${view==="blocked"?"#f59e0b":"#dc2626"}"></i>over the limit${view==="blocked"?" (nearest blocked)":""}</span><span><i style="background:#9ca3af"></i>no path</span>`;
+  $("legend").innerHTML=lg+`<span><i style="background:#2b2540"></i>wall / obstruction</span><span><i style="background:#16a34a"></i>exit</span>`;
+}
+function probeAt(i){probe=i;const A=LAST&&LAST.A;if(!A||G[i]!==0){$("probeOut").textContent="Probe a floor cell.";draw();return}
+  const L=k=>String.fromCharCode(65+k);const a=A.d1[i]*A.cell,b=A.d2[i]*A.cell;
+  $("probeOut").innerHTML=`Point col ${i%W+1}, row ${((i/W)|0)+1}: nearest exit ${A.e1[i]>=0?L(A.e1[i]):"—"} at <b>${fmt(toD(a),1)} ${uL()}</b>${a>LAST.p.lim?" (over the limit)":""}${A.nEx>1?`; if it is blocked, exit ${A.e2[i]>=0?L(A.e2[i]):"—"} at <b>${isFinite(b)?fmt(toD(b),1)+" "+uL():"no path"}</b>${b>LAST.p.lim?" (over the limit)":""}`:""}. Solid line: nearest; dashed: next exit.`;draw();}
+function runrec(){if(!LAST)return;const {p,A,W:Wn}=LAST;
+  const L=[`${APP.name} v${APP.version} · Fire Toolshed · SCREENING ONLY, not the submittal basis`,"Run record for traceability only. Not a professional seal or certification.",`Generated: ${new Date().toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})}`,"--- Inputs",
+   `Project: ${p.proj||"(unnamed)"}   Units shown: ${units}`,`Grid: ${W} × ${H} cells at ${fmt(toD(p.cs),3)} ${uL()} (${fmt(toD(W*p.cs),1)} × ${fmt(toD(H*p.cs),1)} ${uL()})`,
+   `Limit: ${fmt(toD(p.lim),1)} ${uL()}   Basis: ${p.cite||"(none entered)"}`,`Exits: ${A.nEx}   Floor cells: ${A.cells}`,"--- Results",
+   `Max travel to nearest exit: ${fmt(toD(A.mx1),1)} ${uL()}   Over limit: ${fmt(A.pct1,1)}% of reachable floor`,
+   A.nEx>1?`If nearest exit blocked: max ${fmt(toD(A.mx2),1)} ${uL()}   Over limit: ${fmt(A.pct2,1)}%`:"Blocked-exit case: n/a (one exit)",
+   `Unreachable floor cells: ${A.unreach}`,`Warnings: ${Wn.filter(w=>w[0]!=="i").length}`,
+   "Method: shortest unobstructed grid path (Dijkstra, 5-cell any-angle steps). Confirm on the code compliance drawings."];
+  $("runrec").textContent=L.join("\n");}
+function buildReport(){if(!LAST){alert("Fix the inputs first.");return false}
+  const esc=s=>s.replace(/&/g,"\u0026amp;").replace(/</g,"\u0026lt;");const img=$("plan").toDataURL("image/png");
+  $("report").innerHTML=`<div class="card"><h2>${APP.name} report · screening only</h2><div class="runrec">${esc($("runrec").textContent)}</div></div><div class="card"><h2>Plan: ${esc($("view").selectedOptions[0].textContent)}</h2><img src="${img}" alt="Plan" style="width:100%;border:1px solid #ccc"><div class="legend">${$("legend").innerHTML}</div></div><div class="card"><h2>Results</h2><div class="kpis">${$("kpis").innerHTML}</div><ul class="warns">${LAST.W.map(w=>`<li class="${w[0]}">${w[1]}</li>`).join("")}</ul><p class="small">Screening only. Not the submittal basis.</p></div>`;return true;}
+
+// ---------------- UI ----------------
+function syncUnits(){document.querySelectorAll("#unitsSeg button").forEach(b=>b.classList.toggle("on",b.dataset.u===units));document.querySelectorAll(".unit[data-q]").forEach(s=>s.textContent="["+uL()+"]");
+  document.querySelectorAll("input[data-q]").forEach(el=>{const si=parseFloat(el.dataset.si);if(isFinite(si)){el.value=String(Math.round(toD(si)*1000)/1000);el.dataset.shown=el.value}});compute();}
+document.querySelectorAll("input[data-q]").forEach(el=>el.addEventListener("input",()=>{const v=num(el);if(isFinite(v)){el.dataset.si=toS(v);el.dataset.shown=el.value}}));
+document.querySelectorAll("#unitsSeg button").forEach(b=>b.onclick=()=>{units=b.dataset.u;syncUnits()});
+document.querySelectorAll("#tools [data-t]").forEach(b=>b.onclick=()=>{tool=b.dataset.t;document.querySelectorAll("#tools [data-t]").forEach(x=>x.classList.toggle("on",x===b))});
+let painting=false,dirty=false;
+function cellAt(ev){const cv=$("plan"),r=cv.getBoundingClientRect();const x=Math.floor((ev.clientX-r.left)/r.width*W),y=Math.floor((ev.clientY-r.top)/r.height*H);return x>=0&&y>=0&&x<W&&y<H?[x,y]:null}
+function paint(ev){const c=cellAt(ev);if(!c)return;if(tool==="probe"){probeAt(c[1]*W+c[0]);return}const b=+$("brush").value,v=tool==="wall"?1:tool==="exit"?2:0;
+  for(let dy=0;dy<b;dy++)for(let dx=0;dx<b;dx++){const x=c[0]+dx,y=c[1]+dy;if(x<W&&y<H&&G[y*W+x]!==v){G[y*W+x]=v;dirty=true}}if(dirty){LAST=LAST&&{...LAST,A:null};drawQuick()}}
+function drawQuick(){const keep=LAST;LAST=null;draw();LAST=keep}
+const cvs=$("plan");cvs.addEventListener("pointerdown",e=>{painting=true;cvs.setPointerCapture(e.pointerId);paint(e)});cvs.addEventListener("pointermove",e=>{if(painting&&tool!=="probe")paint(e)});
+cvs.addEventListener("pointerup",()=>{painting=false;if(dirty){dirty=false;compute();if(probe!=null)probeAt(probe)}});
+$("view").onchange=draw;
+$("bResize").onclick=()=>{const nw=parseInt($("gw").value),nh=parseInt($("gh").value);if(!(nw>=5&&nh>=5&&nw*nh<=62500)){$("gw").classList.add("bad");$("gh").classList.add("bad");return}$("gw").classList.remove("bad");$("gh").classList.remove("bad");resize(nw,nh);probe=null;compute()};
+$("bExample").onclick=()=>{fromRows(DEFAULT_PLAN);$("cell").dataset.si="0.6096";$("limit").dataset.si="30.48";probe=null;syncUnits()};
+$("bClear").onclick=()=>{blankRoom();probe=null;compute()};
+$("bPoly").onclick=buildPoly;
+let deb;document.addEventListener("input",e=>{if(["limit","cell","cite","proj"].includes(e.target.id)){clearTimeout(deb);deb=setTimeout(compute,250)}});
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));["inputs","verify","guide","method"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab));if(b.dataset.tab==="verify")runVerify();if(b.dataset.tab==="inputs")draw();});
+$("bPrint").onclick=()=>{document.body.classList.remove("print-guide");if(buildReport())window.print()};
+$("bPrintGuide").onclick=()=>{document.body.classList.add("print-guide");window.print()};
+window.addEventListener("afterprint",()=>document.body.classList.remove("print-guide"));
+window.addEventListener("beforeprint",()=>{if(!document.body.classList.contains("print-guide"))buildReport()});
+window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setTimeout(draw,200)});
+function download(name,blob){const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500)}
+const slug=s=>(s||"untitled").replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"").toLowerCase()||"untitled";
+function project(){const {p,A}=LAST;return{app:APP.name,appVersion:APP.version,schema:APP.schema,created:new Date().toISOString(),units,
+  inputsSI:{proj:p.proj,cite:p.cite,cell_m:p.cs,limit_m:p.lim,cols:W,rows:H,plan:toRows(),legend:"# wall/obstruction, . floor, E exit"},
+  results:{maxNearest_m:A.mx1,pctOverNearest:A.pct1,maxIfBlocked_m:A.nEx>1?A.mx2:null,pctOverIfBlocked:A.pct2,exits:A.nEx,unreachableCells:A.unreach},warnings:LAST.W.map(w=>w[1]),note:"Screening only. Not the submittal basis."}}
+function applyProject(o){const s=o.inputsSI||{};if(!Array.isArray(s.plan)||!s.plan.length||!s.plan.every(r=>typeof r==="string"&&r.length===s.plan[0].length))throw new Error("Project has no valid plan grid.");
+  if(s.plan.length*s.plan[0].length>62500)throw new Error("Plan grid too large.");
+  units=o.units==="SI"?"SI":"IP";fromRows(s.plan);$("proj").value=s.proj||"";$("cite").value=s.cite||"";$("cell").dataset.si=+s.cell_m;$("limit").dataset.si=+s.limit_m;probe=null;syncUnits();}
+$("bExport").onclick=()=>{if(!LAST||!LAST.A){$("ioMsg").textContent="Fix the inputs before exporting.";return}download(`travel-distance-${slug($("proj").value)}-${Date.now()}.json`,new Blob([JSON.stringify(project(),null,2)],{type:"application/json"}));$("ioMsg").textContent="Project JSON exported."};
+$("bPng").onclick=()=>{$("plan").toBlob(b=>{if(b){download(`travel-distance-plan-${slug($("proj").value)}.png`,b);$("ioMsg").textContent="Plan image saved."}})};
+$("fImport").onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);if(o.schema!==APP.schema)throw new Error("Not a Travel Distance Checker project.");applyProject(o);$("ioMsg").textContent="Project imported."}catch(err){$("ioMsg").textContent="Import failed: "+err.message}};rd.readAsText(f);e.target.value=""};
+
+// ---------------- verification ----------------
+function gridOf(rows){const h=rows.length,w=rows[0].length,g=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const c=rows[y][x];g[y*w+x]=c==="#"?1:c==="E"?2:0}return {g,w,h}}
+function room(w,h){const r=[];for(let y=0;y<h;y++){const a=[];for(let x=0;x<w;x++)a.push(x===0||y===0||x===w-1||y===h-1?"#":".");r.push(a)}return r}
+function runVerify(){const C=[];
+  let r=room(32,12);r[6][0]="E";let q=gridOf(r.map(a=>a.join("")));let F=field(q.g,q.w,q.h,[6*q.w]);
+  C.push(["T1","Open room, straight run of 30 cells [cells]",F.D[6*q.w+30],REF.T1_exact,"pct"]);
+  C.push(["T2","Open room, oblique run (30, −5) vs exact hypotenuse [cells]",F.D[1*q.w+30],REF.T2_exact,"pct"]);
+  r=room(32,22);r[3][0]="E";for(let y=1;y<16;y++)r[y][15]="#";q=gridOf(r.map(a=>a.join("")));F=field(q.g,q.w,q.h,[3*q.w]);
+  C.push(["T3","Path around a wall end vs exact visibility-graph geodesic [cells]",F.D[3*q.w+30],REF.T3_visgraph,"pct"]);
+  r=room(32,22);r[3][0]="E";r[20][31]="E";q=gridOf(r.map(a=>a.join("")));let A=analyze(q.g,q.w,q.h,1,1e9);
+  C.push(["T4","Two exits: distance if the nearest is blocked vs exact geodesic [cells]",A.d2[18*q.w+28],REF.T4_blocked_visgraph,"pct"]);
+  q=gridOf(DEFAULT_PLAN);A=analyze(q.g,q.w,q.h,0.6096,30.48);
+  C.push(["T5a","Example plan (2 ft cells): max travel to nearest exit [ft]",A.mx1/0.3048,REF.T5_max_nearest,"pct"]);
+  C.push(["T5b","Example plan: max travel if the nearest exit is blocked [ft]",A.mx2/0.3048,REF.T5_max_blocked,"pct"]);
+  C.push(["T6a","Example plan, 100 ft limit: % floor over limit, nearest [%]",A.pct1,REF.T6_pct_over_100,"pts"]);
+  C.push(["T6b","Example plan, 100 ft limit: % floor over limit, blocked [%]",A.pct2,REF.T6_pct_over_blocked_100,"pts"]);
+  let pass=0,h="<thead><tr><th>Case</th><th style='text-align:left'>Description</th><th>App</th><th>Python</th><th>Diff</th><th>Result</th></tr></thead><tbody>";
+  for(const [id,desc,a,ref,mode] of C){const d=mode==="pts"?Math.abs(a-ref):Math.abs(a-ref)/Math.abs(ref)*100,ok=isFinite(d)&&d<=1;if(ok)pass++;
+    h+=`<tr><td>${id}</td><td style="text-align:left;white-space:normal;min-width:260px">${desc}</td><td>${fmt(a,3)}</td><td>${fmt(ref,3)}</td><td>${fmt(d,3)}${mode==="pts"?" pts":"%"}</td><td><span class="pill ${ok?"pass":"fail"}">${ok?"PASS":"FAIL"}</span></td></tr>`;}
+  $("vtbl").innerHTML=h+"</tbody>";$("vsum").innerHTML=`<span class="pill ${pass===C.length?"pass":"fail"}">${pass} / ${C.length} within tolerance</span>`;return {pass,total:C.length};}
+document.querySelectorAll(".gtbl tbody tr").forEach(tr=>{const L=["Input","What it is","Typical / recommended (IP · SI)","Why"];tr.querySelectorAll("td").forEach((td,i)=>td.setAttribute("data-l",L[i]))});
+fromRows(DEFAULT_PLAN);syncUnits();
+if(location.hash==="#guide")document.querySelector('[data-tab="guide"]').click();
+if(location.hash==="#printguide")document.body.classList.add("print-guide");
+if(location.hash==="#verify")document.querySelector('[data-tab="verify"]').click();
+if(location.hash==="#blocked"){$("view").value="blocked";draw();}
+if(location.hash==="#selftest"){const out=[];try{
+  out.push("ok="+(!!(LAST&&LAST.A)));const m0=LAST.A.mx1;
+  const pj=JSON.parse(JSON.stringify(project()));$("limit").value="-5";compute();out.push("badLimit="+(LAST===null));applyProject(pj);out.push("roundtrip="+(Math.abs(LAST.A.mx1-m0)<1e-9));
+  units="SI";syncUnits();const s1=LAST.A.mx1;units="IP";syncUnits();out.push("unitToggle="+(Math.abs(s1-m0)<1e-9&&Math.abs(LAST.A.mx1-m0)<1e-9));
+  probeAt(LAST.A.w2);out.push("probe="+/exit [A-Z] at/.test($("probeOut").textContent));
+  $("poly").value="0,0\n60,0\n60,40\n0,40";$("obs").value="20,10,40,30";$("exs").value="0,18,1,22";buildPoly();out.push("poly="+(LAST&&LAST.A&&LAST.A.nEx===1&&W===32&&H===22));
+  const sv=$("exs").value;$("exs").value="bad";buildPoly();out.push("polyBad="+/not built/.test($("polyMsg").textContent));
+  blankRoom();compute();out.push("noExitErr="+(LAST===null));
+  fromRows(DEFAULT_PLAN);compute();
+  out.push("forbiddenWord="+document.body.innerText.toLowerCase().includes(["st","amp"].join("")));
+}catch(e){out.push("ERR "+e.message)}document.title="SELFTEST "+out.join(" | ");}
+</script>
+</body>
+</html>
