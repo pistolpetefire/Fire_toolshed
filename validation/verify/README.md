@@ -59,7 +59,7 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 - **IBC/IFC Hazard v1.5.0 (2026-10-14).** Oxidizers now map to H-1/H-2/H-3, since Class 4 is H-1. Pyrophorics now map to H-1/H-2: detonable materials are H-1 and nondetonable are H-2.
   - Basis: IBC (2024) 307.3 and 307.4, verified on ICC Digital Codes free access (IBC2024V2.0 Ch. 3).
-  - The explosives review note still stands.
+  - The explosives review note was resolved in v1.6.0.
 
 - **Occupant Egress v1.3.0 (2026-10-15).** Rechecked against IBC 2024 on ICC Digital Codes free access (IBC2024V2.0 Ch. 10).
   - Table 1017.2, 1017.2.2 and Table 1004.5 are unchanged; their citations now read 2024.
@@ -71,3 +71,8 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
   - Dead ends now follow 1020.5: I-1 is 50 ft sprinklered; I-2/I-3, I-4 and R-3/R-4 are 20 ft.
   - R is split into R-1, R-2 and R-3/R-4; a saved R project opens as R-1.
   - Not modeled: the one-exit maximum occupant load, the I-3 Condition 2–4 and I-2 Condition 2 dead-end exceptions, and the 1017.2.3 H-5 increase.
+
+- **IBC/IFC Hazard v1.6.0 (2026-10-15).** Explosives default to H-1 (IBC 2024 307.3). A new "Explosives classification" selector follows IBC 2024 307.3.1, verified on ICC free access:
+  - **Division 1.3 → H-2:** only where confinement or configuration will not elevate the hazard from a mass fire to a mass explosion hazard (item 1).
+  - **Division 1.4, or the articles in item 3 → H-3** (items 2 and 3).
+  - The selector is approved by Kevin.
