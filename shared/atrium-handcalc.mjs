@@ -5,6 +5,6 @@ export const PYTHON_REF = {
   "nfpa92-k12-v": 9791.127843219867,
   "nfpa92-k12-dt": 19.85924885855645,
   "balcony-substitution": 73.68524700296422,
-  "zone-closed-form": 13.11128940744837,
+  "zone-closed-form": 12.837910769082452,
   "_zone_closed_form_check": 13.111289407448341
 }

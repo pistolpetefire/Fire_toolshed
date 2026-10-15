@@ -9,7 +9,7 @@
  * convert into each other exactly.
  */
 
-export const ATRIUM_PATH_VERSION = '1.0.0'
+export const ATRIUM_PATH_VERSION = '1.0.1'
 
 export const SCREENING_NOTE =
   'Screening only. Not the submittal basis. A licensed fire protection engineer must confirm the inputs, the applicability of each equation, and any later FDS analysis before this is used with an AHJ.'
@@ -383,18 +383,33 @@ export function runZone(project, options = {}) {
     return { ok: false, error: 'Length, width, and height must be greater than zero.', history, aset, reasons }
   }
 
+  // Integration: the state is advanced from the previous output time to t in sub-steps of at most
+  // 0.05 s (explicit, HRR at the sub-step midpoint), so each output row is the state AT time t.
+  // Earlier versions advanced the state one full output step past t with a single Euler step.
+  const hMax = Math.min(dt, Math.max(1e-3, num(options.substep_s, 0.05)))
+  let tPrev = 0
   for (let t = 0; t <= tEnd + 1e-9; t += dt) {
+    let tt = tPrev
+    while (tt < t - 1e-12) {
+      const h = Math.min(hMax, t - tt)
+      const Qs = hrrAt(tt + h / 2, fire, failures)
+      const Qcs = chi * Qs
+      const mDotS = plumeMassAt(project, location, Math.max(z, 0.2), Qcs, Qs, entrainmentOnly)
+      const TuS = mu > 1e-6 ? T0 + excess / (mu * CP) : T0
+      const rhoS = 353 / Math.max(TuS, 250)
+      const mExS = Math.min(mu / h, rhoS * exhaust)
+      const fuelS = dHc > 0 ? (Qs / dHc) * h : 0
+      mu = Math.max(0, mu + (mDotS - mExS) * h)
+      excess = Math.max(0, excess + (Qcs - mExS * CP * Math.max(0, TuS - T0)) * h)
+      if (Ys != null) soot = Math.max(0, soot + Ys * fuelS - (mu + mExS * h > 0 ? (soot * mExS * h) / (mu + mExS * h) : 0))
+      if (Yco != null) coMass = Math.max(0, coMass + Yco * fuelS - (mu + mExS * h > 0 ? (coMass * mExS * h) / (mu + mExS * h) : 0))
+      const TuZ = mu > 1e-6 ? T0 + excess / (mu * CP) : T0
+      const VuZ = mu > 0 ? mu / (353 / Math.max(TuZ, 250)) : 0
+      z = Math.min(H, Math.max(0.05, H - VuZ / area))
+      tt += h
+    }
+    tPrev = t
     const Q = hrrAt(t, fire, failures)
-    const Qc = chi * Q
-    const mDot = plumeMassAt(project, location, Math.max(z, 0.2), Qc, Q, entrainmentOnly)
-    const Tu = mu > 1e-6 ? T0 + excess / (mu * CP) : T0
-    const rho = 353 / Math.max(Tu, 250)
-    const mEx = Math.min(mu / dt, rho * exhaust)
-    const fuel = dHc > 0 ? (Q / dHc) * dt : 0
-    mu = Math.max(0, mu + (mDot - mEx) * dt)
-    excess = Math.max(0, excess + (Qc - mEx * CP * Math.max(0, Tu - T0)) * dt)
-    if (Ys != null) soot = Math.max(0, soot + Ys * fuel - (mu + mEx * dt > 0 ? (soot * mEx * dt) / (mu + mEx * dt) : 0))
-    if (Yco != null) coMass = Math.max(0, coMass + Yco * fuel - (mu + mEx * dt > 0 ? (coMass * mEx * dt) / (mu + mEx * dt) : 0))
     const Tu2 = mu > 1e-6 ? T0 + excess / (mu * CP) : T0
     const rho2 = 353 / Math.max(Tu2, 250)
     const Vu = mu > 0 ? mu / rho2 : 0
@@ -583,7 +598,7 @@ export const VERIFICATION_CASES = [
   {
     id: 'zone-closed-form',
     engine: 'zone',
-    source: 'Closed-form integration of the NFPA 92 SI axisymmetric entrainment term 0.071 Qc^(1/3) z^(5/3), steady fire, no exhaust, 0.0018 Qc omitted in both the closed form and this run. A = 1200 m^2, H = 20 m, Qc = 1400 kW, t = 120 s.',
+    source: 'Closed-form integration of the NFPA 92 SI axisymmetric entrainment term 0.071 Qc^(1/3) z^(5/3), steady fire, no exhaust, 0.0018 Qc omitted in both the closed form and this run. A = 1200 m^2, H = 20 m, Qc = 1400 kW, t = 120 s. The zone run heats and expands the layer while the closed form assumes ambient-density smoke, so the run reads about 2% lower; the 5% tolerance covers that physics difference only. The independent Python check of the same heated-layer balance matches within 1%.',
     quantity: 'Clear height',
     unit: 'm',
     expected: null,

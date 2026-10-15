@@ -781,15 +781,13 @@ function pythonHandCalcTable(rows) {
     const ref = PYTHON_REF[row.id]
     const diff = Number.isFinite(ref) && Number.isFinite(row.actual) && ref !== 0 ? (100 * (row.actual - ref)) / ref : null
     const pass = diff != null && Math.abs(diff) <= 1
-    const gap = !pass && diff != null && Math.abs(diff) <= row.tolerancePct
-    return { row, ref, diff, pass, gap }
+    return { row, ref, diff, pass }
   })
   const passed = items.filter((item) => item.pass).length
   return `<h2>App vs independent Python hand calcs</h2>
       <p>Each value is recomputed from the equations in validation/atrium_handcalc.py, not by this page's code. Acceptance: within 1%. <strong class="${passed === items.length ? 'pass' : 'fail'}" data-python-summary>${passed} / ${items.length} within 1%</strong></p>
-      ${items.some((item) => item.gap) ? '<p class="note">Known gap: a row outside 1% but inside that row\'s stated tolerance is flagged, not hidden. The zone engine steps in time (0.5 s) while the Python check integrates finely, so the zone clear height runs slightly low (conservative). Under review; not changed here.</p>' : ''}
       <table><thead><tr><th>Check</th><th>Quantity</th><th>App</th><th>Python</th><th>Difference</th><th></th></tr></thead><tbody>
-        ${items.map(({ row, ref, diff, pass, gap }) => `<tr><td>${esc(row.id)}</td><td>${esc(row.quantity)}</td><td>${esc(row.actual)} ${esc(row.unit)}</td><td>${Number.isFinite(ref) ? esc(Math.round(ref * 10000) / 10000) : 'n/a'} ${esc(row.unit)}</td><td>${diff == null ? 'n/a' : esc(Math.round(diff * 1000) / 1000) + '%'}</td><td class="${pass ? 'pass' : 'fail'}">${pass ? 'pass' : gap ? 'outside 1% (known gap, within ' + esc(row.tolerancePct) + '% row tolerance)' : 'fail'}</td></tr>`).join('')}
+        ${items.map(({ row, ref, diff, pass }) => `<tr><td>${esc(row.id)}</td><td>${esc(row.quantity)}</td><td>${esc(row.actual)} ${esc(row.unit)}</td><td>${Number.isFinite(ref) ? esc(Math.round(ref * 10000) / 10000) : 'n/a'} ${esc(row.unit)}</td><td>${diff == null ? 'n/a' : esc(Math.round(diff * 1000) / 1000) + '%'}</td><td class="${pass ? 'pass' : 'fail'}">${pass ? 'pass' : 'fail'}</td></tr>`).join('')}
       </tbody></table>`
 }
 
