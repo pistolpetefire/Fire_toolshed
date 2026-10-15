@@ -23,8 +23,6 @@ a professional seal or certification.
 | Deflagration Vent | Dust and gas vent equations do not match NFPA 68 (dust: V^(2/3) Pred^(-1/2), no Pmax/Pred term; gas: exponents on wrong pressures) | Dust under-sized about 70%; gas over-sized 3 to 4 times in the test cases |
 | Dry Sprinkler Delivery | Trip-time equation fed gallons and in2 instead of ft3 and ft2 | Trip time about 19 times too short |
 | Dry Sprinkler Delivery | Fitting equivalent lengths differ from NFPA 13 Table 28.2.3.1.1 in several cells | Mixed; swing checks high, some 45 deg / butterfly low |
-| Fire Pump Sizer | Diesel fuel tank 0.055 gal/hp-h x h x 1.2 vs NFPA 20 1 gal/hp + 10% | About half the required tank |
-| Fire Pump Sizer | Breaker at 125% FLA (NEC 695 uses locked-rotor current); churn check always passes | Review |
 | IBC/IFC Hazard | Class 4 oxidizers and detonable pyrophorics not mapped to H-1 (IBC 307.3) | H-1 not suggested |
 | Occupant Egress | IBC travel 400/300 ft used for all S and F (S-1/F-1: 250/200 ft); one value for all H and I subgroups | Non-conservative for S-1, F-1, H, I |
 | Occupant Egress | NFPA 101 business 100 gross (2018+ edition: 150); IBC warehouse 300 (table: 500) | Conservative |
@@ -35,3 +33,12 @@ ignores open-sprinkler loss (optimistic transit); Occupant Egress rounds occupan
 Division 1.4 maps to H-3.
 
 Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
+
+## Fixed
+
+- **Fire Pump Sizer v2.4.0 (2026-10-14).** Three changes:
+  - **Diesel tank:** sized per NFPA 20 (2022) 11.4.1.3.1 and 11.4.1.3.1.1, at 12 h × the entered manufacturer rate + 10%, or 1 gal/hp + 10% when no rate is entered.
+  - **Minimum OCPD:** per NEC (2023) 695.4(B)(2)(a)(1), from the entered locked-rotor current plus the FLC of the other pump motors and accessories, then the next standard size in 240.6(A).
+  - **Churn check:** checks the entered certified-curve shutoff against 140% of rated per NFPA 20 (2022) 6.2.2. With no shutoff entered, it shows as not checked, never as a pass.
+  - The version is now read from the page.
+  - Verification: 13 of 13 checks pass.
