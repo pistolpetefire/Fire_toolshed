@@ -5,13 +5,13 @@ window.FT_VERIFY_CASES = {
  "versionSel": "#appVersion",
  "handcalc": "validation/verify/concrete_fire_rating.py",
  "flags": [
-  "CMU, expanded clay, shale or slate, 1 hour: App table shows 2.2 in for 1 hr; IBC Table 722.3.2 and ACI/TMS 216.1 Table 3.1 give 2.6 in (2.2 in is the 3/4 hr value). Not changed; for Kevin to review."
+  "Fixed in v1.1.0: CMU expanded shale, clay or slate 1 hr is 2.6 in per IBC (2024) Table 722.3.2 (was 2.2 in, the 3/4 hr value)."
  ],
  "cases": [
   {
    "id": "wall-sil-2",
    "title": "wall_cip / siliceous / 2 h",
-   "source": "IBC Table 722.2.1.1",
+   "source": "IBC (2024) Table 722.2.1.1",
    "steps": [
     {
      "set": "#assemblyType",
@@ -44,7 +44,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "slab-carb-4",
    "title": "floor_slab / carbonate / 4 h",
-   "source": "IBC Table 722.2.1.1",
+   "source": "IBC (2024) Table 722.2.1.1",
    "steps": [
     {
      "set": "#assemblyType",
@@ -77,7 +77,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "wall-slw-3",
    "title": "wall_cip / sand_lw / 3 h",
-   "source": "IBC Table 722.2.1.1",
+   "source": "IBC (2024) Table 722.2.1.1",
    "steps": [
     {
      "set": "#assemblyType",
@@ -110,7 +110,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "slab-lw-1",
    "title": "floor_slab / lightweight / 1 h",
-   "source": "IBC Table 722.2.1.1",
+   "source": "IBC (2024) Table 722.2.1.1",
    "steps": [
     {
      "set": "#assemblyType",
@@ -143,7 +143,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "cmu-gravel-2",
    "title": "cmu_wall / cmu_gravel / 2 h",
-   "source": "IBC Table 722.3.2",
+   "source": "IBC (2024) Table 722.3.2",
    "steps": [
     {
      "set": "#assemblyType",
@@ -176,7 +176,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "cmu-lime-4",
    "title": "cmu_wall / cmu_limestone / 4 h",
-   "source": "IBC Table 722.3.2",
+   "source": "IBC (2024) Table 722.3.2",
    "steps": [
     {
      "set": "#assemblyType",
@@ -209,7 +209,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "cmu-clay-1",
    "title": "cmu_wall / cmu_expanded_clay / 1 h",
-   "source": "IBC Table 722.3.2",
+   "source": "IBC (2024) Table 722.3.2",
    "steps": [
     {
      "set": "#assemblyType",
@@ -229,22 +229,20 @@ window.FT_VERIFY_CASES = {
      "sel": "#metricIn",
      "label": "Minimum equivalent thickness Te",
      "unit": "in",
-     "ref": 2.6,
-     "flag": "App table shows 2.2 in for 1 hr; IBC Table 722.3.2 and ACI/TMS 216.1 Table 3.1 give 2.6 in (2.2 in is the 3/4 hr value). Not changed; for Kevin to review."
+     "ref": 2.6
     },
     {
      "sel": "#metricMm",
      "label": "Te in SI",
      "unit": "mm",
-     "ref": 66.0,
-     "flag": "App table shows 2.2 in for 1 hr; IBC Table 722.3.2 and ACI/TMS 216.1 Table 3.1 give 2.6 in (2.2 in is the 3/4 hr value). Not changed; for Kevin to review."
+     "ref": 66.0
     }
    ]
   },
   {
    "id": "cmu-pumice-3",
    "title": "cmu_wall / cmu_pumice / 3 h",
-   "source": "IBC Table 722.3.2",
+   "source": "IBC (2024) Table 722.3.2",
    "steps": [
     {
      "set": "#assemblyType",

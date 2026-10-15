@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.0.0";
+  var APP_VERSION = "1.1.0";
   var STORAGE_KEY = "concreteFireRating.v1";
   var IN_TO_MM = 25.4;
 
@@ -38,7 +38,7 @@
           densityHint: "Typical NWC ~145 pcf",
           t: { 1: 3.5, 2: 5.0, 3: 6.2, 4: 7.0 },
           sources: [
-            "IBC Table 722.2.1.1 — Siliceous",
+            "IBC (2024) Table 722.2.1.1 — Siliceous",
             "ACI/TMS 216.1 Table 2.1 (single-layer concrete walls/floors/roofs)",
             "PCA / PCI industry fire-resistance thickness tables (ASTM E119 heat transmission)",
           ],
@@ -49,7 +49,7 @@
           densityHint: "Typical NWC ~145 pcf",
           t: { 1: 3.2, 2: 4.6, 3: 5.7, 4: 6.6 },
           sources: [
-            "IBC Table 722.2.1.1 — Carbonate",
+            "IBC (2024) Table 722.2.1.1 — Carbonate",
             "ACI/TMS 216.1 Table 2.1",
             "PCA / PCI industry tables",
           ],
@@ -60,7 +60,7 @@
           densityHint: "Sand-lightweight structural concrete",
           t: { 1: 2.7, 2: 3.8, 3: 4.6, 4: 5.4 },
           sources: [
-            "IBC Table 722.2.1.1 — Sand-lightweight",
+            "IBC (2024) Table 722.2.1.1 — Sand-lightweight",
             "ACI/TMS 216.1 Table 2.1",
             "ESCSI / lightweight aggregate industry fire-resistance data",
           ],
@@ -71,7 +71,7 @@
           densityHint: "All-lightweight",
           t: { 1: 2.5, 2: 3.6, 3: 4.4, 4: 5.1 },
           sources: [
-            "IBC Table 722.2.1.1 — Lightweight",
+            "IBC (2024) Table 722.2.1.1 — Lightweight",
             "ACI/TMS 216.1 Table 2.1",
             "ESCSI / SFPE Handbook concrete fire-resistance discussion",
           ],
@@ -94,7 +94,7 @@
           densityHint: "NWC siliceous",
           t: { 1: 3.5, 2: 5.0, 3: 6.2, 4: 7.0 },
           sources: [
-            "IBC Table 722.2.1.1 / ACI 216.1 Table 2.1 (floors & roofs)",
+            "IBC (2024) Table 722.2.2.1 (slabs) / ACI 216.1 Table 2.1 (floors & roofs)",
             "PCI Design Handbook fire-resistance slab thickness by aggregate type",
             "SFPE Handbook — concrete slab heat transmission vs thickness",
           ],
@@ -105,7 +105,7 @@
           densityHint: "NWC carbonate",
           t: { 1: 3.2, 2: 4.6, 3: 5.7, 4: 6.6 },
           sources: [
-            "IBC Table 722.2.1.1 / ACI 216.1 Table 2.1",
+            "IBC (2024) Table 722.2.2.1 (slabs) / ACI 216.1 Table 2.1",
             "PCI / PCA industry tables",
           ],
         },
@@ -115,7 +115,7 @@
           densityHint: "Sand-lightweight",
           t: { 1: 2.7, 2: 3.8, 3: 4.6, 4: 5.4 },
           sources: [
-            "IBC Table 722.2.1.1 / ACI 216.1 Table 2.1",
+            "IBC (2024) Table 722.2.2.1 (slabs) / ACI 216.1 Table 2.1",
             "ESCSI lightweight aggregate fire-resistance guidance",
           ],
         },
@@ -125,7 +125,7 @@
           densityHint: "All-lightweight",
           t: { 1: 2.5, 2: 3.6, 3: 4.4, 4: 5.1 },
           sources: [
-            "IBC Table 722.2.1.1 / ACI 216.1 Table 2.1",
+            "IBC (2024) Table 722.2.2.1 (slabs) / ACI 216.1 Table 2.1",
             "PCI slab fire-endurance curves by aggregate type",
           ],
         },
@@ -148,6 +148,7 @@
           densityHint: "Normal-weight CMU aggregate",
           t: { 1: 2.8, 2: 4.2, 3: 5.3, 4: 6.2 },
           sources: [
+            "IBC (2024) Table 722.3.2",
             "IBC calculated masonry fire resistance / ACI-TMS 216.1",
             "NCMA TEK — Fire Resistance Ratings of Concrete Masonry Assemblies",
             "ASTM E119 / UL assembly testing basis",
@@ -159,6 +160,7 @@
           densityHint: "Limestone / cinder / slag aggregate CMU",
           t: { 1: 2.7, 2: 4.0, 3: 5.0, 4: 5.9 },
           sources: [
+            "IBC (2024) Table 722.3.2",
             "ACI-TMS 216.1 / NCMA TEK fire-resistance tables",
             "IBC masonry calculated fire resistance",
           ],
@@ -167,8 +169,9 @@
           id: "cmu_expanded_clay",
           label: "CMU — expanded clay, shale, or slate",
           densityHint: "Lightweight expanded clay/shale/slate CMU",
-          t: { 1: 2.2, 2: 3.6, 3: 4.4, 4: 5.1 },
+          t: { 1: 2.6, 2: 3.6, 3: 4.4, 4: 5.1 },
           sources: [
+            "IBC (2024) Table 722.3.2",
             "ACI-TMS 216.1 / NCMA TEK (expanded clay, shale or slate)",
             "IBC masonry calculated fire resistance",
           ],
@@ -179,6 +182,7 @@
           densityHint: "Lightweight expanded slag / pumice CMU",
           t: { 1: 2.1, 2: 3.2, 3: 4.0, 4: 4.7 },
           sources: [
+            "IBC (2024) Table 722.3.2",
             "ACI-TMS 216.1 / NCMA TEK (expanded slag or pumice)",
             "IBC masonry calculated fire resistance",
           ],
@@ -187,7 +191,8 @@
     },
   };
 
-  // Expanded clay/shale CMU values: commonly 2.1 / 3.2 / 4.0 / 4.7 for 1/2/3/4 hr in NCMA-style tables
+  // v1.1.0: CMU rows checked against IBC (2024) Table 722.3.2 (ICC Digital Codes, IBC2024V2.0).
+  // Expanded shale/clay/slate 1 hr corrected 2.2 → 2.6 in (2.2 is the 3/4 hr value). 2.1/3.2/4.0/4.7 is the pumice row.
   // Expanded slag/pumice: 1.9 / 2.9 / 3.6 / 4.2
 
   function $(id) {
