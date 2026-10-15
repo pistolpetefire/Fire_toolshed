@@ -8,6 +8,7 @@ import { RsetSegment, SuggestiveValue, RsetComponent, AssumptionsEntry, RsetSess
 import FullGuidePanel from './components/FullGuidePanel'
 import AtriumLevels from './components/AtriumLevels'
 import AsetComparison from './components/AsetComparison'
+import VerificationRunRecord from './components/VerificationRunRecord'
 
 /** Escape user/session text before embedding in the print-summary HTML document. */
 function escapeHtml(raw: string): string {
@@ -272,7 +273,8 @@ export default function App() {
   <div class="meta">
     Project: <strong>${safeProject}</strong><br/>
     Tool version: 0.1.7<br/>
-    Generated: ${escapeHtml(new Date().toLocaleString())}
+    Generated: ${escapeHtml(new Date().toLocaleString())}<br/>
+    Run record for traceability only. Not a professional seal or certification.
   </div>
 
   <div class="warn">
@@ -942,6 +944,14 @@ export default function App() {
         rset={rset}
         tenability={tenability}
         onApplyAset={setTenability}
+      />
+
+      <VerificationRunRecord
+        segments={segments}
+        rset={rset}
+        tenability={tenability}
+        projectName={projectName}
+        logCount={log.length}
       />
 
       {/* Guide panel */}
