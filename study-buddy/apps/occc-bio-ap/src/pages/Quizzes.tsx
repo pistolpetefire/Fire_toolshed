@@ -105,8 +105,16 @@ export function Quizzes() {
                 )}
                 {block.id === 3 && (
                   <Link
-                    to={p('/quizzes/exam/3/bone-lab')}
+                    to={p('/quizzes/exam/3/guide')}
                     className="mt-3 inline-flex items-center gap-1 border-t border-slate-100 pt-3 text-xs font-semibold text-slate-600 hover:text-brand-600 dark:border-slate-800 dark:text-slate-300"
+                  >
+                    Official Unit Three guide + lecture outline <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
+                {block.id === 3 && (
+                  <Link
+                    to={p('/quizzes/exam/3/bone-lab')}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-brand-600 dark:text-slate-300"
                   >
                     Bone lab exam list <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
