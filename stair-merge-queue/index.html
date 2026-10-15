@@ -116,7 +116,7 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
   <div class="logo" aria-hidden="true">STAIR</div>
   <div>
     <h1>Multi-Floor Stair Merge and Queue Screener</h1>
-    <p class="sub"><span class="badge">Screening · v1.0.0</span>Per-story loads into shared stairs: SFPE hydraulic model, merging at landings, door queues, phased vs simultaneous notification, optional loss of one stair, and movement-time handoff to the Transparent RSET Tool. Runs offline.</p>
+    <p class="sub"><span class="badge">Screening · v1.0.1</span>Per-story loads into shared stairs: SFPE hydraulic model, merging at landings, door queues, phased vs simultaneous notification, optional loss of one stair, and movement-time handoff to the Transparent RSET Tool. Runs offline.</p>
   </div>
 </header>
 <div class="banner" role="note"><b>Screening only. Not the submittal basis.</b> A hydraulic (flow) model gives idealized movement times for able-bodied crowds. Use an AHJ-accepted egress model or analysis for the submittal. A licensed fire protection engineer must confirm the inputs, the merge assumption, and the acceptance criteria with the AHJ.</div>
@@ -304,11 +304,11 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
   </div>
 </section>
 <section id="report" aria-hidden="true"></section>
-<footer>Fire Toolshed · Stair Merge and Queue Screener v1.0.0 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
+<footer>Fire Toolshed · Stair Merge and Queue Screener v1.0.1 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
 </div>
 <script>
 "use strict";
-const APP={name:"Stair Merge and Queue Screener",version:"1.0.0",schema:"fireToolshed.stairMerge.v1"};
+const APP={name:"Stair Merge and Queue Screener",version:"1.0.1",schema:"fireToolshed.stairMerge.v1"};
 const A_SFPE=0.266;
 const KS={"7.5/10":1.00,"7/11":1.08,"6.5/12":1.16,"6.5/13":1.23}, CONV={"7.5/10":1.66,"7/11":1.85,"6.5/12":2.10,"6.5/13":2.22}, K_COR=1.40;
 const EDGE={wall:0.15,handrail:0.09};
@@ -525,7 +525,7 @@ window.addEventListener("beforeprint",()=>{if(!document.body.classList.contains(
 window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setTimeout(()=>{if(LAST)drawChart(LAST.R)},200)});
 $("bExport").onclick=()=>{if(!LAST){$("ioMsg").textContent="Fix the inputs before exporting.";return}download(`stair-merge-${slug($("proj").value)}-${Date.now()}.json`,project());$("ioMsg").textContent="Project JSON exported."};
 $("bRset").onclick=()=>{if(!LAST||!LAST.mov){$("ioMsg").textContent="No movement result yet.";return}download(`rset-session-${slug($("proj").value)}-${Date.now()}.json`,rsetSession());$("ioMsg").textContent="RSET Tool session exported: load it with Load Session in the Transparent RSET Tool."};
-$("fImport").onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);if(o.schema!==APP.schema)throw new Error("Not a Stair Merge and Queue Screener project.");applyProject(o);$("ioMsg").textContent="Project imported."}catch(err){$("ioMsg").textContent="Import failed: "+err.message}};rd.readAsText(f);e.target.value=""};
+$("fImport").onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=unwrapShared(JSON.parse(rd.result));if(o.schema!==APP.schema)throw new Error("Not a Stair Merge and Queue Screener project.");applyProject(o);$("ioMsg").textContent="Project imported."}catch(err){$("ioMsg").textContent="Import failed: "+err.message}};rd.readAsText(f);e.target.value=""};
 
 // ---------------- verification ----------------
 const REF={"V1_S": 0.7927200000000001, "V1_Fs": 0.7927200000000001, "V2_Fsm": 1.0150375939849625, "V3_C": 0.8298947368421052, "V4_sim_exit": 301.0, "V4_closed": 300.9944190766108, "V5_stair_building": 381.5, "V5_stair_clear_lower": 361.5, "V5_even_building": 381.5, "V5_even_clear_upper": 181.0, "V6_phased_building": 812.0, "V6_phased_event_exit": 812.0, "V6_simul_building": 712.0, "V6_simul_event_exit": 712.0, "V7_loss_building": 1418.0, "V7_loss_event_exit": 1418.0};
@@ -570,6 +570,10 @@ if(location.hash==="#selftest"){const out=[];try{
   $("nStair").value="1"; drawStairTbl(); $("loss").value="0"; compute(); out.push("lossNeeds2="+(LAST===null)); $("nStair").value="2"; drawStairTbl(); compute();
   out.push("forbiddenWord="+document.body.innerText.toLowerCase().includes(["st","amp"].join("")));
 }catch(e){out.push("ERR "+e.message)} document.title="SELFTEST "+out.join(" | ");}
+
+// Shared project file (fireToolshed.project.v1, see Project File Hub): take this app's section, else the file as is.
+function unwrapShared(o){if(o&&o.schema==="fireToolshed.project.v1"&&o.apps&&typeof o.apps==="object"){for(const k of ["stairMerge"]){const sec=o.apps[k];if(sec&&sec.data&&typeof sec.data==="object")return sec.data;}throw new Error("This shared project file has no section for this app.");}return o;}
+if(location.hash==="#sharedtest"){const r=[];try{r.push("unwrap="+(unwrapShared({schema:"fireToolshed.project.v1",apps:{stairMerge:{data:{x:1}}}}).x===1));r.push("passthrough="+(unwrapShared({y:2}).y===2));try{unwrapShared({schema:"fireToolshed.project.v1",apps:{}});r.push("missing=false")}catch(e){r.push("missing=true")}}catch(e){r.push("ERR "+e.message)}document.title="SHAREDTEST "+r.join(" | ");}
 </script>
 </body>
 </html>

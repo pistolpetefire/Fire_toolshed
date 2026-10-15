@@ -111,7 +111,7 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
   <div class="logo" aria-hidden="true">ASET</div>
   <div>
     <h1>ASET Screener</h1>
-    <p class="sub"><span class="badge">Screening · v1.1.1</span>Smoke-filling ASET for any large space: single-story, atrium, assembly, warehouse. NFPA 92 filling equations plus a two-zone mass/energy-balance layer model. Runs offline in the browser.</p>
+    <p class="sub"><span class="badge">Screening · v1.1.2</span>Smoke-filling ASET for any large space: single-story, atrium, assembly, warehouse. NFPA 92 filling equations plus a two-zone mass/energy-balance layer model. Runs offline in the browser.</p>
   </div>
 </header>
 <div class="banner" role="note"><b>Screening only. Not the submittal basis.</b> Use FDS (NIST Fire Dynamics Simulator) or another AHJ-accepted method for the submittal. A licensed fire protection engineer must confirm the inputs, the design fire, the applicability of each correlation, and the tenability criteria with the AHJ.</div>
@@ -346,12 +346,12 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
 </section>
 
 <section id="report" aria-hidden="true"></section>
-<footer>Fire Toolshed · ASET Screener v1.1.1 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
+<footer>Fire Toolshed · ASET Screener v1.1.2 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
 </div>
 
 <script>
 "use strict";
-const APP={name:"ASET Screener",version:"1.1.1",schema:"fireToolshed.asetScreener.v1"};
+const APP={name:"ASET Screener",version:"1.1.2",schema:"fireToolshed.asetScreener.v1"};
 const CP=1.005,RG=287.05,P0=101325;
 const U={ // SI -> IP
   length:{IP:{f:v=>v/0.3048,b:v=>v*0.3048,u:"ft"},SI:{u:"m"}},
@@ -611,7 +611,7 @@ $("bExport").onclick=()=>{ if(!LAST||!LAST.R){$("ioMsg").textContent="Fix the in
 $("bRset").onclick=()=>{ if(!LAST||!LAST.R||!LAST.R.gov){$("ioMsg").textContent="No governing ASET yet (criteria not reached or inputs invalid).";return}
   download(`rset-session-${slug($("proj").value)}-${Date.now()}.json`,rsetSession()); $("ioMsg").textContent="RSET Tool session exported: load it with “Load Session” in the Transparent RSET Tool; tenabilityLimit = ASET."; };
 $("fImport").onchange=e=>{const f=e.target.files&&e.target.files[0]; if(!f) return; const rd=new FileReader();
-  rd.onload=()=>{try{const o=JSON.parse(rd.result);
+  rd.onload=()=>{try{const o=unwrapShared(JSON.parse(rd.result));
      if(o.schema===APP.schema){applyProject(o);$("ioMsg").textContent="Project imported.";}
      else if(Array.isArray(o.segments)&&o.segments.length===4){applyRset(o);margin();$("ioMsg").textContent="RSET Tool session imported into the margin panel (RSET = "+fmt(rsetVals().sum,0)+" s).";}
      else throw new Error("Not an ASET Screener project or an RSET Tool session.");}
@@ -667,6 +667,10 @@ if(location.hash==="#selftest"){const out=[];try{
  }catch(e){out.push("ERR "+e.message)} document.title="SELFTEST "+out.join(" | ");}
 if(location.hash==="#steady"){fire="steady";syncUI();}
 if(location.hash==="#si"){units="SI";$("exOn").checked=true;$("tOn").checked=true;syncUI(true);}
+
+// Shared project file (fireToolshed.project.v1, see Project File Hub): take this app's section, else the file as is.
+function unwrapShared(o){if(o&&o.schema==="fireToolshed.project.v1"&&o.apps&&typeof o.apps==="object"){for(const k of ["asetScreener","rsetTool"]){const sec=o.apps[k];if(sec&&sec.data&&typeof sec.data==="object")return sec.data;}throw new Error("This shared project file has no section for this app.");}return o;}
+if(location.hash==="#sharedtest"){const r=[];try{r.push("unwrap="+(unwrapShared({schema:"fireToolshed.project.v1",apps:{asetScreener:{data:{x:1}}}}).x===1));r.push("passthrough="+(unwrapShared({y:2}).y===2));try{unwrapShared({schema:"fireToolshed.project.v1",apps:{}});r.push("missing=false")}catch(e){r.push("missing=true")}}catch(e){r.push("ERR "+e.message)}document.title="SHAREDTEST "+r.join(" | ");}
 </script>
 </body>
 </html>

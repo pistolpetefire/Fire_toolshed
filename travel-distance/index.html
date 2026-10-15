@@ -120,7 +120,7 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
   <div class="logo" aria-hidden="true">EXIT</div>
   <div>
     <h1>Travel Distance and Nearest-Exit Checker</h1>
-    <p class="sub"><span class="badge">Screening · v1.0.0</span>Draw or import a plan with walls and obstructions, mark exits, and get the shortest real walking path from every point to the nearest exit and to the next exit if that one is blocked. Areas over your limit are shaded. Runs offline.</p>
+    <p class="sub"><span class="badge">Screening · v1.0.1</span>Draw or import a plan with walls and obstructions, mark exits, and get the shortest real walking path from every point to the nearest exit and to the next exit if that one is blocked. Areas over your limit are shaded. Runs offline.</p>
   </div>
 </header>
 <div class="banner" role="note"><b>Screening only. Not the submittal basis.</b> Distances are measured on a grid between cell centers and depend on the plan you draw. The applicable limit, the measurement rules and the point where travel ends come from the adopted code and the AHJ. A licensed fire protection engineer must confirm them, and the code compliance drawings remain the record.</div>
@@ -292,11 +292,11 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
   </div>
 </section>
 <section id="report" aria-hidden="true"></section>
-<footer>Fire Toolshed · Travel Distance and Nearest-Exit Checker v1.0.0 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
+<footer>Fire Toolshed · Travel Distance and Nearest-Exit Checker v1.0.1 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
 </div>
 <script>
 "use strict";
-const APP={name:"Travel Distance and Nearest-Exit Checker",version:"1.0.0",schema:"fireToolshed.travelDistance.v1"};
+const APP={name:"Travel Distance and Nearest-Exit Checker",version:"1.0.1",schema:"fireToolshed.travelDistance.v1"};
 const REFD={"results": {"T1_app_alg": 30.0, "T1_exact": 30.0, "T2_app_alg": 30.495097567963924, "T2_exact": 30.4138126514911, "T3_app_alg": 39.75463257346233, "T3_visgraph": 39.698866482558415, "T4_blocked_app_alg": 31.786515587188706, "T4_blocked_visgraph": 31.76476034853718, "T6_pct_over_100": 0.0, "T6_pct_over_blocked_100": 44.710669077757686, "T5_max_nearest": 91.57608611539246, "T5_max_blocked": 136.1208022698386, "T5_pct_over": 0.0, "T5_pct_over_blocked": 0.0, "T5_cells": 2212}, "defaultPlan": ["##################################################EE##########", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "######..############..############..####.....................#", "#............................................................#", "#............................................................#", "#............................................................#", "E............................................................#", "E............................................................#", "#............................................................#", "#............................................................#", "#............................................................#", "#............................................................#", "######..############..############..####.....................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#..................########.......#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "#............#.............#.................................#", "##############################################################"]}, DEFAULT_PLAN=REFD.defaultPlan, REF=REFD.results;
 const $=id=>document.getElementById(id);
 let units="IP", tool="wall", LAST=null, probe=null;
@@ -477,7 +477,7 @@ function applyProject(o){const s=o.inputsSI||{};if(!Array.isArray(s.plan)||!s.pl
   units=o.units==="SI"?"SI":"IP";fromRows(s.plan);$("proj").value=s.proj||"";$("cite").value=s.cite||"";$("cell").dataset.si=+s.cell_m;$("limit").dataset.si=+s.limit_m;probe=null;syncUnits();}
 $("bExport").onclick=()=>{if(!LAST||!LAST.A){$("ioMsg").textContent="Fix the inputs before exporting.";return}download(`travel-distance-${slug($("proj").value)}-${Date.now()}.json`,new Blob([JSON.stringify(project(),null,2)],{type:"application/json"}));$("ioMsg").textContent="Project JSON exported."};
 $("bPng").onclick=()=>{$("plan").toBlob(b=>{if(b){download(`travel-distance-plan-${slug($("proj").value)}.png`,b);$("ioMsg").textContent="Plan image saved."}})};
-$("fImport").onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);if(o.schema!==APP.schema)throw new Error("Not a Travel Distance Checker project.");applyProject(o);$("ioMsg").textContent="Project imported."}catch(err){$("ioMsg").textContent="Import failed: "+err.message}};rd.readAsText(f);e.target.value=""};
+$("fImport").onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=unwrapShared(JSON.parse(rd.result));if(o.schema!==APP.schema)throw new Error("Not a Travel Distance Checker project.");applyProject(o);$("ioMsg").textContent="Project imported."}catch(err){$("ioMsg").textContent="Import failed: "+err.message}};rd.readAsText(f);e.target.value=""};
 
 // ---------------- verification ----------------
 function gridOf(rows){const h=rows.length,w=rows[0].length,g=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const c=rows[y][x];g[y*w+x]=c==="#"?1:c==="E"?2:0}return {g,w,h}}
@@ -516,6 +516,10 @@ if(location.hash==="#selftest"){const out=[];try{
   fromRows(DEFAULT_PLAN);compute();
   out.push("forbiddenWord="+document.body.innerText.toLowerCase().includes(["st","amp"].join("")));
 }catch(e){out.push("ERR "+e.message)}document.title="SELFTEST "+out.join(" | ");}
+
+// Shared project file (fireToolshed.project.v1, see Project File Hub): take this app's section, else the file as is.
+function unwrapShared(o){if(o&&o.schema==="fireToolshed.project.v1"&&o.apps&&typeof o.apps==="object"){for(const k of ["travelDistance"]){const sec=o.apps[k];if(sec&&sec.data&&typeof sec.data==="object")return sec.data;}throw new Error("This shared project file has no section for this app.");}return o;}
+if(location.hash==="#sharedtest"){const r=[];try{r.push("unwrap="+(unwrapShared({schema:"fireToolshed.project.v1",apps:{travelDistance:{data:{x:1}}}}).x===1));r.push("passthrough="+(unwrapShared({y:2}).y===2));try{unwrapShared({schema:"fireToolshed.project.v1",apps:{}});r.push("missing=false")}catch(e){r.push("missing=true")}}catch(e){r.push("ERR "+e.message)}document.title="SHAREDTEST "+r.join(" | ");}
 </script>
 </body>
 </html>
