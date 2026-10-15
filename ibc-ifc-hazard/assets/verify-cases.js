@@ -5,8 +5,7 @@ window.FT_VERIFY_CASES = {
  "versionSel": "#appVersion",
  "handcalc": "validation/verify/ibc_ifc_hazard.py",
  "flags": [
-  "Fixed in v1.5.0: oxidizers map to H-1/H-2/H-3 (Class 4 is H-1) and pyrophorics to H-1/H-2 (detonable H-1, nondetonable H-2) per IBC (2024) 307.3 and 307.4.",
-  "Review note: explosives are mapped to H-1 only; IBC 307.5 places Division 1.4 (including consumer fireworks 1.4G) in H-3."
+  "v1.6.0: explosives default to H-1; per IBC (2024) 307.3.1 the user can select Division 1.3 (confinement/configuration will not elevate a mass fire to a mass explosion hazard) for H-2, or Division 1.4 / item 3 articles for H-3. Fixed in v1.5.0: oxidizers map to H-1/H-2/H-3 (Class 4 is H-1) and pyrophorics to H-1/H-2 (detonable H-1, nondetonable H-2) per IBC (2024) 307.3 and 307.4."
  ],
  "cases": [
   {
@@ -188,6 +187,70 @@ window.FT_VERIFY_CASES = {
      "expr": "(document.querySelector('[data-haz=\"pyrophoric\"]').parentNode.textContent.match(/often (H-[0-9](?:\\/H-[0-9])*)/)||[])[1]",
      "label": "Suggested Group H",
      "refText": "H-1/H-2"
+    }
+   ]
+  },
+  {
+   "id": "expl-default",
+   "title": "Explosives classification: default",
+   "source": "IBC (2024) 307.3, 307.3.1",
+   "steps": [
+    {
+     "click": "[data-haz=\"explosives\"]",
+     "wait": 200
+    }
+   ],
+   "reads": [
+    {
+     "expr": "(document.querySelector('[data-haz=\"explosives\"]').parentNode.textContent.match(/often (H-[0-9](?:\\/H-[0-9])*)/)||[])[1]",
+     "label": "Suggested Group H (explosives)",
+     "refText": "H-1"
+    }
+   ]
+  },
+  {
+   "id": "expl-div13",
+   "title": "Explosives classification: div13_h2",
+   "source": "IBC (2024) 307.3, 307.3.1",
+   "steps": [
+    {
+     "click": "[data-haz=\"explosives\"]",
+     "wait": 200
+    },
+    {
+     "set": "#explosivesClass",
+     "value": "div13_h2",
+     "wait": 200
+    }
+   ],
+   "reads": [
+    {
+     "expr": "(document.querySelector('[data-haz=\"explosives\"]').parentNode.textContent.match(/often (H-[0-9](?:\\/H-[0-9])*)/)||[])[1]",
+     "label": "Suggested Group H (explosives)",
+     "refText": "H-2"
+    }
+   ]
+  },
+  {
+   "id": "expl-div14",
+   "title": "Explosives classification: div14_h3",
+   "source": "IBC (2024) 307.3, 307.3.1",
+   "steps": [
+    {
+     "click": "[data-haz=\"explosives\"]",
+     "wait": 200
+    },
+    {
+     "set": "#explosivesClass",
+     "value": "div14_h3",
+     "wait": 200
+    }
+   ],
+   "reads": [
+    {
+     "expr": "(document.querySelector('[data-haz=\"explosives\"]').parentNode.textContent.match(/often (H-[0-9](?:\\/H-[0-9])*)/)||[])[1]",
+     "label": "Suggested Group H (explosives)",
+     "refText": "H-3"
     }
    ]
   }

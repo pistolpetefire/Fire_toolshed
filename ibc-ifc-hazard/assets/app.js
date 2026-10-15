@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.5.0";
+  var APP_VERSION = "1.6.0";
   var STORAGE_KEY = "ibcIfcHazard.v1";
   /** Last HMIS assessment (not persisted) */
   var lastImport = null;
@@ -67,7 +67,7 @@
 
   /** IFC material / hazard families (Ch. 50+) */
   var HAZARDS = [
-    { id: "explosives", label: "Explosives / fireworks", ifc: "IFC 56", mapsH: ["H-1"] },
+    { id: "explosives", label: "Explosives / fireworks", ifc: "IFC 56", mapsH: ["H-1"] }, // H-1 default; see EXPLOSIVES_CLASSES (307.3.1)
     { id: "flammable_gas", label: "Flammable gases", ifc: "IFC 58", mapsH: ["H-2"] },
     { id: "flammable_cryogen", label: "Flammable cryogenic fluids", ifc: "IFC 58", mapsH: ["H-2"] },
     { id: "lpg", label: "LP-gas", ifc: "IFC 61", mapsH: ["H-2"] },
@@ -653,6 +653,8 @@
       pathMode: "group_h",
       hGroups: [],
       hazards: [],
+      /** IBC 2024 307.3.1 explosives classification: "h1" (default), "div13_h2", "div14_h3" */
+      explosivesClass: "h1",
       /** IBC 307 H-1/H-2 process context */
       openToAtmosphere: false,
       underPressure: false,
@@ -686,6 +688,26 @@
     } catch (_) { /* ignore */ }
   }
 
+  /**
+   * IBC 2024 307.3.1 (ICC Digital Codes IBC2024V2.0, checked 2026-10-15): explosives are H-1 unless
+   * (1) Division 1.3 used and maintained so that confinement or configuration will not elevate the hazard
+   * from a mass fire to a mass explosion hazard → H-2 allowed; (2) Division 1.4, or (3) articles not regulated
+   * as Division 1.4 by ATF or unpackaged process articles that do not propagate detonation/deflagration → H-3 allowed.
+   */
+  var EXPLOSIVES_CLASSES = [
+    { id: "h1", h: ["H-1"], label: "Default — H-1 (IBC 2024 307.3)" },
+    { id: "div13_h2", h: ["H-2"], label: "Division 1.3, confinement/configuration will not elevate a mass fire to a mass explosion hazard — H-2 (307.3.1 item 1)" },
+    { id: "div14_h3", h: ["H-3"], label: "Division 1.4, or articles per 307.3.1 item 3 — H-3 (307.3.1 items 2–3)" },
+  ];
+  function hazMaps(haz) {
+    if (!haz) return [];
+    if (haz.id === "explosives") {
+      var c = EXPLOSIVES_CLASSES.find(function (x) { return x.id === state.explosivesClass; }) || EXPLOSIVES_CLASSES[0];
+      return c.h;
+    }
+    return haz.mapsH || [];
+  }
+
   /** H groups implied by selected hazards via mapsH (not yet selected). */
   function suggestedHGroups() {
     var set = {};
@@ -693,8 +715,8 @@
       var haz = HAZARDS.find(function (x) {
         return x.id === hzId;
       });
-      if (!haz || !haz.mapsH) return;
-      haz.mapsH.forEach(function (h) {
+      if (!haz || !hazMaps(haz).length) return;
+      hazMaps(haz).forEach(function (h) {
         if (state.hGroups.indexOf(h) < 0) set[h] = 1;
       });
     });
@@ -712,8 +734,8 @@
       var haz = HAZARDS.find(function (x) {
         return x.id === hzId;
       });
-      if (!haz || !haz.mapsH) return;
-      haz.mapsH.forEach(function (h) {
+      if (!haz || !hazMaps(haz).length) return;
+      hazMaps(haz).forEach(function (h) {
         set[h] = 1;
       });
     });
@@ -932,11 +954,19 @@
           escapeHtml(h.label) +
           '<span class="meta">' +
           escapeHtml(h.ifc) +
-          (h.mapsH && h.mapsH.length
-            ? " · often " + h.mapsH.join("/")
+          (hazMaps(h).length
+            ? " · often " + hazMaps(h).join("/")
             : "") +
           (h.blurb ? " · " + escapeHtml(h.blurb) : "") +
-          "</span></span></label>"
+          "</span></span></label>" +
+          (h.id === "explosives" && on
+            ? '<div class="field explosives-class"><label for="explosivesClass">Explosives classification (IBC 2024 307.3.1)</label>' +
+              '<select id="explosivesClass">' +
+              EXPLOSIVES_CLASSES.map(function (c) {
+                return '<option value="' + c.id + '"' + (c.id === state.explosivesClass ? " selected" : "") + ">" + escapeHtml(c.label) + "</option>";
+              }).join("") +
+              '</select><span class="sub">H-1 unless the 307.3.1 conditions are met and documented. Confirm with the AHJ.</span></div>'
+            : "")
         );
       }).join("");
     }
@@ -1534,6 +1564,9 @@
             return x !== hid;
           });
         }
+      }
+      if (t.id === "explosivesClass") {
+        state.explosivesClass = t.value;
       }
       if (t.getAttribute("data-haz")) {
         var hz = t.getAttribute("data-haz");
