@@ -2,13 +2,9 @@
 window.FT_VERIFY_CASES = {
  "script": "fire_pump_sizer.py",
  "app": "Fire Pump Sizer",
- "appVersion": "2.3.0",
+ "versionSel": "#appVersion",
  "handcalc": "validation/verify/fire_pump_sizer.py",
- "flags": [
-  "Diesel fuel tank: the app sizes 0.055 gal/hp-h x runtime x 1.2 (about 0.53 gal per hp at 8 h). NFPA 20 11.4.1.2 requires at least 1 gal per hp plus 5% expansion and 5% sump, so the app shows about half the required capacity (non-conservative). Not changed; for Kevin to review.",
-  "Motor breaker: the app shows 125% of FLA rounded up to 5 A. NEC 695.4(B)(2) sizes fire pump overcurrent devices to carry the locked-rotor current indefinitely, so this value is not an NEC 695 basis. Not checked here; for Kevin to review.",
-  "The Performance tab \"Churn <= 140% rated\" check always passes: churn is assumed to be exactly 1.4 x rated, so it is not a computed check. Not changed."
- ],
+ "flags": [],
  "cases": [
   {
    "id": "dod-electric",
@@ -18,6 +14,10 @@ window.FT_VERIFY_CASES = {
     {
      "click": "#btnDoD",
      "wait": 600
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
     }
    ],
    "reads": [
@@ -47,16 +47,84 @@ window.FT_VERIFY_CASES = {
     },
     {
      "sel": "#highPressureMessage",
-     "label": "Churn pressure (140% rated)",
+     "label": "Churn shown at the 140% limit when no shutoff is entered",
      "unit": "psi",
      "ref": 175.0
+    },
+    {
+     "sel": "#checksGrid .check-card:nth-child(3)",
+     "attr": "class",
+     "label": "Churn check with no shutoff entered (not a pass)",
+     "refText": "check-card fail"
+    }
+   ]
+  },
+  {
+   "id": "ocpd-363",
+   "title": "OCPD: LRC 363 A, no other loads (EC&M 50 hp, 480 V example)",
+   "source": "NEC (2023) 695.4(B)(2)(a)(1), 240.6(A)",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#lockedRotorA",
+     "value": "363"
+    },
+    {
+     "set": "#otherFlaA",
+     "value": ""
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#breaker",
+     "label": "Minimum OCPD rating",
+     "unit": "A",
+     "ref": 400.0
+    }
+   ]
+  },
+  {
+   "id": "ocpd-404-other",
+   "title": "OCPD: LRC 404 A plus 3.4 A other FLC",
+   "source": "NEC (2023) 695.4(B)(2)(a)(1), 240.6(A)",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#lockedRotorA",
+     "value": "404"
+    },
+    {
+     "set": "#otherFlaA",
+     "value": "3.4"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#breaker",
+     "label": "Minimum OCPD rating",
+     "unit": "A",
+     "ref": 450.0
     }
    ]
   },
   {
    "id": "dod-diesel",
-   "title": "DoD example switched to diesel, 8 h",
-   "source": "See script header; NFPA 20 11.4.1.2",
+   "title": "DoD example switched to diesel, rate not known",
+   "source": "NFPA 20 (2022) 11.4.1.3.1.1",
    "steps": [
     {
      "click": "#btnDoD",
@@ -68,8 +136,12 @@ window.FT_VERIFY_CASES = {
      "wait": 300
     },
     {
+     "set": "#fuelRateGph",
+     "value": ""
+    },
+    {
      "click": "#btnRecalc",
-     "wait": 300
+     "wait": 400
     }
    ],
    "reads": [
@@ -81,10 +153,99 @@ window.FT_VERIFY_CASES = {
     },
     {
      "sel": "#fuelTank",
-     "label": "Minimum fuel tank (NFPA 20: 1 gal/hp + 10%)",
+     "label": "Minimum fuel tank (1 gal/hp + 10%)",
      "unit": "gal",
-     "ref": 257.0,
-     "flag": "Diesel fuel tank: the app sizes 0.055 gal/hp-h x runtime x 1.2 (about 0.53 gal per hp at 8 h). NFPA 20 11.4.1.2 requires at least 1 gal per hp plus 5% expansion and 5% sump, so the app shows about half the required capacity (non-conservative). Not changed; for Kevin to review."
+     "ref": 257.0
+    }
+   ]
+  },
+  {
+   "id": "diesel-rate",
+   "title": "Diesel with an entered consumption rate of 6.0 gal/h, 12 h",
+   "source": "NFPA 20 (2022) 11.4.1.3.1",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "input[name=\"driverType\"][value=\"diesel\"]",
+     "value": true,
+     "wait": 300
+    },
+    {
+     "set": "#fuelRateGph",
+     "value": "6.0"
+    },
+    {
+     "set": "#dieselRuntime",
+     "value": "12"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#fuelTank",
+     "label": "Minimum fuel tank (12 h x rate + 10%)",
+     "unit": "gal",
+     "ref": 80.0
+    }
+   ]
+  },
+  {
+   "id": "churn-pass",
+   "title": "Churn 170 psi entered, rated 125 psi (limit 175)",
+   "source": "NFPA 20 (2022) 6.2.2",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "170"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#checksGrid .check-card:nth-child(3)",
+     "attr": "class",
+     "label": "Churn check",
+     "refText": "check-card pass"
+    }
+   ]
+  },
+  {
+   "id": "churn-fail",
+   "title": "Churn 180 psi entered, rated 125 psi (limit 175)",
+   "source": "NFPA 20 (2022) 6.2.2",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "180"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#checksGrid .check-card:nth-child(3)",
+     "attr": "class",
+     "label": "Churn check",
+     "refText": "check-card fail"
     }
    ]
   }

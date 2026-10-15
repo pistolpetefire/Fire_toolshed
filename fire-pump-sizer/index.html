@@ -304,6 +304,13 @@
               <span class="suffix">PSI</span>
             </div>
           </div>
+          <div class="field">
+            <label for="churnPSIIn">Shutoff (churn) pressure, certified curve</label>
+            <div class="input-row">
+              <input type="number" id="churnPSIIn" min="0" step="any" inputmode="decimal" class="engineering-input" placeholder="optional">
+              <span class="suffix">PSI</span>
+            </div>
+          </div>
         </div>
 
         <div id="electricPanel" class="panel">
@@ -327,10 +334,21 @@
               <div id="fla" class="stat-value tabular-nums" style="font-size:1.25rem">—</div>
             </div>
             <div>
-              <div class="stat-label">Recommended Breaker</div>
+              <div class="stat-label">Min. OCPD (NEC 695.4(B)(2)(a)(1))</div>
               <div id="breaker" class="stat-value tabular-nums" style="font-size:1.25rem">—</div>
             </div>
           </div>
+          <div class="grid-4" style="margin-top:.6rem">
+            <div class="field">
+              <label for="lockedRotorA" class="stat-label">Fire pump motor locked-rotor current (A)</label>
+              <input type="number" id="lockedRotorA" min="0" step="any" inputmode="decimal" class="inline-select" placeholder="nameplate or NEC Table 430.251(B)">
+            </div>
+            <div class="field">
+              <label for="otherFlaA" class="stat-label">Other pump motors + accessories FLA (A)</label>
+              <input type="number" id="otherFlaA" min="0" step="any" inputmode="decimal" class="inline-select" placeholder="e.g. jockey pump, controller">
+            </div>
+          </div>
+          <p class="tiny">OCPD per NEC (2023) 695.4(B)(2)(a)(1): carries indefinitely the locked-rotor current of the largest fire pump motor plus the full-load current of the other pump motors and accessories; next standard size per 240.6(A). Enter the locked-rotor current from the motor nameplate or NEC Table 430.251(B). Est. FLA is a formula estimate, not Table 430.250. Listed fire pump assemblies under 695.4(B)(2)(a)(2) and generator feeders under 695.4(B)(2)(b) are not covered.</p>
         </div>
 
         <div id="dieselPanel" class="panel hidden">
@@ -341,15 +359,16 @@
               <div id="dieselHP" class="stat-value tabular-nums">—</div>
             </div>
             <div class="field">
-              <label for="dieselRuntime" class="stat-label">Min Runtime (UFC)</label>
+              <label for="dieselRuntime" class="stat-label">Min Runtime (NFPA 20: 12 h; UFC per project)</label>
               <select id="dieselRuntime" class="inline-select">
-                <option value="8">8 hours (typical)</option>
-                <option value="12">12 hours</option>
+                <option value="12" selected>12 hours (NFPA 20 minimum)</option>
                 <option value="24">24 hours</option>
               </select>
             </div>
             <div>
-              <div class="stat-label">Fuel Consumption</div>
+              <label for="fuelRateGph" class="stat-label">Engine fuel consumption (gal/h, manufacturer)</label>
+              <input type="number" id="fuelRateGph" min="0" step="any" inputmode="decimal" class="inline-select" placeholder="optional">
+              <div class="stat-label">Fuel consumption used</div>
               <div id="fuelRate" class="stat-value tabular-nums" style="font-size:1.15rem">—</div>
             </div>
             <div>
@@ -357,7 +376,9 @@
               <div id="fuelTank" class="stat-value tabular-nums" style="font-size:1.15rem">—</div>
             </div>
           </div>
+          <p class="tiny" id="dieselNote">Tank per NFPA 20 (2022) 11.4.1.3.1: at least 12 h at the manufacturer's consumption rate plus 5% expansion and 5% sump; if the rate is not known (11.4.1.3.1.1), at least 1 gal per hp plus 5% + 5%. A longer runtime is applied only with an entered rate.</p>
         </div>
+
 
         <div class="flex-end">
           <button type="button" id="btnRecalc" class="btn btn-primary">Recalculate &amp; Verify</button>
@@ -418,7 +439,7 @@
     </div>
 
     <footer class="footer-bar">
-      <div>References: NFPA 20 &amp; UFC 3-600-01. For qualified Fire Protection Engineers only. · v2.0 · Local browser app</div>
+      <div>References: NFPA 20 &amp; UFC 3-600-01. For qualified Fire Protection Engineers only. · <span id="appVersion">v2.4.0</span> · Local browser app</div>
       <div class="footer-actions">
         <button type="button" id="btnCopy" class="btn btn-sm">Copy Results</button>
         <button type="button" id="btnSaveReportFooter" class="btn btn-sm">Save Report</button>

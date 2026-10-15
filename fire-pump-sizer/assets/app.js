@@ -10,7 +10,7 @@
   const SPRINKLER_HANDOFF_KEY = 'fireToolshed.sprinklerHandoff.v1';
   /** Shared handoff to Fire Tank Sizer */
   const PUMP_HANDOFF_KEY = 'fireToolshed.pumpHandoff.v1';
-  const APP_VERSION = '2.3.0';
+  const APP_VERSION = '2.4.0';
   /** NFPA 291 / water-supply curve exponent (matches Flow Test + Sprinkler apps) */
   const SUPPLY_EXPONENT = 1.85;
 
@@ -30,6 +30,20 @@
   let chartAvailable = typeof window.Chart === 'function';
 
   const $ = (id) => document.getElementById(id);
+
+  // NEC (2023) 240.6(A) standard ampere ratings for fuses and inverse-time circuit breakers.
+  const NEC_240_6A = [10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600, 2000, 2500, 3000, 4000, 5000, 6000];
+  function nextStandardOcpd(amps) {
+    for (const r of NEC_240_6A) if (r >= amps - 1e-9) return r;
+    return null;
+  }
+  // NFPA 20 (2022) 11.4.1.3.1: tank for at least 12 h at the manufacturer's fuel consumption rate, plus 5% expansion
+  // and 5% sump. 11.4.1.3.1.1: when the rate is not known, at least 1 gal per hp plus 5% + 5%.
+  // A longer required runtime (for example UFC) is applied only with an entered consumption rate.
+  function dieselFuelTankGal(hp, rateGph, runtimeH) {
+    if (rateGph && rateGph > 0) return Math.ceil(rateGph * Math.max(12, runtimeH || 12) * 1.10);
+    return Math.ceil(hp * 1.0 * 1.10);
+  }
 
   function num(id, fallback) {
     const el = $(id);
@@ -374,6 +388,10 @@
       driverType: getDriverType(),
       voltage: $('voltage')?.value,
       dieselRuntime: $('dieselRuntime')?.value,
+      lockedRotorA: $('lockedRotorA')?.value,
+      otherFlaA: $('otherFlaA')?.value,
+      fuelRateGph: $('fuelRateGph')?.value,
+      churnPSIIn: $('churnPSIIn')?.value,
       hazard: $('hazardSelect')?.value,
       density: $('density')?.value,
       designArea: $('designArea')?.value,
@@ -410,6 +428,10 @@
       assign('ratedPSI', s.ratedPSI);
       assign('voltage', s.voltage);
       assign('dieselRuntime', s.dieselRuntime);
+      assign('lockedRotorA', s.lockedRotorA);
+      assign('otherFlaA', s.otherFlaA);
+      assign('fuelRateGph', s.fuelRateGph);
+      assign('churnPSIIn', s.churnPSIIn);
       assign('density', s.density);
       assign('designArea', s.designArea);
       assign('hoseAllowance', s.hoseAllowance);
@@ -484,18 +506,29 @@
         const motorHP = baseHP * 1.15;
         const voltage = num('voltage', 460);
         const fla = (motorHP * 746) / (voltage * 1.732 * 0.9 * 0.85);
-        const breaker = Math.ceil((fla * 1.25) / 5) * 5;
+        // NEC (2023) 695.4(B)(2)(a)(1): OCPD rated to carry indefinitely the locked-rotor current of the largest
+        // fire pump motor plus the full-load current of the other pump motors and accessory equipment;
+        // next standard size per 240.6(A) when the sum is not a standard rating.
+        const lra = num('lockedRotorA', 0);
+        const otherFla = Math.max(0, num('otherFlaA', 0));
         setText('motorHP', motorHP.toFixed(1));
         setText('fla', fla.toFixed(0));
-        setText('breaker', breaker + 'A');
+        if (lra > 0) {
+          const ocpdSum = lra + otherFla;
+          const breaker = nextStandardOcpd(ocpdSum);
+          setHtml('breaker', breaker ? breaker + 'A <span class="tiny">(≥ ' + ocpdSum.toFixed(0) + ' A)</span>' : '> 6000 A — review');
+        } else {
+          setHtml('breaker', '<span class="tiny">Enter locked-rotor current</span>');
+        }
         window.calculatedData.diesel = null;
       } else {
         const dieselHP = baseHP * 1.2;
-        const runtime = num('dieselRuntime', 8);
-        const fuelRate = dieselHP * 0.055;
-        const fuelTank = Math.round(fuelRate * runtime * 1.2);
+        const runtime = num('dieselRuntime', 12);
+        const fuelRateIn = num('fuelRateGph', 0);
+        const fuelRate = fuelRateIn > 0 ? fuelRateIn : null;
+        const fuelTank = dieselFuelTankGal(dieselHP, fuelRate, runtime);
         setText('dieselHP', dieselHP.toFixed(1));
-        setHtml('fuelRate', fuelRate.toFixed(1) + ' <span class="tiny">gal/hr</span>');
+        setHtml('fuelRate', fuelRate ? fuelRate.toFixed(1) + ' <span class="tiny">gal/hr (entered)</span>' : '<span class="tiny">Not entered: 1 gal/hp basis</span>');
         setHtml('fuelTank', fuelTank + ' <span class="tiny">gal</span>');
         window.calculatedData.diesel = { dieselHP, fuelRate, fuelTank, runtime };
       }
@@ -676,7 +709,8 @@
       return;
     }
 
-    const churnPSI = ratedPSI * 1.4;
+    const churnIn = enteredChurnPSI();
+    const churnPSI = churnIn != null ? churnIn : ratedPSI * 1.4;
 
     if (churnPSI >= 170) {
       warningBox.classList.remove('hidden');
@@ -688,6 +722,13 @@
     } else {
       warningBox.classList.add('hidden');
     }
+  }
+
+  // NFPA 20 (2022) 6.2.2: shutoff head shall not exceed 140% of rated head. Uses the entered certified-curve
+  // shutoff pressure; returns null when none is entered (the check is then "not checked", never a pass).
+  function enteredChurnPSI() {
+    const v = num('churnPSIIn', 0);
+    return v > 0 ? v : null;
   }
 
   function updateVerification(dutyFlow, dutyPSI, ratedGPM, ratedPSI) {
@@ -704,14 +745,17 @@
     // Preliminary checks vs NFPA 20 performance envelope (illustrative)
     const meets100 = dutyFlow <= ratedGPM * 1.1;
     const dutyHeadOk = dutyPSI <= ratedPSI * 1.05; // duty pressure should be near/below rated
-    const churnPSI = ratedPSI * 1.4;
-    const meetsChurn = churnPSI <= ratedPSI * 1.4 + 0.5;
+    const churnIn = enteredChurnPSI();
+    const meetsChurn = churnIn != null && churnIn <= ratedPSI * 1.4 + 1e-9;
+    const churnMsg = churnIn == null
+      ? 'Not checked: enter the shutoff pressure from the certified pump curve'
+      : (meetsChurn ? `${churnIn.toFixed(0)} psi ≤ ${(ratedPSI * 1.4).toFixed(0)} psi (140% rated, NFPA 20 6.2.2)` : `${churnIn.toFixed(0)} psi exceeds ${(ratedPSI * 1.4).toFixed(0)} psi (140% rated, NFPA 20 6.2.2)`);
     const meets150 = true; // assumed by standard 65% head model unless manufacturer curve says otherwise
 
     const checks = [
       { label: '100% Rated Flow', pass: meets100, msg: meets100 ? 'Duty point covered' : 'Consider larger pump' },
       { label: 'Duty ≤ Rated Pressure', pass: dutyHeadOk, msg: dutyHeadOk ? 'Within rating' : 'Duty pressure above rated — review' },
-      { label: 'Churn ≤140% Rated', pass: meetsChurn, msg: meetsChurn ? 'Within NFPA 20 model' : 'Exceeds limit' }
+      { label: 'Churn ≤140% Rated', pass: meetsChurn, msg: churnMsg }
     ];
 
     checks.forEach((c) => {
@@ -740,10 +784,11 @@
       return;
     }
 
-    const churnPSI = ratedPSI * 1.4;
+    const churnIn = enteredChurnPSI();
+    const churnPSI = churnIn != null ? churnIn : ratedPSI * 1.4;
     const oneFiftyPSI = ratedPSI * 0.65;
     const rows = [
-      { name: 'Churn (shutoff)', flow: 0, psi: churnPSI, note: '≤ 140% rated pressure', duty: false },
+      { name: 'Churn (shutoff)', flow: 0, psi: churnPSI, note: churnIn != null ? 'Entered (certified curve); limit 140% rated' : 'Not entered: shown at the 140% limit', duty: false },
       { name: '100% Rated', flow: ratedGPM, psi: ratedPSI, note: 'Rated capacity & pressure', duty: false },
       { name: '150% Flow', flow: ratedGPM * 1.5, psi: oneFiftyPSI, note: '≥ 65% rated pressure', duty: false },
       { name: 'System Demand', flow: systemFlow, psi: systemPSI, note: 'Required at pump discharge', duty: true }
@@ -787,7 +832,8 @@
     canvas.classList.remove('hidden');
     if (fallback) fallback.classList.add('hidden');
 
-    const churnPSI = data.ratedPSI * 1.4;
+    const churnIn = enteredChurnPSI();
+    const churnPSI = churnIn != null ? churnIn : data.ratedPSI * 1.4;
     const oneFiftyPSI = data.ratedPSI * 0.65;
 
     const chartData = {
@@ -1215,8 +1261,8 @@
         const headFt = ratedPSI * 2.31;
         const baseHP = (ratedGPM * headFt) / (3960 * 0.75);
         const dieselHP = baseHP * 1.2;
-        const runtime = num('dieselRuntime', 8);
-        tankGal = Math.round(dieselHP * 0.055 * runtime * 1.2);
+        const fr = num('fuelRateGph', 0);
+        tankGal = dieselFuelTankGal(dieselHP, fr > 0 ? fr : null, num('dieselRuntime', 12));
       }
 
       fuel = estimateFuelTankAndDike(tankGal);
