@@ -24,8 +24,6 @@ a professional seal or certification.
 | Dry Sprinkler Delivery | Trip-time equation fed gallons and in2 instead of ft3 and ft2 | Trip time about 19 times too short |
 | Dry Sprinkler Delivery | Fitting equivalent lengths differ from NFPA 13 Table 28.2.3.1.1 in several cells | Mixed; swing checks high, some 45 deg / butterfly low |
 | IBC/IFC Hazard | Class 4 oxidizers and detonable pyrophorics not mapped to H-1 (IBC 307.3) | H-1 not suggested |
-| Occupant Egress | IBC travel 400/300 ft used for all S and F (S-1/F-1: 250/200 ft); one value for all H and I subgroups | Non-conservative for S-1, F-1, H, I |
-| Occupant Egress | NFPA 101 business 100 gross (2018+ edition: 150); IBC warehouse 300 (table: 500) | Conservative |
 | Smoke Exhaust Lab | Plugholing Vmax uses a temperature rise from 0.5 Qc rather than the layer temperature | Vmax about 29% low (conservative) |
 
 Review notes, not math errors: FA Power Extenders UFC standby duration not confirmed; Dry Sprinkler fill rate
@@ -42,3 +40,13 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
   - **Churn check:** checks the entered certified-curve shutoff against 140% of rated per NFPA 20 (2022) 6.2.2. With no shutoff entered, it shows as not checked, never as a pass.
   - The version is now read from the page.
   - Verification: 13 of 13 checks pass.
+
+- **Occupant Egress v1.2.0 (2026-10-14).** IBC travel limits are now set by subgroup per IBC 2021 Table 1017.2:
+  - F-1 / S-1: 250 / 200 ft. F-2 / S-2 / U: 400 / 300 ft (the U row was previously 300 / 200).
+  - H-1 to H-5: 75 / 100 / 150 / 175 / 200 ft, sprinklered only.
+  - I-1: 250 ft and I-2 / I-3: 200 ft, sprinklered only. I-4: 200 / 150 ft.
+  - Opt-in IBC 1017.2.2 increase to 400 ft for F-1 / S-1.
+  - IBC Table 1004.5 warehouses (500 gross) added; storage / stock / shipping stays at 300.
+  - NFPA 101 (2018+) Table 7.3.1.2 business use is now 150 gross.
+  - Saved v1.1.0 groups F / S / H / I migrate to the most restrictive subgroup (F-1 / S-1 / H-1 / I-2 / I-3).
+  - Common path and dead-end values are unchanged (simplified group values). Per project and AHJ.
