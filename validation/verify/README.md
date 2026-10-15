@@ -19,7 +19,6 @@ a professional seal or certification.
 
 | App | Item | Effect |
 |---|---|---|
-| Concrete Fire Rating | CMU, expanded clay/shale/slate, 1 h: app 2.2 in, IBC Table 722.3.2 2.6 in | Non-conservative |
 | Deflagration Vent | Dust and gas vent equations do not match NFPA 68 (dust: V^(2/3) Pred^(-1/2), no Pmax/Pred term; gas: exponents on wrong pressures) | Dust under-sized about 70%; gas over-sized 3 to 4 times in the test cases |
 | IBC/IFC Hazard | Class 4 oxidizers and detonable pyrophorics not mapped to H-1 (IBC 307.3) | H-1 not suggested |
 | Smoke Exhaust Lab | Plugholing Vmax uses a temperature rise from 0.5 Qc rather than the layer temperature | Vmax about 29% low (conservative) |
@@ -54,3 +53,7 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
   - **Fitting equivalent lengths:** now per NFPA 13 (2025) Table 28.2.3.1.1, checked against the scanned 2025 text on law.resource.org. Blank table cells keep the app's planning values.
   - Delivery times were checked against NFPA 13 (2025) Table 8.2.4.3.2, and the 500/750 gal exemptions against 8.2.4.2.1/8.2.4.2.2; both unchanged.
   - The fill-rate method note (no loss through open sprinklers) still stands.
+
+- **Concrete Fire Rating v1.1.0 (2026-10-14).** CMU expanded shale, clay or slate at 1 hr is now 2.6 in per IBC (2024) Table 722.3.2; it was 2.2 in, the 3/4 hr value.
+  - All other wall, slab and CMU values were checked against the ICC Digital Codes 2024 IBC Chapter 7 (Tables 722.2.1.1, 722.2.2.1, 722.3.2) and are unchanged.
+  - Slab rows now cite Table 722.2.2.1.
