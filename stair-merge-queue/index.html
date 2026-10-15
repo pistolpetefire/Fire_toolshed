@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stair Merge and Queue Screener · Fire Toolshed</title>
+<meta name="description" content="Screening-level multi-floor stair egress: SFPE hydraulic model with merging, queues, phased vs simultaneous, loss of one stair. Screening only.">
+<style>
+:root{
+  --v-50:#f7f5ff;--v-100:#efeafe;--v-200:#ddd3fb;--v-300:#c4b5f5;--v-500:#8b6fd6;--v-700:#5b3fb3;--v-800:#4a3392;--v-900:#2e1f63;
+  --ink:#1f1a33;--muted:#5a5370;--line:#e4def5;--card:#fff;
+  --pass:#1f7a4a;--warn:#8a5a00;--fail:#b4232c;
+  --c1:#5b3fb3;--c2:#b0359b;--c3:#2f6fb0;--c4:#c26a00;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--v-50);color:var(--ink);line-height:1.5;
+  padding:calc(1.25rem + var(--safe-top)) 1rem calc(2rem + var(--safe-bottom))}
+.wrap{max-width:1180px;margin:0 auto}
+header{display:flex;gap:.9rem;align-items:flex-start;margin-bottom:1rem}
+.logo{width:3rem;height:3rem;border-radius:1rem;background:var(--v-700);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0}
+h1{margin:0;font-size:1.65rem;letter-spacing:-.03em;line-height:1.15}
+h2{font-size:1.05rem;margin:0 0 .6rem;color:var(--v-800)}
+h3{font-size:.95rem;margin:.9rem 0 .4rem;color:var(--v-800)}
+.sub{margin:.25rem 0 0;color:var(--muted);font-size:.9rem}
+.badge{display:inline-block;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--v-100);color:var(--v-800);border:1px solid var(--v-200);padding:.15rem .5rem;border-radius:999px;margin-right:.35rem}
+.banner{background:#fff;border:1px solid var(--v-300);border-left:6px solid var(--v-700);border-radius:.9rem;padding:.75rem 1rem;margin-bottom:1rem;font-size:.9rem}
+.banner b{color:var(--v-800)}
+.tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem}
+.tabs button{font:inherit;font-size:.9rem;border:1px solid var(--v-200);background:#fff;color:var(--v-800);border-radius:999px;padding:.45rem 1rem;cursor:pointer;min-height:44px}
+.tabs button[aria-selected="true"]{background:var(--v-700);border-color:var(--v-700);color:#fff}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}
+.grid>*,.row>*{min-width:0}
+@media(min-width:900px){.grid{grid-template-columns:380px minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:1.1rem;padding:1rem 1.15rem;box-shadow:0 1px 2px rgba(46,31,99,.05)}
+.card+.card{margin-top:1rem}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin:.55rem 0 .2rem}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+input,select,textarea{font:inherit;font-size:16px;width:100%;padding:.45rem .6rem;border:1px solid var(--v-200);border-radius:.6rem;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--v-500);outline-offset:1px}
+input.bad{border-color:var(--fail);background:#fff5f5}
+.unit{font-weight:500;color:var(--v-700)}
+.chk{display:flex;gap:.5rem;align-items:center;font-size:.88rem;margin:.5rem 0;color:var(--ink);font-weight:500}
+.chk input{width:auto}
+.seg{display:inline-flex;border:1px solid var(--v-300);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:.85rem;border:0;background:#fff;color:var(--v-800);padding:.35rem .9rem;cursor:pointer;min-height:38px}
+.seg button.on{background:var(--v-700);color:#fff}
+.btns{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.btn{font:inherit;font-size:.88rem;border:1px solid var(--v-700);background:var(--v-700);color:#fff;border-radius:.6rem;padding:.5rem .9rem;cursor:pointer;min-height:42px}
+.btn.alt{background:#fff;color:var(--v-800)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.7rem}
+.kpi{background:var(--v-50);border:1px solid var(--v-200);border-radius:.9rem;padding:.6rem .8rem}
+.kpi .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+.kpi .v{font-size:1.45rem;font-weight:750;color:var(--v-900);line-height:1.2}
+.kpi .s{font-size:.78rem;color:var(--muted)}
+.kpi.gov{border-color:var(--v-700);background:#fff;box-shadow:inset 0 0 0 1px var(--v-700)}
+.pill{display:inline-block;font-weight:700;font-size:.8rem;padding:.1rem .55rem;border-radius:999px}
+.pass{background:#e3f4ea;color:var(--pass)}.warn{background:#fff3d6;color:var(--warn)}.fail{background:#fde4e6;color:var(--fail)}
+ul.warns{margin:.3rem 0 0;padding-left:1.1rem;font-size:.86rem}
+ul.warns li{margin:.2rem 0}
+ul.warns li.w{color:var(--warn)}ul.warns li.e{color:var(--fail);font-weight:600}ul.warns li.i{color:var(--muted)}
+svg{width:100%;height:auto;display:block}
+.tblwrap{overflow-x:auto;max-height:360px;overflow-y:auto;border:1px solid var(--line);border-radius:.6rem}
+table{border-collapse:collapse;width:100%;font-size:.84rem;font-variant-numeric:tabular-nums}
+th,td{padding:.35rem .55rem;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{background:var(--v-100);color:var(--v-900);position:sticky;top:0}
+td:first-child,th:first-child{text-align:left}
+.runrec{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;background:var(--v-50);border:1px dashed var(--v-300);border-radius:.6rem;padding:.7rem .8rem;white-space:pre-wrap;word-break:break-word}
+.small{font-size:.8rem;color:var(--muted)}
+.cite li{margin:.25rem 0;font-size:.86rem}
+code{background:var(--v-100);padding:0 .25rem;border-radius:.3rem;font-size:.85em}
+.eq{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.86rem;background:var(--v-50);border-radius:.5rem;padding:.4rem .6rem;margin:.3rem 0;overflow-x:auto}
+.hidden{display:none!important}
+footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
+#report{display:none}
+.guide ol,.guide ul{padding-left:1.2rem;font-size:.9rem}
+.guide li{margin:.25rem 0}
+.gtbl{max-height:none}
+.gtbl td{white-space:normal;text-align:left;vertical-align:top;font-size:.84rem;min-width:9rem}
+.gtbl td:first-child{font-weight:700;color:var(--v-900);min-width:7rem}
+.gtbl th{text-align:left}
+.gtbl table{table-layout:fixed}
+.gtbl col.c1{width:13%}.gtbl col.c2{width:24%}.gtbl col.c3{width:33%}.gtbl col.c4{width:30%}
+@media(max-width:700px){.gtbl{overflow:visible;border:0}.gtbl table,.gtbl tbody,.gtbl tr,.gtbl td{display:block;width:100%}.gtbl thead{display:none}
+ .gtbl tr{border:1px solid var(--line);border-radius:.7rem;margin:.6rem 0;padding:.4rem .2rem;background:#fff}
+ .gtbl td{border:0;padding:.25rem .6rem;min-width:0}.gtbl td:not(:first-child)::before{content:attr(data-l);display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--v-700)}}
+@media print{
+  body{background:#fff;padding:0;font-size:10.5pt}
+  .tabs,.btns,#tab-inputs .grid>div:first-child,.noprint,footer,#tab-verify,#tab-method{display:none!important}
+  .card{box-shadow:none;border:1px solid #bbb;break-inside:auto;margin-top:.6rem!important}
+  svg,.kpi,tr,.chartbox{break-inside:avoid}
+  h2,h3{break-after:avoid}
+  .banner{margin-bottom:.4rem}
+  #report{display:block}
+  #tab-inputs{display:none!important}
+  .tblwrap{max-height:none;overflow:visible}
+  body.print-guide #report,body.print-guide #tab-inputs{display:none!important}
+  body.print-guide #tab-guide{display:block!important}
+  body:not(.print-guide) #tab-guide{display:none!important}
+  .gtbl th{position:static}
+  .gtbl{overflow:visible!important;border:0}
+  .gtbl table{width:100%!important}
+  .gtbl td{font-size:9pt}
+  @page{margin:14mm}
+}
+
+.ftbl input,.ftbl select{font-size:15px;padding:.3rem .4rem;min-width:4.2rem}
+.ftbl td{padding:.25rem .3rem}
+.ftbl{max-height:none}
+.mini{font:inherit;font-size:.8rem;border:1px solid var(--v-300);background:#fff;color:var(--v-800);border-radius:.5rem;padding:.25rem .6rem;cursor:pointer;min-height:34px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo" aria-hidden="true">STAIR</div>
+  <div>
+    <h1>Multi-Floor Stair Merge and Queue Screener</h1>
+    <p class="sub"><span class="badge">Screening · v1.0.0</span>Per-story loads into shared stairs: SFPE hydraulic model, merging at landings, door queues, phased vs simultaneous notification, optional loss of one stair, and movement-time handoff to the Transparent RSET Tool. Runs offline.</p>
+  </div>
+</header>
+<div class="banner" role="note"><b>Screening only. Not the submittal basis.</b> A hydraulic (flow) model gives idealized movement times for able-bodied crowds. Use an AHJ-accepted egress model or analysis for the submittal. A licensed fire protection engineer must confirm the inputs, the merge assumption, and the acceptance criteria with the AHJ.</div>
+
+<nav class="tabs noprint" role="tablist">
+  <button role="tab" aria-selected="true" data-tab="inputs">Calculator</button>
+  <button role="tab" aria-selected="false" data-tab="verify">Verification</button>
+  <button role="tab" aria-selected="false" data-tab="guide">User guide</button>
+  <button role="tab" aria-selected="false" data-tab="method">Method and limits</button>
+</nav>
+
+<section id="tab-inputs">
+<div class="grid">
+<div>
+  <div class="card">
+    <h2>Project</h2>
+    <label for="proj">Project / building name</label><input id="proj" value="Example mid-rise">
+    <label>Units</label>
+    <div class="seg" id="unitsSeg"><button data-u="IP" class="on">IP (in, ft)</button><button data-u="SI">SI (m)</button></div>
+  </div>
+  <div class="card">
+    <h2>Stairs</h2>
+    <div class="row">
+      <div><label for="nStair">Number of stairs</label><select id="nStair"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></div>
+      <div><label for="klass">Stair riser / tread [in]</label><select id="klass">
+        <option value="7.5/10">7.5 / 10 (k = 1.00)</option><option value="7/11" selected>7 / 11 (k = 1.08)</option><option value="6.5/12">6.5 / 12 (k = 1.16)</option><option value="6.5/13">6.5 / 13 (k = 1.23)</option></select></div>
+    </div>
+    <div class="tblwrap ftbl" style="margin-top:.6rem"><table id="stairTbl"></table></div>
+    <p class="small">Boundary layer subtracted on each side (SFPE): wall or tread edge 0.15 m (6 in); handrail 0.09 m (3.5 in, approximated from the clear width). Doors use 0.15 m each side.</p>
+    <div class="row">
+      <div><label for="H">Floor-to-floor height <span class="unit" data-q="len"></span></label><input id="H" inputmode="decimal" data-q="len" data-si="3.6576"></div>
+      <div><label for="land">Landing travel per story <span class="unit" data-q="len"></span></label><input id="land" inputmode="decimal" data-q="len" data-si="4.0"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Floors (top first)</h2>
+    <p class="small">Floors above the discharge level, listed from the top down. The last row is one story above discharge. Delay = notification delay for the phased case; the simultaneous case sets every delay to 0.</p>
+    <div class="tblwrap ftbl"><table id="floorTbl"></table></div>
+    <div class="btns"><button class="mini" id="addFloor">Add floor at top</button><button class="mini" id="delFloor">Remove top floor</button></div>
+  </div>
+  <div class="card">
+    <h2>Scenario</h2>
+    <label for="merge">Merge rule at each landing</label>
+    <select id="merge"><option value="even" selected>Even share (50/50 when both are queued)</option><option value="stair">Stair flow priority (floor enters gaps only)</option></select>
+    <label for="loss">Loss of one stair (separate case)</label>
+    <select id="loss"><option value="-1">None</option></select>
+    <label for="cite">Basis / citation for occupant loads, delays and pre-movement (required)</label>
+    <textarea id="cite" rows="2" placeholder="e.g. Occupant load per IBC Table 1004.5 (edition); phased sequence per EVACS narrative; pre-movement per RSET Tool library"></textarea>
+  </div>
+</div>
+
+<div>
+  <div class="card">
+    <h2>Results</h2>
+    <div class="kpis" id="kpis"></div>
+    <h3>Checks and warnings</h3>
+    <ul class="warns" id="warns"></ul>
+  </div>
+  <div class="card">
+    <h2>People out of the building vs time</h2>
+    <div id="chart"></div>
+  </div>
+  <div class="card">
+    <h2>Per-floor results</h2>
+    <div class="tblwrap"><table id="resTbl"></table></div>
+    <p class="small">Clearance = last occupant of that floor enters the stair. Door queue delay = clearance minus the uncongested door time (ready + people / door capacity). Max queue = most people waiting at that floor's stair door.</p>
+  </div>
+  <div class="card">
+    <h2>RSET handoff</h2>
+    <div class="row">
+      <div><label for="target">Floor for RSET</label><select id="target"></select></div>
+      <div><label for="caseSel">Case</label><select id="caseSel"><option value="phased">Phased</option><option value="simul">Simultaneous</option><option value="loss">Loss of one stair</option></select></div>
+      <div><label for="rDet">Detection [s]</label><input id="rDet" inputmode="decimal" value=""></div>
+      <div><label for="rNot">Notification [s]</label><input id="rNot" inputmode="decimal" value=""></div>
+    </div>
+    <div id="mov" style="margin-top:.6rem"></div>
+    <p class="small">Movement = last exit of that floor's occupants minus their start of movement (delay + pre-movement). Pre-movement for the RSET Tool is taken from the floor row.</p>
+  </div>
+  <div class="card">
+    <h2>Run record</h2>
+    <div class="runrec" id="runrec"></div>
+    <p class="small">Run record for traceability only. Not a professional seal or certification.</p>
+    <div class="btns">
+      <button class="btn" id="bPrint">Print report</button>
+      <button class="btn alt" id="bExport">Export project JSON</button>
+      <label class="btn alt" style="display:inline-flex;align-items:center">Import JSON<input type="file" id="fImport" accept=".json,application/json" style="display:none"></label>
+      <button class="btn alt" id="bRset">Export RSET Tool session (movement)</button>
+    </div>
+    <p class="small" id="ioMsg" role="status"></p>
+  </div>
+</div>
+</div>
+</section>
+
+<section id="tab-verify" class="hidden">
+  <div class="card">
+    <h2>Verification against independent Python hand calcs</h2>
+    <p class="small">Each case runs live in this page's engine and is compared with <code>verify_handcalc.py</code>: SFPE closed-form values (V1–V3), a closed-form single-floor case (V4), and an independently written Python time-step model (V5–V7). Acceptance: within 1%.</p>
+    <div class="tblwrap" style="max-height:none"><table id="vtbl"></table></div>
+    <p id="vsum" style="margin-top:.6rem"></p>
+  </div>
+</section>
+
+<section id="tab-guide" class="hidden">
+  <div class="card guide">
+    <h2>User guide</h2>
+    <p class="small">What each input is, typical starting values, and why. Values are starting points from the cited sources, not design values. Where values vary they are <b>per project and AHJ</b>.</p>
+    <div class="btns noprint"><button class="btn alt" id="bPrintGuide">Print guide</button></div>
+    <h3>Workflow</h3>
+    <ol>
+      <li>Agree with the AHJ on the scenarios (phased and simultaneous, loss of one stair), the merge assumption, and how movement time will be used in RSET.</li>
+      <li>Enter the stairs: number, clear widths, edge condition, door widths into the stair and at discharge, riser/tread, floor-to-floor height and landing travel.</li>
+      <li>Enter each floor from the top down: occupants, phased notification delay, pre-movement and walking distance to the stair door. Add the basis for these values.</li>
+      <li>Choose the merge rule and the stair to lose for the loss case.</li>
+      <li>Read the warnings, the per-floor table and the chart. Compare phased, simultaneous and loss cases.</li>
+      <li>In RSET handoff, choose the floor (for example the event floor) and case, enter detection and notification, and export the RSET Tool session. Load it in the Transparent RSET Tool with Load Session.</li>
+      <li>Export the project JSON and print the report. Confirm with an AHJ-accepted egress model for the submittal.</li>
+    </ol>
+    <h3>Inputs</h3>
+    <div class="tblwrap gtbl"><table><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup>
+    <thead><tr><th>Input</th><th>What it is</th><th>Typical / recommended (IP · SI)</th><th>Why</th></tr></thead><tbody>
+    <tr><td>Units</td><td>IP (in, ft) or SI (m).</td><td>The units of your drawings.</td><td>The engine runs in SI; the toggle only converts the display.</td></tr>
+    <tr><td>Number of stairs</td><td>Exit stairs serving the floors modeled.</td><td>Per the drawings (1–4).</td><td>Occupants are split evenly between available stairs; uneven use is not modeled, so check it separately.</td></tr>
+    <tr><td>Stair clear width</td><td>Clear width of the stair run.</td><td>Per the drawings, e.g. 44 in (1.118 m) as in many mid-rise stairs; per project.</td><td>Capacity scales with effective width (clear width minus boundary layers), not nominal width.</td></tr>
+    <tr><td>Edge condition</td><td>Boundary layer subtracted on each side.</td><td>Wall / tread edge 6 in (0.15 m); handrail 3.5 in (0.09 m) (SFPE Handbook, hydraulic model chapter).</td><td>People keep away from walls and edges, so part of the width carries no flow.</td></tr>
+    <tr><td>Door into stair</td><td>Clear width of the floor's stair door.</td><td>Per the drawings, e.g. 36 in (0.914 m) clear; per project.</td><td>If the door's capacity is below the stair's, the door, not the stair, sets that floor's entry rate.</td></tr>
+    <tr><td>Discharge door</td><td>Clear width of the exit door at the stair bottom.</td><td>Per the drawings.</td><td>A narrow discharge door limits the whole stair; the screen applies it as the stair capacity.</td></tr>
+    <tr><td>Riser / tread</td><td>Stair geometry class.</td><td>7/11 in (k = 1.08) for most modern code stairs; 7.5/10, 6.5/12, 6.5/13 per the SFPE table.</td><td>The constant k sets stair speed and maximum specific flow (SFPE: Fsm = 0.94, 1.01, 1.09, 1.16 p/s/m).</td></tr>
+    <tr><td>Floor-to-floor height</td><td>Vertical rise per story.</td><td>Per the drawings, e.g. 12 ft (3.66 m); per project.</td><td>Travel along the stair = rise × SFPE conversion factor (1.66, 1.85, 2.10, 2.22) plus landings.</td></tr>
+    <tr><td>Landing travel per story</td><td>Walking distance on landings between flights, per story.</td><td>Measure from the stair plan; per project.</td><td>Landings add travel time; leaving them out understates descent time.</td></tr>
+    <tr><td>Occupants</td><td>People on that floor who use these stairs.</td><td>From the occupant load (IBC Table 1004.5 or NFPA 101 Table 7.3.1.2 per edition) or the approved posted load.</td><td>Queue length and clearance time scale directly with the load.</td></tr>
+    <tr><td>Notification delay</td><td>Time from alarm to that floor's notification, phased case.</td><td>From the EVACS phasing narrative (e.g. event floor 0 s, other floors per the sequence); per project and AHJ.</td><td>Phasing staggers demand on the stairs. It can help or hurt total time; the tool shows both cases.</td></tr>
+    <tr><td>Pre-movement</td><td>Time from cue to starting to move.</td><td>From the Transparent RSET Tool library or project data (SFPE Handbook human behavior chapters; ISO/TR 16738); per project and AHJ.</td><td>Pre-movement often dominates RSET; use population-specific values.</td></tr>
+    <tr><td>Walk to stair</td><td>Travel distance on the floor to the stair door.</td><td>Per the floor plan.</td><td>Walking at the SFPE uncongested speed 0.85 k = 1.19 m/s (3.9 ft/s) for level travel.</td></tr>
+    <tr><td>Merge rule</td><td>How a landing shares capacity between the stair flow from above and the floor door.</td><td>Even share is a common modeling assumption; stair priority is the other bound; per project and AHJ.</td><td>Observed merging varies with stair and door layout. Running both rules brackets the effect.</td></tr>
+    <tr><td>Loss of one stair</td><td>Case with one stair unavailable; its occupants use the others.</td><td>The stair nearest the fire or the one the AHJ names.</td><td>Checks the single-stair-loss scenario for the analysis (not the prescriptive 50% capacity check).</td></tr>
+    <tr><td>Basis / citation</td><td>Sources for loads, delays and pre-movement.</td><td>Required.</td><td>Uncited inputs are the most common reason screening results are rejected.</td></tr>
+    <tr><td>RSET handoff fields</td><td>Floor, case, detection and notification.</td><td>Detection and notification from the alarm design; per project.</td><td>Builds an RSET Tool session with movement from this model and pre-movement from the floor row.</td></tr>
+    </tbody></table></div>
+    <h3>Reading the warnings</h3>
+    <ul class="warns">
+      <li class="e">Error (red): invalid inputs (missing, non-numeric, widths smaller than the boundary layers, loss case with one stair). Nothing is computed.</li>
+      <li class="w">Warning (amber): a door or discharge bottleneck, a missing citation, zero pre-movement, very tall stacks, or a case where phasing increases total evacuation time.</li>
+      <li class="i">Note (gray): modeling assumptions, such as even split between stairs and no counterflow.</li>
+    </ul>
+    <h3>Common mistakes</h3>
+    <ul>
+      <li>Using nominal instead of clear width, or forgetting the boundary layers.</li>
+      <li>Ignoring merging flow from floors below the floor of interest.</li>
+      <li>Leaving out landings, or using the vertical rise as the travel distance.</li>
+      <li>Assuming phased evacuation always shortens total time.</li>
+      <li>Using the hydraulic result as a full RSET: it covers movement only, for an idealized able-bodied crowd.</li>
+      <li>Treating the even-split or merge rule as fact rather than an assumption to bracket.</li>
+    </ul>
+    <h3>Sources</h3>
+    <ul class="cite">
+      <li>Gwynne, S.M.V. and Rosenbaum, E.R., "Employing the Hydraulic Model in Assessing Emergency Movement," SFPE Handbook of Fire Protection Engineering, 5th Ed. (2016), Chapter 59: S = k − akD, a = 0.266, k values, maximum specific flows, boundary layers, stair travel conversion factors, transition rules.</li>
+      <li>Nelson, H.E. and Mowrer, F.W., hydraulic model chapter in earlier SFPE Handbook editions (same method).</li>
+      <li>SFPE Handbook, 5th Ed., human behavior chapters; ISO/TR 16738: pre-movement.</li>
+      <li>IBC (adopted edition) Chapter 10 and NFPA 101 Chapter 7: occupant load and egress capacity (prescriptive checks remain separate).</li>
+    </ul>
+  </div>
+</section>
+
+<section id="tab-method" class="hidden">
+  <div class="card">
+    <h2>Method</h2>
+    <h3>1 · SFPE hydraulic model</h3>
+    <div class="eq">S = k (1 − a·D),  a = 0.266 m²/person (D in persons/m²);  S = 0.85 k for D below 0.54;  Fs = S·D</div>
+    <div class="eq">Maximum specific flow at D = 1/(2a) = 1.88 p/m²:  Fsm = k/(4a);  speed at Fsm = k/2</div>
+    <div class="eq">Effective width We = clear width − boundary layers;  capacity C = Fsm · We  [persons/s]</div>
+    <p class="small">k: corridor, ramp, doorway 1.40; stairs 7.5/10: 1.00; 7/11: 1.08; 6.5/12: 1.16; 6.5/13: 1.23. Travel along stairs = rise × conversion factor (1.66, 1.85, 2.10, 2.22 for those stairs) + landing travel. Source: SFPE Handbook, 5th Ed., Ch. 59 (Gwynne and Rosenbaum). Confirm your edition's tables.</p>
+    <h3>2 · Time-step merge and queue model</h3>
+    <p class="small">Each stair is a chain of story segments. Flow leaving a landing reaches the next landing down after the story travel time (at the speed for maximum flow, k/2). At each landing the stair capacity C·Δt is shared between people arriving from above and the floor's door queue, by the selected merge rule. Floor entry is also limited by the door capacity (Fsm,door · We,door, k = 1.40). The discharge door capacity, if lower, is applied as the stair capacity. People are tracked by floor of origin. Δt = 0.5 s.</p>
+    <h3>3 · Cases</h3>
+    <p class="small">Phased: each floor starts at delay + pre-movement + walk time. Simultaneous: delay = 0 for all floors. Loss of one stair: phased case with the selected stair removed and its share redistributed evenly.</p>
+    <h3>Limits</h3>
+    <ul class="cite">
+      <li>Idealized able-bodied crowd: no slow tail, no people with mobility impairments, no assisted evacuation, no elevators.</li>
+      <li>No counterflow (firefighters), no fatigue, no behavior at merges beyond the rule chosen, no route choice (even split between stairs).</li>
+      <li>Queues inside the stair from a discharge bottleneck are represented by reducing stair capacity, not by tracking density along flights.</li>
+      <li>Floors below the discharge level and the discharge-level floor itself are not modeled.</li>
+      <li>Movement only. Not a tenability analysis and not the submittal basis.</li>
+    </ul>
+  </div>
+</section>
+<section id="report" aria-hidden="true"></section>
+<footer>Fire Toolshed · Stair Merge and Queue Screener v1.0.0 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
+</div>
+<script>
+"use strict";
+const APP={name:"Stair Merge and Queue Screener",version:"1.0.0",schema:"fireToolshed.stairMerge.v1"};
+const A_SFPE=0.266;
+const KS={"7.5/10":1.00,"7/11":1.08,"6.5/12":1.16,"6.5/13":1.23}, CONV={"7.5/10":1.66,"7/11":1.85,"6.5/12":2.10,"6.5/13":2.22}, K_COR=1.40;
+const EDGE={wall:0.15,handrail:0.09};
+const fsm=k=>k/(4*A_SFPE);
+const sfpeSpeed=(k,D)=>D<0.54?0.85*k:k*(1-A_SFPE*D);
+let units="IP", LAST=null;
+const $=id=>document.getElementById(id);
+const U={len:{IP:{f:v=>v/0.3048,b:v=>v*0.3048,u:"ft"},SI:{u:"m"}},wid:{IP:{f:v=>v/0.0254,b:v=>v*0.0254,u:"in"},SI:{u:"m"}}};
+const toD=(q,v)=>units==="IP"?U[q].IP.f(v):v, toS=(q,v)=>units==="IP"?U[q].IP.b(v):v, uL=q=>units==="IP"?U[q].IP.u:U[q].SI.u;
+function fmt(v,d=0){if(v==null||!isFinite(v))return"—";return Number(v).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function mmss(s){if(s==null||!isFinite(s))return"—";const m=Math.floor(s/60),r=Math.round(s-60*m);return r===60?`${m+1} min 0 s`:`${m} min ${r} s`}
+function num(el){const v=parseFloat(String(el.value).replace(/,/g,""));return isFinite(v)?v:NaN}
+
+// ---------------- engine ----------------
+function oneStair(P,ready,C,Cd,nT,rule,dt,sampleEvery,tlimit){
+  const M=P.length-1, Qf=P.slice(), Qs=[], ring=[];
+  for(let m=0;m<=M+1;m++){Qs.push(new Float64Array(M+1));const r=[];for(let i=0;i<nT;i++)r.push(new Float64Array(M+1));ring.push(r);}
+  const exited=new Float64Array(M+1), clear=new Array(M+1).fill(null), ext=new Array(M+1).fill(null), qmax=new Array(M+1).fill(0), curve=[];
+  for(let m=1;m<=M;m++) if(P[m]<=0){clear[m]=ready[m];ext[m]=ready[m];}
+  let step=0, tot=0;
+  while(true){
+    const t=step*dt, ix=step%nT;
+    const arr=[]; for(let m=1;m<M;m++) arr[m]=ring[m+1][ix].slice();
+    const dis=ring[1][ix];
+    for(let o=1;o<=M;o++){ if(dis[o]>0){exited[o]+=dis[o];tot+=dis[o];} if(ext[o]==null&&P[o]>0&&exited[o]>=P[o]*(1-1e-9)) ext[o]=t+dt; }
+    if(step%sampleEvery===0) curve.push([t,tot]);
+    for(let m=M;m>=1;m--){
+      const q=Qs[m]; if(m<M){const a=arr[m];for(let o=1;o<=M;o++)q[o]+=a[o];}
+      let dS=0; for(let o=1;o<=M;o++) dS+=q[o];
+      const started=t>=ready[m]-1e-9, dF=started?Math.min(Qf[m],Cd*dt):0, cap=C*dt;
+      if(started&&Qf[m]>qmax[m]) qmax[m]=Qf[m];
+      let aS,aF;
+      if(rule==="stair"){aS=Math.min(dS,cap);aF=Math.min(dF,cap-aS);}
+      else{const h=cap/2;aS=Math.min(dS,h);aF=Math.min(dF,h);let left=cap-aS-aF;const x=Math.min(dS-aS,left);aS+=x;left-=x;aF+=Math.min(dF-aF,left);}
+      const out=ring[m][ix]; out.fill(0);
+      if(dS>1e-15){const f=aS/dS;for(let o=1;o<=M;o++){out[o]=q[o]*f;q[o]-=out[o];}}
+      out[m]+=aF; Qf[m]-=aF;
+      if(clear[m]==null&&Qf[m]<=P[m]*1e-9) clear[m]=t+dt;
+    }
+    step++;
+    let done=true; for(let o=1;o<=M;o++) if(ext[o]==null){done=false;break;}
+    if(done){curve.push([step*dt,tot]);return{clear,ext,qmax,curve};}
+    if(step*dt>tlimit) return {clear,ext,qmax,curve,timeout:true};
+  }
+}
+function runCase(p,mode){
+  const M=p.floors.length, k=KS[p.klass], dt=0.5, T=(p.H*CONV[p.klass]+p.land)/(k/2), nT=Math.max(1,Math.round(T/dt)), vf=0.85*K_COR;
+  const P0=[0], ready=[0];
+  for(let m=1;m<=M;m++){const f=p.floors[M-m]; ready[m]=(mode==="simul"?0:f.delay)+f.pre+f.walk/vf; P0[m]=f.P;}
+  const stairs=p.stairs.filter((s,i)=>!(mode==="loss"&&i===p.loss));
+  const clr=new Array(M+1).fill(0), ex=new Array(M+1).fill(0), qm=new Array(M+1).fill(0); const curves=[], caps=[]; let timeout=false;
+  for(const s of stairs){
+    const We=s.w-2*EDGE[s.edge], C=Math.min(fsm(k)*We,fsm(K_COR)*(s.dis-0.30)), Cd=fsm(K_COR)*(s.door-0.30);
+    const P=P0.map(v=>v/stairs.length);
+    const r=oneStair(P,ready,C,Cd,nT,p.merge,dt,10,40000); if(r.timeout) timeout=true;
+    for(let m=1;m<=M;m++){clr[m]=Math.max(clr[m],r.clear[m]??Infinity);ex[m]=Math.max(ex[m],r.ext[m]??Infinity);qm[m]+=r.qmax[m];}
+    curves.push(r.curve); caps.push({We,C,Cd,Cstair:fsm(k)*We,Cdis:fsm(K_COR)*(s.dis-0.30)});
+  }
+  // combine curves (same sampling)
+  const n=Math.max(...curves.map(c=>c.length)), curve=[];
+  for(let i=0;i<n;i++){let t=null,tot=0;for(const c of curves){const q=c[Math.min(i,c.length-1)];tot+=q[1];if(i<c.length)t=q[0];}curve.push([t,tot]);}
+  const fl=p.floors.map((f,i)=>{const m=M-i, Cdsum=stairs.reduce((a,s)=>a+fsm(K_COR)*(s.door-0.30),0);
+    const unc=ready[m]+f.P/Cdsum; return {name:f.name,P:f.P,ready:ready[m],start:ready[m]-f.walk/vf,clear:clr[m],exit:ex[m],qdelay:Math.max(0,clr[m]-unc),qmax:qm[m]};});
+  return {mode,T:nT*dt,floors:fl,building:Math.max(...ex.slice(1)),curve,caps,nStairs:stairs.length,timeout};
+}
+
+// ---------------- UI tables ----------------
+const DEF_FLOORS=[{name:"Floor 7 (event)",P:480,delay:0,pre:60,walk:9.144},...[6,5,4,3,2].map(n=>({name:"Floor "+n,P:100,delay:120,pre:60,walk:9.144}))];
+let floorsSI=JSON.parse(JSON.stringify(DEF_FLOORS));
+let stairsSI=[0,1,2,3].map(()=>({w:1.1176,edge:"wall",door:0.9144,dis:0.9144}));
+function drawStairTbl(){
+  const n=+$("nStair").value; let h=`<thead><tr><th>Stair</th><th>Clear width [${uL("wid")}]</th><th>Edges</th><th>Floor door [${uL("wid")}]</th><th>Discharge door [${uL("wid")}]</th></tr></thead><tbody>`;
+  for(let i=0;i<n;i++){const s=stairsSI[i];const d=v=>String(Math.round(toD("wid",v)*(units==="IP"?10:1000))/(units==="IP"?10:1000));
+    h+=`<tr><td>${String.fromCharCode(65+i)}</td><td><input data-s="${i}" data-k="w" inputmode="decimal" value="${d(s.w)}" data-shown="${d(s.w)}"></td><td><select data-s="${i}" data-k="edge"><option value="wall"${s.edge==="wall"?" selected":""}>wall 0.15 m</option><option value="handrail"${s.edge==="handrail"?" selected":""}>handrail 0.09 m</option></select></td><td><input data-s="${i}" data-k="door" inputmode="decimal" value="${d(s.door)}" data-shown="${d(s.door)}"></td><td><input data-s="${i}" data-k="dis" inputmode="decimal" value="${d(s.dis)}" data-shown="${d(s.dis)}"></td></tr>`;}
+  $("stairTbl").innerHTML=h+"</tbody>";
+  const ls=$("loss"), cur=ls.value; ls.innerHTML=`<option value="-1">None</option>`+Array.from({length:n},(_,i)=>`<option value="${i}">Stair ${String.fromCharCode(65+i)}</option>`).join(""); if(+cur<n) ls.value=cur;
+}
+function drawFloorTbl(){
+  let h=`<thead><tr><th>Floor</th><th>Occupants</th><th>Delay [s]</th><th>Pre-move [s]</th><th>Walk [${uL("len")}]</th></tr></thead><tbody>`;
+  floorsSI.forEach((f,i)=>{h+=`<tr><td><input data-f="${i}" data-k="name" value="${f.name.replace(/"/g,"'")}" style="min-width:7.5rem"></td><td><input data-f="${i}" data-k="P" inputmode="decimal" value="${f.P}"></td><td><input data-f="${i}" data-k="delay" inputmode="decimal" value="${f.delay}"></td><td><input data-f="${i}" data-k="pre" inputmode="decimal" value="${f.pre}"></td><td><input data-f="${i}" data-k="walk" inputmode="decimal" value="${Math.round(toD("len",f.walk)*10)/10}" data-shown="${Math.round(toD("len",f.walk)*10)/10}"></td></tr>`;});
+  $("floorTbl").innerHTML=h+"</tbody>";
+  const t=$("target"), cur=t.value; t.innerHTML=floorsSI.map((f,i)=>`<option value="${i}">${f.name.replace(/</g,"")}</option>`).join(""); if(cur!==""&&+cur<floorsSI.length) t.value=cur;
+}
+function readTables(errs){
+  const n=+$("nStair").value;
+  document.querySelectorAll("#stairTbl [data-s]").forEach(el=>{const i=+el.dataset.s,k=el.dataset.k;
+    if(k==="edge"){stairsSI[i].edge=el.value;return}
+    const v=num(el), si=(el.value===el.dataset.shown)?stairsSI[i][k]:toS("wid",v), bad=!isFinite(v)||si<=0.31||si>10; el.classList.toggle("bad",bad); if(bad) errs.push(`Stair ${String.fromCharCode(65+i)} ${k==="w"?"clear width":k==="door"?"floor door":"discharge door"} (must exceed the boundary layers)`); else stairsSI[i][k]=si;});
+  document.querySelectorAll("#floorTbl [data-f]").forEach(el=>{const i=+el.dataset.f,k=el.dataset.k;
+    if(k==="name"){floorsSI[i].name=el.value.trim()||("Floor "+(floorsSI.length-i+1));return}
+    const v=num(el), lim={P:[0,20000],delay:[0,3600],pre:[0,3600],walk:[0,500]}[k], si=k==="walk"?((el.value===el.dataset.shown)?floorsSI[i].walk:toS("len",v)):v, bad=!isFinite(v)||si<lim[0]||si>lim[1]; el.classList.toggle("bad",bad);
+    if(bad) errs.push(`${floorsSI[i].name}: ${k==="P"?"occupants":k==="pre"?"pre-movement":k}`); else floorsSI[i][k]=si;});
+  return stairsSI.slice(0,n).map(s=>({...s}));
+}
+function readInputs(){
+  const errs=[]; const stairs=readTables(errs);
+  const g=(id,min,max)=>{const el=$(id),v=num(el),si=(el.value===el.dataset.shown&&isFinite(parseFloat(el.dataset.si)))?parseFloat(el.dataset.si):toS("len",v),bad=!isFinite(v)||si<min||si>max;el.classList.toggle("bad",bad);if(bad)errs.push(id==="H"?"floor-to-floor height":"landing travel");return si};
+  const p={units,proj:$("proj").value.trim(),klass:$("klass").value,H:g("H",2,10),land:g("land",0,30),merge:$("merge").value,loss:+$("loss").value,cite:$("cite").value.trim(),stairs,floors:floorsSI.map(f=>({...f}))};
+  if(p.loss>=0&&stairs.length<2) errs.push("loss of one stair needs at least two stairs");
+  if(p.floors.reduce((a,f)=>a+f.P,0)<=0) errs.push("total occupants must be above zero");
+  p.errs=errs; return p;
+}
+
+// ---------------- compute + render ----------------
+function compute(){
+  const p=readInputs(), W=[];
+  if(p.errs.length){W.push(["e","Fix the highlighted inputs: "+p.errs.join("; ")+"."]);render(p,null,W);return}
+  const R={phased:runCase(p,"phased"),simul:runCase(p,"simul")}; if(p.loss>=0) R.loss=runCase(p,"loss");
+  const k=KS[p.klass];
+  {const g={};R.phased.caps.forEach((c,i)=>{const L=String.fromCharCode(65+i);
+    if(c.Cd<c.Cstair){const m=`floor door capacity (${fmt(c.Cd,2)} p/s) is below the stair capacity (${fmt(c.Cstair,2)} p/s); the door limits each floor's entry rate.`;(g[m]=g[m]||[]).push(L);}
+    if(c.Cdis<c.Cstair){const m=`discharge door capacity (${fmt(c.Cdis,2)} p/s) is below the stair capacity; it governs the whole stair.`;(g[m]=g[m]||[]).push(L);}});
+   for(const m in g) W.push(["w",`Stair${g[m].length>1?"s":""} ${g[m].join(", ")}: ${m}`]);}
+  if(R.phased.building>R.simul.building+1) W.push(["w",`Phased evacuation (${mmss(R.phased.building)}) takes longer in total than simultaneous (${mmss(R.simul.building)}) for these inputs. Check the floor of interest, not only the total.`]);
+  if(!p.cite) W.push(["w","Add the basis for occupant loads, delays and pre-movement."]);
+  if(p.floors.some(f=>f.P>0&&f.pre===0)) W.push(["w","At least one floor has zero pre-movement; that is rarely defensible."]);
+  if(p.land===0) W.push(["w","Landing travel is zero; descent time is understated."]);
+  if(p.floors.length>30) W.push(["w","More than 30 floors: fatigue, counterflow and stair density effects are not modeled."]);
+  if(Object.values(R).some(r=>r.timeout)) W.push(["e","A case did not finish within the time limit; check the inputs."]);
+  W.push(["i",`Merge rule: ${p.merge==="even"?"even share at landings":"stair flow priority"} (an assumption; run both to bracket).`]);
+  W.push(["i","Occupants are split evenly between available stairs. No counterflow, no slow tail, no assisted evacuation. Movement only; use an AHJ-accepted egress model for the submittal."]);
+  render(p,R,W);
+}
+function kpi(k,v,s,cls=""){return `<div class="kpi ${cls}"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s||""}</div></div>`}
+function render(p,R,W){
+  $("warns").innerHTML=W.map(w=>`<li class="${w[0]}">${w[0]==="e"?"Error: ":w[0]==="w"?"Warning: ":""}${w[1]}</li>`).join("");
+  if(!R){$("kpis").innerHTML=kpi("Building evacuation","—","inputs invalid","gov");$("chart").innerHTML="";$("resTbl").innerHTML="";$("mov").innerHTML="";$("runrec").textContent="Inputs invalid. No run record.";LAST=null;return}
+  const c=R.phased.caps[0];
+  $("kpis").innerHTML=kpi("Phased: building evacuation",mmss(R.phased.building),`${R.phased.nStairs} stair(s)`,"gov")+kpi("Simultaneous",mmss(R.simul.building),"all delays 0")+
+    (R.loss?kpi("Loss of one stair",mmss(R.loss.building),`phased, ${R.loss.nStairs} stair(s)`):"")+
+    kpi("Stair A capacity",fmt(c.C,2)+" p/s",`We ${fmt(toD("wid",c.We),1)} ${uL("wid")} · Fsm ${fmt(fsm(KS[p.klass]),3)} p/s/m`)+kpi("Story travel time",fmt(R.phased.T,1)+" s",`at k/2 = ${fmt(KS[p.klass]/2,2)} m/s`);
+  drawChart(R); drawRes(p,R); LAST={p,R,W}; movement(); runrec();
+}
+function niceMax(v){const e=Math.pow(10,Math.floor(Math.log10(v)));for(const m of[1,1.2,1.5,2,2.5,3,4,5,6,8,10])if(m*e>=v)return m*e;return 10*e}
+function drawChart(R){
+  const cw=$("chart").clientWidth||760, W=Math.max(340,Math.min(760,cw)), h=W<600?280:330, L=64,Rm=18,T=16,B=48,pw=W-L-Rm,ph=h-T-B;
+  const ser=[["Phased",R.phased,"#5b3fb3",""],["Simultaneous",R.simul,"#b0359b","7 5"]]; if(R.loss) ser.push(["Loss of one stair",R.loss,"#2f6fb0","3 4"]);
+  const xMax=niceMax(Math.max(...ser.map(s=>s[1].building))), yMax=niceMax(Math.max(...ser.map(s=>s[1].curve[s[1].curve.length-1][1])));
+  const X=x=>L+x/xMax*pw, Y=y=>T+ph-y/yMax*ph; let g="";
+  for(let i=0;i<=5;i++){const x=xMax*i/5,y=yMax*i/5;g+=`<line x1="${X(x)}" y1="${T}" x2="${X(x)}" y2="${T+ph}" stroke="#ece7f8"/><text x="${X(x)}" y="${T+ph+18}" font-size="12" text-anchor="middle" fill="#5a5370">${fmt(x)}</text><line x1="${L}" y1="${Y(y)}" x2="${L+pw}" y2="${Y(y)}" stroke="#ece7f8"/><text x="${L-8}" y="${Y(y)+4}" font-size="12" text-anchor="end" fill="#5a5370">${fmt(y)}</text>`;}
+  g+=`<rect x="${L}" y="${T}" width="${pw}" height="${ph}" fill="none" stroke="#c4b5f5"/>`;
+  for(const [n,r,col,dash] of ser){const d=r.curve.map((q,i)=>(i?"L":"M")+X(q[0]).toFixed(1)+","+Y(q[1]).toFixed(1)).join("");g+=`<path d="${d}" fill="none" stroke="${col}" stroke-width="2.6" ${dash?`stroke-dasharray="${dash}"`:""}/>`;}
+  g+=`<text x="${L+pw/2}" y="${h-8}" font-size="13" text-anchor="middle" fill="#1f1a33">Time from alarm [s]</text><text transform="translate(16,${T+ph/2}) rotate(-90)" font-size="13" text-anchor="middle" fill="#1f1a33">People out of the building</text>`;
+  const lg=`<div style="display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;font-size:.82rem;margin:.2rem 0 .4rem">`+ser.map(s=>`<span><svg width="26" height="10" style="display:inline;width:26px;vertical-align:middle"><line x1="0" y1="5" x2="26" y2="5" stroke="${s[2]}" stroke-width="3" ${s[3]?`stroke-dasharray="${s[3]}"`:""}/></svg> ${s[0]}: ${mmss(s[1].building)}</span>`).join("")+`</div>`;
+  $("chart").innerHTML=`<div class="chartbox">${lg}<svg viewBox="0 0 ${W} ${h}" role="img" aria-label="People out of the building versus time">${g}</svg></div>`;
+}
+function drawRes(p,R){
+  const cases=[["Phased",R.phased],["Simultaneous",R.simul]]; if(R.loss) cases.push(["Loss of one stair",R.loss]);
+  let h=`<thead><tr><th>Floor</th><th>Occupants</th>`+cases.map(c=>`<th>${c[0]}: ready [s]</th><th>clearance [s]</th><th>last exit [s]</th><th>door queue delay [s]</th><th>max queue</th>`).join("")+`</tr></thead><tbody>`;
+  p.floors.forEach((f,i)=>{h+=`<tr><td>${f.name.replace(/</g,"")}</td><td>${fmt(f.P)}</td>`+cases.map(c=>{const r=c[1].floors[i];return `<td>${fmt(r.ready,1)}</td><td>${fmt(r.clear,1)}</td><td>${fmt(r.exit,1)}</td><td>${fmt(r.qdelay,1)}</td><td>${fmt(r.qmax)}</td>`}).join("")+`</tr>`;});
+  $("resTbl").innerHTML=h+"</tbody>";
+}
+function movement(){
+  if(!LAST) return; const {p,R}=LAST, i=+$("target").value||0, cs=$("caseSel").value, r=(R[cs]||R.phased).floors[i]; const f=p.floors[i];
+  const mv=r.exit-r.start-f.pre; LAST.mov={floor:f.name,case:R[cs]?cs:"phased",movement:mv,pre:f.pre,delay:cs==="simul"?0:f.delay};
+  const d=num($("rDet")), n=num($("rNot")); const tot=isFinite(d)&&isFinite(n)?d+n+f.pre+mv:null;
+  $("mov").innerHTML=`<div class="kpis">${kpi("Movement (to RSET)",fmt(mv,0)+" s",`${f.name.replace(/</g,"")}, ${R[cs]?cs:"phased"} case`)}${kpi("Pre-movement",fmt(f.pre,0)+" s","from the floor row")}${kpi("RSET (D + N + P + M)",tot!=null?fmt(tot,0)+" s":"enter D and N","screening")}</div>`+(cs==="loss"&&!R.loss?`<p class="small">No loss case selected; showing phased.</p>`:"");
+  runrec();
+}
+function runrec(){
+  if(!LAST) return; const {p,R,W}=LAST, mv=LAST.mov;
+  const L=[`${APP.name} v${APP.version} · Fire Toolshed · SCREENING ONLY, not the submittal basis`,"Run record for traceability only. Not a professional seal or certification.",`Generated: ${new Date().toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})}`,"--- Inputs",
+   `Project: ${p.proj||"(unnamed)"}   Units shown: ${units}`,`Stairs: ${p.stairs.length} · riser/tread ${p.klass} (k ${KS[p.klass]}) · floor-to-floor ${fmt(toD("len",p.H),2)} ${uL("len")} · landing travel ${fmt(toD("len",p.land),2)} ${uL("len")}`,
+   ...p.stairs.map((s,i)=>`  Stair ${String.fromCharCode(65+i)}: clear ${fmt(toD("wid",s.w),2)} ${uL("wid")}, edges ${s.edge}, floor door ${fmt(toD("wid",s.door),2)} ${uL("wid")}, discharge door ${fmt(toD("wid",s.dis),2)} ${uL("wid")}`),
+   ...p.floors.map(f=>`  ${f.name}: ${fmt(f.P)} occupants, delay ${fmt(f.delay)} s, pre-movement ${fmt(f.pre)} s, walk ${fmt(toD("len",f.walk),1)} ${uL("len")}`),
+   `Merge rule: ${p.merge}   Loss case: ${p.loss>=0?"Stair "+String.fromCharCode(65+p.loss):"none"}`,`Basis / citation: ${p.cite||"(none entered)"}`,"--- Results",
+   `Building evacuation: phased ${mmss(R.phased.building)} · simultaneous ${mmss(R.simul.building)}${R.loss?" · loss of one stair "+mmss(R.loss.building):""}`,
+   mv?`RSET handoff: ${mv.floor}, ${mv.case} case, movement ${fmt(mv.movement)} s, pre-movement ${fmt(mv.pre)} s`:"",
+   `Warnings: ${W.filter(w=>w[0]!=="i").length}`,"Method: SFPE hydraulic model (SFPE Handbook 5th Ed., Ch. 59) with time-step merging. Use an AHJ-accepted egress model for the submittal."];
+  $("runrec").textContent=L.filter(Boolean).join("\n");
+}
+function buildReport(){
+  if(!LAST){alert("Fix the inputs first.");return false}
+  const esc=s=>s.replace(/&/g,"\u0026amp;").replace(/</g,"\u0026lt;");
+  $("report").innerHTML=`<div class="card"><h2>${APP.name} report · screening only</h2><div class="runrec">${esc($("runrec").textContent)}</div></div><div class="card"><h2>Results</h2><div class="kpis">${$("kpis").innerHTML}</div><ul class="warns">${LAST.W.map(w=>`<li class="${w[0]}">${w[1]}</li>`).join("")}</ul></div><div class="card"><h2>People out vs time</h2>${$("chart").innerHTML}</div><div class="card"><h2>Per-floor results</h2><div class="tblwrap"><table>${$("resTbl").innerHTML}</table></div></div><div class="card">${$("mov").innerHTML}<p class="small">Screening only. Not the submittal basis. SFPE Handbook 5th Ed., Ch. 59 hydraulic model.</p></div>`;
+  return true;
+}
+// ---------------- JSON ----------------
+function download(name,obj){const b=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500)}
+const slug=s=>(s||"untitled").replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"").toLowerCase()||"untitled";
+function project(){const p=LAST.p,R=LAST.R;return{app:APP.name,appVersion:APP.version,schema:APP.schema,created:new Date().toISOString(),units,
+  inputsSI:{proj:p.proj,klass:p.klass,H:p.H,land:p.land,merge:p.merge,loss:p.loss,cite:p.cite,stairs:p.stairs,floors:p.floors,target:+$("target").value,caseSel:$("caseSel").value,rDet:$("rDet").value,rNot:$("rNot").value},
+  results:{building_s:{phased:R.phased.building,simultaneous:R.simul.building,loss:R.loss?R.loss.building:null},floors:R.phased.floors.map((f,i)=>({name:f.name,phased:{clear_s:f.clear,exit_s:f.exit,queueDelay_s:f.qdelay},simultaneous:{clear_s:R.simul.floors[i].clear,exit_s:R.simul.floors[i].exit},loss:R.loss?{clear_s:R.loss.floors[i].clear,exit_s:R.loss.floors[i].exit}:null})),rsetHandoff:LAST.mov||null},
+  warnings:LAST.W.map(w=>w[1]),note:"Screening only. Not the submittal basis."}}
+function applyProject(o){const s=o.inputsSI||{}; units=o.units==="SI"?"SI":"IP";
+  if(!Array.isArray(s.stairs)||!Array.isArray(s.floors)||!s.floors.length) throw new Error("Project has no stairs or floors.");
+  $("proj").value=s.proj||""; $("klass").value=KS[s.klass]?s.klass:"7/11"; $("H").dataset.si=s.H; $("land").dataset.si=s.land; $("merge").value=s.merge==="stair"?"stair":"even"; $("cite").value=s.cite||"";
+  $("nStair").value=String(Math.min(4,Math.max(1,s.stairs.length))); s.stairs.slice(0,4).forEach((st,i)=>stairsSI[i]={w:+st.w,edge:st.edge==="handrail"?"handrail":"wall",door:+st.door,dis:+st.dis});
+  floorsSI=s.floors.map(f=>({name:String(f.name||"Floor"),P:+f.P,delay:+f.delay,pre:+f.pre,walk:+f.walk}));
+  syncUI(true); $("loss").value=String(s.loss??-1); if(s.target!=null) $("target").value=String(s.target); if(s.caseSel) $("caseSel").value=s.caseSel; $("rDet").value=s.rDet||""; $("rNot").value=s.rNot||""; compute();}
+function rsetSession(){const mv=LAST.mov, d=num($("rDet")), n=num($("rNot")), now=new Date().toISOString();
+  return {version:"0.1.7",created:now,updated:now,segments:[{component:"detection",label:"Detection",value:isFinite(d)?d:0,source:"user"},{component:"notification",label:"Notification",value:isFinite(n)?n:0,source:"user"},{component:"premovement",label:"Pre-movement",value:mv.pre,source:"user"},{component:"movement",label:"Movement",value:Math.round(mv.movement),source:"user"}],
+  assumptionsLog:[],projectName:$("proj").value||undefined,notes:`Movement from ${APP.name} v${APP.version}: ${mv.floor}, ${mv.case} case (SFPE hydraulic model, screening only). Pre-movement from the floor row. All values require engineering review.`};}
+
+// ---------------- UI wiring ----------------
+function syncUI(fromSI){
+  document.querySelectorAll("#unitsSeg button").forEach(b=>b.classList.toggle("on",b.dataset.u===units));
+  document.querySelectorAll(".unit[data-q]").forEach(s=>s.textContent="["+uL(s.dataset.q)+"]");
+  if(fromSI) document.querySelectorAll("input[data-q]").forEach(el=>{const si=parseFloat(el.dataset.si);if(isFinite(si)){el.value=String(Math.round(toD(el.dataset.q,si)*100)/100);el.dataset.shown=el.value;}});
+  drawStairTbl(); drawFloorTbl(); compute();
+}
+document.querySelectorAll("input[data-q]").forEach(el=>el.addEventListener("input",()=>{const v=num(el);if(isFinite(v)){el.dataset.si=toS(el.dataset.q,v);el.dataset.shown=el.value;}}));
+document.querySelectorAll("#unitsSeg button").forEach(b=>b.onclick=()=>{const e=[];readTables(e);units=b.dataset.u;syncUI(true)});
+$("nStair").onchange=()=>{drawStairTbl();compute()};
+$("addFloor").onclick=()=>{const e=[];readTables(e);floorsSI.unshift({name:"Floor "+(floorsSI.length+2),P:100,delay:0,pre:60,walk:9.144});drawFloorTbl();compute()};
+$("delFloor").onclick=()=>{const e=[];readTables(e);if(floorsSI.length>1){floorsSI.shift();drawFloorTbl();compute()}};
+let deb; document.addEventListener("input",e=>{if(e.target.closest("#tab-inputs")){clearTimeout(deb);deb=setTimeout(()=>{if(["rDet","rNot"].includes(e.target.id))movement();else compute()},200)}});
+document.addEventListener("change",e=>{if(["klass","merge","loss"].includes(e.target.id)||e.target.dataset.k==="edge")compute();if(["target","caseSel"].includes(e.target.id))movement();});
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));["inputs","verify","guide","method"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab));if(b.dataset.tab==="verify")runVerify();});
+$("bPrint").onclick=()=>{document.body.classList.remove("print-guide");if(buildReport())window.print()};
+$("bPrintGuide").onclick=()=>{document.body.classList.add("print-guide");window.print()};
+window.addEventListener("afterprint",()=>document.body.classList.remove("print-guide"));
+window.addEventListener("beforeprint",()=>{if(!document.body.classList.contains("print-guide"))buildReport()});
+window.addEventListener("resize",()=>{clearTimeout(window.__rz);window.__rz=setTimeout(()=>{if(LAST)drawChart(LAST.R)},200)});
+$("bExport").onclick=()=>{if(!LAST){$("ioMsg").textContent="Fix the inputs before exporting.";return}download(`stair-merge-${slug($("proj").value)}-${Date.now()}.json`,project());$("ioMsg").textContent="Project JSON exported."};
+$("bRset").onclick=()=>{if(!LAST||!LAST.mov){$("ioMsg").textContent="No movement result yet.";return}download(`rset-session-${slug($("proj").value)}-${Date.now()}.json`,rsetSession());$("ioMsg").textContent="RSET Tool session exported: load it with Load Session in the Transparent RSET Tool."};
+$("fImport").onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);if(o.schema!==APP.schema)throw new Error("Not a Stair Merge and Queue Screener project.");applyProject(o);$("ioMsg").textContent="Project imported."}catch(err){$("ioMsg").textContent="Import failed: "+err.message}};rd.readAsText(f);e.target.value=""};
+
+// ---------------- verification ----------------
+const REF={"V1_S": 0.7927200000000001, "V1_Fs": 0.7927200000000001, "V2_Fsm": 1.0150375939849625, "V3_C": 0.8298947368421052, "V4_sim_exit": 301.0, "V4_closed": 300.9944190766108, "V5_stair_building": 381.5, "V5_stair_clear_lower": 361.5, "V5_even_building": 381.5, "V5_even_clear_upper": 181.0, "V6_phased_building": 812.0, "V6_phased_event_exit": 812.0, "V6_simul_building": 712.0, "V6_simul_event_exit": 712.0, "V7_loss_building": 1418.0, "V7_loss_event_exit": 1418.0};
+function runVerify(){
+  const st=[{w:1.1176,edge:"wall",door:2.0,dis:2.0}], base={klass:"7/11",H:3.6576,land:4.0,loss:-1};
+  const z=P=>({name:"x",P,delay:0,pre:0,walk:0});
+  const C=[];
+  C.push(["V1","SFPE speed, 7/11 stair, D = 1.0 p/m² [m/s]",sfpeSpeed(KS["7/11"],1.0),REF.V1_S]);
+  C.push(["V2","SFPE maximum specific flow, 7/11 stair (table 1.01) [p/s/m]",fsm(KS["7/11"]),REF.V2_Fsm]);
+  C.push(["V3","Capacity of a 44 in stair, walls both sides [p/s]",fsm(KS["7/11"])*(1.1176-0.30),REF.V3_C]);
+  const r4=runCase({...base,merge:"stair",stairs:st,floors:[z(200),z(0),z(0)]},"phased");
+  C.push(["V4","One floor 3 stories up, 200 people: last exit vs closed form P/C + 3T [s]",r4.building,REF.V4_closed]);
+  const r5=runCase({...base,merge:"stair",stairs:st,floors:[z(150),z(150)]},"phased");
+  C.push(["V5a","Two floors × 150, stair priority: building evacuation [s]",r5.building,REF.V5_stair_building]);
+  C.push(["V5b","Same: lower floor clearance (waits for stair gaps) [s]",r5.floors[1].clear,REF.V5_stair_clear_lower]);
+  const r5e=runCase({...base,merge:"even",stairs:st,floors:[z(150),z(150)]},"phased");
+  C.push(["V5c","Two floors × 150, even share: upper floor clearance [s]",r5e.floors[0].clear,REF.V5_even_clear_upper]);
+  const fl=[{name:"E",P:480,delay:0,pre:60,walk:30},...[1,2,3,4,5].map(()=>({name:"o",P:100,delay:120,pre:60,walk:30}))];
+  const two=[0,1].map(()=>({w:1.1176,edge:"wall",door:0.9144,dis:0.9144}));
+  const q={...base,merge:"even",stairs:two,floors:fl};
+  C.push(["V6a","Ch. 6 style, 2 × 44 in stairs, 36 in doors: phased building evacuation [s]",runCase(q,"phased").building,REF.V6_phased_building]);
+  C.push(["V6b","Same: simultaneous building evacuation [s]",runCase(q,"simul").building,REF.V6_simul_building]);
+  C.push(["V7","Same, loss of one stair (phased): event floor last exit [s]",runCase({...q,loss:0},"loss").floors[0].exit,REF.V7_loss_event_exit]);
+  let pass=0,h="<thead><tr><th>Case</th><th style='text-align:left'>Description</th><th>App</th><th>Python</th><th>Diff</th><th>Result</th></tr></thead><tbody>";
+  for(const [id,desc,a,r] of C){const d=Math.abs(a-r)/Math.abs(r)*100,ok=isFinite(d)&&d<=1;if(ok)pass++;
+    h+=`<tr><td>${id}</td><td style="text-align:left;white-space:normal;min-width:260px">${desc}</td><td>${fmt(a,3)}</td><td>${fmt(r,3)}</td><td>${fmt(d,3)}%</td><td><span class="pill ${ok?"pass":"fail"}">${ok?"PASS":"FAIL"}</span></td></tr>`;}
+  $("vtbl").innerHTML=h+"</tbody>";$("vsum").innerHTML=`<span class="pill ${pass===C.length?"pass":"fail"}">${pass} / ${C.length} within 1%</span>`;
+  return {pass,total:C.length};
+}
+document.querySelectorAll(".gtbl tbody tr").forEach(tr=>{const L=["Input","What it is","Typical / recommended (IP · SI)","Why"];tr.querySelectorAll("td").forEach((td,i)=>td.setAttribute("data-l",L[i]))});
+syncUI(true);
+if(location.hash==="#guide") document.querySelector('[data-tab="guide"]').click();
+if(location.hash==="#printguide") document.body.classList.add("print-guide");
+if(location.hash==="#verify") document.querySelector('[data-tab="verify"]').click();
+if(location.hash==="#selftest"){const out=[];try{
+  out.push("ok="+(LAST!==null)); const b0=LAST.R.phased.building;
+  const pj=JSON.parse(JSON.stringify(project())); $("H").value="99"; compute(); out.push("badH="+(LAST===null));
+  applyProject(pj); out.push("roundtrip="+(Math.abs(LAST.R.phased.building-b0)<1e-9));
+  units="SI"; syncUI(true); const bSI=LAST.R.phased.building; units="IP"; syncUI(true); out.push("unitToggle="+(Math.abs(bSI-b0)<1e-6&&Math.abs(LAST.R.phased.building-b0)<1e-6));
+  $("loss").value="0"; compute(); out.push("loss="+(LAST.R.loss&&LAST.R.loss.building>b0));
+  $("rDet").value="30"; $("rNot").value="15"; $("target").value="0"; movement(); const s=rsetSession(); out.push("rset4="+(s.segments.length===4&&["detection","notification","premovement","movement"].every(c=>s.segments.find(x=>x.component===c)))+" mov="+s.segments[3].value);
+  $("nStair").value="1"; drawStairTbl(); $("loss").value="0"; compute(); out.push("lossNeeds2="+(LAST===null)); $("nStair").value="2"; drawStairTbl(); compute();
+  out.push("forbiddenWord="+document.body.innerText.toLowerCase().includes(["st","amp"].join("")));
+}catch(e){out.push("ERR "+e.message)} document.title="SELFTEST "+out.join(" | ");}
+</script>
+</body>
+</html>
