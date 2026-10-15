@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.4.0";
+  var APP_VERSION = "1.5.0";
   var STORAGE_KEY = "ibcIfcHazard.v1";
   /** Last HMIS assessment (not persisted) */
   var lastImport = null;
@@ -145,12 +145,12 @@
     },
     { id: "aerosols", label: "Aerosol products (Level 2/3)", ifc: "IFC 51", mapsH: ["H-3"] },
     { id: "flammable_solid", label: "Flammable solids", ifc: "IFC 59", mapsH: ["H-3"] },
-    { id: "oxidizer", label: "Oxidizers (solid/liquid)", ifc: "IFC 63", mapsH: ["H-2", "H-3"] },
+    { id: "oxidizer", label: "Oxidizers (solid/liquid) — Class 4 is H-1 (IBC 2024 307.3)", ifc: "IFC 63", mapsH: ["H-1", "H-2", "H-3"] },
     { id: "oxidizing_gas", label: "Oxidizing gases", ifc: "IFC 63", mapsH: ["H-2", "H-3"] },
     { id: "organic_peroxide", label: "Organic peroxides", ifc: "IFC 62", mapsH: ["H-1", "H-2", "H-3"] },
     { id: "unstable", label: "Unstable (reactive) materials", ifc: "IFC 66", mapsH: ["H-1", "H-2", "H-3"] },
     { id: "water_reactive", label: "Water-reactive materials", ifc: "IFC 67", mapsH: ["H-2", "H-3"] },
-    { id: "pyrophoric", label: "Pyrophoric materials", ifc: "IFC 64", mapsH: ["H-2"] },
+    { id: "pyrophoric", label: "Pyrophoric materials — detonable H-1 (307.3), nondetonable H-2 (307.4)", ifc: "IFC 64", mapsH: ["H-1", "H-2"] },
     { id: "highly_toxic", label: "Highly toxic materials", ifc: "IFC 60", mapsH: ["H-4"] },
     { id: "toxic", label: "Toxic materials", ifc: "IFC 60", mapsH: ["H-4"] },
     { id: "corrosive", label: "Corrosive materials", ifc: "IFC 54", mapsH: ["H-4"] },

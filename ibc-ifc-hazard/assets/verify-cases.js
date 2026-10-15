@@ -5,14 +5,14 @@ window.FT_VERIFY_CASES = {
  "versionSel": "#appVersion",
  "handcalc": "validation/verify/ibc_ifc_hazard.py",
  "flags": [
-  "IBC 307.3 puts Class 4 oxidizers and detonable pyrophoric materials in Group H-1. The app maps oxidizers to H-2/H-3 and pyrophorics to H-2 only, so it will not suggest H-1 for them. Not changed; for Kevin to review.",
+  "Fixed in v1.5.0: oxidizers map to H-1/H-2/H-3 (Class 4 is H-1) and pyrophorics to H-1/H-2 (detonable H-1, nondetonable H-2) per IBC (2024) 307.3 and 307.4.",
   "Review note: explosives are mapped to H-1 only; IBC 307.5 places Division 1.4 (including consumer fireworks 1.4G) in H-3."
  ],
  "cases": [
   {
    "id": "map-flammable_gas",
    "title": "Hazard family: flammable_gas",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -25,7 +25,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-combustible_dust",
    "title": "Hazard family: combustible_dust",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -38,7 +38,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-flammable_solid",
    "title": "Hazard family: flammable_solid",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -51,7 +51,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-aerosols",
    "title": "Hazard family: aerosols",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -64,7 +64,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-pyroxylin",
    "title": "Hazard family: pyroxylin",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -77,7 +77,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-organic_peroxide",
    "title": "Hazard family: organic_peroxide",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -90,7 +90,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-unstable",
    "title": "Hazard family: unstable",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -103,7 +103,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-water_reactive",
    "title": "Hazard family: water_reactive",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -116,7 +116,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-highly_toxic",
    "title": "Hazard family: highly_toxic",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -129,7 +129,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-toxic",
    "title": "Hazard family: toxic",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -142,7 +142,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-corrosive",
    "title": "Hazard family: corrosive",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -155,7 +155,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-hpm",
    "title": "Hazard family: hpm",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
@@ -168,28 +168,26 @@ window.FT_VERIFY_CASES = {
   {
    "id": "map-oxidizer",
    "title": "Hazard family: oxidizer",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
      "expr": "(document.querySelector('[data-haz=\"oxidizer\"]').parentNode.textContent.match(/often (H-[0-9](?:\\/H-[0-9])*)/)||[])[1]",
      "label": "Suggested Group H",
-     "refText": "H-1/H-2/H-3",
-     "flag": "IBC 307.3 puts Class 4 oxidizers and detonable pyrophoric materials in Group H-1. The app maps oxidizers to H-2/H-3 and pyrophorics to H-2 only, so it will not suggest H-1 for them. Not changed; for Kevin to review."
+     "refText": "H-1/H-2/H-3"
     }
    ]
   },
   {
    "id": "map-pyrophoric",
    "title": "Hazard family: pyrophoric",
-   "source": "IBC 307.3 to 307.7",
+   "source": "IBC (2024) 307.3 to 307.7",
    "steps": [],
    "reads": [
     {
      "expr": "(document.querySelector('[data-haz=\"pyrophoric\"]').parentNode.textContent.match(/often (H-[0-9](?:\\/H-[0-9])*)/)||[])[1]",
      "label": "Suggested Group H",
-     "refText": "H-1/H-2",
-     "flag": "IBC 307.3 puts Class 4 oxidizers and detonable pyrophoric materials in Group H-1. The app maps oxidizers to H-2/H-3 and pyrophorics to H-2 only, so it will not suggest H-1 for them. Not changed; for Kevin to review."
+     "refText": "H-1/H-2"
     }
    ]
   }
