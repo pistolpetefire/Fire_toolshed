@@ -111,7 +111,7 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
   <div class="logo" aria-hidden="true">ASET</div>
   <div>
     <h1>ASET Screener</h1>
-    <p class="sub"><span class="badge">Screening · v1.1.2</span>Smoke-filling ASET for any large space: single-story, atrium, assembly, warehouse. NFPA 92 filling equations plus a two-zone mass/energy-balance layer model. Runs offline in the browser.</p>
+    <p class="sub"><span class="badge">Screening · v1.2.0</span>Smoke-filling ASET for any large space: single-story, atrium, assembly, warehouse. NFPA 92 filling equations plus a two-zone mass/energy-balance layer model. Runs offline in the browser.</p>
   </div>
 </header>
 <div class="banner" role="note"><b>Screening only. Not the submittal basis.</b> Use FDS (NIST Fire Dynamics Simulator) or another AHJ-accepted method for the submittal. A licensed fire protection engineer must confirm the inputs, the design fire, the applicability of each correlation, and the tenability criteria with the AHJ.</div>
@@ -227,6 +227,34 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
     </div>
     <p class="small" id="ioMsg" role="status"></p>
   </div>
+  <div class="card" id="fdsCard">
+    <h2>FDS starter file (.fds)</h2>
+    <p class="small"><b>Starter file only.</b> It turns these screening inputs into an FDS input file to start a CFD model. It is not a validated model. The engineer must review and complete every line (geometry, openings, fuel and yields, mesh sensitivity, devices) before running FDS, and the FDS results, not this screen, carry the analysis.</p>
+    <div class="row">
+      <div><label for="fL">Plan length <span class="unit" data-q="length"></span></label><input id="fL" inputmode="decimal" data-q="length" data-si="30"></div>
+      <div><label>Plan width (= area / length)</label><div class="small" id="fW" style="padding:.55rem 0">—</div></div>
+      <div><label for="fAf">Burner area <span class="unit" data-q="area"></span></label><input id="fAf" inputmode="decimal" data-q="area" data-si="4"></div>
+      <div><label for="fRatio">Target D*/δx (cells across D*)</label><input id="fRatio" inputmode="decimal" value="10"></div>
+    </div>
+    <div class="row">
+      <div><label for="fFuel">FDS predefined fuel</label><select id="fFuel"><option>PROPANE</option><option>METHANE</option><option>N-HEPTANE</option><option>ETHANOL</option></select></div>
+      <div><label for="fSoot">Soot yield [kg/kg] (per design fire)</label><input id="fSoot" inputmode="decimal" placeholder="required for visibility"></div>
+      <div><label for="fCO">CO yield [kg/kg] (optional)</label><input id="fCO" inputmode="decimal" placeholder="optional"></div>
+      <div><label for="fYieldCite">Yield source</label><input id="fYieldCite" placeholder="e.g. SFPE Handbook table, test data"></div>
+    </div>
+    <div class="row">
+      <div><label for="fMw">Makeup opening width <span class="unit" data-q="length"></span></label><input id="fMw" inputmode="decimal" data-q="length" data-si="3"></div>
+      <div><label for="fMh">Makeup opening height <span class="unit" data-q="length"></span></label><input id="fMh" inputmode="decimal" data-q="length" data-si="2"></div>
+      <div><label for="fExA">Exhaust vent area <span class="unit" data-q="area"></span></label><input id="fExA" inputmode="decimal" data-q="area" data-si="4"></div>
+      <div><label for="fMake">Makeup opening</label><select id="fMake"><option value="auto">Include when exhaust is on</option><option value="yes">Always include</option><option value="no">Do not include</option></select></div>
+    </div>
+    <p class="small">Plan length, burner area, openings and exhaust vent area start as example values; enter the project's values. The burner sets HRRPUA = peak HRR / burner area. The mesh suggestion follows the FDS User Guide (Sec. 6.3.6): no single D*/δx is acceptable for every case, so a mesh sensitivity study is required.</p>
+    <div id="fdsInfo"></div>
+    <ul class="warns" id="fdsWarns"></ul>
+    <div class="btns"><button class="btn" id="bFds">Export FDS starter (.fds)</button><button class="btn alt" id="bFdsPrev">Show / hide preview</button></div>
+    <pre id="fdsPre" class="runrec hidden" style="max-height:420px;overflow:auto"></pre>
+    <p class="small" id="fdsMsg" role="status"></p>
+  </div>
 </div>
 </div>
 </section>
@@ -237,6 +265,12 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
     <p class="small">Each case is run live in this page's engine and compared with an independent Python calculation (<code>verify_handcalc.py</code>: SciPy root-finding for the closed-form NFPA 92 equations, and SciPy LSODA with rtol 10⁻¹⁰ for the two-zone model, written in a different state formulation). Acceptance: within 1%.</p>
     <div class="tblwrap" style="max-height:none"><table id="vtbl"></table></div>
     <p id="vsum" style="margin-top:.6rem"></p>
+  </div>
+  <div class="card">
+    <h2>FDS starter export: checks</h2>
+    <p class="small">Derived FDS values (characteristic fire diameter D*, cell size, low-prime cell counts, HRRPUA, ramp end time) from this page compared with the independent Python script <code>fds_handcalc.py</code>. Acceptance: within 1% (cell counts exact). The exported file format was checked by running it in FDS 6.11.1 (see Method and limits).</p>
+    <div class="tblwrap" style="max-height:none"><table id="fvtbl"></table></div>
+    <p id="fvsum" style="margin-top:.6rem"></p>
   </div>
 </section>
 
@@ -282,6 +316,11 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
       <tr><td>Layer temperature limit</td><td>Optional upper-layer temperature criterion (two-zone model).</td><td>Per project and AHJ. Values are commonly derived from ISO 13571 and BS PD 7974-6 heat-exposure guidance, which distinguishes direct contact with hot gas from radiation from a layer overhead.</td><td>A hot layer above head height can still be untenable through radiation. This screen gives a single average layer temperature, not a heat-flux analysis.</td></tr>
       <tr><td>Simulation end time</td><td>How long the two-zone model runs.</td><td>1,800 s default; range 10–7,200 s.</td><td>Must exceed the expected ASET; "not reached" means you need to extend it or the layer has stabilized above the criterion.</td></tr>
       <tr><td>RSET segments and ratio</td><td>Detection, notification, pre-movement and movement (s), and the required ASET/RSET ratio.</td><td>From the Transparent RSET Tool; ratio per project and AHJ (1.0 means no extra margin).</td><td>The margin panel shows PASS, MARGINAL (below the required ratio) or FAIL (ASET below RSET).</td></tr>
+      <tr><td>FDS: plan length</td><td>Length of the space for the FDS domain; width = floor area / length.</td><td>Per the drawings, e.g. 100 ft (30 m); per project.</td><td>FDS needs a real plan shape; the screening equations only use the area.</td></tr>
+      <tr><td>FDS: burner area</td><td>Area of the fuel surface. Sets HRRPUA = peak HRR / area.</td><td>From the design fire (fuel package footprint), e.g. 43 ft² (4 m²); per project.</td><td>A too-small burner gives an unrealistically intense fire; too large spreads it thin. FDS snaps it to the mesh, so check the HRR output.</td></tr>
+      <tr><td>FDS: target D*/δx</td><td>Cells across the characteristic fire diameter D*.</td><td>Start coarse and refine; the FDS User Guide (Sec. 6.3.6) says no single value is acceptable for all cases. 10 is only a starting point.</td><td>Resolution of the plume sets the quality of the smoke filling result. A mesh sensitivity study is required.</td></tr>
+      <tr><td>FDS: fuel, soot and CO yields</td><td>FDS predefined fuel and product yields (kg/kg).</td><td>Per the design fire and its source (e.g. SFPE Handbook yield tables or test data); no defaults are filled in.</td><td>Soot yield controls visibility in FDS. With none entered, FDS predicts no soot.</td></tr>
+      <tr><td>FDS: makeup opening and exhaust vent</td><td>Opening to the outside on one wall and the ceiling exhaust vent size.</td><td>Per the smoke control design; e.g. 10 × 6.5 ft (3 × 2 m) opening and 43 ft² (4 m²) vent as placeholders.</td><td>FDS needs real openings; a sealed room pressurizes. Makeup velocity near the plume is limited (NFPA 92: 200 fpm, 1.02 m/s).</td></tr>
       </tbody></table></div>
 
     <h3>Reading the warnings</h3>
@@ -342,16 +381,21 @@ footer{margin-top:1.5rem;font-size:.8rem;color:var(--muted);text-align:center}
     </ul>
     <h3>RSET Tool handoff</h3>
     <p class="small">"Export RSET Tool session" writes the Transparent RSET Tool (v0.1.7) session format: <code>version</code>, <code>created</code>, <code>updated</code>, four <code>segments</code> (detection, notification, premovement, movement; seconds), <code>assumptionsLog</code>, <code>tenabilityLimit</code> (= governing ASET, s), <code>projectName</code>, <code>notes</code>. Load it with "Load Session" in the RSET Tool; it fills the optional tenability limit for its ASET − RSET margin. Import here accepts either this app's project JSON or an RSET Tool session (RSET segments are read into the margin panel).</p>
-  </div>
+      <h3>FDS starter export</h3>
+    <p class="small">Writes an FDS 6 input file: one MESH over the plan length × width × ceiling height; a burner (VENT on the floor, or an OBST up to the fuel elevation) with SURF HRRPUA = peak HRR / burner area; for t² fires a RAMP with F = (t / t<sub>cap</sub>)², t<sub>cap</sub> = t<sub>g</sub> (Q<sub>cap</sub>/1055)<sup>1/2</sup>; REAC with the chosen predefined fuel, the soot and CO yields you enter, and RADIATIVE_FRACTION = 1 − χ<sub>c</sub>; MISC TMPA = ambient; a ceiling exhaust VENT with SURF VOLUME_FLOW (positive = out of the domain); an OPEN makeup VENT on the x = 0 wall; DEVC columns for LAYER HEIGHT and UPPER TEMPERATURE, a TEMPERATURE tree, VISIBILITY at the design clear height; and SLCF slices.</p>
+    <div class="eq">D* = ( Q / (ρ∞ c<sub>p</sub> T∞ √g) )<sup>2/5</sup>,  ρ∞ = 353/T∞, c<sub>p</sub> = 1.005 kJ/kg·K, g = 9.81 m/s²;  δx = D* / (target D*/δx)</div>
+    <p class="small">Cell counts are rounded up to numbers with only 2, 3 and 5 as factors, as the FDS User Guide recommends for the pressure solver. The domain boundaries are FDS default inert walls. The export was run through FDS 6.11.1 (Linux) with a short T_END to confirm that FDS reads every namelist and completes; that check confirms syntax only, not the model. Sources: McGrattan et al., FDS User's Guide, Sixth Edition (FDS 6.11.1), NIST Special Publication 1019: Sec. 6.3.6 mesh resolution (eq. 6.2), Sec. 22.10.7 layer height, SURF VOLUME_FLOW sign convention, predefined fuels in Table 13.1.</p>
+    <ul class="cite"><li>The file does not model leakage, HVAC, sprinklers, detectors, walls inside the space, or material properties. Add these per project.</li><li>One mesh only; split into several meshes for parallel runs per the FDS User Guide.</li><li>Starter file only. Not the submittal basis.</li></ul>
+</div>
 </section>
 
 <section id="report" aria-hidden="true"></section>
-<footer>Fire Toolshed · ASET Screener v1.1.2 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
+<footer>Fire Toolshed · ASET Screener v1.2.0 · For qualified engineers only. Preliminary screening tool; not a substitute for engineering judgment, sealed design documents, or AHJ approval.</footer>
 </div>
 
 <script>
 "use strict";
-const APP={name:"ASET Screener",version:"1.1.2",schema:"fireToolshed.asetScreener.v1"};
+const APP={name:"ASET Screener",version:"1.2.0",schema:"fireToolshed.asetScreener.v1"};
 const CP=1.005,RG=287.05,P0=101325;
 const U={ // SI -> IP
   length:{IP:{f:v=>v/0.3048,b:v=>v*0.3048,u:"ft"},SI:{u:"m"}},
@@ -667,6 +711,116 @@ if(location.hash==="#selftest"){const out=[];try{
  }catch(e){out.push("ERR "+e.message)} document.title="SELFTEST "+out.join(" | ");}
 if(location.hash==="#steady"){fire="steady";syncUI();}
 if(location.hash==="#si"){units="SI";$("exOn").checked=true;$("tOn").checked=true;syncUI(true);}
+
+// ---------- FDS starter export ----------
+const FDS_REF={"A": {"Dstar_m": 1.825063137768037, "dx_target_m": 0.1825063137768037, "I": 180, "J": 180, "K": 120, "cells": 3888000, "dx_actual_max_m": 0.16666666666666666, "HRRPUA_kW_m2": 1250.0, "t_cap_s": 326.5502581380811, "ramp_F_at_half": 0.25}, "B": {"Dstar_m": 1.2650331023764654, "dx_target_m": 0.15812913779705817, "I": 256, "J": 160, "K": 80, "cells": 3276800, "dx_actual_max_m": 0.15625, "HRRPUA_kW_m2": 800.0}};
+function lowPrime(n){n=Math.max(1,Math.floor(n));for(;;n++){let m=n;for(const p of [2,3,5])while(m%p===0)m/=p;if(m===1)return n;}}
+function fdsDerived(Q,L,W,H,T0C,ratio,Af,tg,cap){const T=T0C+273.15,rho=353/T,Ds=Math.pow(Q/(rho*1.005*T*Math.sqrt(9.81)),0.4),dx=Ds/ratio;
+  const I=lowPrime(Math.ceil(L/dx-1e-9)),J=lowPrime(Math.ceil(W/dx-1e-9)),K=lowPrime(Math.ceil(H/dx-1e-9));
+  return {Ds,dx,I,J,K,cells:I*J*K,dxMax:Math.max(L/I,W/J,H/K),HRRPUA:Q/Af,tcap:tg?tg*Math.sqrt(cap/1055):null};}
+const fN=(v,d=3)=>{const s=Number(v).toFixed(d);return s.indexOf(".")>=0?s.replace(/0+$/,"").replace(/\.$/,""):s};
+function fdsSI(id){const el=$(id);if(el.dataset.si!=null&&el.value===el.dataset.shown)return parseFloat(el.dataset.si);const v=num(id);return isFinite(v)?toSI(el.dataset.q,v):NaN}
+function fdsBuild(){
+  const p=readInputs(), W=[], errs=[];
+  if(p.errs.length) return {err:"Fix the calculator inputs first: "+p.errs.join("; ")+"."};
+  const L=fdsSI("fL"), Af=fdsSI("fAf"), ratio=num("fRatio"), mw=fdsSI("fMw"), mh=fdsSI("fMh"), exA=fdsSI("fExA");
+  const bad=(id,c)=>{$(id).classList.toggle("bad",!c);if(!c)errs.push(id)};
+  bad("fL",L>0&&L<=1000); const Wd=p.A/L; bad("fAf",Af>0&&Af<p.A); bad("fRatio",ratio>=2&&ratio<=40);
+  bad("fMw",mw>0&&mw<=Wd); bad("fMh",mh>0&&mh<=p.H); bad("fExA",exA>0&&exA<p.A);
+  const soot=$("fSoot").value.trim()===""?null:num("fSoot"), co=$("fCO").value.trim()===""?null:num("fCO");
+  bad("fSoot",soot==null||(soot>=0&&soot<=1)); bad("fCO",co==null||(co>=0&&co<=1));
+  $("fW").textContent=isFinite(Wd)&&L>0?fN(toDisp("length",Wd),2)+" "+uLab("length"):"—";
+  if(errs.length) return {err:"Fix the highlighted FDS inputs."};
+  if(Wd<0.1*L||Wd>10*L) W.push("Plan aspect ratio is extreme; check the plan length.");
+  const Q=p.fire==="t2"?p.cap:p.Q, d=fdsDerived(Q,L,Wd,p.H,p.T0,ratio,Af,p.fire==="t2"?p.tg:null,p.cap);
+  const side=Math.sqrt(Af), xc=L/2, yc=Wd/2, x1=xc-side/2,x2=xc+side/2,y1=yc-side/2,y2=yc+side/2;
+  const ex=p.exOn&&p.Ve>0, mk=$("fMake").value==="yes"||($("fMake").value==="auto"&&ex);
+  const tEnd=p.tmax, chid=(p.proj||"aset_starter").replace(/[^A-Za-z0-9]+/g,"_").replace(/^_|_$/g,"").slice(0,30)||"aset_starter";
+  if(d.cells>8e6) W.push(`The suggested mesh has ${fmt(d.cells/1e6,1)} million cells; split into several meshes or coarsen for early runs.`);
+  if(side<d.dx*2) W.push("The burner is less than two cells wide at this cell size.");
+  W.push("FDS snaps the burner, vents and devices to the mesh. After a run, check that CHID_hrr.csv matches the design fire.");
+  if(soot==null) W.push("No soot yield entered: FDS then predicts no soot and visibility devices will read clear. Enter a yield for the design fuel.");
+  if(!$("fYieldCite").value.trim()&&(soot!=null||co!=null)) W.push("Add the source of the soot and CO yields.");
+  if(!mk) W.push("No makeup opening: the room is sealed in FDS and pressure will rise. Add leakage or openings per project.");
+  if(ex&&mk) {const vm=p.Ve/(mw*mh); if(vm>1.02) W.push(`Makeup velocity ${fmt(vm,2)} m/s exceeds 1.02 m/s (200 fpm), the NFPA 92 limit for makeup air velocity near the plume; check the opening size.`);}
+  const zc=p.zcrit, cols=[[0.25*L,0.25*Wd],[0.75*L,0.75*Wd],[0.25*L,0.75*Wd]];
+  const R=[];
+  R.push(`FDS STARTER FILE generated by ${APP.name} v${APP.version} (Fire Toolshed) on ${new Date().toISOString()}`);
+  R.push("STARTER FILE ONLY. NOT A VALIDATED MODEL. The engineer must review and complete every line before running FDS.");
+  R.push("Run record for traceability only. Not a professional seal or certification.");
+  R.push(`Project: ${p.proj||"(unnamed)"} . Design fire basis: ${p.cite||"(none entered)"}`);
+  R.push(`Screening inputs (SI): H ${fN(p.H)} m, A ${fN(p.A)} m2, plan ${fN(L)} x ${fN(Wd)} m, fuel elevation ${fN(p.zf)} m, ${p.fire==="t2"?`t-squared tg ${fN(p.tg)} s to cap ${fN(p.cap)} kW`:`steady ${fN(p.Q)} kW`}, convective fraction ${fN(p.chi)}, exhaust ${ex?fN(p.Ve)+" m3/s":"off"}, design clear height ${fN(zc)} m, ambient ${fN(p.T0)} C.`);
+  R.push(`Screening ASET (governing) for comparison: ${LAST&&LAST.R&&LAST.R.gov?fN(LAST.R.gov[1],0)+" s ("+LAST.R.gov[0]+")":"n/a"}.`);
+  R.push(`Mesh suggestion: D* = ${fN(d.Ds)} m, target D*/dx = ${fN(ratio)}, cells ${d.I} x ${d.J} x ${d.K} = ${d.cells}, largest cell ${fN(d.dxMax)} m. Run a mesh sensitivity study (FDS User Guide Sec. 6.3.6).`);
+  R.push("FDS snaps the burner to the mesh: after a run, check that CHID_hrr.csv matches the design fire.");
+  R.push("Syntax of this file format was checked by running exports in FDS 6.11.1; that confirms syntax only, not the model.");
+  R.push("REVIEW: geometry, leakage, openings, exhaust location, fuel, yields, radiative fraction, devices, T_END, and the mesh before any use.");
+  R.push("");
+  R.push(`&HEAD CHID='${chid}', TITLE='ASET Screener starter: review before use' /`);
+  R.push(`&TIME T_END=${fN(tEnd,1)} /`);
+  R.push(`&MISC TMPA=${fN(p.T0,2)} /`);
+  R.push(`&DUMP DT_DEVC=1.0, DT_SLCF=5.0 /`);
+  R.push("");
+  R.push(`&MESH ID='MESH1', IJK=${d.I},${d.J},${d.K}, XB=0.0,${fN(L)},0.0,${fN(Wd)},0.0,${fN(p.H)} /`);
+  R.push("");
+  R.push(`Fuel and yields: predefined fuel per FDS User Guide Table 13.1. Yield source: ${$("fYieldCite").value.trim()||"(not entered)"}.`);
+  R.push(`&REAC FUEL='${$("fFuel").value}'${soot!=null?`, SOOT_YIELD=${fN(soot,4)}`:""}${co!=null?`, CO_YIELD=${fN(co,4)}`:""}, RADIATIVE_FRACTION=${fN(1-p.chi,3)} /`);
+  R.push("");
+  R.push(`Design fire: peak ${fN(Q)} kW over ${fN(Af)} m2 burner centered in plan.`);
+  R.push(`&SURF ID='FIRE', HRRPUA=${fN(d.HRRPUA,2)}${p.fire==="t2"?", RAMP_Q='FIRE_RAMP'":""}, COLOR='ORANGE' /`);
+  if(p.fire==="t2"){R.push(`t-squared growth Q = 1055 (t/tg)^2 kW reaching the cap at ${fN(d.tcap,1)} s, then constant.`);
+    R.push("FDS interpolates RAMP points linearly; 20 segments keep the t-squared curve close (slightly high early, conservative).");
+    for(let i=0;i<=20;i++){const t=d.tcap*i/20;R.push(`&RAMP ID='FIRE_RAMP', T=${fN(t,2)}, F=${fN((i/20)**2,5)} /`);}
+    if(tEnd>d.tcap) R.push(`&RAMP ID='FIRE_RAMP', T=${fN(Math.max(tEnd,d.tcap+1),1)}, F=1.0 /`);}
+  if(p.zf>0) R.push(`&OBST XB=${fN(x1)},${fN(x2)},${fN(y1)},${fN(y2)},0.0,${fN(p.zf)}, SURF_IDS='FIRE','INERT','INERT' /`);
+  else R.push(`&VENT XB=${fN(x1)},${fN(x2)},${fN(y1)},${fN(y2)},0.0,0.0, SURF_ID='FIRE' /`);
+  R.push("");
+  if(ex){const es=Math.sqrt(exA), ex0=0.75*L;R.push(`Mechanical exhaust ${fN(p.Ve)} m3/s through a ${fN(exA)} m2 ceiling vent (location is a placeholder; avoid placing it directly over the plume).`);
+    R.push(`&SURF ID='EXHAUST', VOLUME_FLOW=${fN(p.Ve,3)}, COLOR='GRAY' /`);
+    R.push(`&VENT XB=${fN(ex0-es/2)},${fN(ex0+es/2)},${fN(yc-es/2)},${fN(yc+es/2)},${fN(p.H)},${fN(p.H)}, SURF_ID='EXHAUST' /`);}
+  if(mk){R.push(`Makeup air: ${fN(mw)} m x ${fN(mh)} m opening to the outside on the x = 0 wall (placeholder location).`);
+    R.push(`&VENT XB=0.0,0.0,${fN(yc-mw/2)},${fN(yc+mw/2)},0.0,${fN(mh)}, SURF_ID='OPEN' /`);}
+  R.push("");
+  R.push("Devices: layer height and upper-layer temperature columns (FDS User Guide Sec. 22.10.7), a temperature tree, visibility at the design clear height.");
+  cols.forEach(([x,y],i)=>{R.push(`&DEVC ID='LAYER_${i+1}', QUANTITY='LAYER HEIGHT', XB=${fN(x)},${fN(x)},${fN(y)},${fN(y)},0.0,${fN(p.H)} /`);R.push(`&DEVC ID='TUPPER_${i+1}', QUANTITY='UPPER TEMPERATURE', XB=${fN(x)},${fN(x)},${fN(y)},${fN(y)},0.0,${fN(p.H)} /`);
+    if(zc>0&&zc<p.H) R.push(`&DEVC ID='VIS_${i+1}', QUANTITY='VISIBILITY', XYZ=${fN(x)},${fN(y)},${fN(zc)} /`);});
+  for(let k=1;k<=10;k++){const z=p.H*k/10-(k===10?Math.min(0.1,p.H*0.02):0);R.push(`&DEVC ID='T_${k}', QUANTITY='TEMPERATURE', XYZ=${fN(cols[0][0])},${fN(cols[0][1])},${fN(z)} /`);}
+  R.push(`&SLCF PBY=${fN(yc)}, QUANTITY='TEMPERATURE' /`);
+  R.push(`&SLCF PBY=${fN(yc)}, QUANTITY='VISIBILITY' /`);
+  R.push(`&SLCF PBX=${fN(xc)}, QUANTITY='TEMPERATURE' /`);
+  R.push("");
+  R.push("&TAIL /");
+  return {text:R.join("\n")+"\n",d,W,chid,tEnd};
+}
+function fdsRender(){const r=fdsBuild();
+  if(r.err){$("fdsInfo").innerHTML=`<p class="small">${r.err}</p>`;$("fdsWarns").innerHTML="";$("fdsPre").textContent="";return null}
+  const d=r.d;$("fdsInfo").innerHTML=`<div class="kpis"><div class="kpi"><div class="k">D* (peak HRR)</div><div class="v">${fN(d.Ds,2)} m</div><div class="s">FDS UG eq. 6.2</div></div><div class="kpi"><div class="k">Suggested mesh</div><div class="v">${d.I} × ${d.J} × ${d.K}</div><div class="s">${fmt(d.cells,0)} cells · largest cell ${fN(d.dxMax,3)} m (FDS works in SI)</div></div><div class="kpi"><div class="k">HRRPUA</div><div class="v">${fmt(d.HRRPUA,0)} kW/m²</div><div class="s">${d.tcap?"ramp to cap at "+fmt(d.tcap,0)+" s":"steady"}</div></div></div>`;
+  $("fdsWarns").innerHTML=r.W.map(w=>`<li class="w">Warning: ${w}</li>`).join("")+`<li class="i">Starter file only: review every line; confirm with a mesh sensitivity study.</li>`;
+  $("fdsPre").textContent=r.text;return r;}
+$("bFds").onclick=()=>{const r=fdsRender();if(!r){$("fdsMsg").textContent="Fix the inputs before exporting.";return}
+  const b=new Blob([r.text],{type:"text/plain"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=r.chid+".fds";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500);
+  $("fdsMsg").textContent=`Saved ${r.chid}.fds. Starter file only: review before running FDS.`};
+$("bFdsPrev").onclick=()=>{fdsRender();$("fdsPre").classList.toggle("hidden")};
+document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest("#tab-inputs")){clearTimeout(window.__fdsT);window.__fdsT=setTimeout(fdsRender,300)}});
+document.addEventListener("change",e=>{if(e.target.closest&&e.target.closest("#tab-inputs")){clearTimeout(window.__fdsT);window.__fdsT=setTimeout(fdsRender,300)}});
+function runFdsVerify(){const rows=[];
+  const add=(id,desc,a,r,exact)=>{const d=exact?(a===r?0:100):Math.abs(a-r)/Math.abs(r)*100;rows.push([id,desc,a,r,d,exact?a===r:d<=1])};
+  const A=fdsDerived(5000,30,30,20,20,10,4,150,5000), Ra=FDS_REF.A, B=fdsDerived(2000,40,25,12,25,8,2.5,null,null), Rb=FDS_REF.B;
+  add("F1a","Case A: D* for 5000 kW, 20 °C [m]",A.Ds,Ra.Dstar_m);add("F1b","Case B: D* for 2000 kW, 25 °C [m]",B.Ds,Rb.Dstar_m);
+  add("F2a","Case A: target cell size D*/10 [m]",A.dx,Ra.dx_target_m);
+  add("F3a","Case A: cells I × J × K (low-prime rounding) [count]",A.cells,Ra.cells,true);add("F3b","Case B: cells I × J × K, D*/δx = 8 [count]",B.cells,Rb.cells,true);
+  add("F4","Case A: largest cell size [m]",A.dxMax,Ra.dx_actual_max_m);add("F5","Case A: HRRPUA, 5000 kW over 4 m² [kW/m²]",A.HRRPUA,Ra.HRRPUA_kW_m2);
+  add("F6","Case A: ramp reaches the cap, tg 150 s, 5000 kW [s]",A.tcap,Ra.t_cap_s);
+  let pass=0,h="<thead><tr><th>Case</th><th style='text-align:left'>Description</th><th>App</th><th>Python</th><th>Diff</th><th>Result</th></tr></thead><tbody>";
+  for(const [id,desc,a,r,d,ok] of rows){if(ok)pass++;h+=`<tr><td>${id}</td><td style="text-align:left;white-space:normal;min-width:240px">${desc}</td><td>${fmt(a,4)}</td><td>${fmt(r,4)}</td><td>${fmt(d,3)}%</td><td><span class="pill ${ok?"pass":"fail"}">${ok?"PASS":"FAIL"}</span></td></tr>`}
+  $("fvtbl").innerHTML=h+"</tbody>";$("fvsum").innerHTML=`<span class="pill ${pass===rows.length?"pass":"fail"}">${pass} / ${rows.length} within tolerance</span>`;return {pass,total:rows.length};}
+document.querySelector('[data-tab="verify"]').addEventListener("click",()=>runFdsVerify());
+fdsRender();
+if(location.hash==="#verify") runFdsVerify();
+if(location.hash==="#fdstest"){const o=[];try{const r=fdsRender();o.push("built="+!!r);o.push("tail="+/&TAIL \/\n$/.test(r.text));o.push("mesh="+/&MESH ID='MESH1', IJK=\d+,\d+,\d+/.test(r.text));
+  o.push("ramp="+(r.text.match(/&RAMP /g)||[]).length);o.push("devc="+(r.text.match(/&DEVC /g)||[]).length);const v=runFdsVerify();o.push("verify="+v.pass+"/"+v.total);
+  o.push("ampInComments="+r.text.split("\n").filter(l=>!l.startsWith("&")&&l.includes("&")).length);o.push("forbiddenWord="+r.text.toLowerCase().includes(["st","amp"].join("")));
+  window.__FDS_TEXT=r.text;}catch(e){o.push("ERR "+e.message)}document.title="FDSTEST "+o.join(" | ");}
 
 // Shared project file (fireToolshed.project.v1, see Project File Hub): take this app's section, else the file as is.
 function unwrapShared(o){if(o&&o.schema==="fireToolshed.project.v1"&&o.apps&&typeof o.apps==="object"){for(const k of ["asetScreener","rsetTool"]){const sec=o.apps[k];if(sec&&sec.data&&typeof sec.data==="object")return sec.data;}throw new Error("This shared project file has no section for this app.");}return o;}
