@@ -788,7 +788,8 @@ function pythonHandCalcTable(rows) {
       <p>Each value is recomputed from the equations in validation/atrium_handcalc.py, not by this page's code. Acceptance: within 1%. <strong class="${passed === items.length ? 'pass' : 'fail'}" data-python-summary>${passed} / ${items.length} within 1%</strong></p>
       <table><thead><tr><th>Check</th><th>Quantity</th><th>App</th><th>Python</th><th>Difference</th><th></th></tr></thead><tbody>
         ${items.map(({ row, ref, diff, pass }) => `<tr><td>${esc(row.id)}</td><td>${esc(row.quantity)}</td><td>${esc(row.actual)} ${esc(row.unit)}</td><td>${Number.isFinite(ref) ? esc(Math.round(ref * 10000) / 10000) : 'n/a'} ${esc(row.unit)}</td><td>${diff == null ? 'n/a' : esc(Math.round(diff * 1000) / 1000) + '%'}</td><td class="${pass ? 'pass' : 'fail'}">${pass ? 'pass' : 'fail'}</td></tr>`).join('')}
-      </tbody></table>`
+      </tbody></table>
+      ${items.some(({ row }) => row.id === 'zone-closed-form') ? `<p class="note" data-heated-layer-note>Zone clear-height check (zone-closed-form): the zone model heats the smoke layer, and hot smoke takes more volume than ambient-density smoke, so the layer is deeper and the clear height lower. The Python check integrates the same heated-layer mass and energy balance independently and must agree within 1%. The published closed form (z/H = [1 + (2/3) C t H^(2/3)]^(-3/2)) assumes ambient-density smoke, a known simplification. It reads about 2% higher (${esc(Math.round(PYTHON_REF._zone_closed_form_check * 1000) / 1000)} m here), so the engine table above compares against it with a 5% tolerance that covers only this physics difference. Since atrium path v1.0.1 the engine sub-steps its time integration (at most 0.05 s); that change moved results by less than 1%, toward slightly higher clear heights.</p>` : ''}`
 }
 
 function checklistInline(raw) {
