@@ -21,8 +21,6 @@ a professional seal or certification.
 |---|---|---|
 | Concrete Fire Rating | CMU, expanded clay/shale/slate, 1 h: app 2.2 in, IBC Table 722.3.2 2.6 in | Non-conservative |
 | Deflagration Vent | Dust and gas vent equations do not match NFPA 68 (dust: V^(2/3) Pred^(-1/2), no Pmax/Pred term; gas: exponents on wrong pressures) | Dust under-sized about 70%; gas over-sized 3 to 4 times in the test cases |
-| Dry Sprinkler Delivery | Trip-time equation fed gallons and in2 instead of ft3 and ft2 | Trip time about 19 times too short |
-| Dry Sprinkler Delivery | Fitting equivalent lengths differ from NFPA 13 Table 28.2.3.1.1 in several cells | Mixed; swing checks high, some 45 deg / butterfly low |
 | IBC/IFC Hazard | Class 4 oxidizers and detonable pyrophorics not mapped to H-1 (IBC 307.3) | H-1 not suggested |
 | Smoke Exhaust Lab | Plugholing Vmax uses a temperature rise from 0.5 Qc rather than the layer temperature | Vmax about 29% low (conservative) |
 
@@ -50,3 +48,9 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
   - NFPA 101 (2018+) Table 7.3.1.2 business use is now 150 gross.
   - Saved v1.1.0 groups F / S / H / I migrate to the most restrictive subgroup (F-1 / S-1 / H-1 / I-2 / I-3).
   - Common path and dead-end values are unchanged (simplified group values). Per project and AHJ.
+
+- **Dry Sprinkler Delivery v1.4.0-prelim (2026-10-14).** Two changes:
+  - **Trip time:** V_T is now converted to ft³ and A_n to ft² before the SFPE/FM equation (it previously used gal and in², about 19 times short).
+  - **Fitting equivalent lengths:** now per NFPA 13 (2025) Table 28.2.3.1.1, checked against the scanned 2025 text on law.resource.org. Blank table cells keep the app's planning values.
+  - Delivery times were checked against NFPA 13 (2025) Table 8.2.4.3.2, and the 500/750 gal exemptions against 8.2.4.2.1/8.2.4.2.2; both unchanged.
+  - The fill-rate method note (no loss through open sprinklers) still stands.
