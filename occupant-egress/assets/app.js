@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.1.0";
+  var APP_VERSION = "1.2.0";
   var STORAGE_KEY = "occupantEgress.v1";
 
   /** Shared egress component types */
@@ -39,34 +39,50 @@
     { id: "mercantile_storage", label: "Mercantile storage / stock (300 gross)", factor: 300, basis: "gross" },
     { id: "parking", label: "Parking garages (200 gross)", factor: 200, basis: "gross" },
     { id: "residential", label: "Residential (200 gross)", factor: 200, basis: "gross" },
-    { id: "storage", label: "Storage / warehouse (300 gross)", factor: 300, basis: "gross" },
+    { id: "storage", label: "Storage, stock, shipping / accessory storage (300 gross)", factor: 300, basis: "gross" },
+    { id: "warehouse", label: "Warehouses (500 gross)", factor: 500, basis: "gross" },
     { id: "mechanical", label: "Mechanical / equipment rooms (300 gross)", factor: 300, basis: "gross" },
     { id: "fixed", label: "Fixed seating / known count (use Fixed OL)", factor: 0, basis: "fixed" },
   ];
 
+  /**
+   * Travel limits: IBC 2021 Table 1017.2 (subgroups per table; null = "Not Permitted"
+   * without sprinklers). F-1/S-1 400 ft increase per IBC 2021 1017.2.2 (opt-in checkbox).
+   * Common path / dead-end values are the app's simplified group values (unchanged in v1.2.0).
+   */
   var IBC_OCC_GROUPS = [
     { id: "A", label: "A — Assembly", travel: { yes: 250, no: 200 }, common: { yes: 75, no: 75 }, deadEnd: { yes: 20, no: 20 } },
     { id: "B", label: "B — Business", travel: { yes: 300, no: 200 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
     { id: "E", label: "E — Educational", travel: { yes: 250, no: 200 }, common: { yes: 75, no: 75 }, deadEnd: { yes: 50, no: 20 } },
-    { id: "F", label: "F — Factory / Industrial", travel: { yes: 400, no: 300 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
-    { id: "H", label: "H — High Hazard (verify specific H)", travel: { yes: 200, no: 150 }, common: { yes: 50, no: 50 }, deadEnd: { yes: 20, no: 20 } },
-    { id: "I", label: "I — Institutional (verify specific I)", travel: { yes: 250, no: 200 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 30, no: 20 } },
+    { id: "F-1", label: "F-1 — Factory, moderate hazard", travel: { yes: 250, no: 200 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 }, inc10172: true },
+    { id: "F-2", label: "F-2 — Factory, low hazard", travel: { yes: 400, no: 300 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
+    { id: "H-1", label: "H-1 — High hazard", travel: { yes: 75, no: null }, common: { yes: 50, no: 50 }, deadEnd: { yes: 20, no: 20 } },
+    { id: "H-2", label: "H-2 — High hazard", travel: { yes: 100, no: null }, common: { yes: 50, no: 50 }, deadEnd: { yes: 20, no: 20 } },
+    { id: "H-3", label: "H-3 — High hazard", travel: { yes: 150, no: null }, common: { yes: 50, no: 50 }, deadEnd: { yes: 20, no: 20 } },
+    { id: "H-4", label: "H-4 — High hazard", travel: { yes: 175, no: null }, common: { yes: 50, no: 50 }, deadEnd: { yes: 20, no: 20 } },
+    { id: "H-5", label: "H-5 — High hazard (HPM)", travel: { yes: 200, no: null }, common: { yes: 50, no: 50 }, deadEnd: { yes: 20, no: 20 } },
+    { id: "I-1", label: "I-1 — Institutional (supervised living)", travel: { yes: 250, no: null }, common: { yes: 100, no: 75 }, deadEnd: { yes: 30, no: 20 } },
+    { id: "I-2/I-3", label: "I-2 / I-3 — Institutional (health care, detention)", travel: { yes: 200, no: null }, common: { yes: 100, no: 75 }, deadEnd: { yes: 30, no: 20 } },
+    { id: "I-4", label: "I-4 — Institutional (day care)", travel: { yes: 200, no: 150 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 30, no: 20 } },
     { id: "M", label: "M — Mercantile", travel: { yes: 250, no: 200 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
     { id: "R", label: "R — Residential", travel: { yes: 250, no: 200 }, common: { yes: 125, no: 75 }, deadEnd: { yes: 50, no: 20 } },
-    { id: "S", label: "S — Storage", travel: { yes: 400, no: 300 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
-    { id: "U", label: "U — Utility / Miscellaneous", travel: { yes: 300, no: 200 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
+    { id: "S-1", label: "S-1 — Storage, moderate hazard", travel: { yes: 250, no: 200 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 }, inc10172: true },
+    { id: "S-2", label: "S-2 — Storage, low hazard", travel: { yes: 400, no: 300 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
+    { id: "U", label: "U — Utility / Miscellaneous", travel: { yes: 400, no: 300 }, common: { yes: 100, no: 75 }, deadEnd: { yes: 50, no: 20 } },
   ];
+  /** v1.1.0 saved groups → most restrictive v1.2.0 subgroup (conservative migration). */
+  var LEGACY_OCC_MAP = { F: "F-1", S: "S-1", H: "H-1", I: "I-2/I-3" };
 
   /**
    * NFPA 101 path — Table 7.3.1.2 load factors, §7.3.3 capacity, occupancy travel (simplified).
-   * Notable difference: Business is 100 sf/person gross (vs IBC 150).
+   * Business use 150 gross per NFPA 101 (2018 and later); pre-2018 editions used 100.
    */
   var NFPA_LOAD_USES = [
     { id: "assembly_standing", label: "Assembly — standing space (5 net)", factor: 5, basis: "net" },
     { id: "assembly_chairs", label: "Assembly — concentrated (7 net)", factor: 7, basis: "net" },
     { id: "assembly_tables", label: "Assembly — less concentrated (15 net)", factor: 15, basis: "net" },
     { id: "assembly_stage", label: "Assembly — stages (15 net)", factor: 15, basis: "net" },
-    { id: "business", label: "Business use (100 gross)", factor: 100, basis: "gross" },
+    { id: "business", label: "Business use (150 gross, NFPA 101-2018+)", factor: 150, basis: "gross" },
     { id: "classroom", label: "Educational — classroom (20 net)", factor: 20, basis: "net" },
     { id: "shops", label: "Educational — shops / labs (50 net)", factor: 50, basis: "net" },
     { id: "day_care", label: "Day-care (35 net)", factor: 35, basis: "net" },
@@ -110,7 +126,7 @@
       title: "International Building Code (IBC)",
       loadTable: "IBC Table 1004.5",
       capacityRef: "IBC §1005.3",
-      travelRef: "IBC Chapter 10 (simplified by occupancy group)",
+      travelRef: "IBC 2021 Table 1017.2 travel; common path / dead-end simplified",
       loadUses: IBC_LOAD_USES,
       occGroups: IBC_OCC_GROUPS,
       defaultOcc: "B",
@@ -218,6 +234,7 @@
       buildingArea: "",
       sprinklered: "yes",
       occupancyGroup: "B",
+      inc10172: false,
       spaces: [],
       egress: [],
       travelActual: "",
@@ -231,6 +248,9 @@
   function ensureWorkbenchDefaults() {
     var p = currentPath();
     if (!p) return;
+    if (p.id === "ibc" && LEGACY_OCC_MAP[state.occupancyGroup]) {
+      state.occupancyGroup = LEGACY_OCC_MAP[state.occupancyGroup];
+    }
     if (!state.occupancyGroup || !occGroups().some(function (g) { return g.id === state.occupancyGroup; })) {
       state.occupancyGroup = p.defaultOcc;
     }
@@ -362,6 +382,9 @@
         else state.codePath = "ibc";
       }
       if (state.codePath && !CODE_PATHS[state.codePath]) state.codePath = null;
+      if (state.codePath === "ibc" && LEGACY_OCC_MAP[state.occupancyGroup]) {
+        state.occupancyGroup = LEGACY_OCC_MAP[state.occupancyGroup];
+      }
     } catch (_) { /* ignore */ }
   }
 
@@ -474,8 +497,11 @@
     var margin = cap - load;
     var group = occGroup(state.occupancyGroup);
     var spKey = state.sprinklered === "yes" ? "yes" : "no";
+    var travelLim = group.travel[spKey];
+    var incApplied = !!(group.inc10172 && state.inc10172 && spKey === "yes");
+    if (incApplied) travelLim = 400;
     var allow = {
-      travel: group.travel[spKey],
+      travel: travelLim,
       common: group.common[spKey],
       deadEnd: group.deadEnd[spKey],
     };
@@ -483,7 +509,7 @@
     var common = num(state.commonPathActual, NaN);
     var dead = num(state.deadEndActual, NaN);
     var travelOk =
-      !Number.isFinite(travel) || travel <= 0 ? null : travel <= allow.travel;
+      !Number.isFinite(travel) || travel <= 0 ? null : allow.travel == null ? false : travel <= allow.travel;
     var commonOk =
       !Number.isFinite(common) || common <= 0 ? null : common <= allow.common;
     var deadOk = !Number.isFinite(dead) || dead <= 0 ? null : dead <= allow.deadEnd;
@@ -500,6 +526,7 @@
       margin: margin,
       group: group,
       allow: allow,
+      incApplied: incApplied,
       travel: travel,
       common: common,
       dead: dead,
@@ -601,6 +628,7 @@
           ? "Occupancy classification (travel limits)"
           : "Primary occupancy group (travel limits)";
     }
+    if ($("inc10172Field")) $("inc10172Field").hidden = !(p && p.id === "ibc");
   }
 
   function render() {
@@ -675,9 +703,11 @@
 
     if ($("allowBox")) {
       $("allowBox").innerHTML =
-        "Travel ≤ <strong>" +
-        m.allow.travel +
-        " ft</strong> · Common path ≤ <strong>" +
+        (m.allow.travel == null
+          ? "Travel: <strong>Not permitted without sprinklers</strong>"
+          : "Travel ≤ <strong>" + m.allow.travel + " ft</strong>") +
+        (m.incApplied ? " (1017.2.2)" : "") +
+        " · Common path ≤ <strong>" +
         m.allow.common +
         " ft</strong> · Dead-end ≤ <strong>" +
         m.allow.deadEnd +
@@ -696,7 +726,9 @@
         bits.push("Travel distance OK (" + m.travel + " ≤ " + m.allow.travel + " ft)");
       if (m.travelOk === false)
         bits.push(
-          "Travel distance EXCEEDS limit (" + m.travel + " > " + m.allow.travel + " ft)"
+          m.allow.travel == null
+            ? "Occupancy not permitted without sprinklers (IBC Table 1017.2)"
+            : "Travel distance EXCEEDS limit (" + m.travel + " > " + m.allow.travel + " ft)"
         );
       if (m.commonOk === true)
         bits.push("Common path OK (" + m.common + " ≤ " + m.allow.common + " ft)");
@@ -819,6 +851,7 @@
     state.sprinklered = ($("sprinklered") && $("sprinklered").value) || "yes";
     state.occupancyGroup =
       ($("occupancyGroup") && $("occupancyGroup").value) || state.occupancyGroup;
+    state.inc10172 = !!($("inc10172") && $("inc10172").checked);
     state.travelActual = ($("travelActual") && $("travelActual").value) || "";
     state.commonPathActual =
       ($("commonPathActual") && $("commonPathActual").value) || "";
@@ -829,6 +862,7 @@
     if ($("projectName")) $("projectName").value = state.projectName;
     if ($("buildingArea")) $("buildingArea").value = state.buildingArea;
     if ($("sprinklered")) $("sprinklered").value = state.sprinklered;
+    if ($("inc10172")) $("inc10172").checked = !!state.inc10172;
     if ($("occupancyGroup")) $("occupancyGroup").value = state.occupancyGroup;
     if ($("travelActual")) $("travelActual").value = state.travelActual;
     if ($("commonPathActual")) $("commonPathActual").value = state.commonPathActual;
@@ -935,8 +969,9 @@
       "</tbody></table>" +
       "<h2>Travel limits (simplified)</h2>" +
       "<p>Allowable — Travel " +
-      m.allow.travel +
-      " ft · Common path " +
+      (m.allow.travel == null ? "not permitted without sprinklers" : m.allow.travel + " ft") +
+      (m.incApplied ? " (IBC 1017.2.2)" : "") +
+      " · Common path " +
       m.allow.common +
       " ft · Dead-end " +
       m.allow.deadEnd +
@@ -1044,7 +1079,7 @@
       });
     $("btnChangePath") && $("btnChangePath").addEventListener("click", changePath);
 
-    ["projectName", "buildingArea", "sprinklered", "occupancyGroup", "travelActual", "commonPathActual", "deadEndActual"].forEach(
+    ["projectName", "buildingArea", "sprinklered", "occupancyGroup", "inc10172", "travelActual", "commonPathActual", "deadEndActual"].forEach(
       function (id) {
         var el = $(id);
         if (!el) return;

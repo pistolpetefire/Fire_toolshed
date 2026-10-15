@@ -5,8 +5,7 @@ window.FT_VERIFY_CASES = {
  "versionSel": "#appVersion",
  "handcalc": "validation/verify/occupant_egress.py",
  "flags": [
-  "IBC Table 1017.2 gives 250 ft (sprinklered) / 200 ft (not sprinklered) for S-1 and F-1; the app uses 400 / 300 ft for all of S and F, which is the S-2 / F-2 value (non-conservative for S-1 and F-1). The H and I rows also use one value for every subgroup (IBC: H-1 75 ft, H-2 100 ft, H-3 150 ft, H-4 175 ft; I-2, I-3, I-4 200 ft). Not changed; for Kevin to review.",
-  "Load factors: IBC Table 1004.5 lists warehouses at 500 gross (app \"Storage / warehouse\" uses 300, conservative). NFPA 101 (2018 and later) Table 7.3.1.2 lists business use at 150 gross; the app uses 100 (the pre-2018 value, conservative). Not changed; for Kevin to review.",
+  "Fixed in v1.2.0: IBC travel limits by subgroup per IBC 2021 Table 1017.2 (S-1/F-1 250/200, S-2/F-2/U 400/300, H-1..H-5 75/100/150/175/200 sprinklered only, I-1 250 and I-2/I-3 200 sprinklered only, I-4 200/150), opt-in IBC 1017.2.2 F-1/S-1 400 ft; IBC warehouses 500 gross added (storage/stock/shipping stays 300); NFPA 101 business 150 gross (2018+). Saved v1.1.0 groups F/S/H/I migrate to F-1/S-1/H-1/I-2/I-3 (most restrictive).",
   "Review note: occupant load is rounded to the nearest person; common practice is to round fractions up. Per project and AHJ."
  ],
  "cases": [
@@ -125,7 +124,7 @@ window.FT_VERIFY_CASES = {
   },
   {
    "id": "nfpa-business",
-   "title": "NFPA 101, business 1500 sf gross (app factor 100), two 36 in doors, sprinklered",
+   "title": "NFPA 101, business 1500 sf gross (factor 150), two 36 in doors, sprinklered",
    "source": "NFPA 101 7.3.1.2, 7.3.3.1",
    "steps": [
     {
@@ -138,8 +137,7 @@ window.FT_VERIFY_CASES = {
      "sel": "#mLoad",
      "label": "Occupant load (NFPA 101-2018+ factor 150)",
      "unit": "occ",
-     "ref": 10,
-     "flag": "Load factors: IBC Table 1004.5 lists warehouses at 500 gross (app \"Storage / warehouse\" uses 300, conservative). NFPA 101 (2018 and later) Table 7.3.1.2 lists business use at 150 gross; the app uses 100 (the pre-2018 value, conservative). Not changed; for Kevin to review."
+     "ref": 10
     },
     {
      "sel": "#mCap",
@@ -151,7 +149,7 @@ window.FT_VERIFY_CASES = {
   },
   {
    "id": "ibc-travel-s1",
-   "title": "IBC travel limit, Group S (S-1), sprinklered",
+   "title": "IBC travel limit, S-1, sprinklered",
    "source": "IBC Table 1017.2",
    "steps": [
     {
@@ -160,7 +158,7 @@ window.FT_VERIFY_CASES = {
     },
     {
      "set": "#occupancyGroup",
-     "value": "S"
+     "value": "S-1"
     }
    ],
    "reads": [
@@ -168,8 +166,7 @@ window.FT_VERIFY_CASES = {
      "sel": "#allowBox",
      "label": "Max exit access travel (S-1)",
      "unit": "ft",
-     "ref": 250,
-     "flag": "IBC Table 1017.2 gives 250 ft (sprinklered) / 200 ft (not sprinklered) for S-1 and F-1; the app uses 400 / 300 ft for all of S and F, which is the S-2 / F-2 value (non-conservative for S-1 and F-1). The H and I rows also use one value for every subgroup (IBC: H-1 75 ft, H-2 100 ft, H-3 150 ft, H-4 175 ft; I-2, I-3, I-4 200 ft). Not changed; for Kevin to review."
+     "ref": 250
     },
     {
      "sel": "#allowBox",
@@ -177,6 +174,137 @@ window.FT_VERIFY_CASES = {
      "label": "Common path (S, sprinklered)",
      "unit": "ft",
      "ref": 100
+    }
+   ]
+  },
+  {
+   "id": "ibc-travel-s2-nonspr",
+   "title": "IBC travel limit, S-2, not sprinklered",
+   "source": "IBC 2021 Table 1017.2",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#sprinklered",
+     "value": "no"
+    },
+    {
+     "set": "#occupancyGroup",
+     "value": "S-2"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#allowBox",
+     "label": "Max exit access travel (S-2, nonsprinklered)",
+     "unit": "ft",
+     "ref": 300
+    }
+   ]
+  },
+  {
+   "id": "ibc-travel-f1-inc",
+   "title": "IBC 1017.2.2 increase, F-1, sprinklered, conditions met",
+   "source": "IBC 2021 1017.2.2",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#occupancyGroup",
+     "value": "F-1"
+    },
+    {
+     "click": "#inc10172",
+     "wait": 200
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#allowBox",
+     "label": "Max exit access travel (F-1, 1017.2.2)",
+     "unit": "ft",
+     "ref": 400
+    }
+   ]
+  },
+  {
+   "id": "ibc-travel-h",
+   "title": "IBC travel limits H-1 and H-4, sprinklered",
+   "source": "IBC 2021 Table 1017.2",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#occupancyGroup",
+     "value": "H-4"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#allowBox",
+     "label": "Max exit access travel (H-4)",
+     "unit": "ft",
+     "ref": 175
+    }
+   ]
+  },
+  {
+   "id": "ibc-travel-i23-nonspr",
+   "title": "IBC I-2/I-3 without sprinklers: not permitted",
+   "source": "IBC 2021 Table 1017.2",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#sprinklered",
+     "value": "no"
+    },
+    {
+     "set": "#occupancyGroup",
+     "value": "I-2/I-3"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#allowBox strong",
+     "label": "Travel limit text",
+     "refText": "Not permitted without sprinklers"
+    }
+   ]
+  },
+  {
+   "id": "ibc-warehouse",
+   "title": "IBC warehouse 10000 sf gross",
+   "source": "IBC Table 1004.5",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#spaceBody tr[data-space] [data-f=\"useId\"]",
+     "value": "warehouse",
+     "wait": 200
+    },
+    {
+     "set": "#spaceBody tr[data-space] [data-f=\"areaSf\"]",
+     "value": "10000"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#mLoad",
+     "label": "Occupant load",
+     "unit": "occ",
+     "ref": 20
     }
    ]
   }
