@@ -10,6 +10,153 @@ window.FT_VERIFY_CASES = {
  ],
  "cases": [
   {
+   "id": "ibc-exits-1521",
+   "title": "IBC, not sprinklered, 1,521 occupants (fixed), four 78 in doors",
+   "source": "IBC 2024 Table 1006.3.3, 1005.3.2, 1005.5",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#sprinklered",
+     "value": "no"
+    },
+    {
+     "set": "#spaceBody tr[data-space] [data-f=\"fixedOl\"]",
+     "value": "1521"
+    },
+    {
+     "set": "#egressBody tr[data-egress]:nth-child(1) [data-f=\"clearWidthIn\"]",
+     "value": "78"
+    },
+    {
+     "set": "#egressBody tr[data-egress]:nth-child(1) [data-f=\"qty\"]",
+     "value": "4"
+    },
+    {
+     "set": "#egressBody tr[data-egress]:nth-child(2) [data-f=\"clearWidthIn\"]",
+     "value": "0"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#mLoad",
+     "label": "Occupant load",
+     "unit": "occ",
+     "ref": 1521
+    },
+    {
+     "sel": "#exitCheck [data-x=\"req\"]",
+     "label": "Minimum exits (more than 1,000 -> 4)",
+     "refText": "4"
+    },
+    {
+     "sel": "#exitCheck [data-x=\"wOther\"]",
+     "label": "Required width, other components 1521 x 0.2 = 304.2 in, rounded up",
+     "unit": "in",
+     "ref": 305
+    },
+    {
+     "sel": "#exitCheck [data-x=\"count\"]",
+     "label": "Exit count check (4 provided)",
+     "refText": "PASS"
+    },
+    {
+     "sel": "#exitCheck [data-x=\"loss\"]",
+     "label": "Loss of one exit: 3 x 390 = 1170 >= 760.5",
+     "refText": "PASS"
+    }
+   ]
+  },
+  {
+   "id": "ibc-exits-600",
+   "title": "IBC, not sprinklered, 600 occupants, two exits (100 in + 36 in)",
+   "source": "IBC 2024 Table 1006.3.3, 1005.5",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#sprinklered",
+     "value": "no"
+    },
+    {
+     "set": "#spaceBody tr[data-space] [data-f=\"fixedOl\"]",
+     "value": "600"
+    },
+    {
+     "set": "#egressBody tr[data-egress]:nth-child(1) [data-f=\"clearWidthIn\"]",
+     "value": "100"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#exitCheck [data-x=\"req\"]",
+     "label": "Minimum exits (501-1,000 -> 3)",
+     "refText": "3"
+    },
+    {
+     "sel": "#exitCheck [data-x=\"count\"]",
+     "label": "Exit count check (2 < 3)",
+     "refText": "FAIL"
+    },
+    {
+     "sel": "#mCap",
+     "label": "Egress capacity",
+     "unit": "occ",
+     "ref": 680
+    },
+    {
+     "sel": "#exitCheck [data-x=\"loss\"]",
+     "label": "Loss of one exit: 180 remain < 300",
+     "refText": "FAIL"
+    }
+   ]
+  },
+  {
+   "id": "ibc-exits-500",
+   "title": "IBC, sprinklered, 500 occupants, two 44 in doors",
+   "source": "IBC 2024 Table 1006.3.3, 1005.3.2, 1005.5",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#spaceBody tr[data-space] [data-f=\"fixedOl\"]",
+     "value": "500"
+    },
+    {
+     "set": "#egressBody tr[data-egress]:nth-child(1) [data-f=\"clearWidthIn\"]",
+     "value": "44"
+    },
+    {
+     "set": "#egressBody tr[data-egress]:nth-child(2) [data-f=\"clearWidthIn\"]",
+     "value": "44"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#exitCheck [data-x=\"req\"]",
+     "label": "Minimum exits (1-500 -> 2)",
+     "refText": "2"
+    },
+    {
+     "sel": "#exitCheck [data-x=\"wOther\"]",
+     "label": "Required width 500 x 0.15 = 75 in",
+     "unit": "in",
+     "ref": 75
+    },
+    {
+     "sel": "#exitCheck [data-x=\"loss\"]",
+     "label": "Loss of one exit: 293 >= 250",
+     "refText": "PASS"
+    }
+   ]
+  },
+  {
    "id": "ibc-spr",
    "title": "IBC, B, sprinklered: 1500 sf business, two 36 in doors",
    "source": "IBC 1004.5, 1005.3.2",

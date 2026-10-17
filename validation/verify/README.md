@@ -27,6 +27,11 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
 
+- **Occupant Egress v1.4.0 (2026-10-17).** IBC path: minimum exits per IBC 2024 Table 1006.3.3 (1-500 -> 2, 501-1,000 -> 3, more than 1,000 -> 4),
+  required width = occupant load x factor rounded up to the whole inch (1,521 x 0.2 = 304.2 -> 305 in), and the 1005.5 loss-of-one-exit
+  check (remaining capacity >= 50% of required). Rules in `occupant-egress/assets/egress-rules.js`. 33 of 33 checks pass.
+  Tests: `node --test tests/occupant-egress.test.mjs`.
+
 - **Smoke Exhaust Lab plugholing (2026-10-17): reference corrected, app math unchanged.** The earlier flag compared Vmax against a layer
   temperature with Ks = 1.0. NFPA 92 5.5.5.2 requires Ks = 0.5 (fraction of convective HRR in the layer) for the plugholing Vmax
   (Eq. 5.6.3b); Ks = 1.0 is only for the exhaust volume (5.5.5.1). The app already used 0.5 Qc, so `smoke_exhaust_lab.py` now does too and

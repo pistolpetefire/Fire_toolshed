@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.3.0";
+  var APP_VERSION = "1.4.0";
   var STORAGE_KEY = "occupantEgress.v1";
 
   /** Shared egress component types */
@@ -495,6 +495,61 @@
       .join("");
   }
 
+  /**
+   * IBC 2024 Table 1006.3.3 minimum exits, 1005.3 required width (rounded up to the whole inch) and the 1005.5
+   * loss-of-one-exit check. IBC path only; see assets/egress-rules.js.
+   */
+  function exitModel(p, load, factors) {
+    var R = window.EgressRules;
+    if (!R || !p || p.id !== "ibc") return { applies: false };
+    var units = [];
+    state.egress.forEach(function (eg) {
+      if (eg.typeId === "corridor") return;
+      var w = num(eg.clearWidthIn, 0);
+      if (w <= 0) return;
+      var q = Math.max(1, round0(num(eg.qty, 1)));
+      var per = egressCapacity(Object.assign({}, eg, { qty: 1 }), factors).capacity;
+      for (var i = 0; i < q; i++) units.push({ name: (eg.name || "exit") + (q > 1 ? " #" + (i + 1) : ""), capacity: per });
+    });
+    var required = R.minExitsIbc(load);
+    var provided = units.length;
+    return {
+      applies: true,
+      required: required,
+      provided: provided,
+      countOk: load > 0 ? provided >= required : null,
+      widthOther: R.requiredWidthIn(load, factors.other),
+      widthStair: R.requiredWidthIn(load, factors.stair),
+      loss: R.lossOfOneExit(units, load),
+    };
+  }
+
+  function exitCheckHtml(m) {
+    var x = m.exits;
+    if (!x || !x.applies) return "Exit count and loss-of-one-exit checks run on the IBC path only.";
+    if (!(m.load > 0)) return "Enter spaces to get the required number of exits (IBC 2024 Table 1006.3.3).";
+    var f = m.factors;
+    var lines = [];
+    lines.push(
+      "Minimum exits (IBC 2024 Table 1006.3.3, " + m.load + " occupants): <strong data-x=\"req\">" + x.required + "</strong> · provided <strong data-x=\"prov\">" +
+        x.provided + "</strong> → <strong data-x=\"count\">" + (x.countOk ? "PASS" : "FAIL") + "</strong>"
+    );
+    lines.push(
+      "Required width (IBC 1005.3): other components " + m.load + " × " + f.other.toFixed(2) + " = " + x.widthOther.exact +
+        " in → <strong data-x=\"wOther\">" + x.widthOther.roundedUp + " in</strong> · stairs " + m.load + " × " + f.stair.toFixed(2) + " = " +
+        x.widthStair.exact + " in → <strong data-x=\"wStair\">" + x.widthStair.roundedUp + " in</strong> (rounded up to the whole inch)"
+    );
+    var L = x.loss;
+    lines.push(
+      L.pass == null
+        ? "Loss of one exit (IBC 1005.5): add exits to evaluate."
+        : "Loss of one exit (IBC 1005.5): without the largest exit (" + escapeHtml(L.largestName) + ", " + L.largest + " occ) " +
+            L.remaining + " of " + m.load + " required remain (" + (Number.isFinite(L.pct) ? L.pct.toFixed(1) : "—") +
+            "%; need ≥ 50%) → <strong data-x=\"loss\">" + (L.pass ? "PASS" : "FAIL") + "</strong>"
+    );
+    return lines.join("<br>");
+  }
+
   function calcModel() {
     var p = currentPath();
     var factors = widthFactors(state.sprinklered);
@@ -524,6 +579,8 @@
     if (load > 0 && cap > 0) capStatus = margin >= 0 ? "pass" : "fail";
     else if (load > 0 || cap > 0) capStatus = "partial";
 
+    var exits = exitModel(p, load, factors);
+
     return {
       path: p,
       factors: factors,
@@ -540,6 +597,7 @@
       commonOk: commonOk,
       deadOk: deadOk,
       capStatus: capStatus,
+      exits: exits,
       spaces: state.spaces.map(function (sp) {
         return Object.assign({}, sp, { ol: spaceOl(sp), use: loadFactor(sp.useId) });
       }),
@@ -806,7 +864,21 @@
         statusClass +
         '">' +
         statusText +
-        "</strong></div>";
+        "</strong></div>" +
+        (m.exits.applies && m.load > 0
+          ? '<div class="row"><span>Exits required / provided</span><strong id="sumExits" class="' +
+            (m.exits.countOk ? "pass" : "fail") + '">' + m.exits.required + " / " + m.exits.provided + "</strong></div>" +
+            '<div class="row"><span>Loss of one exit (1005.5)</span><strong id="sumLoss" class="' +
+            (m.exits.loss.pass ? "pass" : "fail") + '">' + (m.exits.loss.pass == null ? "—" : m.exits.loss.pass ? "PASS" : "FAIL") + "</strong></div>"
+          : "");
+    }
+
+    var xc = $("exitCheck");
+    if (xc) {
+      xc.innerHTML = exitCheckHtml(m);
+      var xbad = m.exits.applies && m.load > 0 && (m.exits.countOk === false || m.exits.loss.pass === false);
+      var xok = m.exits.applies && m.load > 0 && m.exits.countOk && m.exits.loss.pass === true;
+      xc.className = "callout " + (xbad ? "bad" : xok ? "ok" : "info");
     }
 
     renderSpaces();
@@ -976,6 +1048,7 @@
       "<th style='text-align:right;border-bottom:1px solid #e2e8f0'>Cap.</th></tr></thead><tbody>" +
       egRows +
       "</tbody></table>" +
+      (m.exits && m.exits.applies ? "<h2>Number of exits &amp; distribution</h2><p>" + exitCheckHtml(m) + "</p>" : "") +
       "<h2>Travel limits (IBC 2024 screening)</h2>" +
       "<p>Allowable — Travel " +
       (m.allow.travel == null ? "not permitted without sprinklers" : m.allow.travel + " ft") +

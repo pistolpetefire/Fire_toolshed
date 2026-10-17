@@ -47,7 +47,7 @@ Phase 1 screens the job and stops at the AHJ kickoff. Phase 2 is [FDS and Smokev
 
 | Tool | Path |
 |------|------|
-| [Occupant Load & Egress Capacity](./occupant-egress/) | IBC / NFPA 101 paths — load factors, egress width capacity, travel checks |
+| [Occupant Load & Egress Capacity](./occupant-egress/) | IBC / NFPA 101 paths — load factors, egress width capacity, IBC minimum exits and loss-of-one-exit, travel checks |
 | [FA Power Extenders](./fa-power-extenders/) | NAC horn/strobe + speaker taps (25/70 V), voltage drop, booster / remote-amp warrant (NFPA 72 / UFC) |
 | [Transparent RSET Tool](./rset-tool/) | Educational RSET = Detection + Notification + Pre-movement + Movement; guides + assumptions log (React app; build with `npm run build` in `rset-tool/`) |
 | [IBC / IFC Hazard Impacts](./ibc-ifc-hazard/) | H occupancy + hazmat classes → construction/mitigations with drivers (2015–2024; defaults to 2024) |
