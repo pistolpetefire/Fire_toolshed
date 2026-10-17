@@ -117,12 +117,16 @@ window.FT_VERIFY_CASES = {
   },
   {
    "id": "ibc-exits-500",
-   "title": "IBC, sprinklered, 500 occupants, two 44 in doors",
+   "title": "IBC, sprinklered + voice/alarm, 500 occupants, two 44 in doors",
    "source": "IBC 2024 Table 1006.3.3, 1005.3.2, 1005.5",
    "steps": [
     {
      "click": "#pickIbc",
      "wait": 400
+    },
+    {
+     "set": "#voiceAlarm",
+     "value": "yes"
     },
     {
      "set": "#spaceBody tr[data-space] [data-f=\"fixedOl\"]",
@@ -158,12 +162,16 @@ window.FT_VERIFY_CASES = {
   },
   {
    "id": "ibc-spr",
-   "title": "IBC, B, sprinklered: 1500 sf business, two 36 in doors",
+   "title": "IBC, B, sprinklered + voice/alarm: 1500 sf business, two 36 in doors",
    "source": "IBC 1004.5, 1005.3.2",
    "steps": [
     {
      "click": "#pickIbc",
      "wait": 400
+    },
+    {
+     "set": "#voiceAlarm",
+     "value": "yes"
     }
    ],
    "reads": [
@@ -225,12 +233,16 @@ window.FT_VERIFY_CASES = {
   },
   {
    "id": "ibc-assembly",
-   "title": "IBC, assembly standing 2000 sf net, three 72 in doors, sprinklered",
+   "title": "IBC, assembly standing 2000 sf net, three 72 in doors, sprinklered + voice/alarm",
    "source": "IBC 1004.5, 1005.3.2",
    "steps": [
     {
      "click": "#pickIbc",
      "wait": 400
+    },
+    {
+     "set": "#voiceAlarm",
+     "value": "yes"
     },
     {
      "set": "#spaceBody tr[data-space] [data-f=\"useId\"]",
@@ -403,7 +415,7 @@ window.FT_VERIFY_CASES = {
   },
   {
    "id": "ibc-travel-i23-nonspr",
-   "title": "IBC I-2/I-3 without sprinklers: not permitted",
+   "title": "IBC I-2 without sprinklers: not permitted",
    "source": "IBC 2024 Table 1017.2",
    "steps": [
     {
@@ -416,7 +428,7 @@ window.FT_VERIFY_CASES = {
     },
     {
      "set": "#occupancyGroup",
-     "value": "I-2/I-3"
+     "value": "I-2"
     }
    ],
    "reads": [
@@ -634,7 +646,7 @@ window.FT_VERIFY_CASES = {
   },
   {
    "id": "ibc-i2-factors",
-   "title": "IBC, I-2/I-3, sprinklered with voice/alarm, 100 occupants: unreduced 0.3 / 0.2",
+   "title": "IBC, I-2, sprinklered with voice/alarm, 100 occupants: unreduced 0.3 / 0.2",
    "source": "IBC 2024 1005.3.1, 1005.3.2 exceptions",
    "steps": [
     {
@@ -643,7 +655,11 @@ window.FT_VERIFY_CASES = {
     },
     {
      "set": "#occupancyGroup",
-     "value": "I-2/I-3"
+     "value": "I-2"
+    },
+    {
+     "set": "#voiceAlarm",
+     "value": "yes"
     },
     {
      "set": "#spaceBody tr[data-space] [data-f=\"fixedOl\"]",
@@ -677,6 +693,10 @@ window.FT_VERIFY_CASES = {
     {
      "set": "#occupancyGroup",
      "value": "B"
+    },
+    {
+     "set": "#voiceAlarm",
+     "value": "yes"
     },
     {
      "set": "#spaceBody tr[data-space] [data-f=\"fixedOl\"]",
@@ -727,6 +747,142 @@ window.FT_VERIFY_CASES = {
      "sel": "#exitCheck [data-x=\"wOther\"]",
      "label": "Other components 100 x 0.2",
      "unit": "in",
+     "ref": 20
+    }
+   ]
+  },
+  {
+   "id": "ibc-default-novoice",
+   "title": "IBC default (B, sprinklered, voice/alarm left at No): 1500 sf, two 36 in doors -> 0.2 in/occ",
+   "source": "IBC 2024 1005.3.2 (exception needs 907.5.2.2)",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#mCap",
+     "label": "Egress capacity at 0.2 (was 480 at 0.15 when voice defaulted to Yes)",
+     "unit": "occ",
+     "ref": 360
+    },
+    {
+     "sel": "#voiceAlarm",
+     "prop": "value",
+     "label": "Voice/alarm default",
+     "refText": "no"
+    }
+   ]
+  },
+  {
+   "id": "ibc-i3-factors",
+   "title": "IBC, I-3, sprinklered with voice/alarm, 100 occupants: reduced 0.2 / 0.15",
+   "source": "IBC 2024 1005.3.1, 1005.3.2 exceptions (only H and I-2 excluded)",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#occupancyGroup",
+     "value": "I-3"
+    },
+    {
+     "set": "#voiceAlarm",
+     "value": "yes"
+    },
+    {
+     "set": "#spaceBody tr[data-space] [data-f=\"fixedOl\"]",
+     "value": "100"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#exitCheck [data-x=\"wStair\"]",
+     "label": "Stair width 100 x 0.2",
+     "unit": "in",
+     "ref": 20
+    },
+    {
+     "sel": "#exitCheck [data-x=\"wOther\"]",
+     "label": "Other components 100 x 0.15",
+     "unit": "in",
+     "ref": 15
+    }
+   ]
+  },
+  {
+   "id": "ibc-i3-limits",
+   "title": "IBC I-3 limits, sprinklered: travel 200, common path 100 (Table 1006.2.1), dead end 20",
+   "source": "IBC 2024 Table 1017.2, Table 1006.2.1, 1020.5",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#occupancyGroup",
+     "value": "I-3"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#allowBox",
+     "label": "Max exit access travel (I-3)",
+     "unit": "ft",
+     "ref": 200
+    },
+    {
+     "sel": "#allowBox",
+     "index": 1,
+     "label": "Common path (I-3, sprinklered)",
+     "unit": "ft",
+     "ref": 100
+    },
+    {
+     "sel": "#allowBox",
+     "index": 2,
+     "label": "Dead end (I-3)",
+     "unit": "ft",
+     "ref": 20
+    }
+   ]
+  },
+  {
+   "id": "ibc-i2-limits",
+   "title": "IBC I-2 limits, sprinklered: travel 200, common path 75, dead end 20 (same as the old combined group)",
+   "source": "IBC 2024 Table 1017.2, Table 1006.2.1, 1020.5",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#occupancyGroup",
+     "value": "I-2"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#allowBox",
+     "label": "Max exit access travel (I-2)",
+     "unit": "ft",
+     "ref": 200
+    },
+    {
+     "sel": "#allowBox",
+     "index": 1,
+     "label": "Common path (I-2, sprinklered)",
+     "unit": "ft",
+     "ref": 75
+    },
+    {
+     "sel": "#allowBox",
+     "index": 2,
+     "label": "Dead end (I-2)",
+     "unit": "ft",
      "ref": 20
     }
    ]

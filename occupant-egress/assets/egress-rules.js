@@ -67,7 +67,7 @@
   function ibcWidthFactors(opts) {
     var o = opts || {};
     var sp = o.sprinklered === "yes" || o.sprinklered === true;
-    var voice = !(o.voiceAlarm === "no" || o.voiceAlarm === false);
+    var voice = o.voiceAlarm === "yes" || o.voiceAlarm === true; // conservative: unknown = no voice/alarm
     var g = String(o.group || "");
     var excluded = excludedFromReduction(g);
     var reduced = sp && voice && !excluded;

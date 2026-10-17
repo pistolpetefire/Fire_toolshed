@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.5.0";
+  var APP_VERSION = "1.6.0";
   var STORAGE_KEY = "occupantEgress.v1";
 
   /** Shared egress component types */
@@ -66,7 +66,9 @@
     { id: "H-4", label: "H-4 — High hazard", travel: { yes: 175, no: null }, common: { yes: 75, no: null }, deadEnd: { yes: 20, no: 20 } },
     { id: "H-5", label: "H-5 — High hazard (HPM)", travel: { yes: 200, no: null }, common: { yes: 75, no: null }, deadEnd: { yes: 20, no: 20 } },
     { id: "I-1", label: "I-1 — Institutional (supervised living)", travel: { yes: 250, no: null }, common: { yes: 75, no: null }, deadEnd: { yes: 50, no: 20 } },
-    { id: "I-2/I-3", label: "I-2 / I-3 — Institutional (health care, detention; I-2 common path governs)", travel: { yes: 200, no: null }, common: { yes: 75, no: null }, deadEnd: { yes: 20, no: 20 } },
+    { id: "I-2", label: "I-2 — Institutional (health care)", travel: { yes: 200, no: null }, common: { yes: 75, no: null }, deadEnd: { yes: 20, no: 20 } },
+    // I-3: Table 1006.2.1 gives 100 ft sprinklered (the old combined I-2/I-3 group used I-2's 75 ft).
+    { id: "I-3", label: "I-3 — Institutional (detention / correctional)", travel: { yes: 200, no: null }, common: { yes: 100, no: null }, deadEnd: { yes: 20, no: 20 } },
     { id: "I-4", label: "I-4 — Institutional (day care)", travel: { yes: 200, no: 150 }, common: { yes: 75, no: null }, deadEnd: { yes: 20, no: 20 } },
     { id: "M", label: "M — Mercantile", travel: { yes: 250, no: 200 }, common: { yes: 75, no: 75 }, deadEnd: { yes: 50, no: 20 } },
     { id: "R-1", label: "R-1 — Residential (transient)", travel: { yes: 250, no: 200 }, common: { yes: 75, no: null }, deadEnd: { yes: 50, no: 20 } },
@@ -77,7 +79,8 @@
     { id: "U", label: "U — Utility / Miscellaneous", travel: { yes: 400, no: 300 }, common: { yes: 75, no: 75 }, deadEnd: { yes: 50, no: 20 } },
   ];
   /** Older saved groups → most restrictive current subgroup (conservative migration). */
-  var LEGACY_OCC_MAP = { F: "F-1", S: "S-1", H: "H-1", I: "I-2/I-3", R: "R-1" };
+  // v1.6.0: the combined "I-2/I-3" group was split; saved sessions map to I-2 (more restrictive: no reduced width factors, 75 ft common path).
+  var LEGACY_OCC_MAP = { F: "F-1", S: "S-1", H: "H-1", I: "I-2", R: "R-1", "I-2/I-3": "I-2" };
 
   /**
    * NFPA 101 path — Table 7.3.1.2 load factors, §7.3.3 capacity, occupancy travel (simplified).
@@ -239,7 +242,7 @@
       projectName: "",
       buildingArea: "",
       sprinklered: "yes",
-      voiceAlarm: "yes",
+      voiceAlarm: "no", // conservative default (v1.6.0): reduced factors need voice/alarm per 907.5.2.2
       occupancyGroup: "B",
       inc10172: false,
       spaces: [],
@@ -394,6 +397,7 @@
       }
       if (state.codePath && !CODE_PATHS[state.codePath]) state.codePath = null;
       if (state.codePath === "ibc" && LEGACY_OCC_MAP[state.occupancyGroup]) {
+        if (state.occupancyGroup === "I-2/I-3") state.groupMigratedFrom = "I-2/I-3";
         state.occupancyGroup = LEGACY_OCC_MAP[state.occupancyGroup];
       }
     } catch (_) { /* ignore */ }
@@ -787,7 +791,11 @@
         (state.sprinklered === "yes" ? " · sprinklered" : " · nonsprinklered") +
         " · " +
         (p ? escapeHtml(p.travelRef) : "") +
-        "</span>";
+        "</span>" +
+        (state.groupMigratedFrom
+          ? "<br><span class='sub' id='groupMigrationNote' style='margin:0'>Saved group " + escapeHtml(state.groupMigratedFrom) +
+            " was mapped to I-2 (conservative: no reduced width factors, 75 ft common path). Choose I-3 if this is a detention occupancy.</span>"
+          : "");
     }
 
     var tr = $("travelResult");
@@ -936,9 +944,11 @@
     state.projectName = ($("projectName") && $("projectName").value.trim()) || "";
     state.buildingArea = ($("buildingArea") && $("buildingArea").value.trim()) || "";
     state.sprinklered = ($("sprinklered") && $("sprinklered").value) || "yes";
-    state.voiceAlarm = ($("voiceAlarm") && $("voiceAlarm").value) || "yes";
+    state.voiceAlarm = ($("voiceAlarm") && $("voiceAlarm").value) || "no";
+    var prevGroup = state.occupancyGroup;
     state.occupancyGroup =
       ($("occupancyGroup") && $("occupancyGroup").value) || state.occupancyGroup;
+    if (state.groupMigratedFrom && state.occupancyGroup !== prevGroup) delete state.groupMigratedFrom;
     state.inc10172 = !!($("inc10172") && $("inc10172").checked);
     state.travelActual = ($("travelActual") && $("travelActual").value) || "";
     state.commonPathActual =
@@ -950,7 +960,7 @@
     if ($("projectName")) $("projectName").value = state.projectName;
     if ($("buildingArea")) $("buildingArea").value = state.buildingArea;
     if ($("sprinklered")) $("sprinklered").value = state.sprinklered;
-    if ($("voiceAlarm")) $("voiceAlarm").value = state.voiceAlarm === "no" ? "no" : "yes";
+    if ($("voiceAlarm")) $("voiceAlarm").value = state.voiceAlarm === "yes" ? "yes" : "no";
     if ($("inc10172")) $("inc10172").checked = !!state.inc10172;
     if ($("occupancyGroup")) $("occupancyGroup").value = state.occupancyGroup;
     if ($("travelActual")) $("travelActual").value = state.travelActual;

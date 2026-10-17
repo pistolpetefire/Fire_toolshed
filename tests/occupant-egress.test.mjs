@@ -2,6 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
+import { readFileSync } from 'node:fs'
 import { serve, dumpDom, text, verifyStatus } from './helpers.mjs'
 const require = createRequire(import.meta.url)
 const R = require('../occupant-egress/assets/egress-rules.js')
@@ -38,15 +39,15 @@ test('egress: 1005.5 loss of one exit keeps >= 50% of required capacity', () => 
   console.log(`  1521 OL, 4x390: ${four.remaining} remain (${four.pct.toFixed(1)}%) PASS; 600 OL, 500+180: ${two.remaining} remain (${two.pct.toFixed(1)}%) FAIL; 500 OL, 250+250: 50.0% PASS`)
 })
 
-test('egress: in-app Verification tab passes (21 original + 12 exit + 10 factor checks) and the page shows the exit check', async () => {
+test('egress: in-app Verification tab passes (53 checks incl. voice default and I-2 / I-3 split) and the page shows the exit check', async () => {
   const s = await serve()
   try {
     const st = text(verifyStatus(await dumpDom(`${s.base}/occupant-egress/?ftverifyrun=1`, 60000))).trim()
     console.log('  ' + st)
-    assert.match(st, /^43 of 43 checks pass/)
+    assert.match(st, /^53 of 53 checks pass/)
     const page = await dumpDom(`${s.base}/occupant-egress/`, 8000)
     assert.match(page, /id="exitCheck"/)
-    assert.match(page, /Version 1\.5\.0/)
+    assert.match(page, /Version 1\.6\.0/)
   } finally { await s.close() }
 })
 
@@ -64,12 +65,12 @@ test('egress factors: 100 occupants, H-2, sprinklered, voice alarm -> 30 in stai
 })
 
 test('egress factors: I-2 gets the same treatment (0.3 / 0.2)', () => {
-  const f = F('I-2/I-3')
+  const f = F('I-2')
   assert.deepEqual([f.stair, f.other], [0.3, 0.2])
   assert.deepEqual(widths(100, f), [30, 20])
-  assert.equal(F('I-2').reduced, false)
+  assert.equal(F('I-2/I-3').reduced, false) // legacy id still excluded
   assert.equal(F('I-1').reduced, true) // only I-2 is excluded
-  console.log(`  I-2/I-3: stairs ${widths(100, f)[0]} in, other ${widths(100, f)[1]} in`)
+  console.log(`  I-2: stairs ${widths(100, f)[0]} in, other ${widths(100, f)[1]} in`)
 })
 
 test('egress factors: non-H group B keeps the reduced 0.2 / 0.15 (and needs voice/alarm + sprinklers)', () => {
@@ -90,5 +91,52 @@ test('egress factors: reason shown on screen and in the printout (H-2 page)', as
     assert.match(app, /\$\("factorBox"\)\.textContent = m\.factors\.label/, 'screen shows the factor reason')
     const page = await dumpDom(`${s.base}/occupant-egress/`, 8000)
     assert.match(page, /id="voiceAlarm"/)
+  } finally { await s.close() }
+})
+
+// v1.6.0: voice/alarm defaults to No; I-2 and I-3 are separate groups.
+test('egress v1.6.0: voice/alarm defaults to No, so a sprinklered B building gets 0.3 / 0.2 unless voice/alarm is set', async () => {
+  const d = R.ibcWidthFactors({ sprinklered: 'yes', group: 'B' }) // voiceAlarm not given -> treated as No
+  assert.deepEqual([d.stair, d.other, d.reduced], [0.3, 0.2, false])
+  assert.match(d.label, /need an emergency voice\/alarm system/)
+  const s = await serve()
+  try {
+    const page = await dumpDom(`${s.base}/occupant-egress/`, 8000)
+    const sel = (page.match(/<select id="voiceAlarm">[\s\S]*?<\/select>/) || [''])[0]
+    assert.match(sel, /<option value="no" selected(="")?>/)
+    console.log('  default select: ' + text(sel).trim() + '; B sprinklered, no voice: 0.3 / 0.2')
+  } finally { await s.close() }
+})
+
+test('egress v1.6.0: 100 occupants, I-3, sprinklered, voice -> 20 in stairs, 15 in other; I-2 stays 30 / 20', () => {
+  const i3 = F('I-3'); const i2 = F('I-2')
+  assert.deepEqual(widths(100, i3), [20, 15]); assert.equal(i3.reduced, true)
+  assert.deepEqual(widths(100, i2), [30, 20]); assert.equal(i2.reduced, false)
+  console.log(`  I-3: ${widths(100, i3).join(' / ')} in; I-2: ${widths(100, i2).join(' / ')} in`)
+})
+
+test('egress v1.6.0: I-2 keeps the combined group limits; I-3 uses Table 1006.2.1 common path 100 ft', () => {
+  const src = (globalThis.__src ||= readFileSync(new URL('../occupant-egress/assets/app.js', import.meta.url), 'utf8'))
+  const grp = (id) => {
+    const m = src.match(new RegExp('\\{ id: "' + id + '", label: "[^"]*", travel: \\{ yes: (\\w+), no: (\\w+) \\}, common: \\{ yes: (\\w+), no: (\\w+) \\}, deadEnd: \\{ yes: (\\w+), no: (\\w+) \\}'))
+    assert.ok(m, id); return m.slice(1).join(',')
+  }
+  assert.equal(grp('I-2'), '200,null,75,null,20,20') // identical to the old combined I-2/I-3 entry
+  assert.equal(grp('I-3'), '200,null,100,null,20,20') // only the sprinklered common path differs (Table 1006.2.1)
+  assert.ok(!/id: "I-2\/I-3"/.test(src), 'combined group removed from the picker')
+  assert.match(src, /"I-2\/I-3": "I-2"/, 'legacy mapping to I-2')
+  console.log('  I-2 travel/common/dead-end (spr, nonspr): ' + grp('I-2') + ' | I-3: ' + grp('I-3'))
+})
+
+test('egress v1.6.0: a saved session with the old "I-2/I-3" group loads as I-2 with a note', async () => {
+  const s = await serve()
+  try {
+    const page = await dumpDom(`${s.base}/tests/fixtures/egress-legacy-session.html`, 10000)
+    const allow = text((page.match(/<div class="allow-box" id="allowBox">[\s\S]*?<\/div>/) || [''])[0]).trim()
+    console.log('  ' + allow)
+    assert.match(allow, /I-2 — Institutional \(health care\)/)
+    assert.match(allow, /Common path ≤ 75 ft/)
+    assert.match(allow, /Saved group I-2\/I-3 was mapped to I-2 \(conservative/)
+    assert.match(text(page), /Stair width|stairs 100 × 0\.30 = 30 in/)
   } finally { await s.close() }
 })

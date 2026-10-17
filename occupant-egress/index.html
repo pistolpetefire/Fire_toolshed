@@ -16,7 +16,7 @@
       <div>
         <p class="eyebrow">Fire Toolshed · Life safety</p>
         <h1>Occupant Load &amp; Egress Capacity</h1>
-        <p class="version" id="appVersion">Version 1.5.0</p>
+        <p class="version" id="appVersion">Version 1.6.0</p>
         <p class="lead" id="headerLead">
           Choose a code path, then calculate <strong>occupant load</strong>, <strong>egress capacity</strong>, and travel-distance checks.
         </p>
@@ -102,8 +102,8 @@
             <div class="field" id="voiceAlarmField">
               <label for="voiceAlarm">Emergency voice/alarm communication (IBC 907.5.2.2)</label>
               <select id="voiceAlarm">
-                <option value="yes" selected>Yes</option>
-                <option value="no">No</option>
+                <option value="no" selected>No (default — conservative)</option>
+                <option value="yes">Yes</option>
               </select>
               <span class="sub">IBC path: the reduced 0.2 / 0.15 in/occ factors (1005.3.1 / 1005.3.2 exceptions) need sprinklers throughout and voice/alarm, and never apply to Group H or I-2.</span>
             </div>
@@ -249,7 +249,7 @@
 
   <script src="../shared/report-logo.js"></script>
   <script type="module" src="../shared/atrium-egress-bridge.mjs"></script>
-  <script src="./assets/egress-rules.js?v=1.5.0"></script>
-  <script src="./assets/app.js?v=1.5.0"></script>
+  <script src="./assets/egress-rules.js?v=1.6.0"></script>
+  <script src="./assets/app.js?v=1.6.0"></script>
 </body>
 </html>

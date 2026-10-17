@@ -27,6 +27,11 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
 
+- **Occupant Egress v1.6.0 (2026-10-17).** Emergency voice/alarm now defaults to No (conservative), so a sprinklered building gets the
+  reduced 0.2 / 0.15 in/occ factors only when voice/alarm is selected. The combined I-2/I-3 group is split: I-2 keeps the old values
+  (travel 200, common path 75, dead end 20; no reduced factors); I-3 uses IBC 2024 Table 1006.2.1 common path 100 ft sprinklered
+  (travel 200, dead end 20) and keeps the reduced factors. Saved "I-2/I-3" sessions load as I-2 with an on-screen note. 53 of 53 checks pass.
+
 - **Smoke Exhaust Lab NFPA 92 edition picker (2026-10-17).** 2021 (default, Florida 9th Edition) or 2024. Ch. 5 equations and Ks
   (1.0 exhaust volume, 0.5 plugholing) are the same in both, so only citations change; the screen and report say so. Two edition
   cases added; 30 of 30 checks pass.

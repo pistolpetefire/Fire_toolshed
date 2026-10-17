@@ -1,0 +1,13 @@
+<!doctype html>
+<!-- Test fixture: seeds a v1.5.0-style saved session that used the old combined "I-2/I-3" group, then opens the app. -->
+<meta charset="utf-8">
+<script>
+  localStorage.setItem("occupantEgress.v1", JSON.stringify({
+    codePath: "ibc", projectName: "Legacy I-2/I-3 session", buildingArea: "", sprinklered: "yes", voiceAlarm: "yes",
+    occupancyGroup: "I-2/I-3", inc10172: false,
+    spaces: [{ id: "s1", name: "Ward", useId: "business", areaSf: "", fixedOl: "100" }],
+    egress: [{ id: "e1", name: "Door 1", typeId: "door", clearWidthIn: 36, qty: 1 }, { id: "e2", name: "Stair 1", typeId: "stair", clearWidthIn: 44, qty: 1 }],
+    travelActual: "", commonPathActual: "", deadEndActual: ""
+  }));
+  location.replace("../../occupant-egress/");
+</script>
