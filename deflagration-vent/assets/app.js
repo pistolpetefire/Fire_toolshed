@@ -2,15 +2,18 @@
  * Deflagration Vent Sizing — NFPA 68 preliminary calculator
  * Primary use: room vent sizing (L×W×H). Also process equipment dust/gas.
  *
- * Dust compact (L/D ≤ 2):
- *   Av0 = 1e-4 × (1 + 1.54 × Pstat^(4/3)) × Kst × V^(2/3) × Pred^(-0.5)
- * Elongated 2 < L/D ≤ 6: NFPA-style geometric multiplier
- * Gas: NFPA 68 Chapter 7 style compact correlation
+ * Basis: NFPA 68-2023 (equations in assets/nfpa68-engine.js).
+ * Dust: Eq. 8.2.1.1 Av0 = 1e-4 (1 + 1.54 Pstat^(4/3)) KSt V^(3/4) sqrt(Pmax/Pred - 1), Pmax = unvented dust Pmax;
+ *       Eq. 8.2.2.3 elongated multiplier for 2 < L/D <= 6.
+ * Gas:  Eq. 7.2.1a/b (Pred <= 0.5 bar-g) or Eq. 7.2.2a/b (Pred > 0.5 bar-g), with lambda per 7.2.6.
+ * "Allowable enclosure pressure" (#pmax) is the structural strength check only; it is not the Pmax in the equations.
  */
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.1.1";
+  var APP_VERSION = "1.2.0";
+  var EDITION = "NFPA 68-2023";
+  var E = window.NFPA68;
   var STORAGE_KEY = "deflagrationVent.v1";
 
   var FT3_PER_M3 = 35.3146667;
@@ -145,6 +148,12 @@
       pstat: 0.5,
       pred: 1.5,
       pmax: 2.5,
+      pmaxMat: 116,
+      su: 46,
+      cd: 0.7,
+      p0: 0,
+      asOverride: "",
+      aobs: "",
       efficiency: 1.0,
       panelArea: "",
       notes: "",
@@ -154,8 +163,8 @@
   var state = defaultState();
 
   /**
-   * Room L/D: longest dimension L_long; cross-section A = V/L_long;
-   * D_eq = 2 * sqrt(A/π)
+   * Room L/D per NFPA 68-2023 6.4.3: H = longest dimension; Dhe from the cross-section
+   * normal to it (6.4.3.6.2 when aspect ratio <= 1.2, else 6.4.3.6.3); L/D = H/Dhe (6.4.3.7).
    */
   function roomGeometrySI(L, W, H, fill) {
     if (!(L > 0) || !(W > 0) || !(H > 0)) {
@@ -164,14 +173,12 @@
     var V = L * W * H;
     var fillF = Math.min(1, Math.max(0.05, fill || 1));
     var Veff = V * fillF;
-    var dims = [L, W, H].sort(function (a, b) {
-      return b - a;
-    });
-    var Llong = dims[0];
-    var A_cs = V / Llong;
-    var Deq = 2 * Math.sqrt(A_cs / Math.PI);
-    var LD = Deq > 0 ? Llong / Deq : NaN;
+    var g = E.roomGeometry(L, W, H);
+    var Llong = g.Llong;
+    var Deq = g.Dhe;
+    var LD = g.LD;
     return {
+      As: g.As,
       V: V,
       Veff: Veff,
       LD: LD,
@@ -199,7 +206,12 @@
     var Pred = num(state.pred, NaN);
     var Pmax = num(state.pmax, NaN);
     var Kst = num(state.kst, NaN);
-    var Kg = num(state.kg, NaN);
+    var PmaxMat = num(state.pmaxMat, NaN);
+    var Su = num(state.su, NaN) / 100;
+    var Cd = num(state.cd, 0.7);
+    var P0 = num(state.p0, 0);
+    var AsOver = num(state.asOverride, NaN);
+    var Aobs = num(state.aobs, NaN);
     var wallAvail = num(state.wallAreaAvail, NaN);
     var panelAreaUser = num(state.panelArea, NaN);
 
@@ -213,6 +225,10 @@
       if (Number.isFinite(Pstat)) Pstat = Pstat / PSI_PER_BAR;
       if (Number.isFinite(Pred)) Pred = Pred / PSI_PER_BAR;
       if (Number.isFinite(Pmax)) Pmax = Pmax / PSI_PER_BAR;
+      if (Number.isFinite(PmaxMat)) PmaxMat = PmaxMat / PSI_PER_BAR;
+      if (Number.isFinite(P0)) P0 = P0 / PSI_PER_BAR;
+      if (Number.isFinite(AsOver)) AsOver = AsOver / FT2_PER_M2;
+      if (Number.isFinite(Aobs)) Aobs = Aobs / FT2_PER_M2;
       if (Number.isFinite(wallAvail)) wallAvail = wallAvail / FT2_PER_M2;
       if (Number.isFinite(panelAreaUser)) panelAreaUser = panelAreaUser / FT2_PER_M2;
     }
@@ -255,36 +271,17 @@
       Pred: Pred,
       Pmax: Pmax,
       Kst: Kst,
-      Kg: Kg,
+      PmaxMat: PmaxMat,
+      Su: Su,
+      Cd: Cd > 0 ? Cd : 0.7,
+      P0: Number.isFinite(P0) ? P0 : 0,
+      AsOver: AsOver,
+      Aobs: Aobs,
       Ef: Math.min(1, Math.max(0.1, num(state.efficiency, 1))),
       panelAreaUser: panelAreaUser,
       wallAvail: wallAvail,
       fill: Math.min(1, Math.max(0.05, fill || 1)),
     };
-  }
-
-  function dustAv0(V, Kst, Pstat, Pred) {
-    if (!(V > 0) || !(Kst > 0) || !(Pstat > 0) || !(Pred > 0)) return NaN;
-    if (Pred <= Pstat) return NaN;
-    var term = 1 + 1.54 * Math.pow(Pstat, 4 / 3);
-    return 1e-4 * term * Kst * Math.pow(V, 2 / 3) * Math.pow(Pred, -0.5);
-  }
-
-  function elongatedMultiplier(LD, Pred) {
-    if (!(LD > 2)) return 1;
-    return 1 + 0.6 * Math.pow(LD - 2, 0.75) * Math.exp(-0.95 * Pred * Pred);
-  }
-
-  function gasAv0(V, Kg, Pstat, Pred) {
-    if (!(V > 0) || !(Kg > 0) || !(Pstat > 0) || !(Pred > 0)) return NaN;
-    var delta = Pred - 1.005 * Pstat;
-    if (delta <= 0) return NaN;
-    var a =
-      (0.1265 * Math.log(Kg) / Math.LN10 - 0.0567) * Math.pow(Pstat, -0.5817);
-    var b = 0.1754 * Math.pow(Pstat, -0.5722) * Math.pow(delta, 0.5722);
-    var coeff = a + b;
-    if (!(coeff > 0)) return NaN;
-    return coeff * Math.pow(V, 2 / 3);
   }
 
   function stClass(kst) {
@@ -302,7 +299,7 @@
     var warnings = [];
     var errors = [];
 
-    var Vuse = si.Veff;
+    var Vuse = dust ? si.Veff : si.V;
     if (!(Vuse > 0)) {
       errors.push(
         room
@@ -316,11 +313,31 @@
       errors.push("Pred must be greater than Pstat.");
     }
     if (dust && !(si.Kst > 0)) errors.push("Enter Kst > 0.");
-    if (!dust && !(si.Kg > 0)) errors.push("Enter KG > 0.");
-    if (dust && si.Kst > 800) {
-      warnings.push("Very high Kst — verify test data and NFPA 68 applicability.");
+    if (!dust && !(si.Su > 0)) errors.push("Enter fundamental burning velocity Su > 0.");
+    if (!(si.PmaxMat > 0)) {
+      errors.push("Enter Pmax (maximum unvented deflagration pressure of the " + (dust ? "dust" : "gas mixture") + ").");
+    } else if (si.Pred > 0 && si.Pred >= si.PmaxMat) {
+      errors.push("Pred must be less than the material Pmax.");
     }
-    if (room && si.fill < 1) {
+    if (dust && si.PmaxMat > 0 && (si.PmaxMat < 5 || si.PmaxMat > 12)) {
+      warnings.push("NFPA 68-2023 8.2.1.3: Eq. 8.2.1.1 applies for 5 bar-g <= Pmax <= 12 bar-g.");
+    }
+    if (dust && si.Kst > 0 && (si.Kst < 10 || si.Kst > 800)) {
+      warnings.push("NFPA 68-2023 8.2.1.3: Eq. 8.2.1.1 applies for 10 <= KSt <= 800 bar-m/s.");
+    }
+    if (dust && si.Pstat >= 0.75) {
+      warnings.push("NFPA 68-2023 8.2.1.3: Pstat must be < 0.75 bar-g.");
+    }
+    if (!dust && si.Pred > 0.1 && si.Pstat >= 0.75 * si.Pred && si.Pred <= 0.5) {
+      warnings.push("NFPA 68-2023 7.2.1.2: Pstat must be < 0.75 Pred.");
+    }
+    if (!dust && si.Su >= 3) warnings.push("NFPA 68-2023 7.2.6.8: lambda equations limited to Su < 3 m/s.");
+    if (!dust && si.PmaxMat >= 10) warnings.push("NFPA 68-2023 7.2.6.8: lambda equations limited to Pmax < 10 bar-g.");
+    if (room && si.fill < 1 && !dust) {
+      warnings.push(
+        "Partial fill fraction is not applied on the gas path (NFPA 68-2023 7.3 partial-volume method not modeled) — full volume used."
+      );
+    } else if (room && si.fill < 1) {
       warnings.push(
         "Partial fill fraction " +
           round2(si.fill) +
@@ -345,22 +362,23 @@
     }
 
     var Av0 = NaN;
+    var gas = null;
+    var gasGeom = null;
     var mult = 1;
     var formula = "";
     var regime = "compact";
 
     if (!errors.length) {
       if (dust) {
-        Av0 = dustAv0(Vuse, si.Kst, si.Pstat, si.Pred);
+        Av0 = E.dustAv0(Vuse, si.Kst, si.Pstat, si.Pred, si.PmaxMat);
         formula =
-          "Av₀ = 1×10⁻⁴ × (1 + 1.54·Pstat^(4/3)) × Kst × V_eff^(2/3) × Pred^(−½)  [NFPA 68 dust]";
+          "Av₀ = 1×10⁻⁴ × (1 + 1.54·Pstat^(4/3)) × KSt × V^(3/4) × √(Pmax/Pred − 1)  [" + EDITION + " Eq. 8.2.1.1]";
         if (LD > 2 && LD <= 6) {
-          mult = elongatedMultiplier(LD, si.Pred);
+          mult = E.dustLDMultiplier(LD, si.Pred, 0);
           regime = "elongated";
-          formula +=
-            "; Av = Av₀ × [1 + 0.6·(L/D−2)^0.75·exp(−0.95·Pred²)]";
+          formula += "; Av₁ = Av₀ × [1 + 0.6·(L/D−2)^0.75·exp(−0.95·Pred²)]  [Eq. 8.2.2.3]";
         } else if (LD > 6) {
-          mult = elongatedMultiplier(6, si.Pred);
+          mult = E.dustLDMultiplier(6, si.Pred, 0);
           regime = "elongated (L/D>6 estimate)";
         } else {
           regime = room ? "room · compact (L/D ≤ 2)" : "compact (L/D ≤ 2)";
@@ -368,13 +386,41 @@
         if (room && LD <= 2) regime = "room · compact (L/D ≤ 2)";
         if (room && LD > 2 && LD <= 6) regime = "room · elongated";
       } else {
-        Av0 = gasAv0(Vuse, si.Kg, si.Pstat, si.Pred);
-        formula = "NFPA 68 gas/vapor compact correlation (KG, Pstat, Pred, V^(2/3))";
-        regime = room ? "room · gas compact" : "gas compact";
-        if (LD > 2) {
-          warnings.push(
-            "Gas correlation is compact-form; elongated rooms/equipment need full NFPA 68 Chapter 7 treatment."
-          );
+        if (room && si.room) {
+          gasGeom = { As: si.room.As, Dhe: si.room.Deq, LD: LD, shape: "rectangular room" };
+        } else {
+          gasGeom = E.cylinderGeometry(Vuse, LD, si.L, si.D);
+        }
+        if (si.AsOver > 0) gasGeom = Object.assign({}, gasGeom, { As: si.AsOver, shape: gasGeom.shape + ", As entered" });
+        gas = E.gasVent({
+          As: gasGeom.As,
+          Dhe: gasGeom.Dhe,
+          LD: LD,
+          Su: si.Su,
+          Pmax: si.PmaxMat,
+          Pred: si.Pred,
+          Pstat: si.Pstat,
+          P0: si.P0,
+          Cd: si.Cd,
+          Aobs: si.Aobs,
+        });
+        Av0 = gas.Av;
+        if (gas.eq === "7.2.2") {
+          formula =
+            "Av₀ = As·[1 − ((Pred+1)/(Pmax+1))^(1/γb)] / [((Pred+1)/(Pmax+1))^(1/γb) − δ] · (Su·ρu/Gu)·(λ/Cd)  [" +
+            EDITION + " Eq. 7.2.2a/b, Pred > 0.5 bar-g]";
+        } else {
+          formula =
+            "Av₀ = As·C/√Pred, C = (Su·ρu·λ/(2·Gu·Cd))·[((Pmax+1)/(P0+1))^(1/γb) − 1]·(P0+1)^½  [" +
+            EDITION + " Eq. 7.2.1a/b, Pred ≤ 0.5 bar-g]";
+        }
+        formula += "; λ per 7.2.6 (iterated on vent diameter); ρu 1.2 kg/m³, Gu 230.1 kg/m²·s, γb 1.15 (7.2.3)";
+        regime = (room ? "room · gas " : "gas ") + "Eq. " + (gas.eq || "—");
+        if (LD > 5) {
+          warnings.push("L/D > 5 is outside NFPA 68-2023 Chapter 7 (7.1.1) — see Chapter 9 / specialist analysis.");
+        }
+        if (Number.isFinite(si.Pred) && si.Pred > 2 && LD >= 2.5) {
+          warnings.push("NFPA 68-2023 7.2.6.7: L/D correction to λ is limited to Pred ≤ 2 bar-g.");
         }
       }
     }
@@ -444,6 +490,9 @@
       status: status,
       panels: panels,
       wallCheck: wallCheck,
+      gas: gas,
+      gasGeom: gasGeom,
+      edition: EDITION,
       st: dust ? stClass(si.Kst) : "—",
       room: room,
       dust: dust,
@@ -561,17 +610,17 @@
       if (dust) $("fieldKst").classList.remove("hidden");
       else $("fieldKst").classList.add("hidden");
     }
-    if ($("fieldKg")) {
-      if (dust) $("fieldKg").classList.add("hidden");
-      else $("fieldKg").classList.remove("hidden");
-    }
+    document.querySelectorAll(".gas-only").forEach(function (el) {
+      if (dust) el.classList.add("hidden");
+      else el.classList.remove("hidden");
+    });
     if ($("pathBanner")) {
       $("pathBanner").innerHTML =
         '<span class="tag">' +
         escapeHtml(meta.tag) +
         "</span> " +
         escapeHtml(meta.title) +
-        " · NFPA 68 · IBC/IFC context";
+        " · " + EDITION + " · IBC/IFC context";
     }
     if ($("labelProject")) {
       $("labelProject").textContent = room
@@ -626,7 +675,12 @@
     state.length = ($("length") && $("length").value) || "";
     state.diameter = ($("diameter") && $("diameter").value) || "";
     state.kst = ($("kst") && $("kst").value) || "";
-    state.kg = ($("kg") && $("kg").value) || "";
+    state.su = ($("su") && $("su").value) || "";
+    state.pmaxMat = ($("pmaxMat") && $("pmaxMat").value) || "";
+    state.cd = ($("cd") && $("cd").value) || "0.7";
+    state.p0 = ($("p0") && $("p0").value) || "0";
+    state.asOverride = ($("asOverride") && $("asOverride").value) || "";
+    state.aobs = ($("aobs") && $("aobs").value) || "";
     state.pstat = ($("pstat") && $("pstat").value) || "";
     state.pred = ($("pred") && $("pred").value) || "";
     state.pmax = ($("pmax") && $("pmax").value) || "";
@@ -650,7 +704,12 @@
     if ($("length")) $("length").value = state.length;
     if ($("diameter")) $("diameter").value = state.diameter;
     if ($("kst")) $("kst").value = state.kst;
-    if ($("kg")) $("kg").value = state.kg;
+    if ($("su")) $("su").value = state.su;
+    if ($("pmaxMat")) $("pmaxMat").value = state.pmaxMat;
+    if ($("cd")) $("cd").value = state.cd;
+    if ($("p0")) $("p0").value = state.p0;
+    if ($("asOverride")) $("asOverride").value = state.asOverride;
+    if ($("aobs")) $("aobs").value = state.aobs;
     if ($("pstat")) $("pstat").value = state.pstat;
     if ($("pred")) $("pred").value = state.pred;
     if ($("pmax")) $("pmax").value = state.pmax;
@@ -717,7 +776,7 @@
           ? round2(r.LD).toFixed(2) +
             "  (L=" +
             fmtLen(r.si.room.Llong) +
-            ", D_eq=" +
+            ", D_he=" +
             fmtLen(r.si.room.Deq) +
             ")"
           : "—";
@@ -825,9 +884,23 @@
             " bar·m/s · " +
             r.st +
             "</strong></div>"
-          : '<div class="row"><span>K<sub>G</sub></span><strong>' +
-            (Number.isFinite(r.si.Kg) ? r.si.Kg : "—") +
-            " bar·m/s</strong></div>") +
+          : '<div class="row"><span>S<sub>u</sub></span><strong>' +
+            (Number.isFinite(r.si.Su) ? round2(r.si.Su * 100) : "—") +
+            " cm/s</strong></div>" +
+            '<div class="row"><span>A<sub>s</sub> · D<sub>he</sub></span><strong>' +
+            (r.gasGeom ? fmtArea(r.gasGeom.As) + " · " + fmtLen(r.gasGeom.Dhe) : "—") +
+            "</strong></div>" +
+            '<div class="row"><span>λ (7.2.6) · equation</span><strong>' +
+            (r.gas && Number.isFinite(r.gas.lambda) ? round3(r.gas.lambda).toFixed(3) : "—") +
+            " · Eq. " +
+            escapeHtml((r.gas && r.gas.eq) || "—") +
+            "</strong></div>") +
+        '<div class="row"><span>P<sub>max</sub> (unvented, material)</span><strong>' +
+        fmtP(r.si.PmaxMat) +
+        "</strong></div>" +
+        '<div class="row"><span>Code basis</span><strong id="mEditionRow">' +
+        EDITION +
+        "</strong></div>" +
         '<div class="row"><span>P<sub>stat</sub> / P<sub>red</sub></span><strong>' +
         fmtP(r.si.Pstat) +
         " / " +
@@ -917,6 +990,7 @@
     return (
       logo +
       "<h1>Deflagration Vent Sizing</h1>" +
+      "<p><strong>Code basis:</strong> " + EDITION + "</p>" +
       "<p><strong>Application:</strong> " +
       escapeHtml(r.meta.title) +
       "<br><strong>Project:</strong> " +
@@ -945,9 +1019,16 @@
           " bar·m/s (" +
           r.st +
           ")"
-        : "<strong>K<sub>G</sub>:</strong> " +
-          (Number.isFinite(r.si.Kg) ? r.si.Kg : "—") +
-          " bar·m/s") +
+        : "<strong>S<sub>u</sub>:</strong> " +
+          (Number.isFinite(r.si.Su) ? round2(r.si.Su * 100) : "—") +
+          " cm/s · <strong>λ:</strong> " +
+          (r.gas && Number.isFinite(r.gas.lambda) ? round3(r.gas.lambda).toFixed(3) : "—") +
+          " · <strong>A<sub>s</sub>:</strong> " +
+          (r.gasGeom ? fmtArea(r.gasGeom.As) : "—") +
+          " · Eq. " +
+          escapeHtml((r.gas && r.gas.eq) || "—")) +
+      "<br><strong>P<sub>max</sub> (material):</strong> " +
+      fmtP(r.si.PmaxMat) +
       "<br><strong>P<sub>stat</sub> / P<sub>red</sub>:</strong> " +
       fmtP(r.si.Pstat) +
       " / " +
@@ -966,7 +1047,7 @@
         ? "<p><strong>Notes:</strong> " + escapeHtml(state.notes) + "</p>"
         : "") +
       "<h2>Code context</h2><ul>" +
-      "<li>NFPA 68 — deflagration venting (rooms and equipment).</li>" +
+      "<li>" + EDITION + " — deflagration venting (rooms and equipment).</li>" +
       "<li>NFPA 69 — prevention / isolation alternatives.</li>" +
       "<li>NFPA 652 / 654 — dust hazard analysis.</li>" +
       "<li>IBC / IFC — explosion control by reference where required.</li></ul>" +

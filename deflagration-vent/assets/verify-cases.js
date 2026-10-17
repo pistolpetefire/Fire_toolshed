@@ -4,14 +4,12 @@ window.FT_VERIFY_CASES = {
  "app": "Deflagration Vent Sizing",
  "versionSel": "#appVersion",
  "handcalc": "validation/verify/deflagration_vent.py",
- "flags": [
-  "App equations differ from NFPA 68. Dust: app uses V^(2/3) x Pred^(-1/2) and no Pmax term; NFPA 68 Eq. 8.2.2 uses V^(3/4) x sqrt(Pmax/Pred - 1), with Pmax the unvented dust pressure, while the app treats \"Pmax\" as enclosure strength. Gas: app puts the exponents on Pstat and (Pred - 1.005 Pstat); the published correlation puts them on Pred with a (Pstat - 0.1) term. Not changed; for Kevin to review before this app is relied on."
- ],
+ "flags": [],
  "cases": [
   {
    "id": "dust-compact",
-   "title": "Process dust, V 10 m3, Kst 200, Pstat 0.1, Pred 0.5, Pmax 8 bar, L/D 1.5",
-   "source": "NFPA 68 (see script header)",
+   "title": "Process dust, V 10 m3, KSt 200, Pstat 0.1, Pred 0.5, Pmax 8 bar, L/D 1.5",
+   "source": "NFPA 68-2023 (see script header)",
    "steps": [
     {
      "click": "#pickProcess",
@@ -43,12 +41,32 @@ window.FT_VERIFY_CASES = {
      "value": "0.5"
     },
     {
+     "set": "#pmaxMat",
+     "value": "8"
+    },
+    {
      "set": "#pmax",
      "value": "8"
     },
     {
      "set": "#efficiency",
      "value": "1"
+    },
+    {
+     "set": "#asOverride",
+     "value": ""
+    },
+    {
+     "set": "#aobs",
+     "value": ""
+    },
+    {
+     "set": "#p0",
+     "value": "0"
+    },
+    {
+     "set": "#cd",
+     "value": "0.7"
     }
    ],
    "reads": [
@@ -56,15 +74,14 @@ window.FT_VERIFY_CASES = {
      "sel": "#mAv",
      "label": "Vent area Av",
      "unit": "m2",
-     "ref": 0.4667,
-     "flag": "App equations differ from NFPA 68. Dust: app uses V^(2/3) x Pred^(-1/2) and no Pmax term; NFPA 68 Eq. 8.2.2 uses V^(3/4) x sqrt(Pmax/Pred - 1), with Pmax the unvented dust pressure, while the app treats \"Pmax\" as enclosure strength. Gas: app puts the exponents on Pstat and (Pred - 1.005 Pstat); the published correlation puts them on Pred with a (Pstat - 0.1) term. Not changed; for Kevin to review before this app is relied on."
+     "ref": 0.4667
     }
    ]
   },
   {
    "id": "dust-elongated",
-   "title": "Process dust, V 25 m3, Kst 150, Pstat 0.1, Pred 0.4, Pmax 8 bar, L/D 4",
-   "source": "NFPA 68 (see script header)",
+   "title": "Process dust, V 25 m3, KSt 150, Pstat 0.1, Pred 0.4, Pmax 8 bar, L/D 4",
+   "source": "NFPA 68-2023 (see script header)",
    "steps": [
     {
      "click": "#pickProcess",
@@ -96,12 +113,32 @@ window.FT_VERIFY_CASES = {
      "value": "0.4"
     },
     {
+     "set": "#pmaxMat",
+     "value": "8"
+    },
+    {
      "set": "#pmax",
      "value": "8"
     },
     {
      "set": "#efficiency",
      "value": "1"
+    },
+    {
+     "set": "#asOverride",
+     "value": ""
+    },
+    {
+     "set": "#aobs",
+     "value": ""
+    },
+    {
+     "set": "#p0",
+     "value": "0"
+    },
+    {
+     "set": "#cd",
+     "value": "0.7"
     }
    ],
    "reads": [
@@ -109,15 +146,14 @@ window.FT_VERIFY_CASES = {
      "sel": "#mAv",
      "label": "Vent area Av",
      "unit": "m2",
-     "ref": 1.4622,
-     "flag": "App equations differ from NFPA 68. Dust: app uses V^(2/3) x Pred^(-1/2) and no Pmax term; NFPA 68 Eq. 8.2.2 uses V^(3/4) x sqrt(Pmax/Pred - 1), with Pmax the unvented dust pressure, while the app treats \"Pmax\" as enclosure strength. Gas: app puts the exponents on Pstat and (Pred - 1.005 Pstat); the published correlation puts them on Pred with a (Pstat - 0.1) term. Not changed; for Kevin to review before this app is relied on."
+     "ref": 1.4622
     }
    ]
   },
   {
    "id": "gas-compact",
-   "title": "Process gas, V 10 m3, KG 100, Pstat 0.1, Pred 0.5 bar, L/D 1.5",
-   "source": "NFPA 68 (see script header)",
+   "title": "Process gas, V 10 m3, propane Su 46 cm/s, Pmax 7.9, Pstat 0.1, Pred 0.5 bar (Eq. 7.2.1), L/D 1.5",
+   "source": "NFPA 68-2023 (see script header)",
    "steps": [
     {
      "click": "#pickGas",
@@ -137,8 +173,8 @@ window.FT_VERIFY_CASES = {
      "value": "1.5"
     },
     {
-     "set": "#kg",
-     "value": "100"
+     "set": "#su",
+     "value": "46"
     },
     {
      "set": "#pstat",
@@ -149,12 +185,32 @@ window.FT_VERIFY_CASES = {
      "value": "0.5"
     },
     {
+     "set": "#pmaxMat",
+     "value": "7.9"
+    },
+    {
      "set": "#pmax",
      "value": "2"
     },
     {
      "set": "#efficiency",
      "value": "1"
+    },
+    {
+     "set": "#asOverride",
+     "value": ""
+    },
+    {
+     "set": "#aobs",
+     "value": ""
+    },
+    {
+     "set": "#p0",
+     "value": "0"
+    },
+    {
+     "set": "#cd",
+     "value": "0.7"
     }
    ],
    "reads": [
@@ -162,15 +218,14 @@ window.FT_VERIFY_CASES = {
      "sel": "#mAv",
      "label": "Vent area Av",
      "unit": "m2",
-     "ref": 1.3636,
-     "flag": "App equations differ from NFPA 68. Dust: app uses V^(2/3) x Pred^(-1/2) and no Pmax term; NFPA 68 Eq. 8.2.2 uses V^(3/4) x sqrt(Pmax/Pred - 1), with Pmax the unvented dust pressure, while the app treats \"Pmax\" as enclosure strength. Gas: app puts the exponents on Pstat and (Pred - 1.005 Pstat); the published correlation puts them on Pred with a (Pstat - 0.1) term. Not changed; for Kevin to review before this app is relied on."
+     "ref": 1.181
     }
    ]
   },
   {
    "id": "gas-pstat",
-   "title": "Process gas, V 50 m3, KG 75, Pstat 0.2, Pred 1.0 bar, L/D 1",
-   "source": "NFPA 68 (see script header)",
+   "title": "Process gas, V 50 m3, methane Su 40 cm/s, Pmax 7.1, Pstat 0.2, Pred 1.0 bar (Eq. 7.2.2), L/D 1",
+   "source": "NFPA 68-2023 (see script header)",
    "steps": [
     {
      "click": "#pickGas",
@@ -190,8 +245,8 @@ window.FT_VERIFY_CASES = {
      "value": "1"
     },
     {
-     "set": "#kg",
-     "value": "75"
+     "set": "#su",
+     "value": "40"
     },
     {
      "set": "#pstat",
@@ -202,12 +257,32 @@ window.FT_VERIFY_CASES = {
      "value": "1.0"
     },
     {
+     "set": "#pmaxMat",
+     "value": "7.1"
+    },
+    {
      "set": "#pmax",
      "value": "3"
     },
     {
      "set": "#efficiency",
      "value": "1"
+    },
+    {
+     "set": "#asOverride",
+     "value": ""
+    },
+    {
+     "set": "#aobs",
+     "value": ""
+    },
+    {
+     "set": "#p0",
+     "value": "0"
+    },
+    {
+     "set": "#cd",
+     "value": "0.7"
     }
    ],
    "reads": [
@@ -215,8 +290,223 @@ window.FT_VERIFY_CASES = {
      "sel": "#mAv",
      "label": "Vent area Av",
      "unit": "m2",
-     "ref": 2.6878,
-     "flag": "App equations differ from NFPA 68. Dust: app uses V^(2/3) x Pred^(-1/2) and no Pmax term; NFPA 68 Eq. 8.2.2 uses V^(3/4) x sqrt(Pmax/Pred - 1), with Pmax the unvented dust pressure, while the app treats \"Pmax\" as enclosure strength. Gas: app puts the exponents on Pstat and (Pred - 1.005 Pstat); the published correlation puts them on Pred with a (Pstat - 0.1) term. Not changed; for Kevin to review before this app is relied on."
+     "ref": 2.5517
+    }
+   ]
+  },
+  {
+   "id": "x-propane-721",
+   "title": "Cross-check: 10 m3, propane Su 46, Pmax 7.9, Pstat 0.1, Pred 0.5 (Eq. 7.2.1), L/D 1.5",
+   "source": "NFPA 68-2023 (see script header)",
+   "steps": [
+    {
+     "click": "#pickGas",
+     "wait": 300
+    },
+    {
+     "set": "#units",
+     "value": "si",
+     "wait": 200
+    },
+    {
+     "set": "#volume",
+     "value": "10"
+    },
+    {
+     "set": "#ldRatio",
+     "value": "1.5"
+    },
+    {
+     "set": "#su",
+     "value": "46"
+    },
+    {
+     "set": "#pstat",
+     "value": "0.1"
+    },
+    {
+     "set": "#pred",
+     "value": "0.5"
+    },
+    {
+     "set": "#pmaxMat",
+     "value": "7.9"
+    },
+    {
+     "set": "#pmax",
+     "value": ""
+    },
+    {
+     "set": "#efficiency",
+     "value": "1"
+    },
+    {
+     "set": "#asOverride",
+     "value": ""
+    },
+    {
+     "set": "#aobs",
+     "value": ""
+    },
+    {
+     "set": "#p0",
+     "value": "0"
+    },
+    {
+     "set": "#cd",
+     "value": "0.7"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#mAv",
+     "label": "Vent area Av",
+     "unit": "m2",
+     "ref": 1.181
+    }
+   ]
+  },
+  {
+   "id": "x-propane-722",
+   "title": "Cross-check: 10 m3, propane Su 46, Pmax 7.9, Pstat 0.1, Pred 1.0 (Eq. 7.2.2), L/D 3",
+   "source": "NFPA 68-2023 (see script header)",
+   "steps": [
+    {
+     "click": "#pickGas",
+     "wait": 300
+    },
+    {
+     "set": "#units",
+     "value": "si",
+     "wait": 200
+    },
+    {
+     "set": "#volume",
+     "value": "10"
+    },
+    {
+     "set": "#ldRatio",
+     "value": "3"
+    },
+    {
+     "set": "#su",
+     "value": "46"
+    },
+    {
+     "set": "#pstat",
+     "value": "0.1"
+    },
+    {
+     "set": "#pred",
+     "value": "1.0"
+    },
+    {
+     "set": "#pmaxMat",
+     "value": "7.9"
+    },
+    {
+     "set": "#pmax",
+     "value": ""
+    },
+    {
+     "set": "#efficiency",
+     "value": "1"
+    },
+    {
+     "set": "#asOverride",
+     "value": ""
+    },
+    {
+     "set": "#aobs",
+     "value": ""
+    },
+    {
+     "set": "#p0",
+     "value": "0"
+    },
+    {
+     "set": "#cd",
+     "value": "0.7"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#mAv",
+     "label": "Vent area Av",
+     "unit": "m2",
+     "ref": 0.8679
+    }
+   ]
+  },
+  {
+   "id": "x-aluminum",
+   "title": "Cross-check: 10 m3, aluminum KSt 400, Pmax 11.2, Pstat 0.1, Pred 0.5, L/D 1.5",
+   "source": "NFPA 68-2023 (see script header)",
+   "steps": [
+    {
+     "click": "#pickProcess",
+     "wait": 300
+    },
+    {
+     "set": "#units",
+     "value": "si",
+     "wait": 200
+    },
+    {
+     "set": "#volume",
+     "value": "10"
+    },
+    {
+     "set": "#ldRatio",
+     "value": "1.5"
+    },
+    {
+     "set": "#kst",
+     "value": "400"
+    },
+    {
+     "set": "#pstat",
+     "value": "0.1"
+    },
+    {
+     "set": "#pred",
+     "value": "0.5"
+    },
+    {
+     "set": "#pmaxMat",
+     "value": "11.2"
+    },
+    {
+     "set": "#pmax",
+     "value": ""
+    },
+    {
+     "set": "#efficiency",
+     "value": "1"
+    },
+    {
+     "set": "#asOverride",
+     "value": ""
+    },
+    {
+     "set": "#aobs",
+     "value": ""
+    },
+    {
+     "set": "#p0",
+     "value": "0"
+    },
+    {
+     "set": "#cd",
+     "value": "0.7"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#mAv",
+     "label": "Vent area Av",
+     "unit": "m2",
+     "ref": 1.1149
     }
    ]
   }

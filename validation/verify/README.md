@@ -19,7 +19,6 @@ a professional seal or certification.
 
 | App | Item | Effect |
 |---|---|---|
-| Deflagration Vent | Dust and gas vent equations do not match NFPA 68 (dust: V^(2/3) Pred^(-1/2), no Pmax/Pred term; gas: exponents on wrong pressures) | Dust under-sized about 70%; gas over-sized 3 to 4 times in the test cases |
 | Smoke Exhaust Lab | Plugholing Vmax uses a temperature rise from 0.5 Qc rather than the layer temperature | Vmax about 29% low (conservative) |
 
 Review notes, not math errors: FA Power Extenders UFC standby duration not confirmed; Dry Sprinkler fill rate
@@ -29,6 +28,16 @@ Division 1.4 maps to H-3.
 Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
+
+- **Deflagration Vent v1.2.0 (2026-10-17).** Rebuilt on NFPA 68-2023 (equations in `deflagration-vent/assets/nfpa68-engine.js`):
+  - **Dust:** Eq. 8.2.1.1 with V^(3/4) and sqrt(Pmax/Pred - 1), where Pmax is the dust's unvented Pmax (new input, separate from the
+    enclosure-strength field), plus the Eq. 8.2.2.3 L/D multiplier. The base equation is 8.2.1.1 in the 2018/2023 numbering (8.2.2 in 2013).
+  - **Gas:** the KG correlation (not in NFPA 68 since 2007) is replaced by the Su method: Eq. 7.2.1a/b for Pred <= 0.5 bar-g and
+    Eq. 7.2.2a/b above it, with As, Cd, P0 and the 7.2.6 turbulence factor lambda (iterated on the vent diameter).
+  - **Room L/D:** now H/Dhe per 6.4.3.6.2 / 6.4.3.6.3 / 6.4.3.7 (was a circular-equivalent diameter).
+  - Before / after on the original cases: dust 10 m3 0.141 -> 0.467 m2; dust 25 m3 L/D 4 0.406 -> 1.462 m2; gas 10 m3 5.276 -> 1.181 m2;
+    gas 50 m3 11.506 -> 2.552 m2. The two gas cases were re-based from KG 100 / 75 to propane Su 46 cm/s (Pmax 7.9) and methane Su 40 cm/s (Pmax 7.1).
+  - Verification: 7 of 7 checks pass (4 original + 3 cross-checks). Tests: `node --test tests/deflagration-vent.test.mjs`.
 
 - **Fire Pump Sizer v2.4.0 (2026-10-14).** Three changes:
   - **Diesel tank:** sized per NFPA 20 (2022) 11.4.1.3.1 and 11.4.1.3.1.1, at 12 h × the entered manufacturer rate + 10%, or 1 gal/hp + 10% when no rate is entered.

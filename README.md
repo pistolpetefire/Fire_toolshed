@@ -52,7 +52,7 @@ Phase 1 screens the job and stops at the AHJ kickoff. Phase 2 is [FDS and Smokev
 | [Transparent RSET Tool](./rset-tool/) | Educational RSET = Detection + Notification + Pre-movement + Movement; guides + assumptions log (React app; build with `npm run build` in `rset-tool/`) |
 | [IBC / IFC Hazard Impacts](./ibc-ifc-hazard/) | H occupancy + hazmat classes → construction/mitigations with drivers (2015–2024) |
 | [Concrete Fire Rating Thickness](./concrete-fire-rating/) | Min. concrete / CMU thickness for 1–4 hr FRR (IBC / ACI 216.1 material tables) |
-| [Deflagration Vent Sizing](./deflagration-vent/) | NFPA 68 dust & gas vent area; IBC/IFC explosion-control context |
+| [Deflagration Vent Sizing](./deflagration-vent/) | NFPA 68-2023 dust (Eq. 8.2.1.1) & gas (Eq. 7.2.1/7.2.2) vent area; IBC/IFC explosion-control context |
 | [Smoke Exhaust Scenario Lab](./smoke-exhaust-lab/app/) | Beta smoke exhaust scenarios (team testing package) |
 | [Games](./games/) | Browser arcade breaks (Punch-Out!!, Frogger, Ms. Pac Maze fan remakes) |
 

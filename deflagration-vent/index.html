@@ -16,10 +16,11 @@
       <div>
         <p class="eyebrow">Fire Toolshed · Explosion protection</p>
         <h1>Deflagration Vent Sizing</h1>
-        <p class="version" id="appVersion">Version 1.1.1</p>
+        <p class="version" id="appVersion">Version 1.2.0</p>
+        <p class="version" id="codeEdition">Code basis: <strong>NFPA 68-2023</strong> (Ch. 7 gas, Ch. 8 dust)</p>
         <p class="lead">
           Preliminary <strong>room</strong> and process-equipment deflagration vent area using
-          <strong>NFPA 68</strong>. Most common use: <strong>room vent sizing</strong> for dust or gas/vapor.
+          <strong>NFPA 68-2023</strong>. Most common use: <strong>room vent sizing</strong> for dust or gas/vapor.
           IBC/IFC may require explosion control by reference to NFPA 68/69/652.
         </p>
       </div>
@@ -48,7 +49,7 @@
         <button type="button" class="path-card" id="pickRoomGas" data-path="room_gas">
           <span class="path-badge">Room</span>
           <strong>Room — gas / vapor</strong>
-          <span class="path-desc">Room dimensions with K<sub>G</sub> gas/vapor correlation. Use for enclosed process rooms with flammable gas/vapor hazard.</span>
+          <span class="path-desc">Room dimensions with the NFPA 68-2023 Chapter 7 gas method (S<sub>u</sub>, A<sub>s</sub>, λ). Use for enclosed process rooms with flammable gas/vapor hazard.</span>
           <span class="path-go">Start room (gas) →</span>
         </button>
         <button type="button" class="path-card" id="pickProcess" data-path="process_dust">
@@ -60,7 +61,7 @@
         <button type="button" class="path-card" id="pickGas" data-path="process_gas">
           <span class="path-badge">Process</span>
           <strong>Process equipment — gas / vapor</strong>
-          <span class="path-desc">Vessels and equipment with flammable gas/vapor (K<sub>G</sub>). Compact correlation; verify elongated cases in full NFPA 68.</span>
+          <span class="path-desc">Vessels and equipment with flammable gas/vapor. NFPA 68-2023 Eq. 7.2.1 / 7.2.2 (S<sub>u</sub>-based), L/D ≤ 5.</span>
           <span class="path-go">Start process (gas) →</span>
         </button>
       </div>
@@ -225,10 +226,37 @@
                 <input id="kst" type="number" min="0" step="any" value="150" />
                 <span class="sub">bar·m/s from dust testing. St1 ≤200, St2 ≤300, St3 &gt;300.</span>
               </div>
-              <div class="field hidden" id="fieldKg">
-                <label for="kg">K<sub>G</sub> (gas deflagration index)</label>
-                <input id="kg" type="number" min="0" step="any" value="100" />
-                <span class="sub">bar·m/s. Use tested/documented values for the mixture.</span>
+              <div class="field hidden gas-only" id="fieldSu">
+                <label for="su">S<sub>u</sub> — fundamental burning velocity (cm/s)</label>
+                <input id="su" type="number" min="0" step="any" value="46" />
+                <span class="sub">Max for any concentration (7.2.3.2). Propane 46, methane 40, mists 46 (7.2.3.1). Always cm/s.</span>
+              </div>
+              <div class="field">
+                <label for="pmaxMat">P<sub>max</sub> — max unvented deflagration pressure of the dust/gas <span class="u-p"></span></label>
+                <input id="pmaxMat" type="number" min="0" step="any" value="116" />
+                <span class="sub">Material test value (closed vessel), used in NFPA 68 equations. Not the enclosure strength.</span>
+              </div>
+              <div class="field hidden gas-only">
+                <label for="cd">Vent discharge coefficient C<sub>d</sub> (7.2.4.1)</label>
+                <select id="cd">
+                  <option value="0.7" selected>0.70 — standard</option>
+                  <option value="0.8">0.80 — vent occupies an entire wall</option>
+                </select>
+              </div>
+              <div class="field hidden gas-only">
+                <label for="p0">P<sub>0</sub> — enclosure pressure before ignition <span class="u-p"></span></label>
+                <input id="p0" type="number" step="any" value="0" />
+                <span class="sub">Gauge. ≥ normal operating pressure (7.2.4.2).</span>
+              </div>
+              <div class="field hidden gas-only">
+                <label for="asOverride">Internal surface area A<sub>s</sub> (optional) <span class="u-area"></span></label>
+                <input id="asOverride" type="number" min="0" step="any" placeholder="auto from geometry" />
+                <span class="sub">7.2.5. Blank = room 2(LW+LH+WH), or cylinder from V and L/D.</span>
+              </div>
+              <div class="field hidden gas-only">
+                <label for="aobs">Obstruction surface area A<sub>obs</sub> (optional) <span class="u-area"></span></label>
+                <input id="aobs" type="number" min="0" step="any" placeholder="0" />
+                <span class="sub">7.2.6.2 items. Raises λ when A<sub>obs</sub> &gt; 0.2 A<sub>s</sub> (7.2.6.4).</span>
               </div>
               <div class="field">
                 <label for="pstat">P<sub>stat</sub> — vent static activation <span class="u-p"></span></label>
@@ -313,7 +341,7 @@
         </p>
         <p class="help-intro">
           <strong>Most common use: room vent sizing.</strong> Pick
-          <em>Room — combustible dust</em> (or room gas), enter L×W×H and a construction preset, then K<sub>St</sub> / K<sub>G</sub>.
+          <em>Room — combustible dust</em> (or room gas), enter L×W×H and a construction preset, then K<sub>St</sub> / S<sub>u</sub> and the material P<sub>max</sub>.
           Process-equipment paths are for vessels, collectors, bins, and silos.
         </p>
 
@@ -338,7 +366,7 @@
           </dd>
           <dt>Room — gas / vapor</dt>
           <dd>
-            Same room geometry workflow, but fuel is flammable gas/vapor using <strong>K<sub>G</sub></strong>.
+            Same room geometry workflow, but fuel is flammable gas/vapor using the NFPA 68-2023 Chapter 7 S<sub>u</sub> method.
             Confirm concentration, ignition scenario, and NFPA 68 gas chapter applicability.
           </dd>
           <dt>Process equipment — dust</dt>
@@ -347,7 +375,7 @@
             For dust collectors use <strong>dirty-side volume</strong> that can participate in the deflagration.
           </dd>
           <dt>Process equipment — gas / vapor</dt>
-          <dd>Process vessels with gas/vapor hazard (K<sub>G</sub>). Compact gas correlation; elongated cases need full NFPA 68 treatment.</dd>
+          <dd>Process vessels with gas/vapor hazard. NFPA 68-2023 Eq. 7.2.1 (P<sub>red</sub> ≤ 0.5 bar-g) or 7.2.2 (P<sub>red</sub> &gt; 0.5 bar-g), λ per 7.2.6.</dd>
           <dt>Change application</dt>
           <dd>Returns to the path chooser to switch room ↔ process or dust ↔ gas.</dd>
         </dl>
@@ -438,11 +466,15 @@
             Higher K<sub>St</sub> → more violent explosion → more vent area.
             Classes shown for reference: St 1 ≤ 200, St 2 ≤ 300, St 3 &gt; 300. Prefer project-specific test data.
           </dd>
-          <dt>K<sub>G</sub> (gas paths)</dt>
+          <dt>S<sub>u</sub> and P<sub>max</sub> (gas paths)</dt>
           <dd>
-            Gas/vapor deflagration index (bar·m/s). Depends on composition and concentration.
-            Order-of-magnitude examples only (methane ≈ 55, propane ≈ 100, hydrogen ≈ 550) — do not design from examples alone.
+            NFPA 68-2023 Chapter 7 sizes gas vents from the fundamental burning velocity S<sub>u</sub> (cm/s), the enclosure
+            internal surface area A<sub>s</sub>, and the closed-vessel P<sub>max</sub> of the mixture, with the turbulence factor λ
+            per 7.2.6. Eq. 7.2.1 applies for P<sub>red</sub> ≤ 0.5 bar-g and Eq. 7.2.2 above that. K<sub>G</sub> is no longer used.
+            Defaults per 7.2.3: ρ<sub>u</sub> 1.2 kg/m³, G<sub>u</sub> 230.1 kg/m²·s, γ<sub>b</sub> 1.15, μ<sub>u</sub> 1.8×10⁻⁵ kg/m·s, a<sub>u</sub> 343 m/s.
           </dd>
+          <dt>P<sub>max</sub> (dust paths)</dt>
+          <dd>Maximum pressure of an unvented deflagration of the dust (test value), used in Eq. 8.2.1.1. Separate from the enclosure strength.</dd>
           <dt>P<sub>stat</sub> — vent static activation</dt>
           <dd>
             Gauge pressure at which the vent panel opens (manufacturer rating).
@@ -520,6 +552,7 @@
   </div>
 
   <script src="../shared/report-logo.js"></script>
+  <script src="./assets/nfpa68-engine.js"></script>
   <script src="./assets/app.js"></script>
 </body>
 </html>
