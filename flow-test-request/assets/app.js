@@ -183,6 +183,7 @@
     return (
       logo +
       "<h1>Hydrant Flow Test Request</h1>" +
+      "<p><strong>Code basis:</strong> NFPA 291-2022 (recommended practice, not code-referenced)</p>" +
       "<h2>1. Purpose</h2>" +
       "<p><strong>" +
       escapeHtml(m.purpose.label) +
@@ -221,7 +222,8 @@
 
   function packagePlainText(m) {
     return (
-      "HYDRANT FLOW TEST REQUEST\n\n" +
+      "HYDRANT FLOW TEST REQUEST\n" +
+      "Code basis: NFPA 291-2022 (recommended practice, not code-referenced)\n\n" +
       "1. PURPOSE\n" +
       m.purpose.label +
       "\n\n" +
