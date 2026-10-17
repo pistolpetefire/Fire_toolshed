@@ -48,9 +48,16 @@
           <div>
             <input id="scenarioName" class="scenarioName" aria-label="Scenario name" />
             <p id="comparisonNote"></p>
+            <p id="codeEdition" class="codeEdition">Code basis: <strong id="nfpa92Label">NFPA 92-2021</strong> · <span id="nfpa92Note"></span></p>
           </div>
           <div class="topActions">
             <span id="versionChipTop" class="versionChipTop" aria-hidden="true"></span>
+            <label class="editionPick" for="nfpa92Edition">NFPA 92
+              <select id="nfpa92Edition" aria-label="NFPA 92 edition">
+                <option value="2021" selected>2021 (Florida 9th Ed.)</option>
+                <option value="2024">2024</option>
+              </select>
+            </label>
             <div class="modeSwitch" aria-label="View mode">
               <button type="button" data-app-mode="standard">Full</button>
               <button type="button" data-app-mode="excel">Excel</button>

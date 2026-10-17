@@ -173,6 +173,62 @@ window.FT_VERIFY_CASES = {
      "ref": 319587.0
     }
    ]
+  },
+  {
+   "id": "edition-2021",
+   "title": "Base scenario with NFPA 92-2021 selected (results unchanged) (default)",
+   "source": "NFPA 92-2021 / 2024 Ch. 5 (same equations and Ks)",
+   "steps": [],
+   "reads": [
+    {
+     "sel": "#nfpa92Label",
+     "label": "Edition shown on screen",
+     "refText": "NFPA 92-2021"
+    },
+    {
+     "sel": "#summaryStrip div:nth-child(2) strong",
+     "label": "Required exhaust (displayed)",
+     "unit": "cfm",
+     "ref": 7117.0
+    },
+    {
+     "expr": "calculate(scenarios.find(function(s){return s.id==='base'})).outputs.vmaxCfm",
+     "label": "Plugholing limit per inlet",
+     "unit": "cfm",
+     "ref": 65431.6
+    }
+   ]
+  },
+  {
+   "id": "edition-2024",
+   "title": "Base scenario with NFPA 92-2024 selected (results unchanged)",
+   "source": "NFPA 92-2021 / 2024 Ch. 5 (same equations and Ks)",
+   "steps": [
+    {
+     "set": "#nfpa92Edition",
+     "value": "2024",
+     "wait": 300
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#nfpa92Label",
+     "label": "Edition shown on screen",
+     "refText": "NFPA 92-2024"
+    },
+    {
+     "sel": "#summaryStrip div:nth-child(2) strong",
+     "label": "Required exhaust (displayed)",
+     "unit": "cfm",
+     "ref": 7117.0
+    },
+    {
+     "expr": "calculate(scenarios.find(function(s){return s.id==='base'})).outputs.vmaxCfm",
+     "label": "Plugholing limit per inlet",
+     "unit": "cfm",
+     "ref": 65431.6
+    }
+   ]
   }
  ]
 }

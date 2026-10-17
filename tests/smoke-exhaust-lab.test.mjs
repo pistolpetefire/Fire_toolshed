@@ -15,8 +15,8 @@ import { serve, dumpDom, text, verifyStatus, ROOT } from './helpers.mjs'
 const src = readFileSync(join(ROOT, 'smoke-exhaust-lab/app/app.js'), 'utf8')
 const cut = src.indexOf('document.getElementById("scenarioList").addEventListener')
 assert.ok(cut > 0)
-const ctx = vm.createContext({ console, Math, Number, JSON, Date, Object, Array, String, Set, Map })
-const app = vm.runInContext(src.slice(0, cut) + '\n;({ calculate, scenarios });', ctx)
+const ctx = vm.createContext({ document: { getElementById: () => null, querySelectorAll: () => [] }, console, Math, Number, JSON, Date, Object, Array, String, Set, Map })
+const app = vm.runInContext(src.slice(0, cut) + '\n;({ calculate, scenarios, formulas, applyNfpa92Edition, nfpa92Label, NFPA92_SAME_NOTE });', ctx)
 const base = app.scenarios.find((s) => s.id === 'base')
 const run = (o) => app.calculate(Object.assign({}, base, o)).outputs
 const CFM = 2118.88
@@ -59,13 +59,52 @@ test('smoke: hand calc 3, low interface in flame zone (3,000 kW, z 4 ft, H 18 ft
   assert.ok(run({ hrrKw: 3000, smokeInterfaceFt: 4 }).vmaxCfm < 0.75 * ks1)
 })
 
-test('smoke: in-app Verification tab passes all 24 checks with the Ks = 0.5 reference', async () => {
+test('smoke: in-app Verification tab passes all 30 checks (Ks = 0.5 reference + both NFPA 92 editions)', async () => {
   const s = await serve()
   try {
     const html = await dumpDom(`${s.base}/smoke-exhaust-lab/app/?ftverifyrun=1`, 60000)
     const st = text(verifyStatus(html)).trim()
     console.log('  ' + st)
-    assert.match(st, /^24 of 24 checks pass/)
+    assert.match(st, /^30 of 30 checks pass/)
     assert.match(src, /Ks = 0\.5/)
+  } finally { await s.close() }
+})
+
+// NFPA 92 edition picker (2021 default for Florida 9th Edition; 2024 optional).
+const numericOutputs = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => typeof v === 'number' || typeof v === 'boolean'))
+const setEdition = (y) => { vm.runInContext(`nfpa92Edition = "${y}"; applyNfpa92Edition();`, ctx) }
+const CASES = [['base', {}], ['tall', { hrrKw: 2500, roomHeightFt: 40, smokeInterfaceFt: 20, exhaustLocationFactor: 0.5 }], ['low', { hrrKw: 3000, smokeInterfaceFt: 4 }]]
+
+test('smoke edition: default is NFPA 92-2021 and citations follow the picker', () => {
+  setEdition('2021')
+  assert.equal(app.nfpa92Label(), 'NFPA 92-2021')
+  const f8 = () => app.formulas.find((f) => f.id === 'F-008').source
+  assert.match(f8(), /^NFPA 92 \(2021\), Eq\. 5\.6\.3b/)
+  setEdition('2024'); assert.equal(app.nfpa92Label(), 'NFPA 92-2024'); assert.match(f8(), /^NFPA 92 \(2024\)/)
+  setEdition('2021'); assert.match(f8(), /^NFPA 92 \(2021\)/)
+  assert.match(app.NFPA92_SAME_NOTE, /same in NFPA 92-2021 and 2024/)
+  console.log('  default ' + app.nfpa92Label() + '; F-008 source: ' + f8())
+})
+
+test('smoke edition: numeric results identical for 2021 and 2024 (3 hand-calc scenarios)', () => {
+  for (const [id, o] of CASES) {
+    setEdition('2021'); const a = numericOutputs(run(o))
+    setEdition('2024'); const b = numericOutputs(run(o))
+    assert.deepEqual(b, a, id)
+    console.log(`  ${id}: ${Object.keys(a).length} numeric outputs equal; Vmax ${a.vmaxCfm.toFixed(0)} cfm, required ${a.requiredCfm.toFixed(0)} cfm`)
+  }
+  setEdition('2021')
+})
+
+test('smoke edition: page shows the picker (2021 default, 2024 option), the edition line and the "no change" note', async () => {
+  const s = await serve()
+  try {
+    const page = await dumpDom(`${s.base}/smoke-exhaust-lab/app/`, 8000)
+    const sel = (page.match(/<select id="nfpa92Edition"[\s\S]*?<\/select>/) || [''])[0]
+    assert.match(sel, /<option value="2021" selected/); assert.match(sel, /value="2024"/)
+    const line = text((page.match(/<p id="codeEdition"[\s\S]*?<\/p>/) || [''])[0]).trim()
+    console.log('  ' + line)
+    assert.match(line, /^Code basis: NFPA 92-2021 · Florida 9th Edition reference · Ch\. 5 equations and Ks/)
+    assert.match(text(page), /NFPA 92 edition NFPA 92-2021/, 'report shows the edition')
   } finally { await s.close() }
 })

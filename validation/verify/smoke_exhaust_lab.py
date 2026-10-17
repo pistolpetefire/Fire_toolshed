@@ -38,5 +38,14 @@ for cid, title, over in [('base', 'Built-in base scenario (500 kW packaging, z 8
     reads.append({'expr': js + 'vmaxCfm', 'label': 'Plugholing limit per inlet (NFPA 92 Eq. 5.6.3b, Ks = 0.5)', 'unit': 'cfm', 'ref': r(out['vmaxCfm'], 1)})
     cases.append({'id': cid, 'title': title, 'source': 'NFPA 92-2024 Ch. 5 (see script header). ' + PLUG_NOTE, 'steps': [], 'reads': reads})
     print(cid, {k: round(v, 3) for k, v in out.items()}, 'Ks=1 vmax', round(calc(s, 1.0)['vmaxCfm'], 1))
+# NFPA 92 edition picker (default 2021, Florida 9th Edition). Ch. 5 equations and Ks are the same in 2021 and 2024, so the
+# displayed results must be identical with either edition selected.
+b = calc(BASE)
+for ed, steps in [('2021', []), ('2024', [{'set': '#nfpa92Edition', 'value': '2024', 'wait': 300}])]:
+    cases.append({'id': 'edition-' + ed, 'title': 'Base scenario with NFPA 92-%s selected (results unchanged)' % ed + (' (default)' if ed == '2021' else ''),
+                  'source': 'NFPA 92-2021 / 2024 Ch. 5 (same equations and Ks)', 'steps': steps,
+                  'reads': [{'sel': '#nfpa92Label', 'label': 'Edition shown on screen', 'refText': 'NFPA 92-' + ed},
+                            {'sel': '#summaryStrip div:nth-child(2) strong', 'label': 'Required exhaust (displayed)', 'unit': 'cfm', 'ref': r(b['requiredCfm'], 0)},
+                            {'expr': "calculate(scenarios.find(function(s){return s.id==='base'})).outputs.vmaxCfm", 'label': 'Plugholing limit per inlet', 'unit': 'cfm', 'ref': r(b['vmaxCfm'], 1)}]})
 write('smoke-exhaust-lab/app', {'script': 'smoke_exhaust_lab.py', 'app': 'Smoke Exhaust Scenario Lab', 'appVersion': '2026.07.16-team-beta (engine steady-axisymmetric-1.1)',
       'handcalc': 'validation/verify/smoke_exhaust_lab.py', 'flags': [], 'cases': cases})

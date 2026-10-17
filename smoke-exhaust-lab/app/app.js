@@ -11,6 +11,25 @@ const APP_VERSION = "2026.07.16-team-beta";
 const CALC_ENGINE_VERSION = "steady-axisymmetric-1.1";
 const SCENARIO_SCHEMA_VERSION = 2;
 const STORAGE_KEY = "smokeExhaustScenarioLab.v1";
+/**
+ * NFPA 92 edition picker. Default 2021: the Florida Building/Fire Prevention Code 9th Edition references NFPA 92-2021.
+ * Chapter 5 equations (plume 5.5.1.1, layer temperature 5.5.5 with Ks = 1.0 for exhaust volume and Ks = 0.5 for
+ * plugholing, 5.6.3 Vmax, 5.6.7-5.6.9 inlets) are the same in 2021 and 2024, so the edition changes citations only.
+ */
+const NFPA92_EDITIONS = {
+  "2021": { label: "NFPA 92-2021", note: "Florida 9th Edition reference" },
+  "2024": { label: "NFPA 92-2024", note: "current NFPA edition" },
+};
+const NFPA92_SAME_NOTE =
+  "Ch. 5 equations and Ks (1.0 for exhaust volume, 0.5 for plugholing) are the same in NFPA 92-2021 and 2024; results do not change with the edition.";
+let nfpa92Edition = "2021";
+function nfpa92Label() {
+  return (NFPA92_EDITIONS[nfpa92Edition] || NFPA92_EDITIONS["2021"]).label;
+}
+function nfpa92Cite() {
+  return `NFPA 92 (${NFPA92_EDITIONS[nfpa92Edition] ? nfpa92Edition : "2021"})`;
+}
+
 const SOURCE_DOCUMENTS = [
   {
     id: "TSFPEWG-G-3-600-01.01-18-C1",
@@ -31,9 +50,9 @@ const SOURCE_DOCUMENTS = [
     role: "Flow, leakage area, flow coefficient, and pressure-difference relationships.",
   },
   {
-    id: "NFPA-92-2024",
-    title: "NFPA 92 (2024)",
-    date: "2024",
+    id: "NFPA-92-2021",
+    title: "NFPA 92 (2021)",
+    date: "2021",
     role: "Rectangular inlet geometry and smoke control criteria cross-checks used by the source spreadsheet.",
   },
 ];
@@ -594,13 +613,13 @@ const formulas = [
     id: "F-008A",
     name: "Rectangular inlet equivalent diameter",
     formula: "Di = 2ab / (a + b); ratio = d / Di",
-    source: "NFPA 92 (2024), 5.6.8 and 5.6.7, inch-pound inlet geometry check",
+    source: "NFPA 92 (2021), 5.6.8 and 5.6.7, inch-pound inlet geometry check",
   },
   {
     id: "F-008",
     name: "Plugholing limit per inlet",
     formula: "Vmax = 4.16 * gamma * d^(5/2) * ((Ts - To) / To)^(1/2), Ts = To + Ks Qc / (m cp) with Ks = 0.5",
-    source: "NFPA 92 (2024), Eq. 5.6.3b (SI); Ts per Eq. 5.5.5 with Ks = 0.5 for plugholing per 5.5.5.2; Handbook of Smoke Control Engineering, Ch. 16, Eq. 16.25",
+    source: "NFPA 92 (2021), Eq. 5.6.3b (SI); Ts per Eq. 5.5.5 with Ks = 0.5 for plugholing per 5.5.5.2; Handbook of Smoke Control Engineering, Ch. 16, Eq. 16.25",
   },
   {
     id: "F-009",
@@ -1782,7 +1801,7 @@ function calculate(scenario) {
     ],
     [
       "Plugholing inlet geometry",
-      "NFPA 92 (2024) 5.6.7 and 5.6.8",
+      `${nfpa92Cite()} 5.6.7 and 5.6.8`,
       inletGeometryPass ? "Pass" : "Fail",
       `Equivalent diameter = ${fmt(equivalentInletDiameterFt, 2)} ft; d/Di = ${fmt(smokeDepthToDiameterRatio, 2)}.`,
     ],
@@ -2334,6 +2353,7 @@ function renderReport(active, calc) {
     ["App version", html(APP_VERSION)],
     ["Calculation engine", html(CALC_ENGINE_VERSION)],
     ["Scenario schema", `v${SCENARIO_SCHEMA_VERSION}`],
+    ["NFPA 92 edition", html(`${nfpa92Label()} (${NFPA92_EDITIONS[nfpa92Edition].note}). ${NFPA92_SAME_NOTE}`)],
     ["Source documents", html(SOURCE_DOCUMENTS.map((item) => `${item.id} (${item.date})`).join("; "))],
     ["Report status", html(readiness.status)],
   ];
@@ -2544,6 +2564,27 @@ function versionLabel() {
   return `v${APP_VERSION} · engine ${CALC_ENGINE_VERSION}`;
 }
 
+/** Updates the NFPA 92 citations (formulas, sources) and the on-screen edition line. Math is edition-independent. */
+function applyNfpa92Edition() {
+  const cite = nfpa92Cite();
+  formulas.forEach((f) => {
+    if (typeof f.source === "string") f.source = f.source.replace(/NFPA 92 \((2021|2024)\)/g, cite);
+  });
+  const doc = SOURCE_DOCUMENTS.find((d) => /^NFPA-92-/.test(d.id));
+  if (doc) {
+    const y = NFPA92_EDITIONS[nfpa92Edition] ? nfpa92Edition : "2021";
+    doc.id = `NFPA-92-${y}`;
+    doc.title = `NFPA 92 (${y})`;
+    doc.date = y;
+  }
+  const sel = document.getElementById("nfpa92Edition");
+  if (sel && sel.value !== nfpa92Edition) sel.value = nfpa92Edition;
+  const lab = document.getElementById("nfpa92Label");
+  if (lab) lab.textContent = nfpa92Label();
+  const note = document.getElementById("nfpa92Note");
+  if (note) note.textContent = `${NFPA92_EDITIONS[nfpa92Edition].note} · ${NFPA92_SAME_NOTE}`;
+}
+
 function renderVersionChips() {
   const label = versionLabel();
   const rail = document.getElementById("versionChip");
@@ -2565,6 +2606,7 @@ function persistState() {
       schemaVersion: SCENARIO_SCHEMA_VERSION,
       activeId,
       appMode,
+      nfpa92Edition,
       scenarios,
       savedAt: new Date().toISOString(),
     };
@@ -2593,6 +2635,7 @@ function loadPersistedState() {
     if (data.appMode === "excel" || data.appMode === "standard") {
       appMode = data.appMode;
     }
+    if (NFPA92_EDITIONS[data.nfpa92Edition]) nfpa92Edition = data.nfpa92Edition;
     lastSaveNote = data.savedAt
       ? `Restored autosave from ${new Date(data.savedAt).toLocaleString()}`
       : "Restored autosaved scenarios.";
@@ -2625,6 +2668,7 @@ function render() {
     button.setAttribute("aria-pressed", String(button.dataset.appMode === appMode));
   });
   renderVersionChips();
+  applyNfpa92Edition();
   renderScenarioList(active);
   document.getElementById("scenarioName").value = active.name;
   document.getElementById("comparisonNote").innerHTML = `Active design scenario compared with <strong>${html(baseline.name)}</strong>`;
@@ -2808,6 +2852,11 @@ document.querySelector(".modeSwitch").addEventListener("click", (event) => {
 });
 
 document.getElementById("printReport").addEventListener("click", () => window.print());
+
+document.getElementById("nfpa92Edition")?.addEventListener("change", (event) => {
+  if (NFPA92_EDITIONS[event.target.value]) nfpa92Edition = event.target.value;
+  render();
+});
 
 scenarios = scenarios.map((scenario) => applyPredictiveReviewerBasis(scenario));
 
