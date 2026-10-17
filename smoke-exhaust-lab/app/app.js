@@ -15,13 +15,15 @@ const STORAGE_KEY = "smokeExhaustScenarioLab.v1";
  * NFPA 92 edition picker. Default 2021: the Florida Building/Fire Prevention Code 9th Edition references NFPA 92-2021.
  * Chapter 5 equations (plume 5.5.1.1, layer temperature 5.5.5 with Ks = 1.0 for exhaust volume and Ks = 0.5 for
  * plugholing, 5.6.3 Vmax, 5.6.7-5.6.9 inlets) are the same in 2021 and 2024, so the edition changes citations only.
+ * Plugholing verified against the NFPA 92-2021 and 2024 text (NFPA LiNK, Fire Code Mater, 2026-10-17): Eq. 5.6.3a/b
+ * (452 / 4.16), gamma 1.0 / 0.5 / 0.5 (5.6.4-5.6.6), d/Di > 2 (5.6.7), Ks = 0.5 (5.5.5.2).
  */
 const NFPA92_EDITIONS = {
   "2021": { label: "NFPA 92-2021", note: "Florida 9th Edition reference" },
   "2024": { label: "NFPA 92-2024", note: "current NFPA edition" },
 };
 const NFPA92_SAME_NOTE =
-  "Ch. 5 equations and Ks (1.0 for exhaust volume, 0.5 for plugholing) are the same in NFPA 92-2021 and 2024; results do not change with the edition.";
+  "Plugholing verified against NFPA 92-2021 and 2024 text: Eq. 5.6.3a/b (452 / 4.16), location factor γ 1.0 / 0.5 / 0.5 (5.6.4–5.6.6), d/Di > 2 (5.6.7) and Ks = 0.5 (5.5.5.2) are identical; results do not change with the edition.";
 let nfpa92Edition = "2021";
 function nfpa92Label() {
   return (NFPA92_EDITIONS[nfpa92Edition] || NFPA92_EDITIONS["2021"]).label;
@@ -618,7 +620,7 @@ const formulas = [
   {
     id: "F-008",
     name: "Plugholing limit per inlet",
-    formula: "Vmax = 4.16 * gamma * d^(5/2) * ((Ts - To) / To)^(1/2), Ts = To + Ks Qc / (m cp) with Ks = 0.5",
+    formula: "Vmax = 4.16 * γ * d^(5/2) * ((Ts - To) / To)^(1/2); γ = exhaust location factor (5.6.4-5.6.6); Ts = To + Ks Qc / (m cp) with Ks = 0.5 (5.5.5.2)",
     source: "NFPA 92 (2021), Eq. 5.6.3b (SI); Ts per Eq. 5.5.5 with Ks = 0.5 for plugholing per 5.5.5.2; Handbook of Smoke Control Engineering, Ch. 16, Eq. 16.25",
   },
   {
@@ -694,7 +696,7 @@ const fields = [
       { type: "number", field: "selectedInletCount", label: "Selected inlets", unit: "count", step: 1, min: 1 },
       { type: "number", field: "exhaustInletLengthIn", label: "Inlet length", unit: "in", min: 0 },
       { type: "number", field: "exhaustInletWidthIn", label: "Inlet width", unit: "in", min: 0 },
-      { type: "number", field: "exhaustLocationFactor", label: "Exhaust location factor", unit: "-", step: 0.5, min: 0 },
+      { type: "number", field: "exhaustLocationFactor", label: "Exhaust location factor γ (5.6.4–5.6.6)", unit: "-", step: 0.5, min: 0 },
     ],
   },
   {
@@ -732,7 +734,7 @@ const excelFields = [
       { type: "number", field: "selectedInletCount", label: "Exhaust points", unit: "count", step: 1, min: 1 },
       { type: "number", field: "exhaustInletLengthIn", label: "Inlet length", unit: "in", min: 0 },
       { type: "number", field: "exhaustInletWidthIn", label: "Inlet width", unit: "in", min: 0 },
-      { type: "number", field: "exhaustLocationFactor", label: "Location factor", unit: "-", step: 0.5, min: 0 },
+      { type: "number", field: "exhaustLocationFactor", label: "Location factor γ", unit: "-", step: 0.5, min: 0 },
       { type: "number", field: "exhaustMarginPercent", label: "Exhaust margin", unit: "%", min: 0 },
     ],
   },
@@ -1634,7 +1636,8 @@ function calculate(scenario) {
     ["rho", "Smoke density", fmt(smokeDensity, 3), "kg/m3", "Calculated", "Formula F-006."],
     ["V", "Required exhaust", whole(requiredCfm), "cfm", "Calculated", "Formula F-007."],
     ["Vsel", "Selected/design exhaust", whole(selectedCfm), "cfm", "Calculated", `${fmt(scenario.exhaustMarginPercent, 1)}% margin.`],
-    ["gamma", "Exhaust location factor", fmt(scenario.exhaustLocationFactor, 2), "-", "User input", "1.0 centered ceiling inlet; 0.5 wall/near-wall inlet."],
+    ["γ (gamma)", "Exhaust location factor γ — inlet position (NFPA 92 5.6.4–5.6.6)", fmt(scenario.exhaustLocationFactor, 2), "-", "User input", "1.0 inlet centered at least 2 Di from the nearest wall; 0.5 closer than 2 Di or on a wall. Separate from Ks."],
+    ["Ks", "Smoke-layer heat fraction Ks — plugholing (NFPA 92 5.5.5.2)", fmt(0.5, 2), "-", "Code value", "Fixed at 0.5 for Vmax; Ks = 1.0 is used for the exhaust volume (5.5.5.1). Separate from γ."],
     ["Vmax", "Plugholing limit per inlet", whole(vmaxCfm), "cfm", "Calculated", "Formula F-008: NFPA 92 Eq. 5.6.3b with Ks = 0.5 (5.5.5.2)."],
     ["Vmu", "Makeup air flow", whole(makeupCfm), "cfm", "Calculated", "Selected ratio times exhaust."],
     ["Afv", "Makeup free area", fmt(scenario.makeupFreeAreaFt2, 1), "ft2", "User input", "Formula F-010."],
@@ -1733,8 +1736,8 @@ function calculate(scenario) {
       id: "8",
       purpose: "Check plugholing limit per exhaust inlet.",
       formulaId: "F-008",
-      symbolic: "Vmax = 4.16 * gamma * d^(5/2) * ((Ts - To) / To)^(1/2); Ts = To + 0.5 Qc / (m cp) (NFPA 92 5.5.5.2, Ks = 0.5)",
-      substitution: `Ts = ${fmt(scenario.ambientTempC, 1)} + 0.5 * ${fmt(Qc, 0)} / ${fmt(massFlowKgs, 2)} = ${fmt(plugSmokeTempC, 1)} C; Vmax = 4.16 * ${fmt(scenario.exhaustLocationFactor, 2)} * ${fmt(smokeDepthM, 2)}^(5/2) * ${fmt(tempRatio, 4)}^(1/2)`,
+      symbolic: "Vmax = 4.16 * γ * d^(5/2) * ((Ts - To) / To)^(1/2); Ts = To + Ks Qc / (m cp); γ = location factor (5.6.4-5.6.6), Ks = 0.5 (5.5.5.2)",
+      substitution: `Ks = 0.50 (smoke-layer heat fraction): Ts = ${fmt(scenario.ambientTempC, 1)} + 0.50 * ${fmt(Qc, 0)} / ${fmt(massFlowKgs, 2)} = ${fmt(plugSmokeTempC, 1)} C; γ = ${fmt(scenario.exhaustLocationFactor, 2)} (location factor): Vmax = 4.16 * ${fmt(scenario.exhaustLocationFactor, 2)} * ${fmt(smokeDepthM, 2)}^(5/2) * ${fmt(tempRatio, 4)}^(1/2)`,
       result: `Vmax = ${whole(vmaxCfm)} cfm per inlet; selected = ${whole(flowPerInletCfm)} cfm per inlet`,
       use: flowPlugholingPass ? "Plugholing flow check passes." : "Increase inlet count or smoke layer depth.",
     },
@@ -1875,7 +1878,7 @@ function changedFields(active, compare) {
     makeupFreeAreaFt2: "Makeup area",
     leakageAreaFt2: "Leakage area",
     flowCoefficient: "Flow coefficient",
-    exhaustLocationFactor: "Exhaust location",
+    exhaustLocationFactor: "Exhaust location factor γ",
     selectedInletCount: "Inlet count",
     exhaustInletLengthIn: "Inlet length",
     exhaustInletWidthIn: "Inlet width",
@@ -2208,7 +2211,8 @@ function renderExcelMode(active, calc) {
     ["a", "Rectangular inlet length", `${fmt(active.exhaustInletLengthIn, 1)} in`, "Inlet input"],
     ["b", "Rectangular inlet width", `${fmt(active.exhaustInletWidthIn, 1)} in`, "Inlet input"],
     ["Di", "Equivalent inlet diameter", `${fmt(calc.outputs.equivalentInletDiameterFt, 2)} ft`, "2ab / (a + b)"],
-    ["gamma", "Exhaust location factor", fmt(active.exhaustLocationFactor, 2), "Inlet input"],
+    ["γ (gamma)", "Exhaust location factor γ (5.6.4–5.6.6)", fmt(active.exhaustLocationFactor, 2), "Inlet input"],
+    ["Ks", "Smoke-layer heat fraction Ks, plugholing (5.5.5.2)", fmt(0.5, 2), "Code value (1.0 for exhaust volume)"],
     ["N", "Selected exhaust points", String(Math.max(1, active.selectedInletCount)), "Inlet input"],
   ].map((row) => row.map(html));
 

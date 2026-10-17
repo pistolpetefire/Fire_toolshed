@@ -34,7 +34,9 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 - **Smoke Exhaust Lab NFPA 92 edition picker (2026-10-17).** 2021 (default, Florida 9th Edition) or 2024. Ch. 5 equations and Ks
   (1.0 exhaust volume, 0.5 plugholing) are the same in both, so only citations change; the screen and report say so. Two edition
-  cases added; 30 of 30 checks pass.
+  cases added; 30 of 30 checks pass. Plugholing verified against the NFPA 92-2021 and 2024 text (NFPA LiNK, Fire Code Mater):
+  Eq. 5.6.3a/b (452 / 4.16), gamma 1.0 / 0.5 / 0.5 (5.6.4-5.6.6), d/Di > 2 (5.6.7), Ks = 0.5 (5.5.5.2). The location factor gamma and
+  Ks are labeled as separate rows on screen and in the report.
 
 - **Occupant Egress v1.5.0 (2026-10-17).** IBC 2024 1005.3.1 / 1005.3.2 exceptions: the reduced 0.2 (stairs) / 0.15 (other) in/occ
   factors apply only "for other than Group H and I-2" and only with sprinklers throughout plus emergency voice/alarm (907.5.2.2,

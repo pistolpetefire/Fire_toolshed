@@ -82,7 +82,6 @@ test('smoke edition: default is NFPA 92-2021 and citations follow the picker', (
   assert.match(f8(), /^NFPA 92 \(2021\), Eq\. 5\.6\.3b/)
   setEdition('2024'); assert.equal(app.nfpa92Label(), 'NFPA 92-2024'); assert.match(f8(), /^NFPA 92 \(2024\)/)
   setEdition('2021'); assert.match(f8(), /^NFPA 92 \(2021\)/)
-  assert.match(app.NFPA92_SAME_NOTE, /same in NFPA 92-2021 and 2024/)
   console.log('  default ' + app.nfpa92Label() + '; F-008 source: ' + f8())
 })
 
@@ -104,7 +103,47 @@ test('smoke edition: page shows the picker (2021 default, 2024 option), the edit
     assert.match(sel, /<option value="2021" selected/); assert.match(sel, /value="2024"/)
     const line = text((page.match(/<p id="codeEdition"[\s\S]*?<\/p>/) || [''])[0]).trim()
     console.log('  ' + line)
-    assert.match(line, /^Code basis: NFPA 92-2021 · Florida 9th Edition reference · Ch\. 5 equations and Ks/)
+    assert.match(line, /^Code basis: NFPA 92-2021 · Florida 9th Edition reference · Plugholing verified against NFPA 92-2021 and 2024 text/)
     assert.match(text(page), /NFPA 92 edition NFPA 92-2021/, 'report shows the edition')
   } finally { await s.close() }
+})
+
+// Item E: plugholing verified against NFPA 92-2021 and 2024 text; gamma (location factor) and Ks labeled separately.
+import { execFileSync as _x } from 'node:child_process'
+
+test('smoke E: note says "verified against 2021 and 2024 text" with the checked clauses, and no longer says "same"/inferred', () => {
+  const n = app.NFPA92_SAME_NOTE
+  console.log('  ' + n)
+  assert.match(n, /^Plugholing verified against NFPA 92-2021 and 2024 text: /)
+  for (const k of ['Eq. 5.6.3a/b (452 / 4.16)', 'location factor γ 1.0 / 0.5 / 0.5 (5.6.4–5.6.6)', 'd/Di > 2 (5.6.7)', 'Ks = 0.5 (5.5.5.2)']) assert.ok(n.includes(k), k)
+  assert.doesNotMatch(n, /inferred|are the same in NFPA 92/)
+})
+
+test('smoke E: gamma (location factor) and Ks have separate labeled rows on screen and in the report', async () => {
+  const v = app.calculate(base).variables
+  const g = v.find((r) => r.symbol === 'γ (gamma)'); const k = v.find((r) => r.symbol === 'Ks')
+  assert.ok(g && k, 'both rows')
+  assert.match(g.description, /^Exhaust location factor γ/); assert.equal(g.value, '1.00')
+  assert.match(k.description, /^Smoke-layer heat fraction Ks — plugholing \(NFPA 92 5\.5\.5\.2\)/); assert.equal(k.value, '0.50')
+  const f8 = app.formulas.find((f) => f.id === 'F-008').formula
+  assert.match(f8, /γ = exhaust location factor \(5\.6\.4-5\.6\.6\)/); assert.match(f8, /Ks = 0\.5 \(5\.5\.5\.2\)/)
+  const s = await serve()
+  try {
+    const t = text(await dumpDom(`${s.base}/smoke-exhaust-lab/app/`, 8000))
+    for (const lab of ['Exhaust location factor γ', 'Smoke-layer heat fraction Ks']) assert.ok(t.includes(lab), 'page: ' + lab)
+    console.log(`  rows: "${g.symbol}" ${g.description} = ${g.value} | "${k.symbol}" ${k.description} = ${k.value}; both on the page/report`)
+  } finally { await s.close() }
+})
+
+test('smoke E: numeric results unchanged vs the previous commit (cd0cd70) for the 3 hand-calc scenarios', () => {
+  const old = _x('git', ['show', 'cd0cd7030a18bf2e87d5520254f4bc1cccd8127c:smoke-exhaust-lab/app/app.js'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 })
+  const oc = vm.createContext({ document: { getElementById: () => null, querySelectorAll: () => [] }, console, Math, Number, JSON, Date, Object, Array, String, Set, Map })
+  const prev = vm.runInContext(old.slice(0, old.indexOf('document.getElementById("scenarioList").addEventListener')) + '\n;({ calculate, scenarios });', oc)
+  const pb = prev.scenarios.find((x) => x.id === 'base')
+  for (const [id, o] of CASES) {
+    const a = numericOutputs(prev.calculate(Object.assign({}, pb, o)).outputs)
+    const b = numericOutputs(run(o))
+    assert.deepEqual(b, a, id)
+    console.log(`  ${id}: ${Object.keys(b).length} numeric outputs identical (Vmax ${b.vmaxCfm.toFixed(0)} cfm)`)
+  }
 })

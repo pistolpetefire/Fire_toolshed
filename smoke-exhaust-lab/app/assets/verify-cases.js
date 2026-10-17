@@ -177,7 +177,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "edition-2021",
    "title": "Base scenario with NFPA 92-2021 selected (results unchanged) (default)",
-   "source": "NFPA 92-2021 / 2024 Ch. 5 (same equations and Ks)",
+   "source": "NFPA 92-2021 / 2024 Ch. 5 (plugholing verified identical in both texts)",
    "steps": [],
    "reads": [
     {
@@ -202,7 +202,7 @@ window.FT_VERIFY_CASES = {
   {
    "id": "edition-2024",
    "title": "Base scenario with NFPA 92-2024 selected (results unchanged)",
-   "source": "NFPA 92-2021 / 2024 Ch. 5 (same equations and Ks)",
+   "source": "NFPA 92-2021 / 2024 Ch. 5 (plugholing verified identical in both texts)",
    "steps": [
     {
      "set": "#nfpa92Edition",
