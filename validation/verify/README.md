@@ -17,9 +17,7 @@ a professional seal or certification.
 
 ## Flagged items (app math differs from the cited source; flagged, not fixed)
 
-| App | Item | Effect |
-|---|---|---|
-| Smoke Exhaust Lab | Plugholing Vmax uses a temperature rise from 0.5 Qc rather than the layer temperature | Vmax about 29% low (conservative) |
+None open.
 
 Review notes, not math errors: FA Power Extenders UFC standby duration not confirmed; Dry Sprinkler fill rate
 ignores open-sprinkler loss (optimistic transit); Occupant Egress rounds occupant load to nearest; IBC/IFC explosives
@@ -28,6 +26,11 @@ Division 1.4 maps to H-3.
 Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
+
+- **Smoke Exhaust Lab plugholing (2026-10-17): reference corrected, app math unchanged.** The earlier flag compared Vmax against a layer
+  temperature with Ks = 1.0. NFPA 92 5.5.5.2 requires Ks = 0.5 (fraction of convective HRR in the layer) for the plugholing Vmax
+  (Eq. 5.6.3b); Ks = 1.0 is only for the exhaust volume (5.5.5.1). The app already used 0.5 Qc, so `smoke_exhaust_lab.py` now does too and
+  the on-screen formula states Ks = 0.5. 24 of 24 checks pass. Tests: `node --test tests/smoke-exhaust-lab.test.mjs`.
 
 - **MAQ & Control Area Calculator v1.0.0 (2026-10-17, new).** `maq_control_area.py` checks IFC 2024 Table 5003.1.1(1)/(2) lookups with
   notes d/e/f and Table 5003.8.3.2 (story % and count), the H-3 / H-4 calls and the printable report. 15 of 15 checks pass.

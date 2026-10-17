@@ -4,14 +4,12 @@ window.FT_VERIFY_CASES = {
  "app": "Smoke Exhaust Scenario Lab",
  "appVersion": "2026.07.16-team-beta (engine steady-axisymmetric-1.1)",
  "handcalc": "validation/verify/smoke_exhaust_lab.py",
- "flags": [
-  "Plugholing check: the app evaluates Vmax with a layer temperature rise based on half the convective HRR (0.5 Qc), not the layer temperature from NFPA 92 (Ts - T0). This lowers Vmax by about 29% (conservative), but it is not the published method. Not changed; for Kevin to review."
- ],
+ "flags": [],
  "cases": [
   {
    "id": "base",
    "title": "Built-in base scenario (500 kW packaging, z 8 ft, H 18 ft)",
-   "source": "NFPA 92 (see script header)",
+   "source": "NFPA 92-2024 Ch. 5 (see script header). Resolved: the earlier flag compared Vmax against Ts with Ks = 1.0. NFPA 92 5.5.5.2 requires Ks = 0.5 for the plugholing limit (Ks = 1.0 is only for the exhaust volume, 5.5.5.1), which is what the app does, so the reference now uses Ks = 0.5. App math unchanged.",
    "steps": [],
    "reads": [
     {
@@ -58,17 +56,16 @@ window.FT_VERIFY_CASES = {
     },
     {
      "expr": "calculate(Object.assign({}, scenarios.find(function(s){return s.id==='base'}), {})).outputs.vmaxCfm",
-     "label": "Plugholing limit per inlet (NFPA 92 layer temperature)",
+     "label": "Plugholing limit per inlet (NFPA 92 Eq. 5.6.3b, Ks = 0.5)",
      "unit": "cfm",
-     "ref": 92534.3,
-     "flag": "Plugholing check: the app evaluates Vmax with a layer temperature rise based on half the convective HRR (0.5 Qc), not the layer temperature from NFPA 92 (Ts - T0). This lowers Vmax by about 29% (conservative), but it is not the published method. Not changed; for Kevin to review."
+     "ref": 65431.6
     }
    ]
   },
   {
    "id": "tall",
    "title": "Base scenario with 2500 kW, H 40 ft, z 20 ft, 10% margin",
-   "source": "NFPA 92 (see script header)",
+   "source": "NFPA 92-2024 Ch. 5 (see script header). Resolved: the earlier flag compared Vmax against Ts with Ks = 1.0. NFPA 92 5.5.5.2 requires Ks = 0.5 for the plugholing limit (Ks = 1.0 is only for the exhaust volume, 5.5.5.1), which is what the app does, so the reference now uses Ks = 0.5. App math unchanged.",
    "steps": [],
    "reads": [
     {
@@ -115,17 +112,16 @@ window.FT_VERIFY_CASES = {
     },
     {
      "expr": "calculate(Object.assign({}, scenarios.find(function(s){return s.id==='base'}), {\"hrrKw\": 2500, \"roomHeightFt\": 40, \"smokeInterfaceFt\": 20, \"exhaustMarginPercent\": 10})).outputs.vmaxCfm",
-     "label": "Plugholing limit per inlet (NFPA 92 layer temperature)",
+     "label": "Plugholing limit per inlet (NFPA 92 Eq. 5.6.3b, Ks = 0.5)",
      "unit": "cfm",
-     "ref": 435096.6,
-     "flag": "Plugholing check: the app evaluates Vmax with a layer temperature rise based on half the convective HRR (0.5 Qc), not the layer temperature from NFPA 92 (Ts - T0). This lowers Vmax by about 29% (conservative), but it is not the published method. Not changed; for Kevin to review."
+     "ref": 307659.8
     }
    ]
   },
   {
    "id": "low",
    "title": "Base scenario with 3000 kW and z 4 ft (below the flame-height limit)",
-   "source": "NFPA 92 (see script header)",
+   "source": "NFPA 92-2024 Ch. 5 (see script header). Resolved: the earlier flag compared Vmax against Ts with Ks = 1.0. NFPA 92 5.5.5.2 requires Ks = 0.5 for the plugholing limit (Ks = 1.0 is only for the exhaust volume, 5.5.5.1), which is what the app does, so the reference now uses Ks = 0.5. App math unchanged.",
    "steps": [],
    "reads": [
     {
@@ -172,10 +168,9 @@ window.FT_VERIFY_CASES = {
     },
     {
      "expr": "calculate(Object.assign({}, scenarios.find(function(s){return s.id==='base'}), {\"hrrKw\": 3000, \"smokeInterfaceFt\": 4})).outputs.vmaxCfm",
-     "label": "Plugholing limit per inlet (NFPA 92 layer temperature)",
+     "label": "Plugholing limit per inlet (NFPA 92 Eq. 5.6.3b, Ks = 0.5)",
      "unit": "cfm",
-     "ref": 451964.3,
-     "flag": "Plugholing check: the app evaluates Vmax with a layer temperature rise based on half the convective HRR (0.5 Qc), not the layer temperature from NFPA 92 (Ts - T0). This lowers Vmax by about 29% (conservative), but it is not the published method. Not changed; for Kevin to review."
+     "ref": 319587.0
     }
    ]
   }
