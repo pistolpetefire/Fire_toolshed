@@ -43,6 +43,9 @@ cases = [
          [rd('#r-fl-IBIC-storage-maq', 'Storage MAQ', maq(120, 'de', True, False, 50)), rd('#caPct', '% of MAQ', '50%')]),
     case('report', 'Printable report carries PASS/FAIL per material and the H-3 call (275 gal IB)', dict(S, materials=[{'key': 'fl-IBIC', 'storage': 275}]),
          [{'expr': "(function(h){return /<td>FAIL<\\/td>/.test(h) && h.indexOf('Exceeds MAQ \u2192 H-3')>=0 ? 'yes' : 'no'})(MAQApp.reportHtml())", 'label': 'Report shows FAIL and H-3', 'refText': 'yes'}]),
+    case('nfpa400', 'Screen and report name NFPA 400-2022 as the companion reference (not modeled)', dict(S, materials=[{'key': 'fl-IBIC', 'storage': 220}]),
+         [{'expr': "MAQApp.reportHtml().indexOf('NFPA 400-2022 (Hazardous Materials Code) is the companion reference') >= 0 ? 'yes' : 'no'", 'label': 'Report names NFPA 400-2022', 'refText': 'yes'},
+          {'sel': '#nfpa400Note strong', 'label': 'On-screen note', 'refText': 'Companion reference: NFPA 400-2022'}]),
     case('unsprk', 'Class IB, not sprinklered, no cabinets', dict(S, sprinklered=False, materials=[{'key': 'fl-IBIC', 'storage': 100}]),
          [rd('#r-fl-IBIC-storage-maq', 'Storage MAQ', maq(120, 'de', False, False, 100))]),
 ]

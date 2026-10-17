@@ -47,7 +47,8 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
   the on-screen formula states Ks = 0.5. 24 of 24 checks pass. Tests: `node --test tests/smoke-exhaust-lab.test.mjs`.
 
 - **MAQ & Control Area Calculator v1.0.0 (2026-10-17, new).** `maq_control_area.py` checks IFC 2024 Table 5003.1.1(1)/(2) lookups with
-  notes d/e/f and Table 5003.8.3.2 (story % and count), the H-3 / H-4 calls and the printable report. 15 of 15 checks pass.
+  notes d/e/f and Table 5003.8.3.2 (story % and count), the H-3 / H-4 calls and the printable report. NFPA 400-2022 is named as the
+  companion reference (not modeled) on screen and in the report. 17 of 17 checks pass.
   Tests: `node --test tests/maq-control-area.test.mjs`.
 
 - **Deflagration Vent v1.2.0 (2026-10-17).** Rebuilt on NFPA 68-2023 (equations in `deflagration-vent/assets/nfpa68-engine.js`):

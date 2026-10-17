@@ -59,11 +59,39 @@ test('maq: page shows edition picker and Florida 9th Edition label, Verification
     const html = await dumpDom(`${s.base}/maq-control-area/?ftverifyrun=1`, 60000)
     const status = verifyStatus(html)
     console.log('  ' + status)
-    assert.match(status, /^15 of 15 checks pass/)
+    assert.match(status, /^17 of 17 checks pass/)
     assert.match(html, /<select id="edition">[\s\S]*value="2024"[\s\S]*value="2021"/)
     assert.match(text(html), /Florida Building Code 9th Edition/)
     assert.match(text(html), /Code basis: 2024 IBC \/ 2024 IFC/)
   } finally { await s.close() }
   const portal = readFileSync(join(ROOT, 'index.html'), 'utf8')
   assert.match(portal, /href="\.\/maq-control-area\/"/)
+})
+
+// Item D: NFPA 400-2022 named as the companion reference (not modeled); results unchanged.
+test('maq notes: on-screen Not-modeled list names NFPA 400-2022 as the companion reference', async () => {
+  const s = await serve()
+  try {
+    const html = await dumpDom(`${s.base}/maq-control-area/`, 8000)
+    const li = text((html.match(/<li id="nfpa400Note">[\s\S]*?<\/li>/) || [''])[0]).trim()
+    console.log('  ' + li)
+    assert.match(li, /^Companion reference: NFPA 400-2022 \(Hazardous Materials Code\)/)
+    assert.match(li, /not modeled here/)
+  } finally { await s.close() }
+})
+
+test('maq notes: printable report carries the NFPA 400-2022 companion line', () => {
+  const app = readFileSync(join(ROOT, 'maq-control-area/assets/app.js'), 'utf8')
+  assert.ok(app.includes('<br><strong>Companion reference:</strong> NFPA 400-2022 (Hazardous Materials Code) is the companion reference for the Florida Fire Prevention Code; it is not modeled here.'))
+})
+
+test('maq notes: Verification tab passes 17 of 17 (15 unchanged + 2 NFPA 400 checks); engine sample unchanged', async () => {
+  const a = run([{ key: 'fl-IBIC', storage: 220 }])
+  assert.equal(a.groups[0].modes.storage.maq.limit, 240)
+  const s = await serve()
+  try {
+    const st = text(verifyStatus(await dumpDom(`${s.base}/maq-control-area/?ftverifyrun=1`, 60000))).trim()
+    console.log('  ' + st)
+    assert.match(st, /^17 of 17 checks pass/)
+  } finally { await s.close() }
 })

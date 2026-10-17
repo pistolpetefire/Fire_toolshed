@@ -205,6 +205,7 @@
       "<h1>MAQ &amp; Control Area Calculator</h1>" +
       "<p><strong>Code basis:</strong> " + esc(r.editionInfo.ibc) + " / " + esc(r.editionInfo.ifc) + " — IFC Tables 5003.1.1(1), 5003.1.1(2), 5003.8.3.2" +
       "<br><strong>Florida:</strong> " + esc(r.editionInfo.florida) + " (Florida amendments not modeled)" +
+      "<br><strong>Companion reference:</strong> NFPA 400-2022 (Hazardous Materials Code) is the companion reference for the Florida Fire Prevention Code; it is not modeled here." +
       "<br><strong>Project:</strong> " + esc(state.projectName || "—") +
       "<br><strong>Sprinklered throughout:</strong> " + (r.sprinklered ? "Yes" : "No") +
       " · <strong>Story:</strong> " + esc(r.story.label) + " (" + (r.story.notAllowed ? "not allowed" : r.story.pct + "% of MAQ") + ")" +

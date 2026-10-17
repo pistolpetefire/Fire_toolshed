@@ -172,6 +172,29 @@ window.FT_VERIFY_CASES = {
    ]
   },
   {
+   "id": "nfpa400",
+   "title": "Screen and report name NFPA 400-2022 as the companion reference (not modeled)",
+   "source": "IFC 2024 Tables 5003.1.1(1)/(2), 5003.8.3.2 (see script header)",
+   "steps": [
+    {
+     "call": "MAQApp.load({\"edition\": \"2024\", \"sprinklered\": true, \"story\": \"A1\", \"controlAreas\": 1, \"materials\": [{\"key\": \"fl-IBIC\", \"storage\": 220}]})",
+     "wait": 300
+    }
+   ],
+   "reads": [
+    {
+     "expr": "MAQApp.reportHtml().indexOf('NFPA 400-2022 (Hazardous Materials Code) is the companion reference') >= 0 ? 'yes' : 'no'",
+     "label": "Report names NFPA 400-2022",
+     "refText": "yes"
+    },
+    {
+     "sel": "#nfpa400Note strong",
+     "label": "On-screen note",
+     "refText": "Companion reference: NFPA 400-2022"
+    }
+   ]
+  },
+  {
    "id": "unsprk",
    "title": "Class IB, not sprinklered, no cabinets",
    "source": "IFC 2024 Tables 5003.1.1(1)/(2), 5003.8.3.2 (see script header)",
