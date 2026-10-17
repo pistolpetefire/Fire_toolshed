@@ -4,6 +4,9 @@
  *    (Single exits per 1006.3.4 / spaces per 1006.2.1 are not evaluated here.)
  *  - 1005.3.1 / 1005.3.2: required capacity (in) = occupant load x factor. No rounding rule is given; the provided width may not
  *    be less than the product, so the whole-inch value is rounded UP (1,521 x 0.2 = 304.2 in -> 305 in).
+ *  - 1005.3.1 / 1005.3.2 exceptions: the reduced factors (stairs 0.2, other components 0.15 in/occupant) apply only
+ *    "for other than Group H and I-2 occupancies" in buildings sprinklered throughout (903.3.1.1 / 903.3.1.2) WITH an
+ *    emergency voice/alarm communication system (907.5.2.2). Otherwise stairs 0.3 and other components 0.2 in/occupant.
  *  - 1005.5: where more than one exit is required, the loss of any one exit shall not reduce the available capacity to less
  *    than 50 percent of the required capacity.
  * UMD: window.EgressRules in the browser, module.exports in Node.
@@ -54,5 +57,38 @@
     };
   }
 
-  return { minExitsIbc: minExitsIbc, requiredWidthIn: requiredWidthIn, lossOfOneExit: lossOfOneExit };
+  /** Groups excluded from the 1005.3.1 / 1005.3.2 reduced factors: every H subgroup and I-2 (the app's combined "I-2/I-3"). */
+  function excludedFromReduction(groupId) {
+    var g = String(groupId || "");
+    return /^H(-|$)/.test(g) || /(^|\/)I-2(\/|$)/.test(g);
+  }
+
+  /** IBC 2024 1005.3.1 / 1005.3.2 capacity factors with the reason shown on screen and in the printout. */
+  function ibcWidthFactors(opts) {
+    var o = opts || {};
+    var sp = o.sprinklered === "yes" || o.sprinklered === true;
+    var voice = !(o.voiceAlarm === "no" || o.voiceAlarm === false);
+    var g = String(o.group || "");
+    var excluded = excludedFromReduction(g);
+    var reduced = sp && voice && !excluded;
+    var reason;
+    if (reduced) {
+      reason = "IBC 1005.3.1 / 1005.3.2 exceptions (sprinklered throughout per 903.3.1.1/903.3.1.2 + emergency voice/alarm per 907.5.2.2): stairs 0.2 in/occ · other egress 0.15 in/occ";
+    } else if (!sp) {
+      reason = "IBC 1005.3.1 / 1005.3.2 (not sprinklered): stairs 0.3 in/occ · other egress 0.2 in/occ";
+    } else if (excluded) {
+      reason = "IBC 1005.3.1 / 1005.3.2: reduced sprinklered factors do not apply to Group H or I-2 (" + g + " selected): stairs 0.3 in/occ · other egress 0.2 in/occ";
+    } else {
+      reason = "IBC 1005.3.1 / 1005.3.2: reduced factors need an emergency voice/alarm system (907.5.2.2) as well as sprinklers: stairs 0.3 in/occ · other egress 0.2 in/occ";
+    }
+    return { stair: reduced ? 0.2 : 0.3, other: reduced ? 0.15 : 0.2, reduced: reduced, excluded: excluded && sp, label: reason };
+  }
+
+  return {
+    minExitsIbc: minExitsIbc,
+    requiredWidthIn: requiredWidthIn,
+    lossOfOneExit: lossOfOneExit,
+    excludedFromReduction: excludedFromReduction,
+    ibcWidthFactors: ibcWidthFactors,
+  };
 });

@@ -583,6 +583,153 @@ window.FT_VERIFY_CASES = {
      "refText": "Not permitted without sprinklers"
     }
    ]
+  },
+  {
+   "id": "ibc-h2-factors",
+   "title": "IBC, H-2, sprinklered with voice/alarm, 100 occupants: unreduced 0.3 / 0.2",
+   "source": "IBC 2024 1005.3.1, 1005.3.2 exceptions",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#occupancyGroup",
+     "value": "H-2"
+    },
+    {
+     "set": "#voiceAlarm",
+     "value": "yes"
+    },
+    {
+     "set": "#spaceBody tr[data-space] [data-f=\"fixedOl\"]",
+     "value": "100"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#exitCheck [data-x=\"wStair\"]",
+     "label": "Stair width 100 x 0.3",
+     "unit": "in",
+     "ref": 30
+    },
+    {
+     "sel": "#exitCheck [data-x=\"wOther\"]",
+     "label": "Other components 100 x 0.2",
+     "unit": "in",
+     "ref": 20
+    },
+    {
+     "sel": "#mCap",
+     "label": "Capacity, two 36 in doors at 0.2",
+     "unit": "occ",
+     "ref": 360
+    },
+    {
+     "sel": "#factorBox",
+     "label": "Reason shown",
+     "refText": "IBC 1005.3.1 / 1005.3.2: reduced sprinklered factors do not apply to Group H or I-2 (H-2 selected): stairs 0.3 in/occ · other egress 0.2 in/occ"
+    }
+   ]
+  },
+  {
+   "id": "ibc-i2-factors",
+   "title": "IBC, I-2/I-3, sprinklered with voice/alarm, 100 occupants: unreduced 0.3 / 0.2",
+   "source": "IBC 2024 1005.3.1, 1005.3.2 exceptions",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#occupancyGroup",
+     "value": "I-2/I-3"
+    },
+    {
+     "set": "#spaceBody tr[data-space] [data-f=\"fixedOl\"]",
+     "value": "100"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#exitCheck [data-x=\"wStair\"]",
+     "label": "Stair width 100 x 0.3",
+     "unit": "in",
+     "ref": 30
+    },
+    {
+     "sel": "#exitCheck [data-x=\"wOther\"]",
+     "label": "Other components 100 x 0.2",
+     "unit": "in",
+     "ref": 20
+    }
+   ]
+  },
+  {
+   "id": "ibc-b-factors",
+   "title": "IBC, B, sprinklered with voice/alarm, 100 occupants: reduced 0.2 / 0.15",
+   "source": "IBC 2024 1005.3.1, 1005.3.2 exceptions",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#occupancyGroup",
+     "value": "B"
+    },
+    {
+     "set": "#spaceBody tr[data-space] [data-f=\"fixedOl\"]",
+     "value": "100"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#exitCheck [data-x=\"wStair\"]",
+     "label": "Stair width 100 x 0.2",
+     "unit": "in",
+     "ref": 20
+    },
+    {
+     "sel": "#exitCheck [data-x=\"wOther\"]",
+     "label": "Other components 100 x 0.15",
+     "unit": "in",
+     "ref": 15
+    },
+    {
+     "sel": "#mCap",
+     "label": "Capacity, two 36 in doors at 0.15",
+     "unit": "occ",
+     "ref": 480
+    }
+   ]
+  },
+  {
+   "id": "ibc-b-novoice",
+   "title": "IBC, B, sprinklered, no voice/alarm: unreduced 0.3 / 0.2",
+   "source": "IBC 2024 1005.3.1, 1005.3.2 exceptions (907.5.2.2)",
+   "steps": [
+    {
+     "click": "#pickIbc",
+     "wait": 400
+    },
+    {
+     "set": "#voiceAlarm",
+     "value": "no"
+    },
+    {
+     "set": "#spaceBody tr[data-space] [data-f=\"fixedOl\"]",
+     "value": "100"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#exitCheck [data-x=\"wOther\"]",
+     "label": "Other components 100 x 0.2",
+     "unit": "in",
+     "ref": 20
+    }
+   ]
   }
  ]
 }

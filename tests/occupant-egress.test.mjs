@@ -38,14 +38,57 @@ test('egress: 1005.5 loss of one exit keeps >= 50% of required capacity', () => 
   console.log(`  1521 OL, 4x390: ${four.remaining} remain (${four.pct.toFixed(1)}%) PASS; 600 OL, 500+180: ${two.remaining} remain (${two.pct.toFixed(1)}%) FAIL; 500 OL, 250+250: 50.0% PASS`)
 })
 
-test('egress: in-app Verification tab passes (21 original + 12 new exit checks) and the page shows the exit check', async () => {
+test('egress: in-app Verification tab passes (21 original + 12 exit + 10 factor checks) and the page shows the exit check', async () => {
   const s = await serve()
   try {
     const st = text(verifyStatus(await dumpDom(`${s.base}/occupant-egress/?ftverifyrun=1`, 60000))).trim()
     console.log('  ' + st)
-    assert.match(st, /^33 of 33 checks pass/)
+    assert.match(st, /^43 of 43 checks pass/)
     const page = await dumpDom(`${s.base}/occupant-egress/`, 8000)
     assert.match(page, /id="exitCheck"/)
-    assert.match(page, /Version 1\.4\.0/)
+    assert.match(page, /Version 1\.5\.0/)
+  } finally { await s.close() }
+})
+
+// v1.5.0: IBC 2024 1005.3.1 / 1005.3.2 exceptions are "for other than Group H and I-2 occupancies".
+const F = (group, o = {}) => R.ibcWidthFactors({ sprinklered: 'yes', voiceAlarm: 'yes', group, ...o })
+const widths = (n, f) => [R.requiredWidthIn(n, f.stair).roundedUp, R.requiredWidthIn(n, f.other).roundedUp]
+
+test('egress factors: 100 occupants, H-2, sprinklered, voice alarm -> 30 in stairs, 20 in elsewhere', () => {
+  const f = F('H-2')
+  assert.equal(f.stair, 0.3); assert.equal(f.other, 0.2); assert.equal(f.reduced, false)
+  assert.deepEqual(widths(100, f), [30, 20])
+  assert.match(f.label, /do not apply to Group H or I-2 \(H-2 selected\)/)
+  for (const g of ['H-1', 'H-3', 'H-4', 'H-5']) assert.equal(F(g).reduced, false, g)
+  console.log(`  H-2: stairs ${widths(100, f)[0]} in, other ${widths(100, f)[1]} in — "${f.label}"`)
+})
+
+test('egress factors: I-2 gets the same treatment (0.3 / 0.2)', () => {
+  const f = F('I-2/I-3')
+  assert.deepEqual([f.stair, f.other], [0.3, 0.2])
+  assert.deepEqual(widths(100, f), [30, 20])
+  assert.equal(F('I-2').reduced, false)
+  assert.equal(F('I-1').reduced, true) // only I-2 is excluded
+  console.log(`  I-2/I-3: stairs ${widths(100, f)[0]} in, other ${widths(100, f)[1]} in`)
+})
+
+test('egress factors: non-H group B keeps the reduced 0.2 / 0.15 (and needs voice/alarm + sprinklers)', () => {
+  const f = F('B')
+  assert.deepEqual([f.stair, f.other, f.reduced], [0.2, 0.15, true])
+  assert.deepEqual(widths(100, f), [20, 15])
+  assert.equal(F('B', { voiceAlarm: 'no' }).reduced, false)
+  assert.equal(F('B', { sprinklered: 'no' }).reduced, false)
+  console.log(`  B: stairs ${widths(100, f)[0]} in, other ${widths(100, f)[1]} in; B without voice/alarm: 0.3 / 0.2`)
+})
+
+test('egress factors: reason shown on screen and in the printout (H-2 page)', async () => {
+  const s = await serve()
+  try {
+    // Drive the page through the Verification copy is covered above; here check the printout HTML carries the factor reason.
+    const app = (await import('node:fs')).readFileSync(new URL('../occupant-egress/assets/app.js', import.meta.url), 'utf8')
+    assert.match(app, /escapeHtml\(m\.factors\.label\)/, 'printout prints the factor reason')
+    assert.match(app, /\$\("factorBox"\)\.textContent = m\.factors\.label/, 'screen shows the factor reason')
+    const page = await dumpDom(`${s.base}/occupant-egress/`, 8000)
+    assert.match(page, /id="voiceAlarm"/)
   } finally { await s.close() }
 })

@@ -27,6 +27,11 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
 
+- **Occupant Egress v1.5.0 (2026-10-17).** IBC 2024 1005.3.1 / 1005.3.2 exceptions: the reduced 0.2 (stairs) / 0.15 (other) in/occ
+  factors apply only "for other than Group H and I-2" and only with sprinklers throughout plus emergency voice/alarm (907.5.2.2,
+  new input, default Yes). H-1..H-5 and the combined I-2/I-3 group use 0.3 / 0.2 (conservative for I-3). The reason is shown with
+  the factors on screen and in the printout. 43 of 43 checks pass.
+
 - **Occupant Egress v1.4.0 (2026-10-17).** IBC path: minimum exits per IBC 2024 Table 1006.3.3 (1-500 -> 2, 501-1,000 -> 3, more than 1,000 -> 4),
   required width = occupant load x factor rounded up to the whole inch (1,521 x 0.2 = 304.2 -> 305 in), and the 1005.5 loss-of-one-exit
   check (remaining capacity >= 50% of required). Rules in `occupant-egress/assets/egress-rules.js`. 33 of 33 checks pass.

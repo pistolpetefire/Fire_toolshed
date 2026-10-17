@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.4.0";
+  var APP_VERSION = "1.5.0";
   var STORAGE_KEY = "occupantEgress.v1";
 
   /** Shared egress component types */
@@ -239,6 +239,7 @@
       projectName: "",
       buildingArea: "",
       sprinklered: "yes",
+      voiceAlarm: "yes",
       occupancyGroup: "B",
       inc10172: false,
       spaces: [],
@@ -300,6 +301,10 @@
   function widthFactors(sprinklered) {
     var sp = sprinklered === "yes";
     var p = currentPath();
+    if (p && p.id === "ibc" && window.EgressRules) {
+      // IBC 2024 1005.3.1 / 1005.3.2: reduced factors not for Group H or I-2, and only with sprinklers + voice/alarm.
+      return window.EgressRules.ibcWidthFactors({ sprinklered: sprinklered, voiceAlarm: state.voiceAlarm, group: state.occupancyGroup });
+    }
     return {
       stair: sp ? 0.2 : 0.3,
       other: sp ? 0.15 : 0.2,
@@ -693,6 +698,7 @@
           : "Primary occupancy group (travel limits)";
     }
     if ($("inc10172Field")) $("inc10172Field").hidden = !(p && p.id === "ibc");
+    if ($("voiceAlarmField")) $("voiceAlarmField").hidden = !(p && p.id === "ibc");
   }
 
   function render() {
@@ -721,7 +727,7 @@
     }
 
     if ($("sprinklerHint") && p) {
-      $("sprinklerHint").textContent = p.widthNote(state.sprinklered === "yes");
+      $("sprinklerHint").textContent = m.factors.label || p.widthNote(state.sprinklered === "yes");
     }
 
     if ($("mLoad")) $("mLoad").textContent = String(m.load);
@@ -930,6 +936,7 @@
     state.projectName = ($("projectName") && $("projectName").value.trim()) || "";
     state.buildingArea = ($("buildingArea") && $("buildingArea").value.trim()) || "";
     state.sprinklered = ($("sprinklered") && $("sprinklered").value) || "yes";
+    state.voiceAlarm = ($("voiceAlarm") && $("voiceAlarm").value) || "yes";
     state.occupancyGroup =
       ($("occupancyGroup") && $("occupancyGroup").value) || state.occupancyGroup;
     state.inc10172 = !!($("inc10172") && $("inc10172").checked);
@@ -943,6 +950,7 @@
     if ($("projectName")) $("projectName").value = state.projectName;
     if ($("buildingArea")) $("buildingArea").value = state.buildingArea;
     if ($("sprinklered")) $("sprinklered").value = state.sprinklered;
+    if ($("voiceAlarm")) $("voiceAlarm").value = state.voiceAlarm === "no" ? "no" : "yes";
     if ($("inc10172")) $("inc10172").checked = !!state.inc10172;
     if ($("occupancyGroup")) $("occupancyGroup").value = state.occupancyGroup;
     if ($("travelActual")) $("travelActual").value = state.travelActual;
@@ -1161,7 +1169,7 @@
       });
     $("btnChangePath") && $("btnChangePath").addEventListener("click", changePath);
 
-    ["projectName", "buildingArea", "sprinklered", "occupancyGroup", "inc10172", "travelActual", "commonPathActual", "deadEndActual"].forEach(
+    ["projectName", "buildingArea", "sprinklered", "voiceAlarm", "occupancyGroup", "inc10172", "travelActual", "commonPathActual", "deadEndActual"].forEach(
       function (id) {
         var el = $(id);
         if (!el) return;
