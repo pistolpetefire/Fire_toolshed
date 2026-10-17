@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 const base = (process.argv[2] || 'http://localhost:8765').replace(/\/$/, '')
 const apps = ['concrete-fire-rating', 'deflagration-vent', 'dry-sprinkler-delivery', 'fa-power-extenders', 'fire-pump-sizer', 'fire-tank-sizer',
-  'flow-test-report', 'ibc-ifc-hazard', 'occupant-egress', 'sprinkler-system-estimator', 'smoke-exhaust-lab/app']
+  'flow-test-report', 'ibc-ifc-hazard', 'maq-control-area', 'occupant-egress', 'sprinkler-system-estimator', 'smoke-exhaust-lab/app']
 let failed = 0
 for (const app of apps) {
   const dir = mkdtempSync(join(process.env.TMPDIR || '/workspace', 'chr-vb-'))

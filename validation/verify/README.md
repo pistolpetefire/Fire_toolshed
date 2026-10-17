@@ -29,6 +29,10 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
 
+- **MAQ & Control Area Calculator v1.0.0 (2026-10-17, new).** `maq_control_area.py` checks IFC 2024 Table 5003.1.1(1)/(2) lookups with
+  notes d/e/f and Table 5003.8.3.2 (story % and count), the H-3 / H-4 calls and the printable report. 15 of 15 checks pass.
+  Tests: `node --test tests/maq-control-area.test.mjs`.
+
 - **Deflagration Vent v1.2.0 (2026-10-17).** Rebuilt on NFPA 68-2023 (equations in `deflagration-vent/assets/nfpa68-engine.js`):
   - **Dust:** Eq. 8.2.1.1 with V^(3/4) and sqrt(Pmax/Pred - 1), where Pmax is the dust's unvented Pmax (new input, separate from the
     enclosure-strength field), plus the Eq. 8.2.2.3 L/D multiplier. The base equation is 8.2.1.1 in the 2018/2023 numbering (8.2.2 in 2013).
