@@ -12,7 +12,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icons/icon.svg">
-  <link rel="stylesheet" href="./assets/styles.css?v=1.4.0">
+  <link rel="stylesheet" href="./assets/styles.css?v=1.5.0">
   <script src="../shared/verify-tab.js"></script>
   <script src="./assets/verify-cases.js"></script>
 </head>
@@ -30,7 +30,8 @@
         <div>
           <p class="eyebrow">Fire Toolshed</p>
           <h1>Dry Sprinkler Water Delivery</h1>
-          <p class="version" id="appVersion">Version 1.4.0-prelim</p>
+          <p class="version" id="appVersion">Version 1.5.0-prelim</p>
+          <p class="version" id="codeEdition">Code basis: <strong data-nfpa13-label>NFPA 13-2025</strong> <span data-nfpa13-sec>§8.2.4</span> / <span data-nfpa13-table>Table 8.2.4.3.2</span></p>
         </div>
       </div>
       <div class="top-actions no-print">
@@ -220,7 +221,16 @@
               <option value="single_interlock">Single-interlock preaction (not evaluated)</option>
               <option value="wet">Wet pipe (rejected)</option>
             </select>
-            <span class="sub">NFPA 13-2025 §8.2.4 dry-pipe water delivery. Wet pipe is water-filled — delivery time does not apply.</span>
+            <span class="sub"><span data-nfpa13-label>NFPA 13-2025</span> <span data-nfpa13-sec>§8.2.4</span> dry-pipe water delivery. Wet pipe is water-filled — delivery time does not apply.</span>
+          </div>
+
+          <div class="field" style="margin-bottom:0.85rem">
+            <label for="nfpa13Edition">NFPA 13 edition</label>
+            <select id="nfpa13Edition">
+              <option value="2025" selected>NFPA 13-2025 (§8.2.4, Table 8.2.4.3.2)</option>
+              <option value="2022">NFPA 13-2022 (§8.2.3, Table 8.2.3.6.1) — Florida 9th Edition reference</option>
+            </select>
+            <span class="sub">Delivery times, 500 / 750 gal exemptions and Table 28.2.3.1.1 equivalent lengths are the same in both editions; citations change.</span>
           </div>
 
           <h3>Criteria set</h3>
@@ -229,7 +239,7 @@
               <input type="radio" name="criteriaSet" value="nfpa" checked>
               <div>
                 <b>NFPA 13</b>
-                <small>NFPA 13-2025 §8.2.4 / Table 8.2.4.3.2 (same times as 2022).</small>
+                <small><span data-nfpa13-label>NFPA 13-2025</span> <span data-nfpa13-sec>§8.2.4</span> / <span data-nfpa13-table>Table 8.2.4.3.2</span> (same times in 2022 and 2025).</small>
               </div>
             </label>
             <label>
@@ -579,7 +589,7 @@
     </div>
 
     <p class="hint" style="margin-top:1.25rem">
-      Standards: NFPA 13 (2025) dry pipe water delivery (§8.2.4) · fitting equivalent lengths Table 28.2.3.1.1 · FM Global alignment · Hazen–Williams per NFPA 13 hydraulic practice.
+      Standards: NFPA 13 (2025 §8.2.4 / 2022 §8.2.3, selectable) dry pipe water delivery · fitting equivalent lengths Table 28.2.3.1.1 · FM Global alignment · Hazen–Williams per NFPA 13 hydraulic practice.
       Volume exemptions: ≤500 gal; ≤750 gal with listed QOD.
     </p>
     <p class="hint no-print" style="margin-top:0.75rem">
@@ -915,6 +925,6 @@
   </div>
 
   <script src="../shared/report-logo.js"></script>
-  <script src="./assets/app.js?v=1.4.0"></script>
+  <script src="./assets/app.js?v=1.5.0"></script>
 </body>
 </html>

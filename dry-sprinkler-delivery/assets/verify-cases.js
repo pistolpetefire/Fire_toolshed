@@ -57,6 +57,53 @@ window.FT_VERIFY_CASES = {
      "ref": 36.4
     }
    ]
+  },
+  {
+   "id": "example-2022",
+   "title": "Built-in example with NFPA 13-2022 selected (results unchanged)",
+   "source": "NFPA 13-2022 Sec. 8.2.3 / Table 8.2.3.6.1 carries the same delivery-time values as 2025 Table 8.2.4.3.2",
+   "steps": [
+    {
+     "click": "#btnExample",
+     "wait": 600
+    },
+    {
+     "set": "#nfpa13Edition",
+     "value": "2022",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#codeEdition [data-nfpa13-label]",
+     "label": "Edition shown on screen",
+     "refText": "NFPA 13-2022"
+    },
+    {
+     "sel": "#metricVolTotal",
+     "label": "Total system volume",
+     "unit": "gal",
+     "ref": 113.04
+    },
+    {
+     "sel": "#metricTransit",
+     "label": "Transit time 60 V / Q_fill",
+     "unit": "s",
+     "ref": 31.5
+    },
+    {
+     "sel": "#metricTrip",
+     "label": "Trip time (SFPE/FM equation)",
+     "unit": "s",
+     "ref": 4.8
+    },
+    {
+     "sel": "#metricDelivery",
+     "label": "Water delivery time (trip + transit)",
+     "unit": "s",
+     "ref": 36.4
+    }
+   ]
   }
  ]
 }

@@ -8,7 +8,20 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.4.0-prelim";
+  const APP_VERSION = "1.5.0-prelim";
+
+  /**
+   * NFPA 13 edition references (v1.5.0). The delivery-time table values, the 500 / 750 gal exemptions and the
+   * Table 28.2.3.1.1 equivalent lengths used here are the same in both editions; only the section numbers differ.
+   * 2022 = edition referenced by the Florida 9th Edition codes.
+   */
+  const NFPA13_EDITIONS = {
+    "2025": { label: "NFPA 13-2025", sec: "§8.2.4", table: "Table 8.2.4.3.2", el: "Table 28.2.3.1.1" },
+    "2022": { label: "NFPA 13-2022", sec: "§8.2.3", table: "Table 8.2.3.6.1", el: "Table 28.2.3.1.1" },
+  };
+  function edRef() {
+    return NFPA13_EDITIONS[state && state.nfpa13Edition] || NFPA13_EDITIONS["2025"];
+  }
   const FIRST_RUN_KEY = "drySprinklerDelivery.firstRun.v1";
   const START_DISMISS_KEY = "drySprinklerDelivery.startDismissed.v1";
 
@@ -145,6 +158,7 @@
       occupancyDesc: "",
       notes: "",
       criteriaSet: "nfpa", // nfpa | fm | both
+      nfpa13Edition: "2025", // 2025 | 2022
       /** dry | double_interlock | single_interlock | wet — only dry & double-interlock use water delivery time */
       systemType: "dry",
       hazardId: "ordinary",
@@ -549,6 +563,7 @@
     if (proj.openHeads != null) state.openHeads = Math.round(num(proj.openHeads));
     if (proj.qodPresent != null) state.qodPresent = !!proj.qodPresent;
     if (proj.criteriaSet) state.criteriaSet = proj.criteriaSet;
+    if (proj.nfpa13Edition && NFPA13_EDITIONS[proj.nfpa13Edition]) state.nfpa13Edition = proj.nfpa13Edition;
 
     // Optional HW batch verification from multi-page printout rows
     let hwResults = null;
@@ -890,11 +905,11 @@
     let exemptReason = "";
     if (V <= 500) {
       exempt = true;
-      exemptReason = "System volume ≤ 500 gal → NFPA 13 water delivery time requirement does not apply.";
+      exemptReason = "System volume ≤ 500 gal → " + edRef().label + " " + edRef().sec + " water delivery time requirement does not apply.";
     } else if (V <= 750 && qod) {
       exempt = true;
       exemptReason =
-        "System volume ≤ 750 gal with listed quick-opening device → NFPA 13 water delivery time requirement does not apply.";
+        "System volume ≤ 750 gal with listed quick-opening device → " + edRef().label + " " + edRef().sec + " water delivery time requirement does not apply.";
     }
 
     checks.push({
@@ -947,7 +962,7 @@
     if (state.criteriaSet === "nfpa" || state.criteriaSet === "both") {
       checks.push({
         id: "nfpa_delivery",
-        label: `NFPA 13 water delivery ≤ ${nfpaMax} s (${hazard.label})`,
+        label: `${edRef().label} water delivery ≤ ${nfpaMax} s (${hazard.label}, ${edRef().table})`,
         status: bandStatus(nfpaBand),
         band: nfpaBand,
         detail: bandDetail(nfpaBand, nfpaMax),
@@ -1315,6 +1330,7 @@
 
     const crit = document.querySelector('input[name="criteriaSet"]:checked');
     if (crit) state.criteriaSet = crit.value;
+    if (g("nfpa13Edition") && NFPA13_EDITIONS[g("nfpa13Edition").value]) state.nfpa13Edition = g("nfpa13Edition").value;
 
     if (g("systemType")) state.systemType = g("systemType").value || "dry";
     if (g("hazardId")) state.hazardId = g("hazardId").value;
@@ -1410,6 +1426,7 @@
 
     const crit = document.querySelector(`input[name="criteriaSet"][value="${state.criteriaSet}"]`);
     if (crit) crit.checked = true;
+    set("nfpa13Edition", NFPA13_EDITIONS[state.nfpa13Edition] ? state.nfpa13Edition : "2025");
 
     set("systemType", state.systemType || "dry");
     set("hazardId", state.hazardId);
@@ -1864,6 +1881,7 @@
       $("calcTiming").textContent = `Recalc ${round(elapsed, 1)} ms`;
     }
 
+    applyEditionLabels();
     updatePrintBlock(r);
   }
 
@@ -1873,6 +1891,14 @@
     renderPipeTable();
     renderResultsOnly();
     save();
+  }
+
+  /** Shows the selected NFPA 13 edition on screen and in the printout. */
+  function applyEditionLabels() {
+    const e = edRef();
+    document.querySelectorAll("[data-nfpa13-label]").forEach((el) => { el.textContent = e.label; });
+    document.querySelectorAll("[data-nfpa13-sec]").forEach((el) => { el.textContent = e.sec; });
+    document.querySelectorAll("[data-nfpa13-table]").forEach((el) => { el.textContent = e.table; });
   }
 
   // ─── Print / report ──────────────────────────────────────────────────────
@@ -1892,7 +1918,7 @@
     set("printHazard", c.hazard.label);
     set("printHeads", String(state.openHeads));
     set("printQod", state.qodPresent ? "Yes" : "No");
-    set("printCriteria", state.criteriaSet === "both" ? "NFPA 13 + FM (stricter)" : state.criteriaSet === "fm" ? "FM Global" : "NFPA 13");
+    set("printCriteria", (state.criteriaSet === "both" ? "NFPA 13 + FM (stricter)" : state.criteriaSet === "fm" ? "FM Global" : "NFPA 13") + " · " + edRef().label + " " + edRef().sec + " / " + edRef().table);
     if (c.rejected) {
       set("printStatus", "REJECTED — NOT ELIGIBLE");
       set("printDelivery", "N/A (system type rejected)");

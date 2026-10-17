@@ -727,6 +727,7 @@
 
   function paint() {
     readMeta();
+    if ($("codeEditionText")) $("codeEditionText").textContent = "NFPA 72-" + (state.nfpaEdition || "2022");
     lastModel = E.analyzeProject(state);
     var m = lastModel;
     var rec = m.rec;

@@ -38,6 +38,16 @@ cases = [{'id': 'example', 'title': 'Built-in example (Load example)', 'source':
               {'sel': '#metricFlow', 'label': 'Design flow n K sqrt(P)', 'unit': 'gpm', 'ref': r(Q, 2)},
               {'sel': '#metricTransit', 'label': 'Transit time 60 V / Q_fill', 'unit': 's', 'ref': r(transit, 1)},
               {'sel': '#metricTrip', 'label': 'Trip time (SFPE/FM equation)', 'unit': 's', 'ref': r(ttrip, 1)},
+              {'sel': '#metricDelivery', 'label': 'Water delivery time (trip + transit)', 'unit': 's', 'ref': r(ttrip + transit, 1)}]},
+         # NFPA 13-2022 option: same delivery-time limits and equivalent lengths, so the same example must give the same numbers.
+         {'id': 'example-2022', 'title': 'Built-in example with NFPA 13-2022 selected (results unchanged)',
+          'source': 'NFPA 13-2022 Sec. 8.2.3 / Table 8.2.3.6.1 carries the same delivery-time values as 2025 Table 8.2.4.3.2',
+          'steps': [{'click': '#btnExample', 'wait': 600}, {'set': '#nfpa13Edition', 'value': '2022', 'wait': 400}],
+          'reads': [
+              {'sel': '#codeEdition [data-nfpa13-label]', 'label': 'Edition shown on screen', 'refText': 'NFPA 13-2022'},
+              {'sel': '#metricVolTotal', 'label': 'Total system volume', 'unit': 'gal', 'ref': r(V, 2)},
+              {'sel': '#metricTransit', 'label': 'Transit time 60 V / Q_fill', 'unit': 's', 'ref': r(transit, 1)},
+              {'sel': '#metricTrip', 'label': 'Trip time (SFPE/FM equation)', 'unit': 's', 'ref': r(ttrip, 1)},
               {'sel': '#metricDelivery', 'label': 'Water delivery time (trip + transit)', 'unit': 's', 'ref': r(ttrip + transit, 1)}]}]
 write('dry-sprinkler-delivery', {'script': 'dry_sprinkler_delivery.py', 'app': 'Dry Sprinkler Water Delivery', 'versionSel': '#appVersion',
       'handcalc': 'validation/verify/dry_sprinkler_delivery.py', 'flags': [FIXED, FILL_NOTE], 'cases': cases})

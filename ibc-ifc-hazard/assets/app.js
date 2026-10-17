@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.6.0";
+  var APP_VERSION = "1.6.1";
   var STORAGE_KEY = "ibcIfcHazard.v1";
   /** Last HMIS assessment (not persisted) */
   var lastImport = null;
@@ -645,7 +645,7 @@
 
   function defaultState() {
     return {
-      edition: "2021",
+      edition: "2024",
       projectName: "",
       facility: "",
       sprinklered: "yes",
