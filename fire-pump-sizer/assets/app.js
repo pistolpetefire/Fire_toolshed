@@ -10,9 +10,9 @@
   const SPRINKLER_HANDOFF_KEY = 'fireToolshed.sprinklerHandoff.v1';
   /** Shared handoff to Fire Tank Sizer */
   const PUMP_HANDOFF_KEY = 'fireToolshed.pumpHandoff.v1';
-  const APP_VERSION = '2.7.0';
+  const APP_VERSION = '2.7.1';
   /** Current service worker cache name; keep in step with CACHE in sw.js. */
-  const SW_CACHE = 'fire-pump-sizer-v7';
+  const SW_CACHE = 'fire-pump-sizer-v8';
   /** NFPA 291 / water-supply curve exponent (matches Flow Test + Sprinkler apps) */
   const SUPPLY_EXPONENT = 1.85;
 
@@ -1895,6 +1895,14 @@ ${(data.demandPoints || []).map((p, i) => `${esc(p.name)}: ${Math.round(p.flow)}
     if (!('serviceWorker' in navigator)) return;
     // Only register when served over http(s) — not file://
     if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+    // Never inside a frame (the hidden Verification copy, ?ftverify=1): no worker registration and no cache cleanup there.
+    // Also not on a page opened to run verification (?ftverifyrun=1 / #verification): a worker that activates mid-run
+    // intermittently left one hidden verification frame without its scripts.
+    const q = new URLSearchParams(location.search);
+    if (window !== window.top || q.get('ftverify') === '1' || q.get('ftverifyrun') === '1' || location.hash === '#verification') {
+      document.documentElement.setAttribute('data-sw', 'skipped');
+      return;
+    }
 
     // Drop old caches so plan-diagram updates are not stuck
     if (navigator.serviceWorker.getRegistrations) {
@@ -1913,7 +1921,7 @@ ${(data.demandPoints || []).map((p, i) => `${esc(p.name)}: ${Math.round(p.flow)}
     }
 
     navigator.serviceWorker.register('./sw.js?v=3', { scope: './' })
-      .then(() => console.log('[Fire Pump Sizer] Service worker ready v3'))
+      .then(() => { document.documentElement.setAttribute('data-sw', 'registered'); console.log('[Fire Pump Sizer] Service worker ready v3'); })
       .catch((err) => console.warn('[Fire Pump Sizer] SW register failed', err));
   }
 

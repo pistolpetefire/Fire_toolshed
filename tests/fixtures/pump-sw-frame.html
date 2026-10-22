@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Fire Pump Sizer in a frame (service worker test)</title></head>
+<body>
+<p id="frameSw">pending</p>
+<iframe id="f" src="/fire-pump-sizer/" style="width:800px;height:600px"></iframe>
+<script>
+  document.getElementById('f').addEventListener('load', function () {
+    setTimeout(function () {
+      var d = document.getElementById('f').contentDocument.documentElement
+      document.getElementById('frameSw').textContent = d.getAttribute('data-sw') || 'none'
+    }, 1500)
+  })
+</script>
+</body></html>

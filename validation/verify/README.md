@@ -27,6 +27,11 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
 
+- **Fire Pump Sizer v2.7.1 (2026-10-22).** The service worker is not registered inside frames (window !== window.top, ?ftverify=1)
+  or on a page opened to run verification (?ftverifyrun=1, #verification). Normal pages still register the worker. The
+  intermittently blank verification frame is reduced but not gone (two batches of 20 headless runs: 18/20 each; one earlier batch
+  20/20), so the test retry stays.
+
 - **Fire Pump Sizer v2.7.0 (2026-10-22).** Summary flow card in whole gpm (pressures one decimal); motor FLC cell labels the column
   ("460 V (480 V system)") and cites NEC 2023 Table 430.250; certified pressures labeled net by default with a discharge option
   (net = discharge − min suction at demand); the app's cache cleanup now keeps the current service-worker cache. 50 of 50 checks pass.

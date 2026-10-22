@@ -56,9 +56,9 @@ test('pump page: shows NFPA 20-2022 and the Verification tab passes 50/50 (duty 
   try {
     const page = await dumpDom(`${s.base}/fire-pump-sizer/`, 8000)
     assert.match(text(page), /NFPA 20-2022/)
-    assert.match(page, /id="appVersion">v2\.7\.0</)
-    // Headless Chrome intermittently (6 of 20 runs on v2.7.0, after the SW cache-cleanup fix) leaves one hidden verification frame without its scripts on this page,
-    // which blanks that one case; a rerun is clean. Up to 3 attempts, and every attempt is logged.
+    assert.match(page, /id="appVersion">v2\.7\.1</)
+    // Retry kept: with the service worker no longer registered during verification (v2.7.1), headless Chrome still leaves one
+    // hidden verification frame blank in about 2 of 20 runs (one case); a rerun is clean. Up to 4 attempts, each logged.
     let st = ''
     for (let i = 1; i <= 4; i++) {
       st = text(verifyStatus(await dumpDom(`${s.base}/fire-pump-sizer/?ftverifyrun=1`, 120000))).trim()
@@ -170,4 +170,19 @@ test('pump v2.7: service worker cleanup keeps the current cache and deletes only
   const keep = ['fire-pump-sizer-v3', 'fire-pump-sizer-v6', cur, 'other-app-v1'].filter((k) => !(k.indexOf('fire-pump-sizer') === 0 && k !== cur))
   assert.deepEqual(keep, [cur, 'other-app-v1'])
   console.log(`  current cache ${cur} kept; older fire-pump-sizer caches deleted`)
+})
+
+test('pump v2.7.1: main page registers the service worker; verification frames and verify runs do not', async () => {
+  const s = await serve()
+  try {
+    const main = await dumpDom(`${s.base}/fire-pump-sizer/`, 8000)
+    assert.match(main, /<html[^>]*data-sw="registered"/)
+    for (const q of ['?ftverify=1', '?ftverifyrun=1']) {
+      assert.match(await dumpDom(`${s.base}/fire-pump-sizer/${q}`, 8000), /<html[^>]*data-sw="skipped"/, q)
+    }
+    // inside an iframe (window !== window.top), without any query flag
+    const framed = await dumpDom(`${s.base}/tests/fixtures/pump-sw-frame.html`, 8000)
+    assert.match(framed, /<p id="frameSw">skipped<\/p>/)
+    console.log('  main: registered; ?ftverify=1, ?ftverifyrun=1, iframe: skipped')
+  } finally { await s.close() }
 })
