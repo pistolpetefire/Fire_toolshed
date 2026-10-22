@@ -365,14 +365,19 @@
               <option value="point" selected>Single certified point</option>
               <option value="curve">Certified curve (3+ points, interpolated)</option>
             </select>
-            <textarea id="certCurve" rows="4" class="engineering-input" style="width:100%;margin-top:.35rem;font-size:.85rem" placeholder="flow, net psi per line, flows ascending&#10;0, 205&#10;750, 165&#10;1125, 120"></textarea>
+            <label for="certBasis" class="tiny" style="display:block;margin-top:.35rem">Certified pressures are</label>
+            <select id="certBasis" class="inline-select">
+              <option value="net" selected>Net pressure (default)</option>
+              <option value="discharge">Discharge pressure (net = discharge − min suction at demand)</option>
+            </select>
+            <textarea id="certCurve" rows="4" class="engineering-input" style="width:100%;margin-top:.35rem;font-size:.85rem" placeholder="flow, psi per line (net by default), flows ascending&#10;0, 205&#10;750, 165&#10;1125, 120"></textarea>
             <p class="tiny" id="certCurveMsg" style="margin:.25rem 0 0"></p>
           </div>
           <div class="field">
-            <label for="certFlow">Certified curve point: flow / net pressure</label>
+            <label for="certFlow">Certified curve point: flow / pressure (net by default)</label>
             <div class="input-row">
               <input type="number" id="certFlow" min="0" step="any" inputmode="decimal" class="engineering-input" placeholder="gpm">
-              <input type="number" id="certPSI" min="0" step="any" inputmode="decimal" class="engineering-input" placeholder="psi net">
+              <input type="number" id="certPSI" min="0" step="any" inputmode="decimal" class="engineering-input" placeholder="psi">
             </div>
           </div>
         </div>
@@ -394,7 +399,7 @@
               </select>
             </div>
             <div>
-              <div class="stat-label">Full-Load Current (NEC Table 430.250)</div>
+              <div class="stat-label">Full-Load Current (NEC 2023 Table 430.250)</div>
               <div id="fla" class="stat-value tabular-nums" style="font-size:1.25rem">—</div>
             </div>
             <div>
@@ -523,7 +528,7 @@
     </div>
 
     <footer class="footer-bar">
-      <div>References: NFPA 20-2022 &amp; UFC 3-600-01. For qualified Fire Protection Engineers only. · <span id="appVersion">v2.6.0</span> · Local browser app</div>
+      <div>References: NFPA 20-2022 &amp; UFC 3-600-01. For qualified Fire Protection Engineers only. · <span id="appVersion">v2.7.0</span> · Local browser app</div>
       <div class="footer-actions">
         <button type="button" id="btnCopy" class="btn btn-sm">Copy Results</button>
         <button type="button" id="btnSaveReportFooter" class="btn btn-sm">Save Report</button>
@@ -536,7 +541,7 @@
   <script src="../shared/water-path-shell.js"></script>
   <script src="../shared/report-logo.js"></script>
   <script src="./assets/chart.umd.min.js?v=2.1.0"></script>
-  <script src="./assets/pump-rules.js?v=2.6.0"></script>
-  <script src="./assets/app.js?v=2.6.0"></script>
+  <script src="./assets/pump-rules.js?v=2.7.0"></script>
+  <script src="./assets/app.js?v=2.7.0"></script>
 </body>
 </html>

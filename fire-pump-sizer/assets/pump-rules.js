@@ -120,6 +120,11 @@
     return NaN;
   }
 
+  /** Certified curve entered as discharge pressure: net = discharge - suction (the minimum suction at demand is used). */
+  function toNetCurve(pts, suction) {
+    return pts.map((p) => ({ flow: p.flow, psi: p.psi - suction }));
+  }
+
   /** Each demand point vs the interpolated certified curve + min suction. */
   function curveCheck(pts, demands, suctionMin) {
     return demands.map((d) => {
@@ -166,7 +171,8 @@
     const row = NEC_430_250.find((r) => r[0] >= hpCalc - 1e-9);
     if (!row || col == null) return { hp: row ? row[0] : null, column: col, flc: null, note: 'Outside NEC Table 430.250 (use motor data)' };
     const flc = row[1 + NEC_COLS.indexOf(col)];
-    return { hp: row[0], column: col, flc, note: flc == null ? `No Table 430.250 value for ${row[0]} hp at ${col} V` : `NEC Table 430.250: ${row[0]} hp at ${col} V column` };
+    const colLabel = col === 460 && Number(volts) !== 460 ? `460 V (${Number(volts)} V system)` : col === 230 && Number(volts) !== 230 ? `230 V (${Number(volts)} V system)` : `${col} V`;
+    return { hp: row[0], column: col, columnLabel: colLabel, flc, note: flc == null ? `No NEC 2023 Table 430.250 value for ${row[0]} hp at ${colLabel}` : `NEC 2023 Table 430.250: ${row[0]} hp, ${colLabel} column` };
   }
 
   /** NFPA 20-2022 relief guidance: electric constant speed -> no relief valve (4.20.1.1); diesel -> 4.20.1.2 check. */
@@ -182,5 +188,5 @@
 
   const BEYOND_RATED_NOTE = 'Assumption: past rated flow the pump curve is taken as a straight line from the rated point to 150% flow at 65% rated pressure (NFPA 20-2022 minimum). Use the certified curve to confirm.';
 
-  return { EDITION, NEC_430_250, motorFlc, reliefGuidance, BEYOND_RATED_NOTE, parseCurve, interpCurve, curveCheck, dutyCheck, hydrantAt, suctionAt, pumpNetAt, minShutoff, demandPoints, certifiedCheck, maxDischarge, r1 };
+  return { EDITION, toNetCurve, NEC_430_250, motorFlc, reliefGuidance, BEYOND_RATED_NOTE, parseCurve, interpCurve, curveCheck, dutyCheck, hydrantAt, suctionAt, pumpNetAt, minShutoff, demandPoints, certifiedCheck, maxDischarge, r1 };
 });

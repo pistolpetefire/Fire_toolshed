@@ -10,7 +10,9 @@
   const SPRINKLER_HANDOFF_KEY = 'fireToolshed.sprinklerHandoff.v1';
   /** Shared handoff to Fire Tank Sizer */
   const PUMP_HANDOFF_KEY = 'fireToolshed.pumpHandoff.v1';
-  const APP_VERSION = '2.6.0';
+  const APP_VERSION = '2.7.0';
+  /** Current service worker cache name; keep in step with CACHE in sw.js. */
+  const SW_CACHE = 'fire-pump-sizer-v7';
   /** NFPA 291 / water-supply curve exponent (matches Flow Test + Sprinkler apps) */
   const SUPPLY_EXPONENT = 1.85;
 
@@ -405,6 +407,7 @@
       lossElev: $('lossElev')?.value,
       certFlow: $('certFlow')?.value,
       certPSI: $('certPSI')?.value,
+      certBasis: $('certBasis')?.value,
       certCurve: $('certCurve')?.value,
       certMode: $('certMode')?.value,
       maxStaticSuction: $('maxStaticSuction')?.value,
@@ -464,6 +467,7 @@
       assign('lossElev', s.lossElev);
       assign('certFlow', s.certFlow);
       assign('certPSI', s.certPSI);
+      assign('certBasis', s.certBasis);
       assign('certCurve', s.certCurve);
       assign('certMode', s.certMode);
       assign('maxStaticSuction', s.maxStaticSuction);
@@ -507,7 +511,7 @@
     const finalHeadFt = systemPSI * 2.31;
 
     // PSI-primary summary cards
-    setText('resultFlow', systemFlow.toFixed(1));
+    setText('resultFlow', Math.round(systemFlow).toString()); // flow: whole gpm; pressures one decimal
     setText('resultHead', systemPSI.toFixed(1));
     setText('resultHeadPSI', `PSI (${Math.round(finalHeadFt)} ft)`);
 
@@ -559,7 +563,7 @@
         setText('motorHP', motorHP.toFixed(1));
         // NEC (2023) 430.6(A)(1): use Table 430.250 FLC for the next standard HP, not the formula estimate.
         const tbl = window.PumpRules.motorFlc(motorHP, voltage);
-        setHtml('fla', tbl.flc != null ? tbl.flc + ' <span class="tiny">A · ' + tbl.hp + ' hp, ' + tbl.column + ' V col.</span>' : '<span class="tiny">' + tbl.note + '</span>');
+        setHtml('fla', tbl.flc != null ? tbl.flc + ' <span class="tiny">A · ' + tbl.hp + ' hp, ' + tbl.columnLabel + '</span>' : '<span class="tiny">' + tbl.note + '</span>');
         setText('flaBasis', tbl.flc != null ? `FLC per NEC (2023) 430.6(A)(1), ${tbl.note} (formula estimate ${fla.toFixed(0)} A not used).` : tbl.note);
         window.calculatedData.motorTable = tbl;
         if (lra > 0) {
@@ -897,11 +901,14 @@
     setText('beyondRatedNote', beyond ? PR.BEYOND_RATED_NOTE : '');
     // Certified curve mode
     const curveMode = $('certMode')?.value === 'curve';
+    const certDischarge = $('certBasis')?.value === 'discharge';
+    const certBasisText = certDischarge ? `entered as discharge pressure, net = discharge − min suction at demand (${sMin.toFixed(1)} psi)` : 'entered as net pressure';
     let curveRes = null;
     if (curveMode) {
       const pc = PR.parseCurve($('certCurve')?.value);
-      setText('certCurveMsg', pc.ok ? `${pc.points.length} points, linear interpolation + min suction ${sMin.toFixed(1)} psi` : 'Curve invalid: ' + pc.error);
-      if (pc.ok) curveRes = PR.curveCheck(pc.points, pts, sMin);
+      const netPts = pc.ok ? (certDischarge ? PR.toNetCurve(pc.points, sMin) : pc.points) : [];
+      setText('certCurveMsg', pc.ok ? `${pc.points.length} points, ${certBasisText}, linear interpolation + min suction ${sMin.toFixed(1)} psi` : 'Curve invalid: ' + pc.error);
+      if (pc.ok) curveRes = PR.curveCheck(netPts, pts, sMin);
     } else setText('certCurveMsg', '');
     body.querySelectorAll('tr').forEach((tr, i) => {
       const td = document.createElement('td');
@@ -913,8 +920,9 @@
     });
     cd.certCurve = curveRes;
     cd.duty = duty;
-    const cc = curveMode ? null : PR.certifiedCheck(num('certFlow', 0), num('certPSI', 0), gov.flow, gov.netReq);
-    setText('certResult', curveMode ? (curveRes ? (curveRes.every((c) => c.pass) ? 'PASS (curve, all points)' : 'FAIL (curve)') : 'Curve invalid') : cc == null ? 'Not entered' : (cc.pass ? 'PASS' : 'FAIL') + ` (${cc.certFlow} gpm @ ${cc.certPsi} psi vs ${Math.round(gov.flow)} gpm @ ${gov.netReq.toFixed(1)} psi)`);
+    const cc = curveMode ? null : PR.certifiedCheck(num('certFlow', 0), num('certPSI', 0) > 0 ? num('certPSI', 0) - (certDischarge ? sMin : 0) : 0, gov.flow, gov.netReq);
+    setText('certResult', curveMode ? (curveRes ? (curveRes.every((c) => c.pass) ? 'PASS (curve, all points)' : 'FAIL (curve)') : 'Curve invalid') : cc == null ? 'Not entered' : (cc.pass ? 'PASS' : 'FAIL') + ` (${cc.certFlow} gpm @ ${+cc.certPsi.toFixed(1)} psi net vs ${Math.round(gov.flow)} gpm @ ${gov.netReq.toFixed(1)} psi)`);
+    if (!curveMode) setText('certCurveMsg', cc ? 'Certified point ' + certBasisText : '');
     cd.pumpReq = { minShutoff: minS, maxDischarge: md, certified: cc, governing: gov.name };
   }
 
@@ -1603,6 +1611,7 @@
     // v2.5.0 inputs: the example uses the hydrant curve with no losses, one demand point and no certified point.
     if ($('suctionMode')) $('suctionMode').value = 'curve';
     if ($('certMode')) $('certMode').value = 'point';
+    if ($('certBasis')) $('certBasis').value = 'net';
     ['suctionMin', 'suctionMax', 'lossBackflow', 'lossPipe', 'lossElev', 'certFlow', 'certPSI', 'churnPSIIn', 'maxStaticSuction', 'certCurve',
       'dpName2', 'dpFlow2', 'dpPress2', 'dpName3', 'dpFlow3', 'dpPress3', 'dpName4', 'dpFlow4', 'dpPress4'].forEach((id) => { if ($(id)) $(id).value = ''; });
 
@@ -1897,7 +1906,8 @@ ${(data.demandPoints || []).map((p, i) => `${esc(p.name)}: ${Math.round(p.flow)}
     }
     if (window.caches && caches.keys) {
       caches.keys().then((keys) => {
-        keys.filter((k) => k.indexOf('fire-pump-sizer') === 0 && k !== 'fire-pump-sizer-v3')
+        // Delete only OLD caches; keep the current worker cache (must match CACHE in sw.js).
+        keys.filter((k) => k.indexOf('fire-pump-sizer') === 0 && k !== SW_CACHE)
           .forEach((k) => caches.delete(k));
       }).catch(() => undefined);
     }

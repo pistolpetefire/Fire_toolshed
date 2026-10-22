@@ -67,6 +67,16 @@ window.FT_VERIFY_CASES = {
      "refText": "105.0"
     },
     {
+     "sel": "#resultFlow",
+     "label": "Summary card flow, whole gpm",
+     "refText": "1750"
+    },
+    {
+     "sel": "#fla",
+     "label": "FLC cell labels the column",
+     "refText": "302 A · 250 hp, 460 V (480 V system)"
+    },
+    {
      "sel": "#checksGrid .check-card:nth-child(3)",
      "attr": "class",
      "label": "Churn check with no shutoff entered (not a pass)",
@@ -440,7 +450,7 @@ window.FT_VERIFY_CASES = {
     {
      "sel": "#certResult",
      "label": "Certified point check",
-     "refText": "PASS (500 gpm @ 175 psi vs 500 gpm @ 170.6 psi)"
+     "refText": "PASS (500 gpm @ 175 psi net vs 500 gpm @ 170.6 psi)"
     }
    ]
   },
@@ -1021,6 +1031,285 @@ window.FT_VERIFY_CASES = {
      "label": "Relief guidance (electric)",
      "prop": "textContent",
      "refText": "Maximum discharge ≈ 278.3 PSI (churn 210.0 + max static suction 68.3). Exceeds 175 psi standard components: 300 psi rated components required. Electric constant-speed: pressure relief valves are not permitted unless specifically required (NFPA 20-2022 4.20.1.1); select components rated for the maximum discharge."
+    }
+   ]
+  },
+  {
+   "id": "pump-curve-discharge",
+   "title": "Certified curve entered as discharge (net + 55) gives the same result as net entry",
+   "source": "net = discharge - min suction",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "224"
+    },
+    {
+     "set": "#systemFlow",
+     "value": "500"
+    },
+    {
+     "set": "#systemPressure",
+     "value": "225.6"
+    },
+    {
+     "set": "#suctionMode",
+     "value": "direct"
+    },
+    {
+     "set": "#dpName2",
+     "value": "B"
+    },
+    {
+     "set": "#dpFlow2",
+     "value": "783.8"
+    },
+    {
+     "set": "#dpPress2",
+     "value": "94.6"
+    },
+    {
+     "set": "#suctionMin",
+     "value": "55"
+    },
+    {
+     "set": "#suctionMax",
+     "value": "61"
+    },
+    {
+     "set": "#certMode",
+     "value": "curve"
+    },
+    {
+     "set": "#certBasis",
+     "value": "discharge"
+    },
+    {
+     "set": "#certCurve",
+     "value": "0, 260\n500, 240\n750, 220\n1125, 175"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#demandPointsBody tr:nth-child(1) .dp-curve",
+     "label": "A vs curve (discharge entry)",
+     "refText": "PASS (240.0 psi)"
+    },
+    {
+     "sel": "#demandPointsBody tr:nth-child(2) .dp-curve",
+     "label": "B vs curve (discharge entry)",
+     "refText": "PASS (215.9 psi)"
+    },
+    {
+     "sel": "#certResult",
+     "label": "Curve overall",
+     "refText": "PASS (curve, all points)"
+    }
+   ]
+  },
+  {
+   "id": "pump-point-net",
+   "title": "Certified point 500 gpm @ 175 psi net",
+   "source": "Certified point",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "224"
+    },
+    {
+     "set": "#systemFlow",
+     "value": "500"
+    },
+    {
+     "set": "#systemPressure",
+     "value": "225.6"
+    },
+    {
+     "set": "#suctionMode",
+     "value": "direct"
+    },
+    {
+     "set": "#dpName2",
+     "value": "B"
+    },
+    {
+     "set": "#dpFlow2",
+     "value": "783.8"
+    },
+    {
+     "set": "#dpPress2",
+     "value": "94.6"
+    },
+    {
+     "set": "#suctionMin",
+     "value": "55"
+    },
+    {
+     "set": "#suctionMax",
+     "value": "61"
+    },
+    {
+     "set": "#certFlow",
+     "value": "500"
+    },
+    {
+     "set": "#certPSI",
+     "value": "175"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#certResult",
+     "label": "Point, net entry",
+     "refText": "PASS (500 gpm @ 175 psi net vs 500 gpm @ 170.6 psi)"
+    }
+   ]
+  },
+  {
+   "id": "pump-point-discharge",
+   "title": "Certified point 500 gpm @ 230 psi discharge (net 175 with 55 psi suction)",
+   "source": "net = discharge - min suction",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "224"
+    },
+    {
+     "set": "#systemFlow",
+     "value": "500"
+    },
+    {
+     "set": "#systemPressure",
+     "value": "225.6"
+    },
+    {
+     "set": "#suctionMode",
+     "value": "direct"
+    },
+    {
+     "set": "#dpName2",
+     "value": "B"
+    },
+    {
+     "set": "#dpFlow2",
+     "value": "783.8"
+    },
+    {
+     "set": "#dpPress2",
+     "value": "94.6"
+    },
+    {
+     "set": "#suctionMin",
+     "value": "55"
+    },
+    {
+     "set": "#suctionMax",
+     "value": "61"
+    },
+    {
+     "set": "#certBasis",
+     "value": "discharge"
+    },
+    {
+     "set": "#certFlow",
+     "value": "500"
+    },
+    {
+     "set": "#certPSI",
+     "value": "230"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#certResult",
+     "label": "Point, discharge entry (same as net)",
+     "refText": "PASS (500 gpm @ 175 psi net vs 500 gpm @ 170.6 psi)"
+    },
+    {
+     "sel": "#certCurveMsg",
+     "label": "Suction used is stated",
+     "refText": "Certified point entered as discharge pressure, net = discharge − min suction at demand (55.0 psi)"
+    }
+   ]
+  },
+  {
+   "id": "flc-125hp-480",
+   "title": "Rated 750 gpm @ 160 psi -> 107.3 hp -> 125 hp at 480 V",
+   "source": "NEC 2023 Table 430.250: 125 hp, 460 V = 156 A",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#voltage",
+     "value": "480"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#fla",
+     "label": "FLC 125 hp",
+     "refText": "156 A · 125 hp, 460 V (480 V system)"
     }
    ]
   }

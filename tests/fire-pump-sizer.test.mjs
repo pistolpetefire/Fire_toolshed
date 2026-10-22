@@ -51,21 +51,21 @@ test('pump: suction direct single / range and hydrant curve minus losses; certif
   assert.equal(R.certifiedCheck(0, 0, 500, 170.6), null)
 })
 
-test('pump page: shows NFPA 20-2022 and the Verification tab passes 41/41 (duty check on required net, demand points, shutoff)', async () => {
+test('pump page: shows NFPA 20-2022 and the Verification tab passes 50/50 (duty check on required net, demand points, shutoff)', async () => {
   const s = await serve()
   try {
     const page = await dumpDom(`${s.base}/fire-pump-sizer/`, 8000)
     assert.match(text(page), /NFPA 20-2022/)
-    assert.match(page, /id="appVersion">v2\.6\.0</)
-    // Headless Chrome intermittently (~1 in 10 runs) leaves one hidden verification frame without its scripts on this page,
+    assert.match(page, /id="appVersion">v2\.7\.0</)
+    // Headless Chrome intermittently (6 of 20 runs on v2.7.0, after the SW cache-cleanup fix) leaves one hidden verification frame without its scripts on this page,
     // which blanks that one case; a rerun is clean. Up to 3 attempts, and every attempt is logged.
     let st = ''
-    for (let i = 1; i <= 3; i++) {
-      st = text(verifyStatus(await dumpDom(`${s.base}/fire-pump-sizer/?ftverifyrun=1`, 60000))).trim()
+    for (let i = 1; i <= 4; i++) {
+      st = text(verifyStatus(await dumpDom(`${s.base}/fire-pump-sizer/?ftverifyrun=1`, 120000))).trim()
       console.log(`  attempt ${i}: ${st}`)
-      if (/^41 of 41 checks pass/.test(st)) break
+      if (/^50 of 50 checks pass/.test(st)) break
     }
-    assert.match(st, /^41 of 41 checks pass/)
+    assert.match(st, /^50 of 50 checks pass/)
   } finally { await s.close() }
 })
 
@@ -128,8 +128,46 @@ test('pump: high-pressure warning reports churn + max static suction (210 + 68.3
   assert.doesNotMatch(app, /or pressure relief valve/)
 })
 
-test('pump: summary cards show one decimal', () => {
+test('pump: summary cards: pressures one decimal, flow whole gpm', () => {
   const app = readFileSync(new URL('../fire-pump-sizer/assets/app.js', import.meta.url), 'utf8')
-  for (const t of ["setText('resultHead', systemPSI.toFixed(1))", "setText('availablePressure', availablePSI.toFixed(1))", "setText('pumpMustAdd', netPumpPressure.toFixed(1))", "setText('resultFlow', systemFlow.toFixed(1))"]) assert.ok(app.includes(t), t)
+  for (const t of ["setText('resultHead', systemPSI.toFixed(1))", "setText('availablePressure', availablePSI.toFixed(1))", "setText('pumpMustAdd', netPumpPressure.toFixed(1))", "setText('resultFlow', Math.round(systemFlow).toString())"]) assert.ok(app.includes(t), t)
   assert.equal((55).toFixed(1), '55.0'); assert.equal((147.4).toFixed(1), '147.4')
+})
+
+// v2.7.0
+test('pump v2.7: motor FLC labeled "460 V (480 V system)" citing NEC 2023 Table 430.250; values 124 / 156 / 302 A', () => {
+  for (const [hp, a] of [[100, 124], [125, 156], [250, 302]]) {
+    const m = R.motorFlc(hp, 480)
+    assert.equal(m.flc, a); assert.equal(m.columnLabel, '460 V (480 V system)')
+    assert.equal(m.note, `NEC 2023 Table 430.250: ${hp} hp, 460 V (480 V system) column`)
+  }
+  assert.equal(R.motorFlc(100, 460).columnLabel, '460 V')
+  assert.equal(R.motorFlc(100, 208).columnLabel, '208 V')
+})
+
+test('pump v2.7: certified curve as discharge (net = discharge - min suction) equals the net entry', () => {
+  const net = R.parseCurve('0, 205\n500, 185\n750, 165\n1125, 120').points
+  const dis = R.parseCurve('0, 260\n500, 240\n750, 220\n1125, 175').points // each + 55 psi suction
+  const D = [{ name: 'A', flow: 500, discharge: 225.6 }, { name: 'B', flow: 783.8, discharge: 94.6 }]
+  const a = R.curveCheck(net, D, 55), b = R.curveCheck(R.toNetCurve(dis, 55), D, 55)
+  assert.deepEqual(b.map((x) => x.pass), a.map((x) => x.pass))
+  a.forEach((x, i) => near(b[i].available, x.available, 1e-9))
+  // single point: 230 psi discharge - 55 = 175 net, same as entering 175 net
+  assert.deepEqual(R.certifiedCheck(500, 230 - 55, 500, 170.6), R.certifiedCheck(500, 175, 500, 170.6))
+  const html = readFileSync(new URL('../fire-pump-sizer/index.html', import.meta.url), 'utf8')
+  assert.match(html, /<option value="net" selected>Net pressure \(default\)<\/option>/)
+  assert.match(html, /Discharge pressure \(net = discharge − min suction at demand\)/)
+})
+
+test('pump v2.7: service worker cleanup keeps the current cache and deletes only old ones', () => {
+  const app = readFileSync(new URL('../fire-pump-sizer/assets/app.js', import.meta.url), 'utf8')
+  const sw = readFileSync(new URL('../fire-pump-sizer/sw.js', import.meta.url), 'utf8')
+  const cur = sw.match(/const CACHE = '([^']+)'/)[1]
+  assert.equal(app.match(/const SW_CACHE = '([^']+)'/)[1], cur)
+  assert.ok(app.includes("k.indexOf('fire-pump-sizer') === 0 && k !== SW_CACHE"))
+  assert.doesNotMatch(app, /k !== 'fire-pump-sizer-v3'/)
+  // the same filter applied to a sample key list
+  const keep = ['fire-pump-sizer-v3', 'fire-pump-sizer-v6', cur, 'other-app-v1'].filter((k) => !(k.indexOf('fire-pump-sizer') === 0 && k !== cur))
+  assert.deepEqual(keep, [cur, 'other-app-v1'])
+  console.log(`  current cache ${cur} kept; older fire-pump-sizer caches deleted`)
 })

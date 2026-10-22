@@ -27,6 +27,10 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
 
+- **Fire Pump Sizer v2.7.0 (2026-10-22).** Summary flow card in whole gpm (pressures one decimal); motor FLC cell labels the column
+  ("460 V (480 V system)") and cites NEC 2023 Table 430.250; certified pressures labeled net by default with a discharge option
+  (net = discharge − min suction at demand); the app's cache cleanup now keeps the current service-worker cache. 50 of 50 checks pass.
+
 - **Fire Pump Sizer v2.6.0 (2026-10-22), NFPA 20-2022.** Separate max static suction input used for churn + suction (falls back
   to the hydrant static, or the direct max); duty check keeps the 5% tolerance and shows REVIEW with its reason on screen and in
   the printout; certified-curve mode (3+ ascending flow/pressure points, linear interpolation, plus suction) checks every demand

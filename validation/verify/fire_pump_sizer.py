@@ -1,4 +1,4 @@
-"""Fire Pump Sizer v2.6.0: the built-in DoD example plus diesel, breaker and churn cases, worked independently in Python.
+"""Fire Pump Sizer v2.7.0: the built-in DoD example plus diesel, breaker and churn cases, worked independently in Python.
 Supply curve: NFPA 291 N^1.85 form, P(Q) = Ps - (Ps - Pr)(Q/Qt)^1.85. Head: ft = psi x 2.31.
 Pump power: water hp = Q H / 3960; brake hp = water hp / efficiency, with the app's stated 0.75 pump efficiency,
 then the app's stated 1.15 (electric) or 1.2 (diesel) driver margin.
@@ -39,6 +39,8 @@ cases = [
                {'sel': '#availablePressure', 'label': 'Summary card, one decimal', 'refText': f'{avail:.1f}'},
                {'sel': '#pumpMustAdd', 'label': 'Summary card, one decimal', 'refText': f'{net:.1f}'},
                {'sel': '#resultHead', 'label': 'Summary card, one decimal', 'refText': '105.0'},
+               {'sel': '#resultFlow', 'label': 'Summary card flow, whole gpm', 'refText': '1750'},
+               {'sel': '#fla', 'label': 'FLC cell labels the column', 'refText': '302 A · 250 hp, 460 V (480 V system)'},
                {'sel': CARD, 'attr': 'class', 'label': 'Churn check with no shutoff entered (not a pass)', 'refText': 'check-card fail'}]},
     {'id': 'ocpd-363', 'title': 'OCPD: LRC 363 A, no other loads (EC&M 50 hp, 480 V example)', 'source': 'NEC (2023) 695.4(B)(2)(a)(1), 240.6(A)',
      'steps': dod([{'set': '#lockedRotorA', 'value': '363'}, {'set': '#otherFlaA', 'value': ''}]),
@@ -89,7 +91,7 @@ cases += [
                {'sel': '#checksGrid .check-card:nth-child(2)', 'attr': 'class', 'label': 'Duty check uses net 170.6 > 160 rated', 'refText': 'check-card fail'}]},
     {'id': 'pump-cert-point', 'title': 'Certified point 500 gpm @ 175 psi net vs 170.6 psi required', 'source': 'NFPA 20-2022',
      'steps': dod(PTS + [{'set': '#suctionMin', 'value': '55'}, {'set': '#certFlow', 'value': '500'}, {'set': '#certPSI', 'value': '175'}]),
-     'reads': [{'sel': '#certResult', 'label': 'Certified point check', 'refText': 'PASS (500 gpm @ 175 psi vs 500 gpm @ 170.6 psi)'}]},
+     'reads': [{'sel': '#certResult', 'label': 'Certified point check', 'refText': 'PASS (500 gpm @ 175 psi net vs 500 gpm @ 170.6 psi)'}]},
     {'id': 'pump-curve-loss', 'title': 'DoD hydrant curve minus 5 psi backflow + 2 psi pipe', 'source': 'NFPA 291 N^1.85 less entered losses',
      'steps': dod([{'set': '#lossBackflow', 'value': '5'}, {'set': '#lossPipe', 'value': '2'}]),
      'reads': [{'sel': '#availableAtFlow', 'label': 'Suction at 1750 gpm after losses', 'unit': 'psi', 'ref': r(avail - 7, 1)}]},
@@ -151,6 +153,28 @@ cases += [
      'reads': [{'sel': '#highPressureMessage', 'label': 'Churn + max static suction', 'unit': 'psi', 'ref': 278.3},
                {'sel': '#highPressureMessage', 'label': 'Relief guidance (electric)', 'prop': 'textContent', 'refText':
                 'Maximum discharge ≈ 278.3 PSI (churn 210.0 + max static suction 68.3). Exceeds 175 psi standard components: 300 psi rated components required. ' + RELIEF_E}]},
+]
+
+# v2.7.0: certified pressures entered as discharge (net = discharge - min suction 55) give the same result as the net entry.
+CURVE_DIS = [(f, p + 55) for f, p in CURVE_OK]
+hp125 = 750 * 160 * 2.31 / (3960 * 0.75) * 1.15
+assert 100 < hp125 <= 125
+cases += [
+    {'id': 'pump-curve-discharge', 'title': 'Certified curve entered as discharge (net + 55) gives the same result as net entry', 'source': 'net = discharge - min suction',
+     'steps': dod(BASE + [{'set': '#certMode', 'value': 'curve'}, {'set': '#certBasis', 'value': 'discharge'}, {'set': '#certCurve', 'value': txt(CURVE_DIS)}]),
+     'reads': [{'sel': '#demandPointsBody tr:nth-child(1) .dp-curve', 'label': 'A vs curve (discharge entry)', 'refText': f'PASS ({aOk:.1f} psi)'},
+               {'sel': '#demandPointsBody tr:nth-child(2) .dp-curve', 'label': 'B vs curve (discharge entry)', 'refText': f'PASS ({bOk:.1f} psi)'},
+               {'sel': '#certResult', 'label': 'Curve overall', 'refText': 'PASS (curve, all points)'}]},
+    {'id': 'pump-point-net', 'title': 'Certified point 500 gpm @ 175 psi net', 'source': 'Certified point',
+     'steps': dod(BASE + [{'set': '#certFlow', 'value': '500'}, {'set': '#certPSI', 'value': '175'}]),
+     'reads': [{'sel': '#certResult', 'label': 'Point, net entry', 'refText': 'PASS (500 gpm @ 175 psi net vs 500 gpm @ 170.6 psi)'}]},
+    {'id': 'pump-point-discharge', 'title': 'Certified point 500 gpm @ 230 psi discharge (net 175 with 55 psi suction)', 'source': 'net = discharge - min suction',
+     'steps': dod(BASE + [{'set': '#certBasis', 'value': 'discharge'}, {'set': '#certFlow', 'value': '500'}, {'set': '#certPSI', 'value': '230'}]),
+     'reads': [{'sel': '#certResult', 'label': 'Point, discharge entry (same as net)', 'refText': 'PASS (500 gpm @ 175 psi net vs 500 gpm @ 170.6 psi)'},
+               {'sel': '#certCurveMsg', 'label': 'Suction used is stated', 'refText': 'Certified point entered as discharge pressure, net = discharge − min suction at demand (55.0 psi)'}]},
+    {'id': 'flc-125hp-480', 'title': f'Rated 750 gpm @ 160 psi -> {hp125:.1f} hp -> 125 hp at 480 V', 'source': 'NEC 2023 Table 430.250: 125 hp, 460 V = 156 A',
+     'steps': dod([{'set': '#ratedGPM', 'value': '750'}, {'set': '#ratedPSI', 'value': '160'}, {'set': '#voltage', 'value': '480'}]),
+     'reads': [{'sel': '#fla', 'label': 'FLC 125 hp', 'refText': '156 A · 125 hp, 460 V (480 V system)'}]},
 ]
 
 write('fire-pump-sizer', {'script': 'fire_pump_sizer.py', 'app': 'Fire Pump Sizer', 'versionSel': '#appVersion',
