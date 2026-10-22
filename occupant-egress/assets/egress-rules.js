@@ -84,7 +84,36 @@
     return { stair: reduced ? 0.2 : 0.3, other: reduced ? 0.15 : 0.2, reduced: reduced, excluded: excluded && sp, label: reason };
   }
 
+  /**
+   * IBC 2024 1020.5 dead-end corridors. Base 20 ft. Exceptions modeled:
+   *  1. Group I-3, Condition 2, 3 or 4: 50 ft.
+   *  2. B, E, F, I-1, M, R-1, R-2, S, U sprinklered throughout (903.3.1.1): 50 ft (carried in the group table).
+   *  4. Group I-2, Condition 2: dead-end corridors that do NOT serve patient rooms or patient treatment spaces: 30 ft.
+   * Exception 3 (not limited when shorter than 2.5 x the least corridor width) is not modeled.
+   * opts: { group, tableValue, i2Condition: "" | "1" | "2", i2NonPatient: bool, i3Condition: "" | "1".."5" }.
+   * Unspecified conditions keep the conservative 20 ft.
+   */
+  function deadEndIbc(opts) {
+    var o = opts || {};
+    var g = String(o.group || "");
+    var base = Number(o.tableValue);
+    if (g === "I-3") {
+      if (["2", "3", "4"].indexOf(String(o.i3Condition)) >= 0)
+        return { limit: 50, source: "IBC 2024 1020.5 Exception 1 (Group I-3, Condition " + o.i3Condition + "): 50 ft" };
+      return { limit: 20, source: o.i3Condition ? "IBC 2024 1020.5 (Group I-3, Condition " + o.i3Condition + ": no exception): 20 ft" : "IBC 2024 1020.5 (I-3 condition not specified: conservative 20 ft)" };
+    }
+    if (g === "I-2") {
+      if (String(o.i2Condition) === "2" && o.i2NonPatient)
+        return { limit: 30, source: "IBC 2024 1020.5 Exception 4 (Group I-2, Condition 2, corridor not serving patient rooms or patient treatment spaces): 30 ft" };
+      return { limit: 20, source: String(o.i2Condition) === "2"
+        ? "IBC 2024 1020.5 (Group I-2, Condition 2, corridor serving patient rooms/treatment spaces): 20 ft"
+        : o.i2Condition ? "IBC 2024 1020.5 (Group I-2, Condition " + o.i2Condition + ": no exception): 20 ft" : "IBC 2024 1020.5 (I-2 condition not specified: conservative 20 ft)" };
+    }
+    return { limit: base, source: base === 50 ? "IBC 2024 1020.5 Exception 2 (sprinklered per 903.3.1.1): 50 ft" : "IBC 2024 1020.5: 20 ft" };
+  }
+
   return {
+    deadEndIbc: deadEndIbc,
     minExitsIbc: minExitsIbc,
     requiredWidthIn: requiredWidthIn,
     lossOfOneExit: lossOfOneExit,

@@ -16,7 +16,7 @@
       <div>
         <p class="eyebrow">Fire Toolshed · Life safety</p>
         <h1>Occupant Load &amp; Egress Capacity</h1>
-        <p class="version" id="appVersion">Version 1.6.0</p>
+        <p class="version" id="appVersion">Version 1.7.0</p>
         <p class="lead" id="headerLead">
           Choose a code path, then calculate <strong>occupant load</strong>, <strong>egress capacity</strong>, and travel-distance checks.
         </p>
@@ -111,6 +111,28 @@
               <label for="occupancyGroup" id="occupancyGroupLabel">Primary occupancy (travel limits)</label>
               <select id="occupancyGroup"></select>
               <span class="sub">IBC path: IBC 2024 Table 1017.2 travel, Table 1006.2.1 common path (one-exit spaces; nonsprinklered uses OL &gt; 30) and 1020.5 dead ends, by subgroup. Confirm the adopted edition and local amendments with the AHJ.</span>
+            </div>
+            <div class="field" id="i2ConditionField" hidden>
+              <label for="i2Condition">I-2 condition (IBC 308.3)</label>
+              <select id="i2Condition">
+                <option value="" selected>Not specified (dead end 20 ft)</option>
+                <option value="1">Condition 1</option>
+                <option value="2">Condition 2</option>
+              </select>
+              <label for="i2NonPatient"><input id="i2NonPatient" type="checkbox" /> Dead-end corridor does not serve patient rooms or patient treatment spaces</label>
+              <span class="sub">IBC 2024 1020.5 Exception 4: 30 ft only for I-2 Condition 2 corridors that do not serve patient rooms or patient treatment spaces; otherwise 20 ft.</span>
+            </div>
+            <div class="field" id="i3ConditionField" hidden>
+              <label for="i3Condition">I-3 condition (IBC 308.4)</label>
+              <select id="i3Condition">
+                <option value="" selected>Not specified (dead end 20 ft)</option>
+                <option value="1">Condition 1</option>
+                <option value="2">Condition 2</option>
+                <option value="3">Condition 3</option>
+                <option value="4">Condition 4</option>
+                <option value="5">Condition 5</option>
+              </select>
+              <span class="sub">IBC 2024 1020.5 Exception 1: 50 ft for I-3 Conditions 2, 3 and 4; Conditions 1 and 5 stay at 20 ft.</span>
             </div>
             <div class="field" id="inc10172Field">
               <label for="inc10172"><input id="inc10172" type="checkbox" /> IBC 1017.2.2: F-1 / S-1 increase to 400 ft</label>
@@ -249,7 +271,7 @@
 
   <script src="../shared/report-logo.js"></script>
   <script type="module" src="../shared/atrium-egress-bridge.mjs"></script>
-  <script src="./assets/egress-rules.js?v=1.6.0"></script>
-  <script src="./assets/app.js?v=1.6.0"></script>
+  <script src="./assets/egress-rules.js?v=1.7.0"></script>
+  <script src="./assets/app.js?v=1.7.0"></script>
 </body>
 </html>

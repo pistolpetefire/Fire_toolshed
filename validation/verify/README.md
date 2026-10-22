@@ -27,6 +27,11 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
 
+- **Occupant Egress v1.7.0 (2026-10-22).** IBC 2024 1020.5 dead-end exceptions: I-3 Conditions 2, 3, 4 -> 50 ft (Exception 1);
+  I-2 Condition 2 corridors that do not serve patient rooms or patient treatment spaces -> 30 ft (Exception 4). New condition inputs
+  default to "not specified" (20 ft). The dead-end basis is shown on screen and in the printout. Added `ibc-exits-500-novoice`
+  (voice/alarm left at No: capacity 440 FAIL, loss of one exit 220 < 250 FAIL) next to the explicit-Yes `ibc-exits-500`. 64 of 64 checks pass.
+
 - **Occupant Egress v1.6.0 (2026-10-17).** Emergency voice/alarm now defaults to No (conservative), so a sprinklered building gets the
   reduced 0.2 / 0.15 in/occ factors only when voice/alarm is selected. The combined I-2/I-3 group is split: I-2 keeps the old values
   (travel 200, common path 75, dead end 20; no reduced factors); I-3 uses IBC 2024 Table 1006.2.1 common path 100 ft sprinklered

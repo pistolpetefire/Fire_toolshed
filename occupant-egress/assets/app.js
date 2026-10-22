@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.6.0";
+  var APP_VERSION = "1.7.0";
   var STORAGE_KEY = "occupantEgress.v1";
 
   /** Shared egress component types */
@@ -52,7 +52,8 @@
    *   nonsprinklered value is the OL > 30 column (OL <= 30 is 100 ft for B, S, U).
    *   The table's maximum occupant load for a one-exit space is not checked here.
    * deadEnd: 1020.5 — 20 ft; 50 ft for B, E, F, I-1, M, R-1, R-2, S, U sprinklered (903.3.1.1).
-   *   I-3 Condition 2–4 (50 ft) and I-2 Condition 2 non-patient corridors (30 ft) are not applied.
+   *   I-3 Conditions 2–4 (50 ft, Exception 1) and I-2 Condition 2 non-patient corridors (30 ft, Exception 4) are applied in
+   *   EgressRules.deadEndIbc() from the condition inputs (v1.7.0); unspecified conditions stay at 20 ft.
    */
   var IBC_OCC_GROUPS = [
     { id: "A", label: "A — Assembly", travel: { yes: 250, no: 200 }, common: { yes: 75, no: 75 }, deadEnd: { yes: 20, no: 20 } },
@@ -250,6 +251,9 @@
       travelActual: "",
       commonPathActual: "",
       deadEndActual: "",
+      i2Condition: "", // "" = not specified (conservative 20 ft dead end)
+      i2NonPatient: false,
+      i3Condition: "",
     };
   }
 
@@ -574,7 +578,16 @@
       travel: travelLim,
       common: group.common[spKey],
       deadEnd: group.deadEnd[spKey],
+      deadEndSource: "",
     };
+    if (p && p.id === "ibc" && window.EgressRules && window.EgressRules.deadEndIbc) {
+      var de = window.EgressRules.deadEndIbc({
+        group: group.id, tableValue: allow.deadEnd,
+        i2Condition: state.i2Condition, i2NonPatient: state.i2NonPatient, i3Condition: state.i3Condition,
+      });
+      allow.deadEnd = de.limit;
+      allow.deadEndSource = de.source;
+    }
     var travel = num(state.travelActual, NaN);
     var common = num(state.commonPathActual, NaN);
     var dead = num(state.deadEndActual, NaN);
@@ -702,6 +715,9 @@
           : "Primary occupancy group (travel limits)";
     }
     if ($("inc10172Field")) $("inc10172Field").hidden = !(p && p.id === "ibc");
+    var gId = state.occupancyGroup;
+    if ($("i2ConditionField")) $("i2ConditionField").hidden = !(p && p.id === "ibc" && gId === "I-2");
+    if ($("i3ConditionField")) $("i3ConditionField").hidden = !(p && p.id === "ibc" && gId === "I-3");
     if ($("voiceAlarmField")) $("voiceAlarmField").hidden = !(p && p.id === "ibc");
   }
 
@@ -716,6 +732,8 @@
 
     var m = calcModel();
     var p = m.path;
+    if ($("i2ConditionField")) $("i2ConditionField").hidden = !(p && p.id === "ibc" && m.group.id === "I-2");
+    if ($("i3ConditionField")) $("i3ConditionField").hidden = !(p && p.id === "ibc" && m.group.id === "I-3");
 
     if ($("pathBanner") && p) {
       $("pathBanner").innerHTML =
@@ -792,6 +810,9 @@
         " · " +
         (p ? escapeHtml(p.travelRef) : "") +
         "</span>" +
+        (m.allow.deadEndSource
+          ? "<br><span class='sub' id='deadEndSource' style='margin:0'>Dead end: " + escapeHtml(m.allow.deadEndSource) + "</span>"
+          : "") +
         (state.groupMigratedFrom
           ? "<br><span class='sub' id='groupMigrationNote' style='margin:0'>Saved group " + escapeHtml(state.groupMigratedFrom) +
             " was mapped to I-2 (conservative: no reduced width factors, 75 ft common path). Choose I-3 if this is a detention occupancy.</span>"
@@ -954,6 +975,9 @@
     state.commonPathActual =
       ($("commonPathActual") && $("commonPathActual").value) || "";
     state.deadEndActual = ($("deadEndActual") && $("deadEndActual").value) || "";
+    state.i2Condition = ($("i2Condition") && $("i2Condition").value) || "";
+    state.i2NonPatient = !!($("i2NonPatient") && $("i2NonPatient").checked);
+    state.i3Condition = ($("i3Condition") && $("i3Condition").value) || "";
   }
 
   function writeFormMeta() {
@@ -966,6 +990,9 @@
     if ($("travelActual")) $("travelActual").value = state.travelActual;
     if ($("commonPathActual")) $("commonPathActual").value = state.commonPathActual;
     if ($("deadEndActual")) $("deadEndActual").value = state.deadEndActual;
+    if ($("i2Condition")) $("i2Condition").value = state.i2Condition || "";
+    if ($("i2NonPatient")) $("i2NonPatient").checked = !!state.i2NonPatient;
+    if ($("i3Condition")) $("i3Condition").value = state.i3Condition || "";
   }
 
   function packageHtml(m, includeLogo) {
@@ -1075,7 +1102,9 @@
       (m.allow.common == null ? "not permitted without sprinklers" : m.allow.common + " ft") +
       " · Dead-end " +
       m.allow.deadEnd +
-      " ft<br>Entered — Travel " +
+      " ft" +
+      (m.allow.deadEndSource ? "<br>Dead-end basis: " + escapeHtml(m.allow.deadEndSource) : "") +
+      "<br>Entered — Travel " +
       (Number.isFinite(m.travel) ? m.travel + " ft" : "—") +
       " · Common " +
       (Number.isFinite(m.common) ? m.common + " ft" : "—") +
@@ -1179,7 +1208,7 @@
       });
     $("btnChangePath") && $("btnChangePath").addEventListener("click", changePath);
 
-    ["projectName", "buildingArea", "sprinklered", "voiceAlarm", "occupancyGroup", "inc10172", "travelActual", "commonPathActual", "deadEndActual"].forEach(
+    ["projectName", "buildingArea", "sprinklered", "voiceAlarm", "occupancyGroup", "inc10172", "i2Condition", "i2NonPatient", "i3Condition", "travelActual", "commonPathActual", "deadEndActual"].forEach(
       function (id) {
         var el = $(id);
         if (!el) return;

@@ -39,15 +39,15 @@ test('egress: 1005.5 loss of one exit keeps >= 50% of required capacity', () => 
   console.log(`  1521 OL, 4x390: ${four.remaining} remain (${four.pct.toFixed(1)}%) PASS; 600 OL, 500+180: ${two.remaining} remain (${two.pct.toFixed(1)}%) FAIL; 500 OL, 250+250: 50.0% PASS`)
 })
 
-test('egress: in-app Verification tab passes (53 checks incl. voice default and I-2 / I-3 split) and the page shows the exit check', async () => {
+test('egress: in-app Verification tab passes (64 checks incl. 1020.5 dead-end exceptions) and the page shows the exit check', async () => {
   const s = await serve()
   try {
     const st = text(verifyStatus(await dumpDom(`${s.base}/occupant-egress/?ftverifyrun=1`, 60000))).trim()
     console.log('  ' + st)
-    assert.match(st, /^53 of 53 checks pass/)
+    assert.match(st, /^64 of 64 checks pass/)
     const page = await dumpDom(`${s.base}/occupant-egress/`, 8000)
     assert.match(page, /id="exitCheck"/)
-    assert.match(page, /Version 1\.6\.0/)
+    assert.match(page, /Version 1\.7\.0/)
   } finally { await s.close() }
 })
 
@@ -139,4 +139,55 @@ test('egress v1.6.0: a saved session with the old "I-2/I-3" group loads as I-2 w
     assert.match(allow, /Saved group I-2\/I-3 was mapped to I-2 \(conservative/)
     assert.match(text(page), /Stair width|stairs 100 × 0\.30 = 30 in/)
   } finally { await s.close() }
+})
+
+// v1.7.0: IBC 2024 1020.5 dead-end corridor exceptions for I-2 and I-3.
+const DE = (group, o = {}) => R.deadEndIbc({ group, tableValue: 20, ...o })
+
+test('egress 1020.5: I-3 Condition 2 -> 50 ft (also 3 and 4); Conditions 1 and 5 -> 20 ft', () => {
+  const c2 = DE('I-3', { i3Condition: '2' })
+  assert.equal(c2.limit, 50); assert.equal(c2.source, 'IBC 2024 1020.5 Exception 1 (Group I-3, Condition 2): 50 ft')
+  assert.equal(DE('I-3', { i3Condition: '3' }).limit, 50); assert.equal(DE('I-3', { i3Condition: '4' }).limit, 50)
+  assert.equal(DE('I-3', { i3Condition: '1' }).limit, 20); assert.equal(DE('I-3', { i3Condition: '5' }).limit, 20)
+  console.log('  I-3: C1 20, C2 50, C3 50, C4 50, C5 20 ft — ' + c2.source)
+})
+
+test('egress 1020.5: I-2 Condition 2 corridor not serving patient rooms/treatment spaces -> 30 ft; otherwise 20 ft', () => {
+  const x = DE('I-2', { i2Condition: '2', i2NonPatient: true })
+  assert.equal(x.limit, 30); assert.match(x.source, /^IBC 2024 1020\.5 Exception 4 \(Group I-2, Condition 2, corridor not serving patient rooms or patient treatment spaces\): 30 ft$/)
+  assert.equal(DE('I-2', { i2Condition: '2', i2NonPatient: false }).limit, 20) // serves patient rooms
+  assert.equal(DE('I-2', { i2Condition: '1', i2NonPatient: true }).limit, 20) // Condition 1: no exception
+  console.log('  I-2: C2 non-patient 30, C2 patient 20, C1 20 ft')
+})
+
+test('egress 1020.5: default (condition not specified) stays at 20 ft; other groups unchanged', async () => {
+  assert.equal(DE('I-2').limit, 20); assert.equal(DE('I-3').limit, 20)
+  assert.match(DE('I-3').source, /not specified: conservative 20 ft/)
+  assert.equal(R.deadEndIbc({ group: 'B', tableValue: 50 }).limit, 50) // Exception 2 via the group table
+  assert.equal(R.deadEndIbc({ group: 'B', tableValue: 20 }).limit, 20)
+  const s = await serve()
+  try {
+    const page = await dumpDom(`${s.base}/occupant-egress/`, 8000)
+    for (const id of ['i2Condition', 'i3Condition']) {
+      const sel = (page.match(new RegExp('<select id="' + id + '">[\\s\\S]*?</select>')) || [''])[0]
+      assert.match(sel, /<option value="" selected(="")?>Not specified \(dead end 20 ft\)/, id)
+    }
+    console.log('  defaults: I-2 / I-3 not specified -> 20 ft; B sprinklered 50 / nonsprinklered 20 unchanged')
+  } finally { await s.close() }
+})
+
+test('egress 1020.5: dead-end source shown on screen and in the printout', () => {
+  const app = readFileSync(new URL('../occupant-egress/assets/app.js', import.meta.url), 'utf8')
+  assert.ok(app.includes(`"<br><span class='sub' id='deadEndSource' style='margin:0'>Dead end: " + escapeHtml(m.allow.deadEndSource)`), 'screen')
+  assert.ok(app.includes(`"<br>Dead-end basis: " + escapeHtml(m.allow.deadEndSource)`), 'printout')
+})
+
+test('egress sample: 500 occupants, sprinklered, voice/alarm left at No -> capacity 440 FAIL, loss of one exit 220 < 250 FAIL', () => {
+  const f = R.ibcWidthFactors({ sprinklered: 'yes', group: 'B' })
+  const per = Math.floor(44 / f.other + 1e-9)
+  assert.equal(2 * per, 440); assert.ok(2 * per < 500)
+  const L = R.lossOfOneExit([{ name: 'D1', capacity: per }, { name: 'D2', capacity: per }], 500)
+  assert.equal(L.remaining, 220); assert.equal(L.pass, false)
+  assert.equal(R.requiredWidthIn(500, f.other).roundedUp, 100)
+  console.log(`  no voice: capacity ${2 * per} < 500 FAIL; loss of one exit ${L.remaining} < ${L.half} FAIL; width 100 in`)
 })
