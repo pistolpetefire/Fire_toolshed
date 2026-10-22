@@ -226,6 +226,16 @@
             </div>
           </div>
         </div>
+        <div class="grid-3 mb-4">
+          <div class="field">
+            <label for="maxStaticSuction">Max static suction pressure (no flow)</label>
+            <div class="input-row">
+              <input type="number" id="maxStaticSuction" step="any" min="0" inputmode="decimal" class="engineering-input sm" placeholder="optional">
+              <span class="suffix">PSI</span>
+            </div>
+            <span class="hint">Used for churn + max suction (max discharge). Blank: hydrant static (hydrant mode) or direct max.</span>
+          </div>
+        </div>
         <p class="tiny" id="suctionSource" style="margin:-0.5rem 0 0.75rem">—</p>
 
         <div class="status-row">
@@ -350,6 +360,15 @@
             </div>
           </div>
           <div class="field">
+            <label for="certMode">Certified curve check</label>
+            <select id="certMode" class="inline-select">
+              <option value="point" selected>Single certified point</option>
+              <option value="curve">Certified curve (3+ points, interpolated)</option>
+            </select>
+            <textarea id="certCurve" rows="4" class="engineering-input" style="width:100%;margin-top:.35rem;font-size:.85rem" placeholder="flow, net psi per line, flows ascending&#10;0, 205&#10;750, 165&#10;1125, 120"></textarea>
+            <p class="tiny" id="certCurveMsg" style="margin:.25rem 0 0"></p>
+          </div>
+          <div class="field">
             <label for="certFlow">Certified curve point: flow / net pressure</label>
             <div class="input-row">
               <input type="number" id="certFlow" min="0" step="any" inputmode="decimal" class="engineering-input" placeholder="gpm">
@@ -375,7 +394,7 @@
               </select>
             </div>
             <div>
-              <div class="stat-label">Est. Full Load Amps</div>
+              <div class="stat-label">Full-Load Current (NEC Table 430.250)</div>
               <div id="fla" class="stat-value tabular-nums" style="font-size:1.25rem">—</div>
             </div>
             <div>
@@ -393,7 +412,8 @@
               <input type="number" id="otherFlaA" min="0" step="any" inputmode="decimal" class="inline-select" placeholder="e.g. jockey pump, controller">
             </div>
           </div>
-          <p class="tiny">OCPD per NEC (2023) 695.4(B)(2)(a)(1): carries indefinitely the locked-rotor current of the largest fire pump motor plus the full-load current of the other pump motors and accessories; next standard size per 240.6(A). Enter the locked-rotor current from the motor nameplate or NEC Table 430.251(B). Est. FLA is a formula estimate, not Table 430.250. Listed fire pump assemblies under 695.4(B)(2)(a)(2) and generator feeders under 695.4(B)(2)(b) are not covered.</p>
+          <p class="tiny" id="flaBasis"></p>
+          <p class="tiny">OCPD per NEC (2023) 695.4(B)(2)(a)(1): carries indefinitely the locked-rotor current of the largest fire pump motor plus the full-load current of the other pump motors and accessories; next standard size per 240.6(A). Enter the locked-rotor current from the motor nameplate or NEC Table 430.251(B). Full-load current is NEC (2023) Table 430.250 for the next standard HP at or above the calculated HP, per 430.6(A)(1) (230 V column for 220–240 V, 460 V column for 440–480 V); breaker sizing still uses the entered locked-rotor current. Listed fire pump assemblies under 695.4(B)(2)(a)(2) and generator feeders under 695.4(B)(2)(b) are not covered.</p>
         </div>
 
         <div id="dieselPanel" class="panel hidden">
@@ -455,10 +475,12 @@
           </div>
           <div class="table-wrap">
             <table class="test-points" aria-label="Demand points">
-              <thead><tr><th>Demand</th><th class="num">Flow (GPM)</th><th class="num">Discharge (PSI)</th><th class="num">Net req. (PSI)</th><th class="num">Pump net + suction (PSI)</th><th class="num">Min shutoff (PSI)</th><th>Result</th></tr></thead>
+              <thead><tr><th>Demand</th><th class="num">Flow (GPM)</th><th class="num">Discharge (PSI)</th><th class="num">Net req. (PSI)</th><th class="num">Pump net + suction (PSI)</th><th class="num">Min shutoff (PSI)</th><th>Result</th><th>Certified curve</th></tr></thead>
               <tbody id="demandPointsBody"></tbody>
             </table>
           </div>
+          <p class="tiny" id="dutyStatus"></p>
+          <p class="tiny" id="beyondRatedNote"></p>
           <p class="tiny">Pump curve modeled conservatively as a straight line from shutoff to the rated point, then to 150% flow at 65% rated pressure (NFPA 20-2022 6.2.2). Shutoff uses the entered certified churn, otherwise the 140% limit (assumed). Demand checks use the minimum suction; max discharge uses the maximum suction.</p>
         </div>
 
@@ -501,7 +523,7 @@
     </div>
 
     <footer class="footer-bar">
-      <div>References: NFPA 20-2022 &amp; UFC 3-600-01. For qualified Fire Protection Engineers only. · <span id="appVersion">v2.5.0</span> · Local browser app</div>
+      <div>References: NFPA 20-2022 &amp; UFC 3-600-01. For qualified Fire Protection Engineers only. · <span id="appVersion">v2.6.0</span> · Local browser app</div>
       <div class="footer-actions">
         <button type="button" id="btnCopy" class="btn btn-sm">Copy Results</button>
         <button type="button" id="btnSaveReportFooter" class="btn btn-sm">Save Report</button>
@@ -514,7 +536,7 @@
   <script src="../shared/water-path-shell.js"></script>
   <script src="../shared/report-logo.js"></script>
   <script src="./assets/chart.umd.min.js?v=2.1.0"></script>
-  <script src="./assets/pump-rules.js?v=2.5.0"></script>
-  <script src="./assets/app.js?v=2.5.0"></script>
+  <script src="./assets/pump-rules.js?v=2.6.0"></script>
+  <script src="./assets/app.js?v=2.6.0"></script>
 </body>
 </html>

@@ -27,6 +27,14 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
 
+- **Fire Pump Sizer v2.6.0 (2026-10-22), NFPA 20-2022.** Separate max static suction input used for churn + suction (falls back
+  to the hydrant static, or the direct max); duty check keeps the 5% tolerance and shows REVIEW with its reason on screen and in
+  the printout; certified-curve mode (3+ ascending flow/pressure points, linear interpolation, plus suction) checks every demand
+  point; past-rated pump net labeled as an assumption on screen and in the printout. Motor full-load current from NEC (2023)
+  Table 430.250 per 430.6(A)(1) (next standard hp; 100 hp at 460/480 V = 124 A) instead of the formula; the high-pressure warning
+  reports churn + max static suction; the electric "or pressure relief valve" suggestion is removed (NFPA 20-2022 4.20.1.1), with the
+  diesel 4.20.1.2 check kept; summary cards show one decimal. 41 of 41 checks pass.
+
 - **Fire Pump Sizer v2.5.0 (2026-10-22), basis NFPA 20-2022.** Direct suction pressure input (single value or min/max at demand
   flow) as an alternative to the hydrant curve; optional backflow / pipe / elevation losses subtracted from the hydrant curve.
   Up to four demand points, each checked against pump net + minimum suction, governing point (least margin) flagged. Pump-curve

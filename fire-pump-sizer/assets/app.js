@@ -10,7 +10,7 @@
   const SPRINKLER_HANDOFF_KEY = 'fireToolshed.sprinklerHandoff.v1';
   /** Shared handoff to Fire Tank Sizer */
   const PUMP_HANDOFF_KEY = 'fireToolshed.pumpHandoff.v1';
-  const APP_VERSION = '2.5.0';
+  const APP_VERSION = '2.6.0';
   /** NFPA 291 / water-supply curve exponent (matches Flow Test + Sprinkler apps) */
   const SUPPLY_EXPONENT = 1.85;
 
@@ -405,6 +405,9 @@
       lossElev: $('lossElev')?.value,
       certFlow: $('certFlow')?.value,
       certPSI: $('certPSI')?.value,
+      certCurve: $('certCurve')?.value,
+      certMode: $('certMode')?.value,
+      maxStaticSuction: $('maxStaticSuction')?.value,
       dpName2: $('dpName2')?.value,
       dpFlow2: $('dpFlow2')?.value,
       dpPress2: $('dpPress2')?.value,
@@ -461,6 +464,9 @@
       assign('lossElev', s.lossElev);
       assign('certFlow', s.certFlow);
       assign('certPSI', s.certPSI);
+      assign('certCurve', s.certCurve);
+      assign('certMode', s.certMode);
+      assign('maxStaticSuction', s.maxStaticSuction);
       assign('dpName2', s.dpName2);
       assign('dpFlow2', s.dpFlow2);
       assign('dpPress2', s.dpPress2);
@@ -501,8 +507,8 @@
     const finalHeadFt = systemPSI * 2.31;
 
     // PSI-primary summary cards
-    setText('resultFlow', Math.round(systemFlow).toString());
-    setText('resultHead', systemPSI.toFixed(0));
+    setText('resultFlow', systemFlow.toFixed(1));
+    setText('resultHead', systemPSI.toFixed(1));
     setText('resultHeadPSI', `PSI (${Math.round(finalHeadFt)} ft)`);
 
     window.calculatedData = {
@@ -551,7 +557,11 @@
         const lra = num('lockedRotorA', 0);
         const otherFla = Math.max(0, num('otherFlaA', 0));
         setText('motorHP', motorHP.toFixed(1));
-        setText('fla', fla.toFixed(0));
+        // NEC (2023) 430.6(A)(1): use Table 430.250 FLC for the next standard HP, not the formula estimate.
+        const tbl = window.PumpRules.motorFlc(motorHP, voltage);
+        setHtml('fla', tbl.flc != null ? tbl.flc + ' <span class="tiny">A · ' + tbl.hp + ' hp, ' + tbl.column + ' V col.</span>' : '<span class="tiny">' + tbl.note + '</span>');
+        setText('flaBasis', tbl.flc != null ? `FLC per NEC (2023) 430.6(A)(1), ${tbl.note} (formula estimate ${fla.toFixed(0)} A not used).` : tbl.note);
+        window.calculatedData.motorTable = tbl;
         if (lra > 0) {
           const ocpdSum = lra + otherFla;
           const breaker = nextStandardOcpd(ocpdSum);
@@ -717,8 +727,8 @@
     const netPumpPressure = Math.max(0, systemPressure - availablePSI);
     const cls = classifySupply(availablePSI, systemPressure);
 
-    setText('availablePressure', availablePSI.toFixed(0));
-    setText('pumpMustAdd', netPumpPressure.toFixed(0));
+    setText('availablePressure', availablePSI.toFixed(1));
+    setText('pumpMustAdd', netPumpPressure.toFixed(1));
 
     const resultsBox = $('supplyResults');
     if (resultsBox) resultsBox.classList.remove('hidden');
@@ -771,14 +781,16 @@
 
     const churnIn = enteredChurnPSI();
     const churnPSI = churnIn != null ? churnIn : ratedPSI * 1.4;
+    const cd = window.calculatedData || {};
+    const stat = Number.isFinite(cd.maxStaticPSI) ? cd.maxStaticPSI : 0;
+    const total = churnPSI + stat; // churn + max static suction (NFPA 20-2022), not churn alone
+    const relief = window.PumpRules.reliefGuidance(getDriverType(), churnPSI, stat, 175);
 
-    if (churnPSI >= 170) {
+    if (total >= 170) {
       warningBox.classList.remove('hidden');
-      if (churnPSI >= 300) {
-        messageEl.innerHTML = `Maximum churn pressure ≈ <strong>${churnPSI.toFixed(0)} PSI</strong>. Significantly exceeds standard 175 psi components. 300 psi rated fittings and relief protection strongly recommended.`;
-      } else {
-        messageEl.innerHTML = `Maximum churn pressure ≈ <strong>${churnPSI.toFixed(0)} PSI</strong>. Approaches/exceeds 175 psi rating of standard components. Consider 300 psi fittings or pressure relief valve.`;
-      }
+      const head = `Maximum discharge ≈ <strong>${total.toFixed(1)} PSI</strong> (churn ${churnPSI.toFixed(1)} + max static suction ${stat.toFixed(1)}).`;
+      const comp = total > 300 ? ' Exceeds 300 psi rated components.' : total > 175 ? ' Exceeds 175 psi standard components: 300 psi rated components required.' : ' Approaches the 175 psi rating of standard components.';
+      messageEl.innerHTML = head + comp + ' ' + relief;
     } else {
       warningBox.classList.add('hidden');
     }
@@ -805,7 +817,8 @@
 
     // Preliminary checks vs NFPA 20 performance envelope (illustrative)
     const meets100 = dutyFlow <= ratedGPM * 1.1;
-    const dutyHeadOk = dutyPSI <= ratedPSI * 1.05; // duty pressure should be near/below rated
+    const duty = window.PumpRules.dutyCheck(dutyPSI, ratedPSI); // 5% tolerance kept
+    const dutyHeadOk = duty.pass;
     const churnIn = enteredChurnPSI();
     const meetsChurn = churnIn != null && churnIn <= ratedPSI * 1.4 + 1e-9;
     const churnMsg = churnIn == null
@@ -815,7 +828,7 @@
 
     const checks = [
       { label: '100% Rated Flow', pass: meets100, msg: meets100 ? 'Duty point covered' : 'Consider larger pump' },
-      { label: 'Duty ≤ Rated Pressure', pass: dutyHeadOk, msg: `Required net ${dutyPSI.toFixed(1)} psi ${dutyHeadOk ? '≤' : '>'} rated ${ratedPSI.toFixed(0)} psi` + (dutyHeadOk ? '' : ' — review (see pump-curve requirement)') + (suctionKnown ? '' : ' · no suction entered: net = discharge') },
+      { label: 'Duty ≤ Rated Pressure', pass: dutyHeadOk, msg: duty.status + ': ' + duty.reason + (suctionKnown ? '' : ' · no suction entered: net = discharge') },
       { label: 'Churn ≤140% Rated', pass: meetsChurn, msg: churnMsg }
     ];
 
@@ -870,11 +883,38 @@
     setText('reqNet', gov.netReq.toFixed(1) + ' psi @ ' + Math.round(gov.flow) + ' gpm');
     setText('minShutoff', minS != null ? minS.toFixed(1) + ' psi' : 'n/a');
     setText('minShutoffMax', sMax > sMin && atMax.length ? `At max suction ${sMax.toFixed(1)} psi: net ${(gov.discharge - sMax).toFixed(1)} psi, shutoff ${Math.max(...atMax).toFixed(1)} psi` : '');
-    const md = PR.maxDischarge(shutoff, sMax);
+    const msIn = num('maxStaticSuction', 0);
+    const directMode = $('suctionMode')?.value === 'direct';
+    const sStatic = msIn > 0 ? msIn : sMax;
+    const sStaticSrc = msIn > 0 ? 'max static suction (entered)' : directMode ? 'max suction (direct; no static entered)' : 'hydrant static (no max static entered)';
+    cd.maxStaticPSI = sStatic; cd.maxStaticSrc = sStaticSrc;
+    const md = PR.maxDischarge(shutoff, sStatic);
     setText('maxDischarge', md.psi.toFixed(1) + ' psi');
-    setText('componentFlag', `${churnIn != null ? 'Entered churn' : 'Churn at 140% limit (assumed)'} ${shutoff.toFixed(1)} + max suction ${sMax.toFixed(1)}: ${md.note}`);
-    const cc = PR.certifiedCheck(num('certFlow', 0), num('certPSI', 0), gov.flow, gov.netReq);
-    setText('certResult', cc == null ? 'Not entered' : (cc.pass ? 'PASS' : 'FAIL') + ` (${cc.certFlow} gpm @ ${cc.certPsi} psi vs ${Math.round(gov.flow)} gpm @ ${gov.netReq.toFixed(1)} psi)`);
+    setText('componentFlag', `${churnIn != null ? 'Entered churn' : 'Churn at 140% limit (assumed)'} ${shutoff.toFixed(1)} + ${sStaticSrc} ${sStatic.toFixed(1)}: ${md.note}`);
+    const duty = PR.dutyCheck(gov.netReq, ratedPSI);
+    setText('dutyStatus', `Duty ≤ Rated Pressure: ${duty.status} — ${duty.reason}`);
+    const beyond = pts.some((p) => p.flow > ratedGPM);
+    setText('beyondRatedNote', beyond ? PR.BEYOND_RATED_NOTE : '');
+    // Certified curve mode
+    const curveMode = $('certMode')?.value === 'curve';
+    let curveRes = null;
+    if (curveMode) {
+      const pc = PR.parseCurve($('certCurve')?.value);
+      setText('certCurveMsg', pc.ok ? `${pc.points.length} points, linear interpolation + min suction ${sMin.toFixed(1)} psi` : 'Curve invalid: ' + pc.error);
+      if (pc.ok) curveRes = PR.curveCheck(pc.points, pts, sMin);
+    } else setText('certCurveMsg', '');
+    body.querySelectorAll('tr').forEach((tr, i) => {
+      const td = document.createElement('td');
+      td.className = 'dp-curve';
+      const c = curveRes && curveRes[i];
+      td.textContent = !curveMode ? '—' : !c ? 'curve invalid' : c.reason ? 'FAIL (' + c.reason + ')' : `${c.pass ? 'PASS' : 'FAIL'} (${c.available.toFixed(1)} psi)`;
+      tr.appendChild(td);
+      if (pts[i].flow > ratedGPM) tr.children[4].textContent += ' (assumed)';
+    });
+    cd.certCurve = curveRes;
+    cd.duty = duty;
+    const cc = curveMode ? null : PR.certifiedCheck(num('certFlow', 0), num('certPSI', 0), gov.flow, gov.netReq);
+    setText('certResult', curveMode ? (curveRes ? (curveRes.every((c) => c.pass) ? 'PASS (curve, all points)' : 'FAIL (curve)') : 'Curve invalid') : cc == null ? 'Not entered' : (cc.pass ? 'PASS' : 'FAIL') + ` (${cc.certFlow} gpm @ ${cc.certPsi} psi vs ${Math.round(gov.flow)} gpm @ ${gov.netReq.toFixed(1)} psi)`);
     cd.pumpReq = { minShutoff: minS, maxDischarge: md, certified: cc, governing: gov.name };
   }
 
@@ -1562,7 +1602,8 @@
     $('ratedPSI').value = '125';
     // v2.5.0 inputs: the example uses the hydrant curve with no losses, one demand point and no certified point.
     if ($('suctionMode')) $('suctionMode').value = 'curve';
-    ['suctionMin', 'suctionMax', 'lossBackflow', 'lossPipe', 'lossElev', 'certFlow', 'certPSI', 'churnPSIIn',
+    if ($('certMode')) $('certMode').value = 'point';
+    ['suctionMin', 'suctionMax', 'lossBackflow', 'lossPipe', 'lossElev', 'certFlow', 'certPSI', 'churnPSIIn', 'maxStaticSuction', 'certCurve',
       'dpName2', 'dpFlow2', 'dpPress2', 'dpName3', 'dpFlow3', 'dpPress3', 'dpName4', 'dpFlow4', 'dpPress4'].forEach((id) => { if ($(id)) $(id).value = ''; });
 
     const electric = document.querySelector('input[name="driverType"][value="electric"]');
@@ -1621,7 +1662,9 @@
     text += `\nPUMP-CURVE REQUIREMENT (NFPA 20-2022)\n`;
     text += `Required net: ${$('reqNet')?.textContent || '—'} · Min shutoff: ${$('minShutoff')?.textContent || '—'}\n`;
     text += `Max discharge: ${$('maxDischarge')?.textContent || '—'} (${$('componentFlag')?.textContent || ''})\n`;
-    text += `Certified point: ${$('certResult')?.textContent || '—'}\n`;
+    text += `Certified check: ${$('certResult')?.textContent || '—'} ${$('certCurveMsg')?.textContent || ''}\n`;
+    text += `${$('dutyStatus')?.textContent || ''}\n`;
+    if ($('beyondRatedNote')?.textContent) text += $('beyondRatedNote').textContent + '\n';
     (data.demandPoints || []).forEach((p) => { text += `  ${p.name}: ${Math.round(p.flow)} gpm @ ${p.discharge.toFixed(1)} psi, net ${p.netReq.toFixed(1)} -> ${p.pass ? 'PASS' : 'FAIL'}${p.governing ? ' (governs)' : ''}\n`; });
     text += `\nVerification: ${$('verificationStatus')?.innerText || '—'}\n`;
     text += 'References: NFPA 20-2022 + UFC 3-600-01 (2026)\n';
@@ -1791,8 +1834,10 @@ ${
 ${esc($('suctionSource')?.textContent || '')}<br>
 Required net: ${esc($('reqNet')?.textContent)} · Minimum shutoff: ${esc($('minShutoff')?.textContent)} ${esc($('minShutoffMax')?.textContent)}<br>
 Max discharge: ${esc($('maxDischarge')?.textContent)} — ${esc($('componentFlag')?.textContent)}<br>
-Certified curve point: ${esc($('certResult')?.textContent)}<br>
-${(data.demandPoints || []).map((p) => `${esc(p.name)}: ${Math.round(p.flow)} gpm @ ${p.discharge.toFixed(1)} psi, net ${p.netReq.toFixed(1)} psi — ${p.pass ? 'PASS' : 'FAIL'}${p.governing ? ' (governs)' : ''}`).join('<br>')}
+Certified curve check: ${esc($('certResult')?.textContent)} ${esc($('certCurveMsg')?.textContent)}<br>
+${esc($('dutyStatus')?.textContent)}<br>
+${$('beyondRatedNote')?.textContent ? esc($('beyondRatedNote').textContent) + '<br>' : ''}
+${(data.demandPoints || []).map((p, i) => `${esc(p.name)}: ${Math.round(p.flow)} gpm @ ${p.discharge.toFixed(1)} psi, net ${p.netReq.toFixed(1)} psi — ${p.pass ? 'PASS' : 'FAIL'}${p.governing ? ' (governs)' : ''}${p.flow > (data.ratedGPM || 0) ? ' [pump net assumed: linear rated -> 150%]' : ''}${data.certCurve && data.certCurve[i] ? ' · certified curve ' + (data.certCurve[i].pass ? 'PASS' : 'FAIL') : ''}`).join('<br>')}
 </div>
 <p><b>Verification:</b> ${esc($('verificationStatus')?.innerText || '—')}</p>
 <p class="muted">Preliminary tool only — not a substitute for manufacturer curves, stamped design, or AHJ approval. Next: Fire Tank Sizer for storage volume.</p>
@@ -1877,7 +1922,7 @@ ${(data.demandPoints || []).map((p) => `${esc(p.name)}: ${Math.round(p.flow)} gp
     });
 
     const onInput = () => calculateAll();
-    document.querySelectorAll('input[type="number"], input[type="text"], select').forEach((el) => {
+    document.querySelectorAll('input[type="number"], input[type="text"], select, textarea').forEach((el) => {
       el.addEventListener('input', onInput);
       el.addEventListener('change', onInput);
     });

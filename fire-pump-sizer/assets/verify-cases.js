@@ -41,15 +41,30 @@ window.FT_VERIFY_CASES = {
     },
     {
      "sel": "#fla",
-     "label": "Motor full-load current",
+     "label": "Motor FLC, NEC Table 430.250 (223.6 hp -> 250 hp, 480 V -> 460 V column)",
      "unit": "A",
-     "ref": 262.0
+     "ref": 302.0
     },
     {
      "sel": "#highPressureMessage",
-     "label": "Churn shown at the 140% limit when no shutoff is entered",
+     "label": "Max discharge = churn at the 140% limit + hydrant static 58",
      "unit": "psi",
-     "ref": 175.0
+     "ref": 233.0
+    },
+    {
+     "sel": "#availablePressure",
+     "label": "Summary card, one decimal",
+     "refText": "27.4"
+    },
+    {
+     "sel": "#pumpMustAdd",
+     "label": "Summary card, one decimal",
+     "refText": "77.6"
+    },
+    {
+     "sel": "#resultHead",
+     "label": "Summary card, one decimal",
+     "refText": "105.0"
     },
     {
      "sel": "#checksGrid .check-card:nth-child(3)",
@@ -457,6 +472,555 @@ window.FT_VERIFY_CASES = {
      "label": "Suction at 1750 gpm after losses",
      "unit": "psi",
      "ref": 20.4
+    }
+   ]
+  },
+  {
+   "id": "pump-max-static",
+   "title": "Churn 224 psi + max static suction 68.3 psi = 292.3 psi (300 psi components, under 300)",
+   "source": "NFPA 20-2022: churn + maximum static suction vs component rating",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "224"
+    },
+    {
+     "set": "#systemFlow",
+     "value": "500"
+    },
+    {
+     "set": "#systemPressure",
+     "value": "225.6"
+    },
+    {
+     "set": "#suctionMode",
+     "value": "direct"
+    },
+    {
+     "set": "#dpName2",
+     "value": "B"
+    },
+    {
+     "set": "#dpFlow2",
+     "value": "783.8"
+    },
+    {
+     "set": "#dpPress2",
+     "value": "94.6"
+    },
+    {
+     "set": "#suctionMin",
+     "value": "55"
+    },
+    {
+     "set": "#suctionMax",
+     "value": "61"
+    },
+    {
+     "set": "#maxStaticSuction",
+     "value": "68.3"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#maxDischarge",
+     "label": "Max discharge",
+     "unit": "psi",
+     "ref": 292.3
+    },
+    {
+     "sel": "#dutyStatus",
+     "label": "Duty REVIEW with reason (5% tolerance kept)",
+     "refText": "Duty ≤ Rated Pressure: REVIEW — required net 170.6 psi > 168 psi (rated 160 + 5% tolerance): pump runs left of rated; confirm the certified curve covers the demand"
+    },
+    {
+     "sel": "#beyondRatedNote",
+     "label": "Past-rated assumption labeled (B is past rated)",
+     "refText": "Assumption: past rated flow the pump curve is taken as a straight line from the rated point to 150% flow at 65% rated pressure (NFPA 20-2022 minimum). Use the certified curve to confirm."
+    },
+    {
+     "sel": "#demandPointsBody tr:nth-child(2) td:nth-child(5)",
+     "label": "B pump net + suction (assumed)",
+     "unit": "psi",
+     "ref": 210.0
+    }
+   ]
+  },
+  {
+   "id": "pump-curve-mode",
+   "title": "Certified curve 0/500/750/1125 gpm, linear interpolation + 55 psi suction",
+   "source": "Certified curve, linear interpolation",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "224"
+    },
+    {
+     "set": "#systemFlow",
+     "value": "500"
+    },
+    {
+     "set": "#systemPressure",
+     "value": "225.6"
+    },
+    {
+     "set": "#suctionMode",
+     "value": "direct"
+    },
+    {
+     "set": "#dpName2",
+     "value": "B"
+    },
+    {
+     "set": "#dpFlow2",
+     "value": "783.8"
+    },
+    {
+     "set": "#dpPress2",
+     "value": "94.6"
+    },
+    {
+     "set": "#suctionMin",
+     "value": "55"
+    },
+    {
+     "set": "#suctionMax",
+     "value": "61"
+    },
+    {
+     "set": "#certMode",
+     "value": "curve"
+    },
+    {
+     "set": "#certCurve",
+     "value": "0, 205\n500, 185\n750, 165\n1125, 120"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#demandPointsBody tr:nth-child(1) .dp-curve",
+     "label": "A vs curve",
+     "refText": "PASS (240.0 psi)"
+    },
+    {
+     "sel": "#demandPointsBody tr:nth-child(2) .dp-curve",
+     "label": "B vs curve",
+     "refText": "PASS (215.9 psi)"
+    },
+    {
+     "sel": "#certResult",
+     "label": "Curve overall",
+     "refText": "PASS (curve, all points)"
+    }
+   ]
+  },
+  {
+   "id": "pump-curve-low",
+   "title": "Certified curve too low at 500 gpm (165 psi net + 55 < 225.6)",
+   "source": "Certified curve, linear interpolation",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "224"
+    },
+    {
+     "set": "#systemFlow",
+     "value": "500"
+    },
+    {
+     "set": "#systemPressure",
+     "value": "225.6"
+    },
+    {
+     "set": "#suctionMode",
+     "value": "direct"
+    },
+    {
+     "set": "#dpName2",
+     "value": "B"
+    },
+    {
+     "set": "#dpFlow2",
+     "value": "783.8"
+    },
+    {
+     "set": "#dpPress2",
+     "value": "94.6"
+    },
+    {
+     "set": "#suctionMin",
+     "value": "55"
+    },
+    {
+     "set": "#suctionMax",
+     "value": "61"
+    },
+    {
+     "set": "#certMode",
+     "value": "curve"
+    },
+    {
+     "set": "#certCurve",
+     "value": "0, 190\n500, 165\n750, 150\n1125, 110"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#demandPointsBody tr:nth-child(1) .dp-curve",
+     "label": "A vs curve",
+     "refText": "FAIL (220.0 psi)"
+    },
+    {
+     "sel": "#certResult",
+     "label": "Curve overall",
+     "refText": "FAIL (curve)"
+    }
+   ]
+  },
+  {
+   "id": "pump-curve-invalid",
+   "title": "Certified curve validation: descending flows",
+   "source": "Input validation",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "224"
+    },
+    {
+     "set": "#systemFlow",
+     "value": "500"
+    },
+    {
+     "set": "#systemPressure",
+     "value": "225.6"
+    },
+    {
+     "set": "#suctionMode",
+     "value": "direct"
+    },
+    {
+     "set": "#dpName2",
+     "value": "B"
+    },
+    {
+     "set": "#dpFlow2",
+     "value": "783.8"
+    },
+    {
+     "set": "#dpPress2",
+     "value": "94.6"
+    },
+    {
+     "set": "#suctionMin",
+     "value": "55"
+    },
+    {
+     "set": "#suctionMax",
+     "value": "61"
+    },
+    {
+     "set": "#certMode",
+     "value": "curve"
+    },
+    {
+     "set": "#certCurve",
+     "value": "0, 205\n750, 165\n500, 185"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#certCurveMsg",
+     "label": "Descending flows rejected",
+     "refText": "Curve invalid: Flows must be ascending (750 then 500 gpm)"
+    }
+   ]
+  },
+  {
+   "id": "pump-curve-short",
+   "title": "Certified curve with 2 points",
+   "source": "Input validation",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "224"
+    },
+    {
+     "set": "#systemFlow",
+     "value": "500"
+    },
+    {
+     "set": "#systemPressure",
+     "value": "225.6"
+    },
+    {
+     "set": "#suctionMode",
+     "value": "direct"
+    },
+    {
+     "set": "#dpName2",
+     "value": "B"
+    },
+    {
+     "set": "#dpFlow2",
+     "value": "783.8"
+    },
+    {
+     "set": "#dpPress2",
+     "value": "94.6"
+    },
+    {
+     "set": "#suctionMin",
+     "value": "55"
+    },
+    {
+     "set": "#suctionMax",
+     "value": "61"
+    },
+    {
+     "set": "#certMode",
+     "value": "curve"
+    },
+    {
+     "set": "#certCurve",
+     "value": "0, 205\n750, 165"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#certCurveMsg",
+     "label": "Fewer than 3 points rejected",
+     "refText": "Curve invalid: At least 3 points required (2 entered)"
+    }
+   ]
+  },
+  {
+   "id": "flc-100hp-480",
+   "title": "Rated 750 gpm @ 145 psi -> 97.3 hp -> 100 hp at 480 V",
+   "source": "NEC (2023) 430.6(A)(1), Table 430.250: 100 hp, 460 V = 124 A",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "145"
+    },
+    {
+     "set": "#voltage",
+     "value": "480"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#fla",
+     "label": "FLC 100 hp, 460 V column",
+     "unit": "A",
+     "ref": 124.0
+    }
+   ]
+  },
+  {
+   "id": "flc-100hp-208",
+   "title": "100 hp at 208 V",
+   "source": "NEC (2023) Table 430.250: 100 hp, 208 V = 273 A",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "145"
+    },
+    {
+     "set": "#voltage",
+     "value": "208"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#fla",
+     "label": "FLC 100 hp, 208 V column",
+     "unit": "A",
+     "ref": 273.0
+    }
+   ]
+  },
+  {
+   "id": "hp-warn-static",
+   "title": "Warning: churn 210 + max static 68.3 = 278.3 psi, electric (no relief valve suggestion)",
+   "source": "NFPA 20-2022 4.20.1.1",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "224"
+    },
+    {
+     "set": "#systemFlow",
+     "value": "500"
+    },
+    {
+     "set": "#systemPressure",
+     "value": "225.6"
+    },
+    {
+     "set": "#suctionMode",
+     "value": "direct"
+    },
+    {
+     "set": "#dpName2",
+     "value": "B"
+    },
+    {
+     "set": "#dpFlow2",
+     "value": "783.8"
+    },
+    {
+     "set": "#dpPress2",
+     "value": "94.6"
+    },
+    {
+     "set": "#suctionMin",
+     "value": "55"
+    },
+    {
+     "set": "#suctionMax",
+     "value": "61"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "210"
+    },
+    {
+     "set": "#maxStaticSuction",
+     "value": "68.3"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#highPressureMessage",
+     "label": "Churn + max static suction",
+     "unit": "psi",
+     "ref": 278.3
+    },
+    {
+     "sel": "#highPressureMessage",
+     "label": "Relief guidance (electric)",
+     "prop": "textContent",
+     "refText": "Maximum discharge ≈ 278.3 PSI (churn 210.0 + max static suction 68.3). Exceeds 175 psi standard components: 300 psi rated components required. Electric constant-speed: pressure relief valves are not permitted unless specifically required (NFPA 20-2022 4.20.1.1); select components rated for the maximum discharge."
     }
    ]
   }

@@ -92,5 +92,95 @@
           `${r1(p)} psi within 175 psi standard components` };
   }
 
-  return { EDITION, hydrantAt, suctionAt, pumpNetAt, minShutoff, demandPoints, certifiedCheck, maxDischarge, r1 };
+  /** Parse certified curve text: one "flow, net psi" pair per line. Requires >= 3 points with strictly ascending flows. */
+  function parseCurve(textIn) {
+    const lines = String(textIn || '').split(/[\n;]+/).map((l) => l.trim()).filter(Boolean);
+    const pts = [];
+    for (const l of lines) {
+      const m = l.split(/[\s,@]+/).filter(Boolean).map(Number);
+      if (m.length !== 2 || !m.every(Number.isFinite) || m[0] < 0 || m[1] <= 0) return { ok: false, points: [], error: `Invalid point "${l}": enter flow, pressure` };
+      pts.push({ flow: m[0], psi: m[1] });
+    }
+    if (pts.length < 3) return { ok: false, points: pts, error: `At least 3 points required (${pts.length} entered)` };
+    for (let i = 1; i < pts.length; i++) {
+      if (!(pts[i].flow > pts[i - 1].flow)) return { ok: false, points: pts, error: `Flows must be ascending (${pts[i - 1].flow} then ${pts[i].flow} gpm)` };
+    }
+    return { ok: true, points: pts, error: '' };
+  }
+
+  /** Linear interpolation of net pressure on the certified curve; NaN outside the entered flow range. */
+  function interpCurve(pts, q) {
+    if (!pts || pts.length < 2 || q < pts[0].flow || q > pts[pts.length - 1].flow) return NaN;
+    for (let i = 1; i < pts.length; i++) {
+      if (q <= pts[i].flow) {
+        const a = pts[i - 1], b = pts[i];
+        return a.psi + (b.psi - a.psi) * (q - a.flow) / (b.flow - a.flow);
+      }
+    }
+    return NaN;
+  }
+
+  /** Each demand point vs the interpolated certified curve + min suction. */
+  function curveCheck(pts, demands, suctionMin) {
+    return demands.map((d) => {
+      const net = interpCurve(pts, d.flow);
+      if (!Number.isFinite(net)) return { name: d.name, net: NaN, available: NaN, margin: NaN, pass: false, reason: 'outside certified curve flow range' };
+      const available = net + suctionMin;
+      const margin = available - d.discharge;
+      return { name: d.name, net, available, margin, pass: margin >= -0.05, reason: '' };
+    });
+  }
+
+  /** Duty check (5% tolerance kept): required net vs rated. */
+  function dutyCheck(netReq, ratedP) {
+    const lim = ratedP * 1.05;
+    const pass = netReq <= lim + 1e-9;
+    return { pass, limit: lim, status: pass ? 'OK' : 'REVIEW',
+      reason: pass ? `required net ${r1(netReq)} psi <= ${r1(lim)} psi (rated ${r1(ratedP)} + 5% tolerance)`
+        : `required net ${r1(netReq)} psi > ${r1(lim)} psi (rated ${r1(ratedP)} + 5% tolerance): pump runs left of rated; confirm the certified curve covers the demand` };
+  }
+
+  // NEC (2023) Table 430.250, full-load current, three-phase induction-type squirrel cage and wound rotor motors (A).
+  // Columns 200, 208, 230, 460, 575 V. Per the table heading the 230 V column serves 220-240 V and 460 V serves 440-480 V.
+  // Use per 430.6(A)(1): table FLC, not nameplate, for conductor/OCPD sizing. null = no table value.
+  const NEC_430_250 = [
+    [0.5, 2.5, 2.4, 2.2, 1.1, 0.9], [0.75, 3.7, 3.5, 3.2, 1.6, 1.3], [1, 4.8, 4.6, 4.2, 2.1, 1.7], [1.5, 6.9, 6.6, 6, 3, 2.4],
+    [2, 7.8, 7.5, 6.8, 3.4, 2.7], [3, 11, 10.6, 9.6, 4.8, 3.9], [5, 17.5, 16.7, 15.2, 7.6, 6.1], [7.5, 25.3, 24.2, 22, 11, 9],
+    [10, 32.2, 30.8, 28, 14, 11], [15, 48.3, 46.2, 42, 21, 17], [20, 62.1, 59.4, 54, 27, 22], [25, 78.2, 74.8, 68, 34, 27],
+    [30, 92, 88, 80, 40, 32], [40, 120, 114, 104, 52, 41], [50, 150, 143, 130, 65, 52], [60, 177, 169, 154, 77, 62],
+    [75, 221, 211, 192, 96, 77], [100, 285, 273, 248, 124, 99], [125, 359, 343, 312, 156, 125], [150, 414, 396, 360, 180, 144],
+    [200, 552, 528, 480, 240, 192], [250, null, null, null, 302, 242], [300, null, null, null, 361, 289], [350, null, null, null, 414, 336],
+    [400, null, null, null, 477, 382], [450, null, null, null, 515, 412], [500, null, null, null, 590, 472],
+  ];
+  const NEC_COLS = [200, 208, 230, 460, 575];
+  function tableColumn(volts) {
+    const v = Number(volts);
+    if (v >= 440 && v <= 480) return 460;
+    if (v >= 220 && v <= 240) return 230;
+    if (v >= 550 && v <= 600) return 575;
+    return NEC_COLS.includes(v) ? v : null;
+  }
+  /** Next standard HP at or above the calculated HP, and its Table 430.250 FLC at the motor voltage. */
+  function motorFlc(hpCalc, volts) {
+    const col = tableColumn(volts);
+    const row = NEC_430_250.find((r) => r[0] >= hpCalc - 1e-9);
+    if (!row || col == null) return { hp: row ? row[0] : null, column: col, flc: null, note: 'Outside NEC Table 430.250 (use motor data)' };
+    const flc = row[1 + NEC_COLS.indexOf(col)];
+    return { hp: row[0], column: col, flc, note: flc == null ? `No Table 430.250 value for ${row[0]} hp at ${col} V` : `NEC Table 430.250: ${row[0]} hp at ${col} V column` };
+  }
+
+  /** NFPA 20-2022 relief guidance: electric constant speed -> no relief valve (4.20.1.1); diesel -> 4.20.1.2 check. */
+  function reliefGuidance(driver, churn, maxStatic, componentRating) {
+    if (driver === 'diesel') {
+      const p = 1.21 * churn + maxStatic;
+      return p > componentRating
+        ? `Diesel: 121% of net shutoff + max static suction = ${r1(p)} psi exceeds ${componentRating} psi components; a pressure relief valve is required (NFPA 20-2022 4.20.1.2).`
+        : `Diesel: 121% of net shutoff + max static suction = ${r1(p)} psi within ${componentRating} psi components (NFPA 20-2022 4.20.1.2).`;
+    }
+    return 'Electric constant-speed: pressure relief valves are not permitted unless specifically required (NFPA 20-2022 4.20.1.1); select components rated for the maximum discharge.';
+  }
+
+  const BEYOND_RATED_NOTE = 'Assumption: past rated flow the pump curve is taken as a straight line from the rated point to 150% flow at 65% rated pressure (NFPA 20-2022 minimum). Use the certified curve to confirm.';
+
+  return { EDITION, NEC_430_250, motorFlc, reliefGuidance, BEYOND_RATED_NOTE, parseCurve, interpCurve, curveCheck, dutyCheck, hydrantAt, suctionAt, pumpNetAt, minShutoff, demandPoints, certifiedCheck, maxDischarge, r1 };
 });

@@ -2,6 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
+import { readFileSync } from 'node:fs'
 import { serve, dumpDom, text, verifyStatus } from './helpers.mjs'
 const require = createRequire(import.meta.url)
 const R = require('../fire-pump-sizer/assets/pump-rules.js')
@@ -50,20 +51,85 @@ test('pump: suction direct single / range and hydrant curve minus losses; certif
   assert.equal(R.certifiedCheck(0, 0, 500, 170.6), null)
 })
 
-test('pump page: shows NFPA 20-2022 and the Verification tab passes (duty check on required net, demand points, shutoff)', async () => {
+test('pump page: shows NFPA 20-2022 and the Verification tab passes 41/41 (duty check on required net, demand points, shutoff)', async () => {
   const s = await serve()
   try {
     const page = await dumpDom(`${s.base}/fire-pump-sizer/`, 8000)
     assert.match(text(page), /NFPA 20-2022/)
-    assert.match(page, /id="appVersion">v2\.5\.0</)
+    assert.match(page, /id="appVersion">v2\.6\.0</)
     // Headless Chrome intermittently (~1 in 10 runs) leaves one hidden verification frame without its scripts on this page,
     // which blanks that one case; a rerun is clean. Up to 3 attempts, and every attempt is logged.
     let st = ''
     for (let i = 1; i <= 3; i++) {
       st = text(verifyStatus(await dumpDom(`${s.base}/fire-pump-sizer/?ftverifyrun=1`, 60000))).trim()
       console.log(`  attempt ${i}: ${st}`)
-      if (/^23 of 23 checks pass/.test(st)) break
+      if (/^41 of 41 checks pass/.test(st)) break
     }
-    assert.match(st, /^23 of 23 checks pass/)
+    assert.match(st, /^41 of 41 checks pass/)
   } finally { await s.close() }
+})
+
+// v2.6.0
+test('pump v2.6: churn 224 + max static suction 68.3 = 292.3 psi -> 300 psi components required, under 300', () => {
+  const md = R.maxDischarge(224, 68.3)
+  near(md.psi, 292.3, 1e-9)
+  assert.equal(md.needs300, true); assert.equal(md.over300, false)
+  assert.equal(md.note, '292.3 psi exceeds 175 psi standard components: 300 psi rated components required')
+  console.log('  ' + md.note)
+})
+
+test('pump v2.6: duty check keeps the 5% tolerance and reports REVIEW with its reason', () => {
+  const d = R.dutyCheck(170.6, 160)
+  assert.equal(d.pass, false); assert.equal(d.status, 'REVIEW'); near(d.limit, 168, 1e-9)
+  assert.match(d.reason, /^required net 170\.6 psi > 168 psi \(rated 160 \+ 5% tolerance\)/)
+  assert.equal(R.dutyCheck(167.9, 160).status, 'OK') // inside the 5% band
+  assert.equal(R.dutyCheck(164.6, 160).pass, true)
+  assert.match(R.BEYOND_RATED_NOTE, /^Assumption: past rated flow/)
+})
+
+test('pump v2.6: certified curve mode: validation, linear interpolation, pass/fail per demand point', () => {
+  assert.equal(R.parseCurve('0, 205\n750, 165').error, 'At least 3 points required (2 entered)')
+  assert.equal(R.parseCurve('0, 205\n750, 165\n500, 185').error, 'Flows must be ascending (750 then 500 gpm)')
+  assert.equal(R.parseCurve('0, 205\n500, 185\n500, 180').ok, false) // equal flows are not ascending
+  assert.match(R.parseCurve('0, 205\nabc\n750, 165').error, /^Invalid point "abc"/)
+  const c = R.parseCurve('0, 205\n500, 185\n750, 165\n1125, 120')
+  assert.equal(c.ok, true)
+  near(R.interpCurve(c.points, 783.8), 165 - 45 * 33.8 / 375, 1e-9) // hand: 160.944
+  assert.ok(Number.isNaN(R.interpCurve(c.points, 1200))) // outside the entered range
+  const res = R.curveCheck(c.points, [{ name: 'A', flow: 500, discharge: 225.6 }, { name: 'B', flow: 783.8, discharge: 94.6 }, { name: 'C', flow: 1300, discharge: 90 }], 55)
+  assert.deepEqual(res.map((x) => x.pass), [true, true, false])
+  near(res[0].available, 240, 1e-9); assert.equal(res[2].reason, 'outside certified curve flow range')
+  const low = R.curveCheck(R.parseCurve('0, 190\n500, 165\n750, 150').points, [{ name: 'A', flow: 500, discharge: 225.6 }], 55)
+  assert.equal(low[0].pass, false); near(low[0].margin, -5.6, 1e-9)
+  console.log(`  A 240.0 PASS, B ${res[1].available.toFixed(1)} PASS, C outside range FAIL; low curve A 220.0 < 225.6 FAIL`)
+})
+
+// Items 5-8
+test('pump: motor FLC from NEC Table 430.250 per 430.6(A)(1): 100 hp 460/480 V = 124 A (formula gave 118 A)', () => {
+  assert.equal(R.motorFlc(100, 480).flc, 124); assert.equal(R.motorFlc(100, 460).flc, 124)
+  assert.equal(R.motorFlc(97.3, 480).hp, 100) // next standard hp
+  assert.equal(R.motorFlc(100, 208).flc, 273); assert.equal(R.motorFlc(100, 230).flc, 248)
+  assert.equal(R.motorFlc(223.6, 480).flc, 302) // DoD example: 250 hp
+  assert.equal(R.motorFlc(250, 208).flc, null) // no 208 V value above 200 hp
+  // spot-check rows typed from the table
+  for (const [hp, v, a] of [[0.5, 230, 2.2], [7.5, 460, 11], [50, 575, 52], [150, 200, 414], [500, 460, 590]]) assert.equal(R.motorFlc(hp, v).flc, a)
+  const formula = 100 * 746 / (480 * 1.732 * 0.9 * 0.85)
+  console.log(`  100 hp @ 480 V: table 124 A (old formula ${formula.toFixed(0)} A)`)
+})
+
+test('pump: high-pressure warning reports churn + max static suction (210 + 68.3 = 278.3) with no relief valve for electric', () => {
+  near(210 + 68.3, 278.3, 1e-9)
+  const e = R.reliefGuidance('electric', 210, 68.3, 175)
+  assert.doesNotMatch(e, /or pressure relief valve/i)
+  assert.match(e, /not permitted unless specifically required \(NFPA 20-2022 4\.20\.1\.1\)/)
+  const d = R.reliefGuidance('diesel', 210, 68.3, 175)
+  assert.match(d, /= 322\.4 psi exceeds 175 psi components; a pressure relief valve is required \(NFPA 20-2022 4\.20\.1\.2\)/) // 1.21 x 210 + 68.3
+  const app = readFileSync(new URL('../fire-pump-sizer/assets/app.js', import.meta.url), 'utf8')
+  assert.doesNotMatch(app, /or pressure relief valve/)
+})
+
+test('pump: summary cards show one decimal', () => {
+  const app = readFileSync(new URL('../fire-pump-sizer/assets/app.js', import.meta.url), 'utf8')
+  for (const t of ["setText('resultHead', systemPSI.toFixed(1))", "setText('availablePressure', availablePSI.toFixed(1))", "setText('pumpMustAdd', netPumpPressure.toFixed(1))", "setText('resultFlow', systemFlow.toFixed(1))"]) assert.ok(app.includes(t), t)
+  assert.equal((55).toFixed(1), '55.0'); assert.equal((147.4).toFixed(1), '147.4')
 })
