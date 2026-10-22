@@ -248,6 +248,217 @@ window.FT_VERIFY_CASES = {
      "refText": "check-card fail"
     }
    ]
+  },
+  {
+   "id": "pump-req-55-61",
+   "title": "Rated 750 gpm @ 160 psi; A 500 gpm @ 225.6 psi, B 783.8 gpm @ 94.6 psi; suction 55-61 psi",
+   "source": "NFPA 20-2022 6.2.2 (straight-line conservative curve); churn + max suction vs component rating",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "224"
+    },
+    {
+     "set": "#systemFlow",
+     "value": "500"
+    },
+    {
+     "set": "#systemPressure",
+     "value": "225.6"
+    },
+    {
+     "set": "#suctionMode",
+     "value": "direct"
+    },
+    {
+     "set": "#dpName2",
+     "value": "B"
+    },
+    {
+     "set": "#dpFlow2",
+     "value": "783.8"
+    },
+    {
+     "set": "#dpPress2",
+     "value": "94.6"
+    },
+    {
+     "set": "#suctionMin",
+     "value": "55"
+    },
+    {
+     "set": "#suctionMax",
+     "value": "61"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#reqNet",
+     "label": "Required net, A at 55 psi suction",
+     "unit": "psi",
+     "ref": 170.6
+    },
+    {
+     "sel": "#minShutoff",
+     "label": "Minimum shutoff (55 psi)",
+     "unit": "psi",
+     "ref": 191.8
+    },
+    {
+     "sel": "#minShutoffMax",
+     "index": 1,
+     "label": "Required net at 61 psi",
+     "unit": "psi",
+     "ref": 164.6
+    },
+    {
+     "sel": "#minShutoffMax",
+     "index": 2,
+     "label": "Minimum shutoff (61 psi)",
+     "unit": "psi",
+     "ref": 173.8
+    },
+    {
+     "sel": "#maxDischarge",
+     "label": "Max discharge = churn + 61",
+     "unit": "psi",
+     "ref": 285.0
+    },
+    {
+     "sel": "#demandPointsBody tr:nth-child(1)",
+     "attr": "data-governing",
+     "label": "A governs",
+     "refText": "true"
+    },
+    {
+     "sel": "#demandPointsBody tr:nth-child(2) .dp-result",
+     "label": "B check",
+     "refText": "PASS"
+    },
+    {
+     "sel": "#checksGrid .check-card:nth-child(2)",
+     "attr": "class",
+     "label": "Duty check uses net 170.6 > 160 rated",
+     "refText": "check-card fail"
+    }
+   ]
+  },
+  {
+   "id": "pump-cert-point",
+   "title": "Certified point 500 gpm @ 175 psi net vs 170.6 psi required",
+   "source": "NFPA 20-2022",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#ratedGPM",
+     "value": "750"
+    },
+    {
+     "set": "#ratedPSI",
+     "value": "160"
+    },
+    {
+     "set": "#churnPSIIn",
+     "value": "224"
+    },
+    {
+     "set": "#systemFlow",
+     "value": "500"
+    },
+    {
+     "set": "#systemPressure",
+     "value": "225.6"
+    },
+    {
+     "set": "#suctionMode",
+     "value": "direct"
+    },
+    {
+     "set": "#dpName2",
+     "value": "B"
+    },
+    {
+     "set": "#dpFlow2",
+     "value": "783.8"
+    },
+    {
+     "set": "#dpPress2",
+     "value": "94.6"
+    },
+    {
+     "set": "#suctionMin",
+     "value": "55"
+    },
+    {
+     "set": "#certFlow",
+     "value": "500"
+    },
+    {
+     "set": "#certPSI",
+     "value": "175"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#certResult",
+     "label": "Certified point check",
+     "refText": "PASS (500 gpm @ 175 psi vs 500 gpm @ 170.6 psi)"
+    }
+   ]
+  },
+  {
+   "id": "pump-curve-loss",
+   "title": "DoD hydrant curve minus 5 psi backflow + 2 psi pipe",
+   "source": "NFPA 291 N^1.85 less entered losses",
+   "steps": [
+    {
+     "click": "#btnDoD",
+     "wait": 600
+    },
+    {
+     "set": "#lossBackflow",
+     "value": "5"
+    },
+    {
+     "set": "#lossPipe",
+     "value": "2"
+    },
+    {
+     "click": "#btnRecalc",
+     "wait": 400
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#availableAtFlow",
+     "label": "Suction at 1750 gpm after losses",
+     "unit": "psi",
+     "ref": 20.4
+    }
+   ]
   }
  ]
 }

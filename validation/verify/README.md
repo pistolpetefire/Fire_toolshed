@@ -27,6 +27,13 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
 
+- **Fire Pump Sizer v2.5.0 (2026-10-22), basis NFPA 20-2022.** Direct suction pressure input (single value or min/max at demand
+  flow) as an alternative to the hydrant curve; optional backflow / pipe / elevation losses subtracted from the hydrant curve.
+  Up to four demand points, each checked against pump net + minimum suction, governing point (least margin) flagged. Pump-curve
+  requirement: minimum shutoff from a straight line shutoff -> rated point (rated -> 150% @ 65% beyond rated), certified curve
+  point pass/fail, max discharge = churn + max suction with the 175 / 300 psi component flag. The "Duty <= Rated Pressure" check
+  now compares required NET pressure (discharge - suction), not discharge. 23 of 23 checks pass.
+
 - **Occupant Egress v1.7.0 (2026-10-22).** IBC 2024 1020.5 dead-end exceptions: I-3 Conditions 2, 3, 4 -> 50 ft (Exception 1);
   I-2 Condition 2 corridors that do not serve patient rooms or patient treatment spaces -> 30 ft (Exception 4). New condition inputs
   default to "not specified" (20 ft). The dead-end basis is shown on screen and in the printout. Added `ibc-exits-500-novoice`

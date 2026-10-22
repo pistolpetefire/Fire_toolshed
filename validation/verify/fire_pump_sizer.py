@@ -1,4 +1,4 @@
-"""Fire Pump Sizer v2.4.0: the built-in DoD example plus diesel, breaker and churn cases, worked independently in Python.
+"""Fire Pump Sizer v2.5.0: the built-in DoD example plus diesel, breaker and churn cases, worked independently in Python.
 Supply curve: NFPA 291 N^1.85 form, P(Q) = Ps - (Ps - Pr)(Q/Qt)^1.85. Head: ft = psi x 2.31.
 Pump power: water hp = Q H / 3960; brake hp = water hp / efficiency, with the app's stated 0.75 pump efficiency,
 then the app's stated 1.15 (electric) or 1.2 (diesel) driver margin.
@@ -56,7 +56,42 @@ cases = [
     {'id': 'churn-fail', 'title': 'Churn 180 psi entered, rated 125 psi (limit 175)', 'source': 'NFPA 20 (2022) 6.2.2',
      'steps': dod([{'set': '#churnPSIIn', 'value': '180'}]),
      'reads': [{'sel': CARD, 'attr': 'class', 'label': 'Churn check', 'refText': 'check-card fail'}]},
+
 ]
+# v2.5.0 (NFPA 20-2022): direct suction, multiple demand points, minimum shutoff by the straight line shutoff -> rated.
+# Line: P(Q) = S - (S - Pr) Q/Qr  ->  S = (Pnet - Pr Q/Qr) / (1 - Q/Qr). Beyond rated: rated -> 150% Qr at 65% Pr.
+RQ, RP, CH = 750, 160, 224.0
+def shut(q, pnet):
+    f = q / RQ
+    return max(RP, (pnet - RP * f) / (1 - f))
+def pump(q, s):
+    return s - (s - RP) * q / RQ if q <= RQ else RP - 0.35 * RP * (q - RQ) / (0.5 * RQ)
+netA55, netA61 = 225.6 - 55, 225.6 - 61
+mA, mB = pump(500, CH) + 55 - 225.6, pump(783.8, CH) + 55 - 94.6
+assert mA < mB
+PTS = [{'set': '#ratedGPM', 'value': '750'}, {'set': '#ratedPSI', 'value': '160'}, {'set': '#churnPSIIn', 'value': '224'},
+       {'set': '#systemFlow', 'value': '500'}, {'set': '#systemPressure', 'value': '225.6'}, {'set': '#suctionMode', 'value': 'direct'},
+       {'set': '#dpName2', 'value': 'B'}, {'set': '#dpFlow2', 'value': '783.8'}, {'set': '#dpPress2', 'value': '94.6'}]
+cases += [
+    {'id': 'pump-req-55-61', 'title': 'Rated 750 gpm @ 160 psi; A 500 gpm @ 225.6 psi, B 783.8 gpm @ 94.6 psi; suction 55-61 psi',
+     'source': 'NFPA 20-2022 6.2.2 (straight-line conservative curve); churn + max suction vs component rating',
+     'steps': dod(PTS + [{'set': '#suctionMin', 'value': '55'}, {'set': '#suctionMax', 'value': '61'}]),
+     'reads': [{'sel': '#reqNet', 'label': 'Required net, A at 55 psi suction', 'unit': 'psi', 'ref': r(netA55, 1)},
+               {'sel': '#minShutoff', 'label': 'Minimum shutoff (55 psi)', 'unit': 'psi', 'ref': r(shut(500, netA55), 1)},
+               {'sel': '#minShutoffMax', 'index': 1, 'label': 'Required net at 61 psi', 'unit': 'psi', 'ref': r(netA61, 1)},
+               {'sel': '#minShutoffMax', 'index': 2, 'label': 'Minimum shutoff (61 psi)', 'unit': 'psi', 'ref': r(shut(500, netA61), 1)},
+               {'sel': '#maxDischarge', 'label': 'Max discharge = churn + 61', 'unit': 'psi', 'ref': CH + 61},
+               {'sel': '#demandPointsBody tr:nth-child(1)', 'attr': 'data-governing', 'label': 'A governs', 'refText': 'true'},
+               {'sel': '#demandPointsBody tr:nth-child(2) .dp-result', 'label': 'B check', 'refText': 'PASS'},
+               {'sel': '#checksGrid .check-card:nth-child(2)', 'attr': 'class', 'label': 'Duty check uses net 170.6 > 160 rated', 'refText': 'check-card fail'}]},
+    {'id': 'pump-cert-point', 'title': 'Certified point 500 gpm @ 175 psi net vs 170.6 psi required', 'source': 'NFPA 20-2022',
+     'steps': dod(PTS + [{'set': '#suctionMin', 'value': '55'}, {'set': '#certFlow', 'value': '500'}, {'set': '#certPSI', 'value': '175'}]),
+     'reads': [{'sel': '#certResult', 'label': 'Certified point check', 'refText': 'PASS (500 gpm @ 175 psi vs 500 gpm @ 170.6 psi)'}]},
+    {'id': 'pump-curve-loss', 'title': 'DoD hydrant curve minus 5 psi backflow + 2 psi pipe', 'source': 'NFPA 291 N^1.85 less entered losses',
+     'steps': dod([{'set': '#lossBackflow', 'value': '5'}, {'set': '#lossPipe', 'value': '2'}]),
+     'reads': [{'sel': '#availableAtFlow', 'label': 'Suction at 1750 gpm after losses', 'unit': 'psi', 'ref': r(avail - 7, 1)}]},
+]
+
 write('fire-pump-sizer', {'script': 'fire_pump_sizer.py', 'app': 'Fire Pump Sizer', 'versionSel': '#appVersion',
       'handcalc': 'validation/verify/fire_pump_sizer.py', 'flags': [], 'cases': cases})
 print(avail, net, motor, fla, diesel, tank_hp, tank_rate, ocpd(363), ocpd(407.4))

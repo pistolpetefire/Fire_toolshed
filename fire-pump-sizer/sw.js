@@ -1,11 +1,12 @@
 /* Fire Pump Sizer — offline cache (network-first for app shell so updates show) */
-const CACHE = 'fire-pump-sizer-v4';
+const CACHE = 'fire-pump-sizer-v5';
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
   './assets/styles.css?v=2.1.0',
-  './assets/app.js?v=2.1.0',
+  './assets/pump-rules.js?v=2.5.0',
+  './assets/app.js?v=2.5.0',
   './assets/chart.umd.min.js?v=2.1.0',
   './icons/icon-192.png',
   './icons/icon-512.png',
