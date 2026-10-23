@@ -381,6 +381,61 @@ footer {
 }
 footer a { color: var(--teal); font-weight: 700; }
 
+
+/* Site map & field photo attachments */
+.attach-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.65rem;
+}
+.attach-card {
+  position: relative;
+  width: min(100%, 220px);
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.55rem;
+}
+.attach-card img {
+  display: block;
+  width: 100%;
+  height: 140px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+.attach-card .attach-name {
+  margin: 0.4rem 0 0.25rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+  word-break: break-all;
+}
+.attach-card input[type="text"] {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid var(--field);
+  border-radius: 8px;
+  padding: 0.35rem 0.5rem;
+}
+.attach-card .attach-remove {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  min-height: 32px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+  background: #fff;
+}
+#siteMapPreviewEmpty, #photosPreviewEmpty {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.print-attachments-root {
+  display: none;
+}
 .print-edition { display: none; margin: 0 0 0.5rem; font-size: 0.85rem; }
 @media print {
   .beta-banner, .top-actions, .no-print, .print-omit, button,
@@ -442,6 +497,151 @@ footer a { color: var(--teal); font-weight: 700; }
     .metric { background: #e7f0fb !important; }
     .metric .value { color: #1d4e89 !important; }
     table.data th { color: #1d4e89 !important; }
+
+    /* Attachment pages (after main report) */
+    .print-attachments-root {
+      display: block !important;
+    }
+    .print-attachments-root:empty { display: none !important; }
+    @page sitemap {
+      size: letter landscape;
+      margin: 0.45in;
+      @top-left {
+        content: "Flow Test Report — Site map";
+        white-space: pre;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        font-size: 11pt;
+        font-weight: 800;
+        line-height: 1.28;
+        color: #1d4e89;
+        vertical-align: bottom;
+        padding-bottom: 5pt;
+        border-bottom: 2.5px solid #1d4e89;
+      }
+      @top-center {
+        content: "";
+        vertical-align: bottom;
+        padding-bottom: 5pt;
+        border-bottom: 2.5px solid #1d4e89;
+      }
+      @top-right {
+        content: "";
+        vertical-align: bottom;
+        padding-bottom: 5pt;
+        border-bottom: 2.5px solid #1d4e89;
+      }
+      @bottom-left { content: ""; }
+      @bottom-center { content: ""; }
+      @bottom-right { content: ""; }
+    }
+    @page photos {
+      size: letter portrait;
+      margin: 0.55in 0.55in 0.45in 0.55in;
+      @top-left {
+        content: "Flow Test Report — Photos";
+        white-space: pre;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        font-size: 11pt;
+        font-weight: 800;
+        line-height: 1.28;
+        color: #1d4e89;
+        vertical-align: bottom;
+        padding-bottom: 5pt;
+        border-bottom: 2.5px solid #1d4e89;
+      }
+      @top-center {
+        content: "";
+        vertical-align: bottom;
+        padding-bottom: 5pt;
+        border-bottom: 2.5px solid #1d4e89;
+      }
+      @top-right {
+        content: "";
+        vertical-align: bottom;
+        padding-bottom: 5pt;
+        border-bottom: 2.5px solid #1d4e89;
+      }
+      @bottom-left { content: ""; }
+      @bottom-center { content: ""; }
+      @bottom-right { content: ""; }
+    }
+    .print-sitemap-page {
+      page: sitemap;
+      break-before: page;
+      page-break-before: always;
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 6.8in;
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+    .print-sitemap-page h2 {
+      margin: 0 0 0.35rem;
+      font-size: 14pt;
+      color: #1d4e89 !important;
+      align-self: flex-start;
+      width: 100%;
+    }
+    .print-sitemap-page .print-sitemap-fit {
+      display: block;
+      max-width: 100%;
+      max-height: 6.9in;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      object-position: center;
+      margin: 0 auto;
+    }
+    .print-photo-page {
+      page: photos;
+      break-before: page;
+      page-break-before: always;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .print-photo-page h2 {
+      margin: 0 0 0.65rem;
+      font-size: 14pt;
+      color: #1d4e89 !important;
+    }
+    .print-photo-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+    .print-photo-grid.two {
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem 0.9rem;
+      align-items: start;
+    }
+    .print-photo-fig {
+      margin: 0;
+      break-inside: avoid;
+      page-break-inside: avoid;
+      text-align: center;
+    }
+    .print-photo-fig img {
+      display: block;
+      max-width: 100%;
+      max-height: 8.6in;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      margin: 0 auto;
+      border: 1px solid #d3e2f4;
+    }
+    .print-photo-grid.two .print-photo-fig img {
+      max-height: 4.2in;
+    }
+    .print-photo-fig figcaption {
+      margin-top: 0.35rem;
+      font-size: 10pt;
+      color: #334155;
+      text-align: left;
+    }
   </style>
   <script src="../shared/verify-tab.js"></script>
   <script src="./assets/verify-cases.js"></script>
@@ -454,7 +654,7 @@ footer a { color: var(--teal); font-weight: 700; }
       <div>
         <p class="eyebrow">Fire Toolshed</p>
         <h1>Flow Test Report</h1>
-        <p class="version" id="appVersion">Version 2.2.0</p>
+        <p class="version" id="appVersion">Version 2.4.0</p>
         <p class="version" id="codeEdition">Code basis: <strong>NFPA 291-2022</strong> (recommended practice, not code-referenced) · hydrant flow testing</p>
         <p class="print-edition" id="printCodeEdition">Code basis: NFPA 291-2022 (recommended practice, not code-referenced)</p>
         <p class="hint" style="margin-top:0.5rem;max-width:36rem">
@@ -774,6 +974,34 @@ footer a { color: var(--teal); font-weight: 700; }
             </div>
           </div>
         </section>
+
+        <section class="panel print-omit" id="attachmentsPanel">
+          <h2>Site map &amp; field photos</h2>
+          <p class="hint">Optional. Site map prints as its own landscape page after the report (scaled to fit, no crop). Photos print on following pages with captions.</p>
+          <div class="field-grid two">
+            <div class="field" style="grid-column:1/-1">
+              <label for="siteMapFile">Site map (JPG / PNG / PDF)</label>
+              <input id="siteMapFile" type="file" accept="image/jpeg,image/png,image/jpg,application/pdf,.jpg,.jpeg,.png,.pdf" />
+              <span class="sub">One file. PDF uses page 1 rendered to an image for reliable print.</span>
+              <div id="siteMapPreview" class="attach-preview" hidden></div>
+              <p id="siteMapPreviewEmpty" class="hint">No site map uploaded.</p>
+              <div style="margin-top:0.45rem">
+                <button type="button" id="btnClearSiteMap" class="ghost" hidden>Clear site map</button>
+              </div>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="photoFiles">Field photos (JPG / PNG, multiple)</label>
+              <input id="photoFiles" type="file" accept="image/jpeg,image/png,image/jpg,.jpg,.jpeg,.png" multiple />
+              <span class="sub">Add optional captions under each photo. Prints after the site map page.</span>
+              <div id="photosPreview" class="attach-preview"></div>
+              <p id="photosPreviewEmpty" class="hint">No photos uploaded.</p>
+              <div style="margin-top:0.45rem">
+                <button type="button" id="btnClearPhotos" class="ghost" hidden>Clear all photos</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </div>
 
       <div>
@@ -857,7 +1085,7 @@ footer a { color: var(--teal); font-weight: 700; }
         <section class="panel print-omit">
           <h2>What this tool does / does not</h2>
           <ul class="hint" style="margin:0;padding-left:1.1rem">
-            <li><strong>Does:</strong> record hydrant flow test, pitot GPM, supply curve, fire flow at 20 psi, PDF/print package, capture for Sprinkler Estimator.</li>
+            <li><strong>Does:</strong> record hydrant flow test, pitot GPM, supply curve, fire flow at 20 psi, PDF/print package (optional site map + field photos), capture for Sprinkler Estimator.</li>
             <li><strong>Does not:</strong> compute sprinkler density-area demand, UFC/NFPA hazard demand, or fire pump duty — use Sprinkler Estimator then Fire Pump Sizer.</li>
             <li><strong>Future tank sizer:</strong> tank volume ≈ (system or pump flow) × duration + NFPA 20 / UFC / FM Global safety factors.</li>
           </ul>
@@ -865,9 +1093,12 @@ footer a { color: var(--teal); font-weight: 700; }
       </div>
     </div>
 
+
+    <div id="printAttachments" class="print-attachments-root" aria-hidden="true"></div>
+
     <footer class="print-omit">
       <p>
-        <strong>Version <span id="footerVersion">2.2.0</span></strong>
+        <strong>Version <span id="footerVersion">2.4.0</span></strong>
         · Hydrant flow test (NFPA 291) · Not a substitute for stamped hydraulics or AHJ approval.
         <a href="../">Portal</a> ·
         <a href="../sprinkler-system-estimator/">Sprinkler Estimator</a> ·
@@ -935,6 +1166,8 @@ footer a { color: var(--teal); font-weight: 700; }
         <ul>
           <li>Checklist tracks NFPA 291 field steps (bleed air, open one-at-a-time, simultaneous read, slow shutdown, valve wide open, pitot position, radios).</li>
           <li>Data sheet: main size, weather, operators, last/next test, ordinary demand confirmation, notes.</li>
+          <li><strong>Site map:</strong> optional JPG/PNG/PDF — prints as its own landscape page after the report, scaled to fit (no crop).</li>
+          <li><strong>Field photos:</strong> optional multi-image upload with captions — print on pages after the site map.</li>
         </ul>
 
         <h3>Outputs</h3>
@@ -964,7 +1197,7 @@ footer a { color: var(--teal); font-weight: 700; }
 (function () {
   "use strict";
 
-  var APP_VERSION = "2.3.0";
+  var APP_VERSION = "2.4.0";
   var SUPPLY_EXPONENT = 1.85;
   var FIRE_FLOW_REF = 20;
   var GAUGE_CAL_MONTHS = 12;
@@ -973,6 +1206,13 @@ footer a { color: var(--teal); font-weight: 700; }
   var PITOT_MAX_PSI = 30;
   var STORAGE_KEY = "flow-test-report:v1";
   var FLOW_TEST_HANDOFF_KEY = "fireToolshed.flowTestHandoff.v1";
+
+  /** Print attachments (kept out of localStorage to avoid quota blowups). */
+  var siteMapAttach = null; // { name, dataUrl, mime }
+  var photoAttach = []; // [{ id, name, dataUrl, caption }]
+  var photoIdSeq = 1;
+  var pdfJsLoading = null;
+
 
   /** Outlet discharge coefficients — Fig. 4.7.1 + pumper (Table 4.8.2-style) */
   var OUTLET_C = {
@@ -2068,6 +2308,328 @@ footer a { color: var(--teal); font-weight: 700; }
     return s.join("");
   }
 
+
+  function loadPdfJs() {
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    if (pdfJsLoading) return pdfJsLoading;
+    pdfJsLoading = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+      s.onload = function () {
+        if (!window.pdfjsLib) {
+          reject(new Error("pdf.js failed to initialize"));
+          return;
+        }
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+          "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        resolve(window.pdfjsLib);
+      };
+      s.onerror = function () {
+        reject(new Error("Could not load pdf.js (needed for PDF site maps)"));
+      };
+      document.head.appendChild(s);
+    });
+    return pdfJsLoading;
+  }
+
+  function readFileAsDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () { resolve(String(reader.result || "")); };
+      reader.onerror = function () { reject(reader.error || new Error("read failed")); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function pdfFirstPageToDataUrl(file) {
+    return loadPdfJs().then(function (pdfjsLib) {
+      return file.arrayBuffer().then(function (buf) {
+        return pdfjsLib.getDocument({ data: buf }).promise.then(function (pdf) {
+          return pdf.getPage(1).then(function (page) {
+            var viewport = page.getViewport({ scale: 2 });
+            var canvas = document.createElement("canvas");
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            var ctx = canvas.getContext("2d");
+            return page
+              .render({ canvasContext: ctx, viewport: viewport })
+              .promise.then(function () {
+                return canvas.toDataURL("image/jpeg", 0.92);
+              });
+          });
+        });
+      });
+    });
+  }
+
+  function isPdfFile(file) {
+    if (!file) return false;
+    var t = (file.type || "").toLowerCase();
+    var n = (file.name || "").toLowerCase();
+    return t === "application/pdf" || n.endsWith(".pdf");
+  }
+
+  function isImageFile(file) {
+    if (!file) return false;
+    var t = (file.type || "").toLowerCase();
+    var n = (file.name || "").toLowerCase();
+    return (
+      t === "image/jpeg" ||
+      t === "image/jpg" ||
+      t === "image/png" ||
+      n.endsWith(".jpg") ||
+      n.endsWith(".jpeg") ||
+      n.endsWith(".png")
+    );
+  }
+
+  function renderAttachmentUi() {
+    var mapHost = $("siteMapPreview");
+    var mapEmpty = $("siteMapPreviewEmpty");
+    var clearMap = $("btnClearSiteMap");
+    if (mapHost) {
+      if (siteMapAttach && siteMapAttach.dataUrl) {
+        mapHost.hidden = false;
+        mapHost.innerHTML =
+          '<div class="attach-card">' +
+          '<img src="' +
+          siteMapAttach.dataUrl +
+          '" alt="Site map preview" />' +
+          '<p class="attach-name">' +
+          escapeHtml(siteMapAttach.name || "Site map") +
+          "</p></div>";
+        if (mapEmpty) mapEmpty.hidden = true;
+        if (clearMap) clearMap.hidden = false;
+      } else {
+        mapHost.hidden = true;
+        mapHost.innerHTML = "";
+        if (mapEmpty) mapEmpty.hidden = false;
+        if (clearMap) clearMap.hidden = true;
+      }
+    }
+
+    var photosHost = $("photosPreview");
+    var photosEmpty = $("photosPreviewEmpty");
+    var clearPhotos = $("btnClearPhotos");
+    if (photosHost) {
+      if (!photoAttach.length) {
+        photosHost.innerHTML = "";
+        if (photosEmpty) photosEmpty.hidden = false;
+        if (clearPhotos) clearPhotos.hidden = true;
+      } else {
+        if (photosEmpty) photosEmpty.hidden = true;
+        if (clearPhotos) clearPhotos.hidden = false;
+        photosHost.innerHTML = photoAttach
+          .map(function (p) {
+            return (
+              '<div class="attach-card" data-photo-id="' +
+              p.id +
+              '">' +
+              '<button type="button" class="attach-remove" data-remove-photo="' +
+              p.id +
+              '">Remove</button>' +
+              '<img src="' +
+              p.dataUrl +
+              '" alt="' +
+              escapeHtml(p.name || "Photo") +
+              '" />' +
+              '<p class="attach-name">' +
+              escapeHtml(p.name || "Photo") +
+              "</p>" +
+              '<label class="sub" for="photoCap_' +
+              p.id +
+              '">Caption</label>' +
+              '<input type="text" id="photoCap_' +
+              p.id +
+              '" data-photo-caption="' +
+              p.id +
+              '" value="' +
+              escapeHtml(p.caption || "") +
+              '" placeholder="Optional caption" />' +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+    }
+    renderPrintAttachments();
+  }
+
+  function renderPrintAttachments() {
+    var host = $("printAttachments");
+    if (!host) return;
+    var parts = [];
+    if (siteMapAttach && siteMapAttach.dataUrl) {
+      parts.push(
+        '<div class="print-sitemap-page">' +
+          "<h2>Site map</h2>" +
+          '<img class="print-sitemap-fit" src="' +
+          siteMapAttach.dataUrl +
+          '" alt="Site map" />' +
+          "</div>"
+      );
+    }
+    if (photoAttach.length) {
+      var i = 0;
+      var pageNum = 0;
+      while (i < photoAttach.length) {
+        pageNum += 1;
+        // Prefer 2-up when both fit captions; last odd photo alone
+        var take = photoAttach.length - i >= 2 ? 2 : 1;
+        var slice = photoAttach.slice(i, i + take);
+        i += take;
+        var gridClass = take === 2 ? "print-photo-grid two" : "print-photo-grid";
+        var figs = slice
+          .map(function (p, idx) {
+            var cap = (p.caption || "").trim();
+            return (
+              '<figure class="print-photo-fig">' +
+              '<img src="' +
+              p.dataUrl +
+              '" alt="' +
+              escapeHtml(cap || p.name || "Photo") +
+              '" />' +
+              (cap
+                ? "<figcaption>" + escapeHtml(cap) + "</figcaption>"
+                : p.name
+                  ? "<figcaption>" + escapeHtml(p.name) + "</figcaption>"
+                  : "") +
+              "</figure>"
+            );
+          })
+          .join("");
+        parts.push(
+          '<div class="print-photo-page">' +
+            "<h2>Field photos" +
+            (photoAttach.length > 2 ? " (" + pageNum + ")" : "") +
+            "</h2>" +
+            '<div class="' +
+            gridClass +
+            '">' +
+            figs +
+            "</div></div>"
+        );
+      }
+    }
+    host.innerHTML = parts.join("");
+    host.setAttribute("aria-hidden", parts.length ? "false" : "true");
+  }
+
+  function handleSiteMapFile(file) {
+    if (!file) return;
+    var proceed;
+    if (isPdfFile(file)) {
+      toast("Rendering PDF page 1…");
+      proceed = pdfFirstPageToDataUrl(file).then(function (dataUrl) {
+        return { name: file.name, dataUrl: dataUrl, mime: "image/jpeg" };
+      });
+    } else if (isImageFile(file)) {
+      proceed = readFileAsDataUrl(file).then(function (dataUrl) {
+        return { name: file.name, dataUrl: dataUrl, mime: file.type || "image/jpeg" };
+      });
+    } else {
+      toast("Site map must be JPG, PNG, or PDF");
+      return;
+    }
+    proceed
+      .then(function (att) {
+        siteMapAttach = att;
+        renderAttachmentUi();
+        toast("Site map ready for print");
+      })
+      .catch(function (err) {
+        console.error(err);
+        toast(err && err.message ? err.message : "Could not load site map");
+      });
+  }
+
+  function handlePhotoFiles(fileList) {
+    var files = Array.prototype.slice.call(fileList || []);
+    if (!files.length) return;
+    var jobs = files.map(function (file) {
+      if (!isImageFile(file)) {
+        return Promise.resolve(null);
+      }
+      return readFileAsDataUrl(file).then(function (dataUrl) {
+        return {
+          id: photoIdSeq++,
+          name: file.name,
+          dataUrl: dataUrl,
+          caption: "",
+        };
+      });
+    });
+    Promise.all(jobs).then(function (items) {
+      var added = items.filter(Boolean);
+      if (!added.length) {
+        toast("Photos must be JPG or PNG");
+        return;
+      }
+      photoAttach = photoAttach.concat(added);
+      renderAttachmentUi();
+      toast("Added " + added.length + " photo" + (added.length === 1 ? "" : "s"));
+    });
+  }
+
+  function clearSiteMap() {
+    siteMapAttach = null;
+    var inp = $("siteMapFile");
+    if (inp) inp.value = "";
+    renderAttachmentUi();
+  }
+
+  function clearPhotos() {
+    photoAttach = [];
+    var inp = $("photoFiles");
+    if (inp) inp.value = "";
+    renderAttachmentUi();
+  }
+
+  function bindAttachmentControls() {
+    var mapInput = $("siteMapFile");
+    if (mapInput) {
+      mapInput.addEventListener("change", function () {
+        var f = mapInput.files && mapInput.files[0];
+        handleSiteMapFile(f);
+        mapInput.value = "";
+      });
+    }
+    var photoInput = $("photoFiles");
+    if (photoInput) {
+      photoInput.addEventListener("change", function () {
+        handlePhotoFiles(photoInput.files);
+        photoInput.value = "";
+      });
+    }
+    if ($("btnClearSiteMap")) {
+      $("btnClearSiteMap").addEventListener("click", clearSiteMap);
+    }
+    if ($("btnClearPhotos")) {
+      $("btnClearPhotos").addEventListener("click", clearPhotos);
+    }
+    document.addEventListener("click", function (e) {
+      var t = e.target;
+      if (!t || !t.getAttribute) return;
+      var rid = t.getAttribute("data-remove-photo");
+      if (rid) {
+        var id = Number(rid);
+        photoAttach = photoAttach.filter(function (p) { return p.id !== id; });
+        renderAttachmentUi();
+      }
+    });
+    document.addEventListener("input", function (e) {
+      var t = e.target;
+      if (!t || !t.getAttribute) return;
+      var cid = t.getAttribute("data-photo-caption");
+      if (!cid) return;
+      var id = Number(cid);
+      photoAttach.forEach(function (p) {
+        if (p.id === id) p.caption = t.value || "";
+      });
+      renderPrintAttachments();
+    });
+  }
+
   function updateReportLogoPrint() {
     var host = $("reportLogoPrint");
     if (!host) return;
@@ -2084,6 +2646,7 @@ footer a { color: var(--teal); font-weight: 700; }
     var nfpa = evaluateNfpa291(c);
     renderRequirements(nfpa);
     updateReportLogoPrint();
+    renderPrintAttachments();
 
     $("mStatic").textContent = c.valid ? round1(c.staticPressure) + " psi" : "—";
     $("mResidual").textContent = c.valid ? round1(c.residualPressure) + " psi" : "—";
@@ -2554,6 +3117,8 @@ footer a { color: var(--teal); font-weight: 700; }
       location.reload();
     });
 
+    bindAttachmentControls();
+    renderAttachmentUi();
     render();
   }
 
