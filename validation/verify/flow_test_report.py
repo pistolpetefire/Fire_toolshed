@@ -1,15 +1,17 @@
 """Hydrant Flow Test Report: worked independently in Python.
 Outlet flow: NFPA 291, Q = 29.83 c d^2 sqrt(Pp) (gpm, in, psi). Available flow at the rating residual (20 psi default):
-Q_R = Q_F x ((Ps - Pr_rating) / (Ps - Pr))^(1/1.85) (NFPA 291 N^1.85 capacity method). Pressure drop % = (Ps - Pr) / Ps.
+Q_R = Q_F x ((Ps - Pr_rating) / (Ps - Pr))^0.54 (NFPA 291, exponent 0.54). Pressure drop % = (Ps - Pr) / Ps.
 Hydrant class (NFPA 291 color code): AA >= 1500, A 1000-1499, B 500-999, C < 500 gpm."""
 import math
 from ftverify import write, r
-def q20(ps, pr, qf, rr=20): return qf * ((ps - rr) / (ps - pr)) ** (1 / 1.85)
+def q20(ps, pr, qf, rr=20): return qf * ((ps - rr) / (ps - pr)) ** 0.54
 cases = []
 for cid, title, ps, pr, qf, rr, steps in [
     ('defaults', 'Defaults: static 72, residual 48 psi at 1256 gpm', 72, 48, 1256, 20, []),
     ('case2', 'Static 85, residual 60 psi at 1500 gpm, rating at 20 psi', 85, 60, 1500, 20,
      [{'set': '#staticPressure', 'value': '85'}, {'set': '#residualPressure', 'value': '60'}, {'set': '#flowAtResidual', 'value': '1500'}]),
+    ('sea-atct', 'SEA ATCT: static 68.3, residual 61.2 psi at 1250 gpm, rating at 20 psi', 68.3, 61.2, 1250, 20,
+     [{'set': '#staticPressure', 'value': '68.3'}, {'set': '#residualPressure', 'value': '61.2'}, {'set': '#flowAtResidual', 'value': '1250'}]),
     ('case3', 'Static 60, residual 30 psi at 900 gpm, rating at 25 psi', 60, 30, 900, 25,
      [{'set': '#staticPressure', 'value': '60'}, {'set': '#residualPressure', 'value': '30'}, {'set': '#flowAtResidual', 'value': '900'}, {'set': '#minResidual', 'value': '25'}]),
 ]:

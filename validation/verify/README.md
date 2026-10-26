@@ -27,6 +27,12 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
 
 ## Fixed
 
+- **Flow Test Report v2.4.1 (2026-10-26).** Available flow at the rating residual uses the NFPA 291 exponent 0.54 instead of
+  1/1.85: Q_R = Q_F x ((Ps - Pr_rating) / (Ps - Pr))^0.54. The result row on screen, in the printout and in the saved report is
+  labeled "NFPA 291, exponent 0.54", as is the rated-capacity checklist line. SEA ATCT (68.3 static, 61.2 residual, 1250 gpm):
+  3,520 gpm (was 3,524). Python hand calc and the Verification-tab cases updated (SEA ATCT case added); new
+  tests/flow-test-report.test.mjs. The plotted supply curve is unchanged (N^1.85 scale).
+
 - **Fire Pump Sizer v2.7.1 (2026-10-22).** The service worker is not registered inside frames (window !== window.top, ?ftverify=1)
   or on a page opened to run verification (?ftverifyrun=1, #verification). Normal pages still register the worker. The
   intermittently blank verification frame is reduced but not gone (two batches of 20 headless runs: 18/20 each; one earlier batch

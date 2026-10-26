@@ -16,7 +16,7 @@ window.FT_VERIFY_CASES = {
      "sel": "#mFireFlow20",
      "label": "Available flow at rating residual",
      "unit": "gpm",
-     "ref": 1908.0
+     "ref": 1907.0
     },
     {
      "sel": "#mDrop",
@@ -55,7 +55,7 @@ window.FT_VERIFY_CASES = {
      "sel": "#mFireFlow20",
      "label": "Available flow at rating residual",
      "unit": "gpm",
-     "ref": 2514.0
+     "ref": 2513.0
     },
     {
      "sel": "#mDrop",
@@ -68,6 +68,45 @@ window.FT_VERIFY_CASES = {
      "label": "Pressure drop",
      "unit": "%",
      "ref": 29.4
+    }
+   ]
+  },
+  {
+   "id": "sea-atct",
+   "title": "SEA ATCT: static 68.3, residual 61.2 psi at 1250 gpm, rating at 20 psi",
+   "source": "NFPA 291 (see script header)",
+   "steps": [
+    {
+     "set": "#staticPressure",
+     "value": "68.3"
+    },
+    {
+     "set": "#residualPressure",
+     "value": "61.2"
+    },
+    {
+     "set": "#flowAtResidual",
+     "value": "1250"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#mFireFlow20",
+     "label": "Available flow at rating residual",
+     "unit": "gpm",
+     "ref": 3520.0
+    },
+    {
+     "sel": "#mDrop",
+     "label": "Pressure drop",
+     "unit": "psi",
+     "ref": 7.1
+    },
+    {
+     "sel": "#mDropPct",
+     "label": "Pressure drop",
+     "unit": "%",
+     "ref": 10.4
     }
    ]
   },

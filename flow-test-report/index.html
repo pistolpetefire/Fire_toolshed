@@ -654,7 +654,7 @@ footer a { color: var(--teal); font-weight: 700; }
       <div>
         <p class="eyebrow">Fire Toolshed</p>
         <h1>Flow Test Report</h1>
-        <p class="version" id="appVersion">Version 2.4.0</p>
+        <p class="version" id="appVersion">Version 2.4.1</p>
         <p class="version" id="codeEdition">Code basis: <strong>NFPA 291-2022</strong> (recommended practice, not code-referenced) · hydrant flow testing</p>
         <p class="print-edition" id="printCodeEdition">Code basis: NFPA 291-2022 (recommended practice, not code-referenced)</p>
         <p class="hint" style="margin-top:0.5rem;max-width:36rem">
@@ -1098,7 +1098,7 @@ footer a { color: var(--teal); font-weight: 700; }
 
     <footer class="print-omit">
       <p>
-        <strong>Version <span id="footerVersion">2.4.0</span></strong>
+        <strong>Version <span id="footerVersion">2.4.1</span></strong>
         · Hydrant flow test (NFPA 291) · Not a substitute for stamped hydraulics or AHJ approval.
         <a href="../">Portal</a> ·
         <a href="../sprinkler-system-estimator/">Sprinkler Estimator</a> ·
@@ -1197,8 +1197,11 @@ footer a { color: var(--teal); font-weight: 700; }
 (function () {
   "use strict";
 
-  var APP_VERSION = "2.4.0";
+  var APP_VERSION = "2.4.1";
   var SUPPLY_EXPONENT = 1.85;
+  /** NFPA 291 available-flow exponent: Q_R = Q_F x ((Ps - Pr_rating) / (Ps - Pr))^0.54 */
+  var CAPACITY_EXPONENT = 0.54;
+  var CAPACITY_LABEL = "NFPA 291, exponent " + CAPACITY_EXPONENT;
   var FIRE_FLOW_REF = 20;
   var GAUGE_CAL_MONTHS = 12;
   var MIN_DROP_PCT = 25;
@@ -1710,8 +1713,8 @@ footer a { color: var(--teal); font-weight: 700; }
             (Number.isFinite(c.fireFlowAt20Rounded) ? round0(c.fireFlowAt20Rounded) : "—") +
             " gpm (nearest 50 &lt;1000 / 100 ≥1000) at " +
             round0(state.minResidual || FIRE_FLOW_REF) +
-            " psi residual (N^" +
-            SUPPLY_EXPONENT +
+            " psi residual (" +
+            CAPACITY_LABEL +
             "). " +
             (c.hydrantClassLabel || "")
           : "Cannot compute rated capacity until a valid test is entered and static exceeds the rating residual.",
@@ -2188,14 +2191,14 @@ footer a { color: var(--teal); font-weight: 700; }
     return r > 0 ? r : FIRE_FLOW_REF;
   }
 
-  /** Available flow at rating residual (NFPA 291 capacity method, N^1.85) */
+  /** Available flow at rating residual (NFPA 291 capacity method, exponent 0.54) */
   function fireFlowAtRating() {
     var rating = ratingResidual();
     if (!isValidTest() || state.staticPressure <= rating) return NaN;
     var drop = state.staticPressure - state.residualPressure;
     return state.flowAtResidual * Math.pow(
       (state.staticPressure - rating) / drop,
-      1 / SUPPLY_EXPONENT
+      CAPACITY_EXPONENT
     );
   }
 
@@ -2692,7 +2695,7 @@ footer a { color: var(--teal); font-weight: 700; }
         state.testPurpose === "fireFlow"
           ? "Fire-flow rated capacity @ " +
             round0(c.minResidual) +
-            " psi ≈ " +
+            " psi (" + CAPACITY_LABEL + ") ≈ " +
             (Number.isFinite(c.fireFlowAt20) ? round0(c.fireFlowAt20) + " gpm" : "n/a")
           : "Suppression-supply curve ready for Sprinkler Estimator handoff";
       note.textContent =
@@ -2718,7 +2721,7 @@ footer a { color: var(--teal); font-weight: 700; }
           n:
             (state.testPurpose === "fireFlow" ? "Rated capacity @ " : "Avail. flow @ ") +
             round0(c.minResidual) +
-            " psi",
+            " psi (" + CAPACITY_LABEL + ")",
           q: round0(c.fireFlowAt20),
           p: round0(c.minResidual),
         });
@@ -3171,7 +3174,7 @@ footer a { color: var(--teal); font-weight: 700; }
         tableRows +=
           "<tr><td>Capacity @ " +
           round0(c.minResidual) +
-          " psi</td><td>" +
+          " psi (" + CAPACITY_LABEL + ")</td><td>" +
           round0(c.minResidual) +
           " psi</td><td>" +
           round0(c.fireFlowAt20) +
