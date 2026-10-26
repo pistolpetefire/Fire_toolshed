@@ -21,6 +21,7 @@ const REPORT_APPS = [
   "occupant-egress",
   "concrete-fire-rating",
   "deflagration-vent",
+  "hydrant-loop-sizer",
 ];
 
 let pass = 0;

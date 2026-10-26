@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1d4e89">
+  <meta name="description" content="Size a private hydrant loop: NFPA 291 available flow, ring hydraulics with hydrant arms, velocity, single-break and pressure-class checks for Florida, IBC/IFC and DoD (UFC) bases.">
+  <title>Hydrant Loop Sizer · Fire Toolshed</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+  <script src="../shared/verify-tab.js"></script>
+  <script src="./assets/verify-cases.js"></script>
+  <script src="../shared/report-logo.js"></script>
+</head>
+<body>
+<div id="screenRoot" class="shell no-print">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Fire Toolshed · Water supply</p>
+      <h1>Hydrant Loop Sizer</h1>
+      <p class="version" id="appVersion">Version 1.0.0</p>
+      <p class="version" id="codeEdition">Code basis: —</p>
+      <p class="lead">Sizes a private hydrant loop (6, 8, 10, 12, 16 in.) from a flow test: NFPA 291 available flow, ring hydraulics with hydrant arms, velocity, single-break case and pressure class. <strong>Hydrant-only supply</strong>: if the main also feeds sprinklers or standpipes, size that separately.</p>
+    </div>
+    <div class="top-actions">
+      <button type="button" id="btnHelp" class="ghost">Help / Guide</button>
+      <button type="button" id="btnPrint" class="primary">Print report</button>
+      <button type="button" id="btnSave">Save report</button>
+      <a class="btn-link" href="../">Portal</a>
+      <button type="button" id="btnReset" class="ghost">Reset</button>
+    </div>
+  </header>
+
+  <section class="metrics" aria-label="Results">
+    <div class="metric"><div class="label" id="lblQr">Available flow at 20 psi</div><div class="value" id="mQr">—</div></div>
+    <div class="metric"><div class="label">Demand (hydrants flowing)</div><div class="value" id="mDemand">—</div></div>
+    <div class="metric"><div class="label">Test drop</div><div class="value" id="mDropPct">—</div></div>
+    <div class="metric metric-wide"><div class="label">Smallest passing size</div><div class="value" id="mSmallest">—</div></div>
+    <div class="metric"><div class="label">Max working pressure</div><div class="value" id="mWork">—</div></div>
+  </section>
+  <div id="banner" class="banner" hidden></div>
+  <div id="warnings" class="warnings"></div>
+
+  <div class="grid">
+    <div class="col">
+      <section class="panel" id="panelProject">
+        <h2>Project and report</h2>
+        <div class="fields two">
+          <label>Project<input id="projectName" type="text" autocomplete="off"></label>
+          <label>Site / address<input id="address" type="text" autocomplete="off"></label>
+          <label>Prepared by<input id="preparedBy" type="text" autocomplete="name"></label>
+          <label>Date<input id="reportDate" type="date"></label>
+          <div class="full">
+            <label for="reportLogoSource">Report logo</label>
+            <select id="reportLogoSource">
+              <option value="benham">Benham</option>
+              <option value="meadhunt">MeadHunt JV</option>
+              <option value="haskell">Haskell (by state)</option>
+              <option value="upload">Upload image…</option>
+            </select>
+            <span class="sub">Appears on screen and in the printed or saved report header. Same saved choice as Flow Test Report, Fire Pump Sizer and the other Toolshed reports.</span>
+            <div id="reportLogoFileWrap" class="hidden" style="margin-top:0.5rem">
+              <label for="reportLogoFile" class="sub" style="display:block;margin-bottom:0.25rem">Choose logo image</label>
+              <input id="reportLogoFile" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp,image/*">
+            </div>
+            <div id="reportLogoPreview" style="margin-top:0.5rem;min-height:2rem"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Units</h2>
+        <div class="fields three">
+          <label>System<select id="unitSystem"><option value="us">US customary (in., ft, gpm, psi)</option><option value="metric">Metric (DN, m, L/min or m³/h, kPa or bar)</option></select></label>
+          <label id="flowUnitWrap" class="hidden">Flow<select id="flowUnit"><option value="lpm">L/min</option><option value="m3h">m³/h</option></select></label>
+          <label id="pressUnitWrap" class="hidden">Pressure<select id="pressUnit"><option value="kpa">kPa</option><option value="bar">bar</option></select></label>
+        </div>
+        <p class="hint">All calculations run in US units internally (1 in. = 25.4 mm, 1 ft = 0.3048 m, 1 gpm = 3.785411784 L/min = 0.2271247 m³/h, 1 psi = 6.894757 kPa = 0.06894757 bar). Switching units converts every value shown; nothing is rounded in storage.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Code basis</h2>
+        <div class="fields two">
+          <label>Basis<select id="basis">
+            <option value="fl">Florida (FFPC / NFPA 1, NFPA 24)</option>
+            <option value="ifc">IBC / IFC (Appendix B and C)</option>
+            <option value="dod">DoD (UFC 3-600-01, UFC 3-230-01)</option>
+          </select></label>
+          <label>Edition<select id="edition"></select></label>
+        </div>
+        <label class="check"><input id="dodRange" type="checkbox"> Show UFC 3-230-01 distribution-main velocity range (2 to 5 ft/s) as advisory</label>
+        <p class="hint" id="basisNote"></p>
+      </section>
+
+      <section class="panel">
+        <h2>Flow test (NFPA 291)</h2>
+        <div class="fields three">
+          <label>Static pressure <span class="u" data-kind="press"></span><input id="ps" type="number" step="any" inputmode="decimal"></label>
+          <label>Residual pressure <span class="u" data-kind="press"></span><input id="pr" type="number" step="any" inputmode="decimal"></label>
+          <label>Test flow <span class="u" data-kind="flow"></span><input id="qf" type="number" step="any" inputmode="decimal"></label>
+          <label>Test hydrant elevation <span class="u" data-kind="elev"></span><input id="testElev" type="number" step="any" inputmode="decimal"></label>
+          <label>Connection elevation <span class="u" data-kind="elev"></span><input id="connElev" type="number" step="any" inputmode="decimal"></label>
+          <label>Loop hydrant elevation <span class="u" data-kind="elev"></span><input id="hydElev" type="number" step="any" inputmode="decimal"></label>
+          <label>Minimum residual <span class="u" data-kind="press"></span><input id="minResidual" type="number" step="any" inputmode="decimal"></label>
+        </div>
+        <p class="hint">Elevations default to 0 (level). Elevation head is 0.433 psi per ft.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Required fire flow and hydrants</h2>
+        <div class="fields three">
+          <label>Required fire flow <span class="u" data-kind="flow"></span><input id="qreq" type="number" step="any" inputmode="decimal"></label>
+          <label>Hydrants flowing (N)<input id="nHyd" type="number" min="1" max="16" step="1" inputmode="numeric"></label>
+          <label>Flow per hydrant <span class="u" data-kind="flow"></span><input id="qh" type="number" step="any" inputmode="decimal"></label>
+        </div>
+        <details>
+          <summary>Look up required fire flow from the table</summary>
+          <div class="fields three">
+            <label>Construction type<select id="ffGroup"></select></label>
+            <label>Fire-flow calculation area <span class="u" data-kind="area"></span><input id="ffArea" type="number" step="any" inputmode="decimal"></label>
+            <label>Sprinklers<select id="ffSprinkler"></select></label>
+          </div>
+          <p><button type="button" id="btnFF">Look up</button> <button type="button" id="btnFFUse" class="ghost">Use as required fire flow</button></p>
+          <p class="result-line" id="ffResult">—</p>
+        </details>
+        <details>
+          <summary>Suggest hydrant count</summary>
+          <div class="fields three">
+            <label id="bandWrap">Hydrant distance (Florida credit)<select id="hydBand"><option value="250">Within 250 ft</option><option value="500" selected>250 to 500 ft</option><option value="1000">500 to 1,000 ft</option></select></label>
+          </div>
+          <p><button type="button" id="btnSuggest">Suggest hydrants</button> <button type="button" id="btnSuggestUse" class="ghost">Use count and flow per hydrant</button></p>
+          <p class="result-line" id="hydSuggest">—</p>
+        </details>
+      </section>
+
+      <section class="panel">
+        <h2>Loop</h2>
+        <div class="fields three">
+          <label>Loop length (ring) <span class="u" data-kind="len"></span><input id="loopLen" type="number" step="any" inputmode="decimal"></label>
+          <label>Supply connections<select id="sources"><option value="1">1 connection</option><option value="2">2 connections (opposite points)</option></select></label>
+          <label>Hydrant placement<select id="placement"><option value="far">Worst case: all at the farthest point</option><option value="even">Evenly spaced around the loop</option></select></label>
+          <label>Pipe<select id="material"></select></label>
+          <label>Velocity limit <span class="u" data-kind="vel"></span><input id="maxVel" type="number" step="any" inputmode="decimal"></label>
+          <label>Single-break check<select id="breakMode"><option value="50">50% of fire flow, one segment out</option><option value="100">100% of fire flow, one segment out</option><option value="0">Not checked</option></select></label>
+          <label>Surge allowance <span class="u" data-kind="press"></span><input id="surge" type="number" step="any" inputmode="decimal"></label>
+          <label>Fittings and valves (% of length)<input id="fittingPct" type="number" step="any" inputmode="decimal"></label>
+          <label>Hydrant loss <span class="u" data-kind="press"></span><input id="hydLoss" type="number" step="any" inputmode="decimal"></label>
+        </div>
+        <div id="customBox" class="hidden">
+          <div class="fields three">
+            <label>Hazen-Williams C<input id="customC" type="number" step="any"></label>
+            <label>Pressure rating <span class="u" data-kind="press"></span><input id="customRating" type="number" step="any"></label>
+          </div>
+          <div class="fields five" id="customIds"></div>
+        </div>
+        <p class="hint">Hazen-Williams uses the actual internal diameter. Hydrant and fitting minor losses are not modeled unless entered above.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Hydrant arms (laterals)</h2>
+        <p class="hint">Each hydrant has its own arm. Size defaults to 6 in. (NFPA 24 minimum); length is optional (blank or 0 means no arm friction is added). Arm friction and arm velocity go into each hydrant's residual check.</p>
+        <div class="fields three">
+          <label>All arms: size<select id="armAllSize"></select></label>
+          <label>All arms: length <span class="u" data-kind="len"></span><input id="armAllLen" type="number" step="any"></label>
+          <label>&nbsp;<button type="button" id="btnArmAll">Apply to all hydrants</button></label>
+        </div>
+        <div class="tablewrap"><table class="data"><thead><tr><th>Hydrant</th><th>Arm size</th><th>Arm length <span class="u" data-kind="len"></span></th></tr></thead><tbody id="armsBody"></tbody></table></div>
+      </section>
+
+      <section class="panel print-omit" id="attachmentsPanel">
+        <h2>Site map &amp; field photos</h2>
+        <p class="hint">Optional. The site map prints as its own landscape page after the report (scaled to fit). Photos print on following pages with captions.</p>
+        <div class="fields">
+          <div class="full">
+            <label for="siteMapFile">Site map (JPG / PNG / PDF)</label>
+            <input id="siteMapFile" type="file" accept="image/jpeg,image/png,image/jpg,application/pdf,.jpg,.jpeg,.png,.pdf">
+            <span class="sub">One file. A PDF uses page 1 rendered to an image.</span>
+            <div id="siteMapPreview" class="attach-preview" hidden></div>
+            <p id="siteMapPreviewEmpty" class="hint">No site map uploaded.</p>
+            <button type="button" id="btnClearSiteMap" class="ghost" hidden>Clear site map</button>
+          </div>
+          <div class="full">
+            <label for="photoFiles">Field photos (JPG / PNG, multiple)</label>
+            <input id="photoFiles" type="file" accept="image/jpeg,image/png,image/jpg,.jpg,.jpeg,.png" multiple>
+            <div id="photosPreview" class="attach-preview"></div>
+            <p id="photosPreviewEmpty" class="hint">No photos uploaded.</p>
+            <button type="button" id="btnClearPhotos" class="ghost" hidden>Clear all photos</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="panel">
+        <h2>Examples</h2>
+        <p><button type="button" id="btnExSea">SEA ATCT test, 4 hydrants at 1,250 gpm</button> <button type="button" id="btnExSpec">Spec 5.1 loop, 2 hydrants at 1,250 gpm</button></p>
+        <p class="hint">Loop length, hydrant count and pipe in the SEA example are illustrative: the flow test (68.3 / 61.2 psi at 1,250 gpm) is the only given data.</p>
+      </section>
+      <div id="results"></div>
+    </div>
+  </div>
+
+  <footer class="foot"><span>Hydrant Loop Sizer · <span id="footVersion">1.0.0</span> · local browser app</span></footer>
+</div>
+
+<div id="helpModal" class="modal hidden no-print" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="modal-card">
+    <h2 id="helpTitle">How this tool works</h2>
+    <ol>
+      <li>Enter the flow test (static, residual, flow). The tool prints the NFPA 291 available flow at the minimum residual and builds the supply curve.</li>
+      <li>Enter the required fire flow and the hydrants flowing, or use the table lookup and hydrant suggestion for the chosen code basis.</li>
+      <li>Enter the loop length, connections, pipe and the arm of each hydrant. The tool checks 6, 8, 10, 12 and 16 in. pipe for velocity, residual pressure at every hydrant (arm friction included), a single-break case and the pressure class.</li>
+      <li>Items marked "confirm with AHJ/edition" were not verified in the code text. They are listed on the report.</li>
+    </ol>
+    <p><button type="button" id="btnHelpClose" class="primary">Close</button></p>
+  </div>
+</div>
+
+<div id="printReport" class="print-report" aria-hidden="true"></div>
+<div id="printAttachments" class="print-attachments-root" aria-hidden="true"></div>
+<div id="toast" class="toast no-print" hidden></div>
+<script src="./assets/hls-engine.js"></script>
+<script src="./assets/app.js"></script>
+</body>
+</html>
