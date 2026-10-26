@@ -13,7 +13,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
-  var VERSION = "1.0.0";
+  var VERSION = "1.0.1";
   var PSI_PER_FT = 0.433; // spec 4.1
   var HW_EXP = 1.85;
   var CURVE_EXP = 1.85; // supply curve exponent (spec 4.1)
@@ -191,7 +191,12 @@
     nodes.push({ pos: 0, type: "S", src: 0, hyd: [] });
     if (s === 2) nodes.push({ pos: L / 2, type: "S", src: 1, hyd: [] });
     if (inp.placement === "even") {
-      for (i = 0; i < n; i++) nodes.push({ pos: (i + 0.5) / n * L, type: "H", hyd: [i] });
+      for (i = 0; i < n; i++) {
+        var hp = (i + 0.5) / n * L, onSrc = null;
+        // a hydrant that lands exactly on a connection is fed by that connection directly: no zero-length segment (v1.0.1)
+        nodes.forEach(function (nd) { if (nd.type === "S" && Math.abs(nd.pos - hp) <= 1e-9 * L) onSrc = nd; });
+        if (onSrc) onSrc.hyd.push(i); else nodes.push({ pos: hp, type: "H", hyd: [i] });
+      }
     } else {
       var all = []; for (i = 0; i < n; i++) all.push(i);
       nodes.push({ pos: s === 2 ? L / 4 : L / 2, type: "H", hyd: all });
@@ -237,6 +242,7 @@
       var f = [], l = [];
       for (var x2 = 0; x2 < m; x2++) {
         var fx = jb >= 0 && x2 === jb ? 0 : flowAt(q0, x2);
+        if (Math.abs(fx) < 1e-7) fx = 0; // solver noise on a pipe that carries nothing
         f.push(fx); l.push(lossAt(fx, x2));
         flows[list[x2]] = fx; losses[list[x2]] = l[x2];
       }
@@ -249,7 +255,7 @@
         drop[list[y]] = dr;
       }
       drop[a] = 0;
-      srcFlow[a] = (srcFlow[a] || 0) + q0;
+      srcFlow[a] = (srcFlow[a] || 0) + q0 + nodes[a].hyd.length * qh; // hydrants on the connection itself draw straight from it
       srcFlow[b] = (srcFlow[b] || 0) + (D - q0);
     });
     return { flows: flows, losses: losses, drop: drop, srcFlow: srcFlow };
@@ -260,7 +266,7 @@
     return {
       basis: "dod", edition: "2021", dodRange: false,
       ps: 68.3, pr: 61.2, qf: 1250, testElev: 0, connElev: 0, hydElev: 0, minResidual: 20,
-      qreq: 5000, nHyd: 4, qh: 1250, placement: "far",
+      qreq: 5000, nHyd: 4, qh: 1250, placement: "far", dropMin: 10,
       loopLen: 1267, sources: 1, material: "di", custom: null, maxVel: 10, breakMode: "50", surge: 0, fittingPct: 0, hydLoss: 0,
       arms: [], displaySize: "auto",
     };
@@ -269,7 +275,7 @@
   function armOf(inp, i) {
     var a = (inp.arms && inp.arms[i]) || {};
     var size = SIZES.some(function (s) { return s.nom === +a.size; }) ? +a.size : 6;
-    return { size: size, len: Math.max(0, num(a.len, 0)) };
+    return { size: size, len: Math.max(0, num(a.len, 0)), sizeSet: a.sizeSet === true };
   }
 
   function evaluate(raw, uset) {
@@ -277,7 +283,8 @@
     var FU = function (k, v) { return fmtU(u, k, v); };
     var SL = function (nom) { var z = SIZES.find(function (x) { return x.nom === nom; }); return u.sys === "metric" && z ? "DN" + z.dn : nom + " in."; };
     var inp = Object.assign(defaults(), raw || {});
-    ["ps", "pr", "qf", "testElev", "connElev", "hydElev", "minResidual", "qreq", "qh", "loopLen", "maxVel", "surge", "fittingPct", "hydLoss"].forEach(function (k) { inp[k] = num(inp[k], defaults()[k]); });
+    ["ps", "pr", "qf", "testElev", "connElev", "hydElev", "minResidual", "qreq", "qh", "loopLen", "maxVel", "surge", "fittingPct", "hydLoss", "dropMin"].forEach(function (k) { inp[k] = num(inp[k], defaults()[k]); });
+    { var dm = (raw || {}).dropMin; if (dm === null || dm === undefined || dm === "" || !(inp.dropMin >= 0)) inp.dropMin = 10; } // blank or invalid threshold falls back to the 10% default
     // required inputs are never defaulted silently: null, "" and undefined stay missing (NaN) and raise an error below
     ["ps", "pr", "qf", "qh", "loopLen"].forEach(function (k) { var v = (raw || {})[k]; if (v === null || v === undefined || v === "" || (typeof v === "number" && !isFinite(v))) inp[k] = NaN; });
     inp.nHyd = Math.max(0, Math.round(num(inp.nHyd, 0)));
@@ -302,10 +309,11 @@
     supply.ok = Q <= qrMin + 1e-9;
     supply.at = function (q) { return supplyPressure(inp.ps, inp.pr, inp.qf, q) + PSI_PER_FT * (inp.testElev - inp.connElev); };
     res.supply = supply;
-    if (dropPct < 10) warnings.push({ id: "drop", level: "warn", text: "Test pressure drop is " + dropPct.toFixed(1) + "% of static, under the 10% guideline: the extrapolation is unreliable (NFPA 291)." });
+    if (dropPct < inp.dropMin) warnings.push({ id: "drop", level: "warn", text: "Test pressure drop is " + dropPct.toFixed(1) + "% of static, under the " + fmtNum(inp.dropMin, inp.dropMin % 1 ? 1 : 0) + "% warning threshold: the extrapolation is unreliable (NFPA 291). The default here is 10% (this tool's spec); Flow Test Report uses 25%. Enter 25 in the test-drop threshold field to match it." });
     if (Q > 2 * inp.qf) warnings.push({ id: "extrap2", level: "warn", text: "Demand " + FU("flow", Q) + " is more than 2 times the test flow (" + FU("flow", inp.qf) + "): extrapolating the test curve this far is unreliable. Confirm the limit with the AHJ (U)." });
     else if (Q > 1.5 * inp.qf) warnings.push({ id: "extrap15", level: "warn", text: "Demand " + FU("flow", Q) + " is more than 1.5 times the test flow (" + FU("flow", inp.qf) + "): extrapolation reliability is reduced. Confirm the limit with the AHJ (U)." });
-    if (!supply.ok) warnings.push({ id: "supply", level: "fail", text: "The water supply cannot deliver the demand: available flow at " + FU("press", inp.minResidual) + " is " + FU("flow", qrMin) + ", demand is " + FU("flow", Q) + ". No pipe size can fix this. A larger test flow, a second source with its own test, or a lower demand is needed." });
+    if (Math.abs(Q - qrMin) <= 0.005 * qrMin) warnings.push({ id: "atlimit", level: supply.ok ? "warn" : "fail", text: "Demand " + FU("flow", Q) + " is at the supply limit (" + FU("flow", qrMin) + " available at " + FU("press", inp.minResidual) + "). Any friction loss in the loop drops the hydrants below " + FU("press", inp.minResidual) + ", so the loop needs more supply or less demand." });
+    else if (!supply.ok) warnings.push({ id: "supply", level: "fail", text: "The water supply cannot deliver the demand: available flow at " + FU("press", inp.minResidual) + " is " + FU("flow", qrMin) + ", demand is " + FU("flow", Q) + ". No pipe size can fix this. A larger test flow, a second source with its own test, or a lower demand is needed." });
     if (inp.basis === "dod" && inp.qh > 1250 + 1e-9) warnings.push({ id: "qh", level: "fail", text: "Flow per hydrant " + FU("flow", inp.qh) + " exceeds the UFC 3-600-01 limit of " + FU("flow", 1250) + " per hydrant." });
     if (Q + 1e-9 < inp.qreq) warnings.push({ id: "qreq", level: "warn", text: "Hydrants flowing (" + FU("flow", Q) + ") deliver less than the required fire flow (" + FU("flow", inp.qreq) + ")." });
     var bm = inp.breakMode === "100" ? 1 : inp.breakMode === "50" ? 0.5 : 0;
@@ -392,7 +400,7 @@
     var firstAny = sizes[0].intact;
     arms.forEach(function (a, h) {
       var aid = mat.ids[a.size], v = velocity(inp.qh, aid);
-      armCheck.push({ i: h, size: a.size, len: a.len, id: aid, vel: v, loss: hwLoss(inp.qh, a.len * fit, mat.c, aid), ok: v <= inp.maxVel + 1e-9 });
+      armCheck.push({ i: h, size: a.size, len: a.len, sizeAssumed: !a.sizeSet && a.size === 6, lenAssumed: !(a.len > 0), id: aid, vel: v, loss: hwLoss(inp.qh, a.len * fit, mat.c, aid), ok: v <= inp.maxVel + 1e-9 });
     });
     var armsOk = armCheck.every(function (x) { return x.ok; });
     if (!armsOk) {
@@ -425,7 +433,13 @@
     res.detail = sizes.find(function (s) { return s.nom === disp; });
     res.pass = smallest != null && armsOk && supply.ok;
     res.q = Q; res.breakFraction = bm;
-    if (smallest == null) res.summary = (res.supplyLimited ? "No size passes: the water supply cannot deliver " + FU("flow", Q) + " at " + FU("press", inp.minResidual) + " (available " + FU("flow", qrMin) + ")." : "No listed size passes all checks.") + (smallestVel ? " Smallest size under the velocity limit: " + SL(smallestVel) + "." : "");
+    // demand within 0.5% of the available flow at the minimum residual is "at the supply limit" (rounding and test scatter), either side of it
+    supply.atLimit = Math.abs(Q - qrMin) <= 0.005 * qrMin;
+    if (smallest == null) {
+      var vtail = smallestVel ? " Smallest size under the velocity limit: " + SL(smallestVel).replace(/\.$/, "") + "." : "";
+      if (res.supplyLimited && supply.atLimit) res.summary = "No size passes: demand " + FU("flow", Q) + " is at the supply limit (" + FU("flow", qrMin) + " available at " + FU("press", inp.minResidual) + "), so any friction loss in the loop drops the hydrants below " + FU("press", inp.minResidual) + "." + vtail;
+      else res.summary = (res.supplyLimited ? "No size passes: the water supply cannot deliver " + FU("flow", Q) + " at " + FU("press", inp.minResidual) + " (available " + FU("flow", qrMin) + ")." : "No listed size passes all checks.") + vtail;
+    }
     else res.summary = "Smallest passing main size: " + SL(smallest) + " (" + controlling + ")." + (armsOk ? "" : " The hydrant arms fail the velocity limit; see the arm warning.");
     res.items = itemsToConfirm(inp, mat, res, u);
     res.criteria = criteriaFor(inp, u);
@@ -505,56 +519,106 @@
     o = o || {};
     if (!res || !res.detail) return "";
     var inp = res.input, d = res.detail, c = d.intact, net = c.net || buildNetwork(inp);
-    var W = 780, H = 700, cx = W / 2, cy = H / 2 + 6, R = 170, Rh = 262;
+    var W = 780, cx = W / 2, R = 170, Rh = 250, dense = inp.nHyd > 8, pad = dense ? 52 : 0, cy = 330 + pad, stemEnd = dense ? Rh + 30 : R + 52; // dense: the connection labels sit beyond the hydrant ring
     var sizeLbl = function (nom) { return u.sys === "metric" ? "DN" + (SIZES.find(function (s) { return s.nom === nom; }) || {}).dn : nom + " in."; };
     var L = inp.loopLen;
+    // Geometry the layout check reads (o.layout): text boxes, circles and line segments in SVG units.
+    var lay = { W: W, cx: cx, cy: cy, R: R, boxes: [], circles: [], lines: [] };
+    if (o.layout) Object.keys(lay).forEach(function (k) { o.layout[k] = lay[k]; });
     function ang(pos) { return (-90 + 360 * pos / L) * Math.PI / 180; }
     function pt(a, r) { return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; }
     function f1(x) { return x.toFixed(1); }
-    var out = [];
-    out.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Hydrant loop schematic" class="hls-diagram" font-family="Arial,Helvetica,sans-serif">');
-    out.push('<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="#fff"/>');
-    out.push('<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="#1d4e89" stroke-width="6"/>');
-    // segment labels
-    var nseg = c.segs.length;
+    function box(kind, x, y, lines, fs, anchor) { // x,y = baseline of the first line; records the text box
+      var w = 0; lines.forEach(function (t) { w = Math.max(w, t.length * fs * 0.56); });
+      var x0 = anchor === "middle" ? x - w / 2 : anchor === "end" ? x - w : x;
+      lay.boxes.push({ kind: kind, x0: x0, x1: x0 + w, y0: y - fs, y1: y + (lines.length - 1) * (fs + 3) + fs * 0.25 });
+    }
+    function ln(kind, p, q) { lay.lines.push({ kind: kind, x1: p[0], y1: p[1], x2: q[0], y2: q[1] }); }
+    var body = [];
+    body.push('<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="#1d4e89" stroke-width="6"/>');
+    // segment labels: inside the ring; with many segments the labels alternate between two radii so neighbours never share space
+    var nseg = c.segs.length, live = c.segs.filter(function (sg) { return sg.len > 1e-9; }).length, idx = 0;
+    var fsSeg = live > 12 ? 8 : live > 4 ? 10 : 11;
     c.segs.forEach(function (sg, si) {
       var p0 = net.nodes[sg.a].pos, p1 = si === nseg - 1 ? L + net.nodes[0].pos : net.nodes[sg.b].pos;
       if (sg.len < 1e-9) return;
-      var mid = (p0 + p1) / 2, a = ang(mid), tp = pt(a, R - 46);
+      var mid = (p0 + p1) / 2, a = ang(mid);
       var dir = sg.flow > 1e-9 ? "\u21BB" : sg.flow < -1e-9 ? "\u21BA" : "";
       var lines = [sizeLbl(d.nom) + " \u00B7 " + fmtNum(sg.len * u.kinds.len.k, 0) + " " + u.kinds.len.label, fmtNum(Math.abs(sg.flow) * u.kinds.flow.k, u.kinds.flow.digits) + " " + u.kinds.flow.label + " " + dir];
+      // the whole text box sits inside the ring: the centre is pulled in by the box's reach in the label's direction
+      var hw = Math.max(lines[0].length, lines[1].length) * fsSeg * 0.56 / 2, hh = fsSeg + 2;
+      function maxCorner(r) { var q = pt(a, r), m = 0; [[-hw, -hh], [hw, -hh], [-hw, hh + 3], [hw, hh + 3]].forEach(function (k) { m = Math.max(m, Math.hypot(q[0] + k[0] - cx, q[1] + k[1] - cy)); }); return m; }
+      var rr = R - 10; while (rr > 0 && maxCorner(rr) > R - 10) rr -= 1;
+      // greedy: take the outermost radius whose text box does not touch a label already placed (neighbours, including the one across the 12 o'clock join)
+      for (var guard = 0; guard < 40 && rr > 0; guard++) {
+        var q2 = pt(a, rr), cand = { x0: q2[0] - hw, x1: q2[0] + hw, y0: q2[1] - 3 - fsSeg, y1: q2[1] + fsSeg + 5 };
+        var hit = lay.boxes.some(function (b) { return b.kind === "seg" && cand.x0 < b.x1 + 3 && b.x0 < cand.x1 + 3 && cand.y0 < b.y1 + 3 && b.y0 < cand.y1 + 3; });
+        if (!hit) break;
+        rr -= 6;
+      }
+      var tp = pt(a, rr);
       var tick = pt(a, R), tick2 = pt(a, R - 12);
-      out.push('<line x1="' + f1(tick[0]) + '" y1="' + f1(tick[1]) + '" x2="' + f1(tick2[0]) + '" y2="' + f1(tick2[1]) + '" stroke="#64748b" stroke-width="1"/>');
-      out.push('<text class="seg-label" text-anchor="middle" font-size="11" fill="#0f172a"><tspan x="' + f1(tp[0]) + '" y="' + f1(tp[1] - 3) + '">' + esc(lines[0]) + '</tspan><tspan x="' + f1(tp[0]) + '" dy="13">' + esc(lines[1]) + "</tspan></text>");
+      body.push('<line x1="' + f1(tick[0]) + '" y1="' + f1(tick[1]) + '" x2="' + f1(tick2[0]) + '" y2="' + f1(tick2[1]) + '" stroke="#64748b" stroke-width="1"/>');
+      body.push('<text class="seg-label" text-anchor="middle" font-size="' + fsSeg + '" fill="#0f172a"><tspan x="' + f1(tp[0]) + '" y="' + f1(tp[1] - 3) + '">' + esc(lines[0]) + '</tspan><tspan x="' + f1(tp[0]) + '" dy="' + (fsSeg + 2) + '">' + esc(lines[1]) + "</tspan></text>");
+      lay.boxes.push({ kind: "seg", x0: tp[0] - hw, x1: tp[0] + hw, y0: tp[1] - 3 - fsSeg, y1: tp[1] - 3 + fsSeg + 2 + 3 });
     });
-    // sources
+    // connections (a hydrant that sits on a connection is drawn beside it, clockwise)
+    var hydPts = [];
+    function hydrant(h, base, fromNode) {
+      var p = pt(fromNode, R), q = pt(base, Rh);
+      var hy = c.hy[h], ok = hy.residual >= inp.minResidual - 1e-9;
+      body.push('<line x1="' + f1(p[0]) + '" y1="' + f1(p[1]) + '" x2="' + f1(q[0]) + '" y2="' + f1(q[1]) + '" stroke="#475569" stroke-width="3"/>');
+      body.push('<circle cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="4" fill="#1d4e89"/>');
+      body.push('<circle class="hydrant ' + (ok ? "ok" : "bad") + '" cx="' + f1(q[0]) + '" cy="' + f1(q[1]) + '" r="12" fill="' + (ok ? "#dcfce7" : "#fee2e2") + '" stroke="' + (ok ? "#15803d" : "#b91c1c") + '" stroke-width="2.5"/>');
+      body.push('<text x="' + f1(q[0]) + '" y="' + f1(q[1] + 4) + '" text-anchor="middle" font-size="' + (h >= 9 ? 10 : 11) + '" font-weight="700" fill="#0f172a">H' + (h + 1) + "</text>");
+      ln("arm", p, q); lay.circles.push({ kind: "hyd", cx: q[0], cy: q[1], r: 14 });
+      hydPts.push({ h: h, ok: ok });
+    }
     net.nodes.forEach(function (nd, ni) {
       if (nd.type !== "S") return;
-      var a = ang(nd.pos), p = pt(a, R), q = pt(a, R + 52), t = pt(a, R + 66);
-      var fl = c.srcFlows ? c.srcFlows[ni] : (nd.src === 0 ? res.q / inp.sources : res.q / inp.sources);
-      out.push('<line x1="' + f1(p[0]) + '" y1="' + f1(p[1]) + '" x2="' + f1(q[0]) + '" y2="' + f1(q[1]) + '" stroke="#0f172a" stroke-width="4"/>');
-      out.push('<rect x="' + f1(p[0] - 9) + '" y="' + f1(p[1] - 9) + '" width="18" height="18" fill="#0f172a"/>');
-      out.push('<text text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a"><tspan x="' + f1(t[0]) + '" y="' + f1(t[1]) + '">Connection ' + (nd.src + 1) + '</tspan><tspan x="' + f1(t[0]) + '" dy="14">' + esc(fmtNum(fl * u.kinds.flow.k, u.kinds.flow.digits) + " " + u.kinds.flow.label) + "</tspan></text>");
+      var a = ang(nd.pos), p = pt(a, R), q = pt(a, stemEnd);
+      var fl = c.srcFlows ? c.srcFlows[ni] : res.q / inp.sources;
+      var cl = ["Connection " + (nd.src + 1), fmtNum(fl * u.kinds.flow.k, u.kinds.flow.digits) + " " + u.kinds.flow.label];
+      var chw = Math.max(cl[0].length, cl[1].length) * 12 * 0.56 / 2, chh = 15;
+      var ext = chw * Math.abs(Math.cos(a)) + chh * Math.abs(Math.sin(a)) + 6, t0 = pt(a, stemEnd + ext), t = [t0[0], t0[1] - 6];
+      body.push('<line x1="' + f1(p[0]) + '" y1="' + f1(p[1]) + '" x2="' + f1(q[0]) + '" y2="' + f1(q[1]) + '" stroke="#0f172a" stroke-width="4"/>');
+      body.push('<rect x="' + f1(p[0] - 9) + '" y="' + f1(p[1] - 9) + '" width="18" height="18" fill="#0f172a"/>');
+      body.push('<text text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a"><tspan x="' + f1(t[0]) + '" y="' + f1(t[1]) + '">' + esc(cl[0]) + '</tspan><tspan x="' + f1(t[0]) + '" dy="14">' + esc(cl[1]) + "</tspan></text>");
+      lay.boxes.push({ kind: "conn", x0: t0[0] - chw, x1: t0[0] + chw, y0: t[1] - 12, y1: t[1] + 14 + 3 }); ln("stem", p, q); lay.circles.push({ kind: "src", cx: p[0], cy: p[1], r: 10 });
+      nd.hyd.forEach(function (h, k) { hydrant(h, a + (22 + 18 * k) * Math.PI / 180, a); });
     });
-    // hydrants and arms
-    net.nodes.forEach(function (nd, ni) {
+    net.nodes.forEach(function (nd) {
       if (nd.type !== "H") return;
-      var m = nd.hyd.length, base = ang(nd.pos);
-      nd.hyd.forEach(function (h, k) {
-        var off = (k - (m - 1) / 2) * (m > 1 && nd.hyd.length === inp.nHyd && inp.placement !== "even" ? (m <= 4 ? 24 : 14) : 0) * Math.PI / 180;
-        var a = base + off, p = pt(base, R), q = pt(a, Rh);
-        var hy = c.hy[h], ar = res.arms[h], ok = hy.residual >= inp.minResidual - 1e-9;
-        out.push('<line x1="' + f1(p[0]) + '" y1="' + f1(p[1]) + '" x2="' + f1(q[0]) + '" y2="' + f1(q[1]) + '" stroke="#475569" stroke-width="3"/>');
-        out.push('<circle cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="4" fill="#1d4e89"/>');
-        out.push('<circle class="hydrant ' + (ok ? "ok" : "bad") + '" cx="' + f1(q[0]) + '" cy="' + f1(q[1]) + '" r="12" fill="' + (ok ? "#dcfce7" : "#fee2e2") + '" stroke="' + (ok ? "#15803d" : "#b91c1c") + '" stroke-width="2.5"/>');
-        out.push('<text x="' + f1(q[0]) + '" y="' + f1(q[1] + 4) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">H' + (h + 1) + "</text>");
-        var lp = pt(a, Rh + 34 + (m > 1 && k % 2 ? 28 : 0));
-        out.push('<text class="arm-label" text-anchor="middle" font-size="10" fill="#0f172a"><tspan x="' + f1(lp[0]) + '" y="' + f1(lp[1] - 12) + '">' + esc("Arm " + sizeLbl(ar.size) + " \u00B7 " + fmtNum(ar.len * u.kinds.len.k, 0) + " " + u.kinds.len.label) + '</tspan><tspan x="' + f1(lp[0]) + '" dy="12">' + esc(fmtNum(hy.q * u.kinds.flow.k, u.kinds.flow.digits) + " " + u.kinds.flow.label + " \u00B7 " + fmtNum(hy.residual * u.kinds.press.k, u.kinds.press.digits) + " " + u.kinds.press.label) + "</tspan></text>");
-      });
+      var m = nd.hyd.length, base = ang(nd.pos), step = (m > 1 ? Math.min(m <= 4 ? 24 : 14, 150 / (m - 1)) : 0) * Math.PI / 180;
+      nd.hyd.forEach(function (h, k) { hydrant(h, base + (k - (m - 1) / 2) * step, base); });
     });
-    out.push('<text x="14" y="22" font-size="13" font-weight="700" fill="#1d4e89">Loop schematic \u2014 ' + esc(sizeLbl(d.nom)) + " main, " + inp.sources + " connection" + (inp.sources > 1 ? "s" : "") + ", " + inp.nHyd + " hydrant" + (inp.nHyd > 1 ? "s" : "") + " flowing</text>");
-    out.push('<text x="14" y="38" font-size="10" fill="#475569">Intact loop. Not to scale. \u21BB / \u21BA = flow clockwise / counterclockwise. Hydrant colour: green meets the minimum residual, red does not.' + (inp.placement === "even" ? "" : " All hydrants shown at the farthest point.") + "</text>");
+    // legend: one line per hydrant (arm size and length, flow, residual), two columns, below the drawing
+    var y0 = cy + Rh + 44 + pad, rows = Math.ceil(inp.nHyd / 2), anyAssumed = false, leg = [];
+    for (var h = 0; h < inp.nHyd; h++) {
+      var ar = res.arms[h], hy = c.hy[h], ok = hy.residual >= inp.minResidual - 1e-9, as = ar.sizeAssumed || ar.lenAssumed; if (as) anyAssumed = true;
+      var col = h % 2, row = (h - col) / 2, x = 40 + col * 372, y = y0 + 16 + row * 16;
+      var txt = "H" + (h + 1) + "  Arm " + sizeLbl(ar.size) + " \u00B7 " + fmtNum(ar.len * u.kinds.len.k, 0) + " " + u.kinds.len.label + (as ? " *" : "") + "  \u00B7  " + fmtNum(hy.q * u.kinds.flow.k, u.kinds.flow.digits) + " " + u.kinds.flow.label + "  \u00B7  " + fmtNum(hy.residual * u.kinds.press.k, u.kinds.press.digits) + " " + u.kinds.press.label;
+      leg.push('<circle cx="' + (x - 10) + '" cy="' + (y - 4) + '" r="5" fill="' + (ok ? "#16a34a" : "#dc2626") + '"/>');
+      leg.push('<text class="arm-label" x="' + x + '" y="' + y + '" font-size="11" fill="#0f172a">' + esc(txt) + "</text>");
+      box("legend", x, y, [txt], 11, "start");
+    }
+    var H = y0 + 16 + rows * 16 + (anyAssumed ? 18 : 4) + 8;
+    var out = [];
+    out.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Hydrant loop schematic" class="hls-diagram" font-family="Arial,Helvetica,sans-serif">');
+    out.push('<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="#fff"/>');
+    var sub = ["Intact loop. Not to scale. \u21BB / \u21BA = flow clockwise / counterclockwise.", "Hydrant colour: green meets the minimum residual, red does not." + (inp.placement === "even" ? "" : " All hydrants shown at the farthest point.")];
+    var ttl = "Loop schematic \u2014 " + sizeLbl(d.nom) + " main, " + inp.sources + " connection" + (inp.sources > 1 ? "s" : "") + ", " + inp.nHyd + " hydrant" + (inp.nHyd > 1 ? "s" : "") + " flowing";
+    out.push('<text x="14" y="20" font-size="13" font-weight="700" fill="#1d4e89">' + esc(ttl) + "</text>");
+    out.push('<text x="14" y="37" font-size="10" fill="#475569">' + esc(sub[0]) + "</text>");
+    out.push('<text x="14" y="52" font-size="10" fill="#475569">' + esc(sub[1]) + "</text>");
+    box("title", 14, 20, [ttl], 13, "start"); box("title", 14, 37, [sub[0]], 10, "start"); box("title", 14, 52, [sub[1]], 10, "start");
+    out = out.concat(body);
+    out.push('<text x="14" y="' + (y0 + 2) + '" font-size="11" font-weight="700" fill="#1d4e89">Hydrants: arm size and length, flow, residual pressure at the hydrant</text>');
+    out = out.concat(leg);
+    if (anyAssumed) out.push('<text x="14" y="' + (y0 + 16 + rows * 16 + 12) + '" font-size="10" fill="#92400e">* Arm size or length left at the default (6 in., length not entered): assumed, confirm.</text>');
     out.push("</svg>");
+    lay.H = H;
+    if (o.layout) o.layout.H = H;
     return out.join("");
   }
 

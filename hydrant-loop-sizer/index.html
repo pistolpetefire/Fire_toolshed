@@ -17,7 +17,7 @@
     <div>
       <p class="eyebrow">Fire Toolshed · Water supply</p>
       <h1>Hydrant Loop Sizer</h1>
-      <p class="version" id="appVersion">Version 1.0.0</p>
+      <p class="version" id="appVersion">Version 1.0.1</p>
       <p class="version" id="codeEdition">Code basis: —</p>
       <p class="lead">Sizes a private hydrant loop (6, 8, 10, 12, 16 in.) from a flow test: NFPA 291 available flow, ring hydraulics with hydrant arms, velocity, single-break case and pressure class. <strong>Hydrant-only supply</strong>: if the main also feeds sprinklers or standpipes, size that separately.</p>
     </div>
@@ -33,7 +33,7 @@
   <section class="metrics" aria-label="Results">
     <div class="metric"><div class="label" id="lblQr">Available flow at 20 psi</div><div class="value" id="mQr">—</div></div>
     <div class="metric"><div class="label">Demand (hydrants flowing)</div><div class="value" id="mDemand">—</div></div>
-    <div class="metric"><div class="label">Test drop</div><div class="value" id="mDropPct">—</div></div>
+    <div class="metric"><div class="label">Test drop</div><div class="value" id="mDropPct">—</div><div class="sub" id="mDropNote">Warns under 10% (Flow Test Report: 25%)</div></div>
     <div class="metric metric-wide"><div class="label">Smallest passing size</div><div class="value" id="mSmallest">—</div></div>
     <div class="metric"><div class="label">Max working pressure</div><div class="value" id="mWork">—</div></div>
   </section>
@@ -101,8 +101,10 @@
           <label>Connection elevation <span class="u" data-kind="elev"></span><input id="connElev" type="number" step="any" inputmode="decimal"></label>
           <label>Loop hydrant elevation <span class="u" data-kind="elev"></span><input id="hydElev" type="number" step="any" inputmode="decimal"></label>
           <label>Minimum residual <span class="u" data-kind="press"></span><input id="minResidual" type="number" step="any" inputmode="decimal"></label>
+          <label>Test-drop warning below (% of static)<input id="dropMin" type="number" min="0" max="100" step="any" inputmode="decimal"></label>
         </div>
         <p class="hint">Elevations default to 0 (level). Elevation head is 0.433 psi per ft.</p>
+        <p class="hint" id="dropHint">A flow test whose pressure drop is under the warning threshold gives an unreliable extrapolation. This tool defaults to 10% (its spec); the Flow Test Report app uses 25%. Enter 25 to match it, or leave the default of 10.</p>
       </section>
 
       <section class="panel">
@@ -157,7 +159,7 @@
 
       <section class="panel">
         <h2>Hydrant arms (laterals)</h2>
-        <p class="hint">Each hydrant has its own arm. Size defaults to 6 in. (NFPA 24 minimum); length is optional (blank or 0 means no arm friction is added). Arm friction and arm velocity go into each hydrant's residual check.</p>
+        <p class="hint">Each hydrant has its own arm. Size defaults to 6 in. (NFPA 24 minimum) and length is optional (blank or 0 means no arm friction is added). An arm left at the default size, or with no length, is marked "assumed, confirm" in the printout. Arm friction and arm velocity go into each hydrant's residual check.</p>
         <div class="fields three">
           <label>All arms: size<select id="armAllSize"></select></label>
           <label>All arms: length <span class="u" data-kind="len"></span><input id="armAllLen" type="number" step="any"></label>
@@ -199,7 +201,7 @@
     </div>
   </div>
 
-  <footer class="foot"><span>Hydrant Loop Sizer · <span id="footVersion">1.0.0</span> · local browser app</span></footer>
+  <footer class="foot"><span>Hydrant Loop Sizer · <span id="footVersion">1.0.1</span> · local browser app</span></footer>
 </div>
 
 <div id="helpModal" class="modal hidden no-print" role="dialog" aria-modal="true" aria-labelledby="helpTitle">

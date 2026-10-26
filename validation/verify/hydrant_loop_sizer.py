@@ -40,7 +40,12 @@ def layout(L, nsrc, nh, placement):
     nodes = [(0.0, 'S', [])]
     if nsrc == 2: nodes.append((L / 2, 'S', []))
     if placement == 'even':
-        for i in range(nh): nodes.append(((i + 0.5) / nh * L, 'H', [i]))
+        for i in range(nh):
+            hp = (i + 0.5) / nh * L
+            # a hydrant that falls exactly on a connection is fed by that connection (no zero-length pipe); v1.0.1
+            on = [k for k, nd in enumerate(nodes) if nd[1] == 'S' and abs(nd[0] - hp) < 1e-9 * L]
+            if on: nodes[on[0]][2].append(i)
+            else: nodes.append((hp, 'H', [i]))
     else:
         nodes.append((L / 4 if nsrc == 2 else L / 2, 'H', list(range(nh))))
     nodes.sort(key=lambda t: (t[0], t[1] != 'S'))
@@ -58,6 +63,7 @@ def solve_heads(nodes, edges, qh, k, head0):
     """Node-head method. Unknown: head of every non-source node. Returns heads and edge flows (positive i -> j)."""
     unk = [i for i, nd in enumerate(nodes) if nd[1] == 'H']
     dem = {i: len(nodes[i][2]) * qh for i in unk}
+    if not unk: return [head0] * len(nodes), [0.0] * len(edges)   # every node is a connection: equal heads, no flow in the pipes
     def flows(h):
         f = []
         for (i, j, ln) in edges:
@@ -276,6 +282,20 @@ add('even2-metric', 'Same loop switched to metric (DN, m, L/min, kPa): values eq
 # bar and m3/h
 reads5 = [rd('#mQr', 'Available flow (m3/h)', 'm3/h', R['qr'] * 0.2271247070, 1), rd('#sz-10-res', 'DN250 intact min residual', 'bar', s10['res'] * 0.06894757293, 2), rd('#hy-1-q', 'Flow per hydrant', 'm3/h', 1000 * 0.2271247070, 1)]
 add('even2-m3h-bar', 'Same loop with m3/h and bar', [{'call': 'HLSApp.load(%s)' % cs(st3)}, {'set': '#unitSystem', 'value': 'metric'}, {'set': '#flowUnit', 'value': 'm3h'}, {'set': '#pressUnit', 'value': 'bar'}], reads5)
+
+# Case 4b (v1.0.1): hydrants that fall exactly on a connection (even placement). A hydrant on a connection is fed by it directly:
+# no zero-length pipe segment, no flow in the main for 1 hydrant / 2 connections.
+for cid, nh_, qreq_, title in [('src-hyd-1h2s', 1, 1250, '1 hydrant x 1,250 gpm, 2 connections, even placement: the hydrant sits on connection 2 (SEA test, 2,000 ft DI loop)'),
+                               ('src-hyd-3h2s', 3, 3750, '3 hydrants x 1,250 gpm, 2 connections, even placement: the middle hydrant sits on connection 2 (SEA test, 2,000 ft DI loop)')]:
+    cfg = dict(ps=68.3, pr=61.2, qf=1250, nh=nh_, qh=1250, L=2000, sources=2, placement='even', **DI)
+    Rs = run(cfg); s6 = Rs['sizes'][6]; s8_ = Rs['sizes'][8]
+    sts = state({'nHyd': nh_, 'qreq': qreq_, 'sources': 2, 'placement': 'even', 'displaySize': 6})
+    rds = [rd('#sz-6-vel', '6 in. intact velocity (max over live pipe segments)', 'ft/s', s6['vel'], 3), rd('#sz-6-res', '6 in. intact min residual', 'psi', s6['res'], 3),
+           rd('#sz-6-bvel', '6 in. break velocity', 'ft/s', s6['bvel'], 3), rd('#sz-6-bres', '6 in. break min residual', 'psi', s6['bres'], 3),
+           rd('#sz-8-vel', '8 in. intact velocity', 'ft/s', s8_['vel'], 3), rd('#sz-8-res', '8 in. intact min residual', 'psi', s8_['res'], 3),
+           rd('#hy-1-av', 'Arm velocity H1 (6 in. DI arm, 1,250 gpm)', 'ft/s', Rs['arms'][0][0], 3)]
+    add(cid, title, [{'call': 'HLSApp.load(%s)' % cs(sts)}], rds)
+    print(cid, '6in vel', s6['vel'], 'res', s6['res'], 'bvel', s6['bvel'], 'bres', s6['bres'], '| 8in vel', s8_['vel'], 'res', s8_['res'])
 
 # Case 5: SEA in metric: displayed metric values equal the US values converted
 Rsea = run(sea)

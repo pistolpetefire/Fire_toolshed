@@ -335,6 +335,114 @@ window.FT_VERIFY_CASES = {
    ]
   },
   {
+   "id": "src-hyd-1h2s",
+   "title": "1 hydrant x 1,250 gpm, 2 connections, even placement: the hydrant sits on connection 2 (SEA test, 2,000 ft DI loop)",
+   "source": "See script header",
+   "steps": [
+    {
+     "call": "HLSApp.load({\"basis\": \"dod\", \"edition\": \"c6\", \"ps\": 68.3, \"pr\": 61.2, \"qf\": 1250, \"qreq\": 1250, \"nHyd\": 1, \"qh\": 1250, \"loopLen\": 2000, \"sources\": 2, \"placement\": \"even\", \"material\": \"di\", \"breakMode\": \"50\", \"maxVel\": 10, \"displaySize\": 6})"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#sz-6-vel",
+     "label": "6 in. intact velocity (max over live pipe segments)",
+     "unit": "ft/s",
+     "ref": 0.0
+    },
+    {
+     "sel": "#sz-6-res",
+     "label": "6 in. intact min residual",
+     "unit": "psi",
+     "ref": 61.2
+    },
+    {
+     "sel": "#sz-6-bvel",
+     "label": "6 in. break velocity",
+     "unit": "ft/s",
+     "ref": 0.0
+    },
+    {
+     "sel": "#sz-6-bres",
+     "label": "6 in. break min residual",
+     "unit": "psi",
+     "ref": 66.331
+    },
+    {
+     "sel": "#sz-8-vel",
+     "label": "8 in. intact velocity",
+     "unit": "ft/s",
+     "ref": 0.0
+    },
+    {
+     "sel": "#sz-8-res",
+     "label": "8 in. intact min residual",
+     "unit": "psi",
+     "ref": 61.2
+    },
+    {
+     "sel": "#hy-1-av",
+     "label": "Arm velocity H1 (6 in. DI arm, 1,250 gpm)",
+     "unit": "ft/s",
+     "ref": 12.947
+    }
+   ]
+  },
+  {
+   "id": "src-hyd-3h2s",
+   "title": "3 hydrants x 1,250 gpm, 2 connections, even placement: the middle hydrant sits on connection 2 (SEA test, 2,000 ft DI loop)",
+   "source": "See script header",
+   "steps": [
+    {
+     "call": "HLSApp.load({\"basis\": \"dod\", \"edition\": \"c6\", \"ps\": 68.3, \"pr\": 61.2, \"qf\": 1250, \"qreq\": 3750, \"nHyd\": 3, \"qh\": 1250, \"loopLen\": 2000, \"sources\": 2, \"placement\": \"even\", \"material\": \"di\", \"breakMode\": \"50\", \"maxVel\": 10, \"displaySize\": 6})"
+    }
+   ],
+   "reads": [
+    {
+     "sel": "#sz-6-vel",
+     "label": "6 in. intact velocity (max over live pipe segments)",
+     "unit": "ft/s",
+     "ref": 7.672
+    },
+    {
+     "sel": "#sz-6-res",
+     "label": "6 in. intact min residual",
+     "unit": "psi",
+     "ref": 9.838
+    },
+    {
+     "sel": "#sz-6-bvel",
+     "label": "6 in. break velocity",
+     "unit": "ft/s",
+     "ref": 6.474
+    },
+    {
+     "sel": "#sz-6-bres",
+     "label": "6 in. break min residual",
+     "unit": "psi",
+     "ref": 47.03
+    },
+    {
+     "sel": "#sz-8-vel",
+     "label": "8 in. intact velocity",
+     "unit": "ft/s",
+     "ref": 4.258
+    },
+    {
+     "sel": "#sz-8-res",
+     "label": "8 in. intact min residual",
+     "unit": "psi",
+     "ref": 13.09
+    },
+    {
+     "sel": "#hy-1-av",
+     "label": "Arm velocity H1 (6 in. DI arm, 1,250 gpm)",
+     "unit": "ft/s",
+     "ref": 12.947
+    }
+   ]
+  },
+  {
    "id": "sea-metric",
    "title": "SEA case in metric: 470.9 / 422.0 kPa at 4,732 L/min",
    "source": "See script header",

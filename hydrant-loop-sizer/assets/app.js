@@ -27,7 +27,7 @@
   function blank() {
     return {
       basis: "dod", edition: "c6", dodRange: false,
-      ps: null, pr: null, qf: null, testElev: 0, connElev: 0, hydElev: 0, minResidual: 20,
+      ps: null, pr: null, qf: null, testElev: 0, connElev: 0, hydElev: 0, minResidual: 20, dropMin: 10,
       qreq: null, nHyd: null, qh: null, placement: "far", loopLen: null, sources: 1,
       material: "di", custom: { c: 140, rating: 150, ids: { 6: 6, 8: 8, 10: 10, 12: 12, 16: 16 } },
       maxVel: 10, breakMode: "50", surge: 0, fittingPct: 0, hydLoss: 0, arms: [], displaySize: "auto",
@@ -42,7 +42,7 @@
 
   var NUM = { ps: 1, pr: 1, qf: 1, testElev: 1, connElev: 1, hydElev: 1, minResidual: 1, qreq: 1, qh: 1, loopLen: 1, maxVel: 1, surge: 1, hydLoss: 1, ffArea: 1 };
   var KIND = Object.assign({}, E.FIELD_KINDS, { ffArea: "area" });
-  var PLAIN_NUM = { nHyd: 1, fittingPct: 1 };
+  var PLAIN_NUM = { nHyd: 1, fittingPct: 1, dropMin: 1 };
   var SEL = ["basis", "edition", "ffGroup", "ffSprinkler", "hydBand", "sources", "placement", "material", "breakMode"];
   var TXT = ["projectName", "address", "preparedBy", "reportDate"];
 
@@ -90,7 +90,7 @@
   }
   function ensureArms() {
     var n = Math.max(0, Math.min(16, Math.round(st.nHyd || 0)));
-    while (st.arms.length < n) st.arms.push({ size: 6, len: 0 });
+    while (st.arms.length < n) st.arms.push({ size: 6, len: 0, sizeSet: false });
     st.arms.length = n;
   }
   function writeArms() {
@@ -124,13 +124,13 @@
     ["unitSystem", "flowUnit", "pressUnit"].forEach(function (id) { $(id).addEventListener("change", setUnits); });
     $("armsBody").addEventListener("input", function (e) {
       var t = e.target, i = t.getAttribute("data-arm"), j = t.getAttribute("data-arm-len");
-      if (i != null) st.arms[+i].size = +t.value;
+      if (i != null) { st.arms[+i].size = +t.value; st.arms[+i].sizeSet = true; }
       if (j != null) { var v = parseFloat(t.value); st.arms[+j].len = isFinite(v) && v > 0 ? E.toUS(U(), "len", v) : 0; }
       save(); render();
     });
     $("btnArmAll").addEventListener("click", function () {
       var v = parseFloat($("armAllLen").value), size = +$("armAllSize").value; ensureArms();
-      st.arms.forEach(function (a) { a.size = size; a.len = isFinite(v) && v > 0 ? E.toUS(U(), "len", v) : 0; });
+      st.arms.forEach(function (a) { a.size = size; a.sizeSet = true; a.len = isFinite(v) && v > 0 ? E.toUS(U(), "len", v) : 0; });
       writeArms(); save(); render();
     });
     $("btnFF").addEventListener("click", doFF);
@@ -174,7 +174,7 @@
   function load(obj) {
     var u = st.units; st = Object.assign(blank(), obj || {}); if (!(obj && obj.units)) st.units = u;
     if (!st.custom || !st.custom.ids) st.custom = blank().custom;
-    st.arms = (st.arms || []).map(function (a) { return { size: a.size || 6, len: a.len || 0 }; });
+    st.arms = (st.arms || []).map(function (a) { return { size: a.size || 6, len: a.len || 0, sizeSet: a.sizeSet === true }; });
     ensureArms(); writeForm(); save(); render(); return lastRes;
   }
   function setUnits(sys, flowU, pressU) { st.units = { sys: sys, flowU: flowU || "lpm", pressU: pressU || "kpa" }; writeForm(); save(); render(); }
@@ -190,7 +190,7 @@
   function evalInput() {
     var o = JSON.parse(JSON.stringify(st));
     if (!(o.qreq > 0)) o.qreq = o.nHyd * o.qh;
-    o.arms = st.arms.map(function (a) { return { size: a.size, len: a.len }; });
+    o.arms = st.arms.map(function (a) { return { size: a.size, len: a.len, sizeSet: a.sizeSet === true }; });
     o.custom = st.custom;
     return o;
   }
@@ -221,7 +221,7 @@
     d.intact.hy.forEach(function (x, i) {
       var a = res.arms[i], p = "hy-" + (i + 1) + "-", okR = x.residual >= inp.minResidual - 1e-9, okV = a.ok;
       var why = []; if (!okR) why.push("residual"); if (!okV) why.push("arm velocity");
-      h += "<tr><td class=\"l\">H" + (i + 1) + "</td>" + td(E.fmt(u, "flow", x.q), "", p + "q", ids) + "<td>" + esc(sizeLbl(u, a.size)) + " × " + (a.len > 0 ? E.fmt(u, "len", a.len) + " " + E.label(u, "len") : "not entered") + "</td>" +
+      h += "<tr><td class=\"l\">H" + (i + 1) + "</td>" + td(E.fmt(u, "flow", x.q), "", p + "q", ids) + "<td>" + esc(sizeLbl(u, a.size)) + (a.sizeAssumed ? " (assumed, confirm)" : "") + " × " + (a.len > 0 ? E.fmt(u, "len", a.len) + " " + E.label(u, "len") : "length not entered (assumed, confirm)") + "</td>" +
         td(E.fmt(u, "vel", a.vel), okV ? "" : "fail", p + "av", ids) + td(E.fmt(u, "press", x.armLoss, u.kinds.press.digits + 1), "", p + "al", ids) + td(E.fmt(u, "press", x.nodeP), "", p + "np", ids) +
         td(E.fmt(u, "press", x.residual), okR ? "" : "fail", p + "res", ids) + td(why.length ? "FAIL: " + why.join(", ") : "PASS", why.length ? "fail l" : "pass l", p + "st", ids) + "</tr>";
     });
@@ -274,11 +274,20 @@
       (Math.abs(inp.minResidual - 20) > 1e-9 ? "<dt>Available flow at " + E.fmtU(u, "press", inp.minResidual) + "</dt><dd>" + E.fmtU(u, "flow", s.qrMin) + "</dd>" : "") +
       "<dt>Demand</dt><dd>" + inp.nHyd + " × " + E.fmtU(u, "flow", inp.qh) + " = " + E.fmtU(u, "flow", res.q) + " (" + (res.q / inp.qf).toFixed(2) + " × test flow)</dd><dt>Supply capacity check</dt><dd class=\"" + (s.ok ? "pass-t" : "fail-t") + '">' + (s.ok ? "PASS" : "FAIL: demand exceeds available flow") + "</dd><dt>Supply pressure at the connection at demand</dt><dd>" + E.fmtU(u, "press", s.at(res.q)) + "</dd></dl>";
   }
+  function armSummary(res, u) {
+    var A = res.arms, f = A[0];
+    var same = A.length > 0 && A.every(function (a) { return a.size === f.size && a.len === f.len && a.sizeAssumed === f.sizeAssumed && a.lenAssumed === f.lenAssumed; });
+    if (!same) {
+      var n = A.filter(function (a) { return a.sizeAssumed || a.lenAssumed; }).length;
+      return "per hydrant (see hydrant table)" + (n ? "; " + n + " of " + A.length + " arm" + (A.length > 1 ? "s" : "") + " use a default size or no length: assumed, confirm" : "");
+    }
+    return "All " + A.length + " arms: " + sizeLbl(u, f.size) + (f.sizeAssumed ? " (assumed, confirm)" : "") + ", " + (f.len > 0 ? E.fmtU(u, "len", f.len) : "length not entered, no arm friction (assumed, confirm)");
+  }
   function inputsHtml(res, u) {
-    var i = res.input, armNote = res.arms.every(function (a) { return a.size === res.arms[0].size && a.len === res.arms[0].len; }) ? "All " + res.arms.length + " arms: " + sizeLbl(u, res.arms[0].size) + ", " + (res.arms[0].len > 0 ? E.fmtU(u, "len", res.arms[0].len) : "length not entered (no arm friction)") : "per hydrant (see hydrant table)";
+    var i = res.input, armNote = armSummary(res, u);
     function row(k, v) { return "<dt>" + k + "</dt><dd>" + v + "</dd>"; }
     return '<dl class="kv">' + row("Code basis", esc(BASIS_NAME[i.basis]) + ", " + esc(editionName(i))) + row("Static / residual / test flow", E.fmtU(u, "press", i.ps) + " / " + E.fmtU(u, "press", i.pr) + " / " + E.fmtU(u, "flow", i.qf)) +
-      row("Elevations (test hydrant / connection / loop hydrants)", E.fmtU(u, "elev", i.testElev) + " / " + E.fmtU(u, "elev", i.connElev) + " / " + E.fmtU(u, "elev", i.hydElev)) + row("Minimum residual", E.fmtU(u, "press", i.minResidual)) +
+      row("Elevations (test hydrant / connection / loop hydrants)", E.fmtU(u, "elev", i.testElev) + " / " + E.fmtU(u, "elev", i.connElev) + " / " + E.fmtU(u, "elev", i.hydElev)) + row("Minimum residual", E.fmtU(u, "press", i.minResidual)) + row("Test-drop warning threshold", E.fmtNum(i.dropMin, i.dropMin % 1 ? 1 : 0) + "% of static (default 10%, this tool's spec; Flow Test Report uses 25%)") +
       row("Required fire flow", E.fmtU(u, "flow", st.qreq > 0 ? st.qreq : res.q)) + row("Hydrants flowing", i.nHyd + " × " + E.fmtU(u, "flow", i.qh)) +
       row("Loop", E.fmtU(u, "len", i.loopLen) + " ring, " + i.sources + " connection" + (i.sources > 1 ? "s (opposite points)" : "") + ", hydrants " + (i.placement === "even" ? "evenly spaced" : "at the farthest point")) +
       row("Pipe", esc(res.material.name) + ", C = " + res.material.c) + row("Hydrant arms", armNote) + row("Velocity limit", E.fmtU(u, "vel", i.maxVel)) +
@@ -344,6 +353,7 @@
     $("mQr").textContent = E.fmtU(u, "flow", res.supply.qr20);
     $("mDemand").textContent = E.fmtU(u, "flow", res.q);
     $("mDropPct").textContent = res.supply.dropPct.toFixed(1) + "%";
+    $("mDropNote").textContent = "Warns under " + E.fmtNum(res.input.dropMin, res.input.dropMin % 1 ? 1 : 0) + "% (Flow Test Report: 25%)";
     $("mSmallest").textContent = res.smallest != null ? sizeLbl(u, res.smallest) : "None";
     $("mWork").textContent = E.fmtU(u, "press", res.pressure.maxWork);
     banner.hidden = false; banner.className = "banner " + (res.pass ? "pass" : "fail");

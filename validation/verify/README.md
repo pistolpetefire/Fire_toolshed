@@ -33,6 +33,9 @@ Not applicable (no calculations): Water Supply path hub, Flow Test Request form.
   3,520 gpm (was 3,524). Python hand calc and the Verification-tab cases updated (SEA ATCT case added); new
   tests/flow-test-report.test.mjs. The plotted supply curve is unchanged (N^1.85 scale).
 
+- **Hydrant Loop Sizer v1.0.1 (2026-10-26).** Two Verification cases added (221 checks): hydrants that fall exactly on a connection under even
+  placement (1 hydrant / 2 connections: idle main, 6 in. residual 61.2 psi, 50% break 66.33 psi; 3 hydrants / 2 connections). `hydrant_loop_sizer.py`
+  now feeds such a hydrant from the connection (no zero-length pipe), as the app does.
 - **Hydrant Loop Sizer v1.0.0 (new).** Verification tab with 207 checks from `hydrant_loop_sizer.py`: NFPA 291 flow, Hazen-Williams on the
   actual IDs, a bisection / node-head ring solution (scipy cross-check run by hand, not in CI), hydrant arms, two connections, break case,
   IFC Table B105.1(2) band edges, metric / m3/h / bar display. The script does not call the app's JavaScript.

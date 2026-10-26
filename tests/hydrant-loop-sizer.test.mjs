@@ -1,4 +1,4 @@
-// Hydrant Loop Sizer v1.0.0: NFPA 291 available flow, NFPA 24 Hazen-Williams, ring network with hydrant arms, code tables,
+// Hydrant Loop Sizer v1.0.1: NFPA 291 available flow, NFPA 24 Hazen-Williams, ring network with hydrant arms, code tables,
 // US / metric equivalence, the loop schematic, the shared report logo, print gating and the Verification tab.
 // Expected numbers are independent hand calcs (validation/verify/hydrant_loop_sizer.py, formulas restated below), never the app's own output.
 import test from 'node:test'
@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs'
 import vm from 'node:vm'
 import { join } from 'node:path'
 import { serve, dumpDom, text, verifyStatus, python, ROOT } from './helpers.mjs'
+import { layoutProblems } from './diagram-layout.mjs'
 const require = createRequire(import.meta.url)
 const E = require('../hydrant-loop-sizer/assets/hls-engine.js')
 const near = (a, b, tol = 0.01) => assert.ok(Math.abs(a - b) <= tol, `${a} vs ${b} (tol ${tol})`)
@@ -180,7 +181,7 @@ test('engine: IFC Table B105.1(2) (flag S) at every band edge matches the indepe
 test('engine: warnings for a small test drop, flow per hydrant over 1,250 gpm under DoD, and demand above the required fire flow', () => {
   const small = E.evaluate({ ...SPEC, ps: 68.3, pr: 65 })
   near(small.supply.dropPct, 100 * 3.3 / 68.3, 1e-9)
-  assert.ok(small.warnings.some((w) => w.id === 'drop' && /10% guideline/.test(w.text)))
+  assert.ok(small.warnings.some((w) => w.id === 'drop' && /under the 10% warning threshold/.test(w.text)))
   assert.ok(!E.evaluate(SPEC).warnings.some((w) => w.id === 'drop')) // 10.4% drop is fine
   const big = E.evaluate({ ...SPEC, nHyd: 1, qh: 1500 })
   assert.ok(big.warnings.some((w) => w.id === 'qh'))
@@ -240,13 +241,124 @@ test('engine: the loop schematic is an SVG with pipe size, segment length, flow 
   assert.match(two, /Connection 1/); assert.match(two, /Connection 2/); assert.match(two, /H6/)
 })
 
+test('engine v1.0.1: 1 hydrant, 2 connections, even placement puts the hydrant on connection 2: no zero-length pipe, 6 in. main passes', () => {
+  const cfg = { ...SEA, nHyd: 1, qreq: 1250, sources: 2, placement: 'even' }
+  const r = E.evaluate(cfg)
+  const six = size(r, 6)
+  // hand check: the hydrant is fed straight from connection 2, so the main is idle: 0 ft/s, residual = supply curve at 1,250 gpm = 68.3 - 7.1 = 61.2 psi
+  assert.equal(six.intact.maxVel, 0)
+  near(six.intact.minRes, 61.2, 1e-9)
+  assert.deepEqual(six.intact.segs.map((g) => g.len), [1000, 1000]) // two live pipes, no zero-length segment
+  assert.ok(six.intact.segs.every((g) => g.flow === 0))
+  assert.deepEqual(Object.values(six.intact.srcFlows).map((x) => Math.round(x)), [0, 1250]) // connection 2 carries the whole hydrant flow
+  // 50% single break: 625 gpm straight from the supply, 68.3 - 7.1 x 0.5^1.85
+  near(six.brk.minRes, 68.3 - 7.1 * 0.5 ** 1.85, 1e-6)
+  assert.equal(six.velOk, true); assert.equal(six.resOk, true); assert.equal(six.pass, true)
+  assert.equal(r.smallest, 6)
+  assert.match(r.summary, /Smallest passing main size: 6 in\./)
+  // the 6 in. arm (12.95 ft/s at 1,250 gpm) is what fails, as a separate arm check
+  near(r.arms[0].vel, 0.4085 * 1250 / 6.28 ** 2, 1e-9); near(r.arms[0].vel, 12.947, 0.001)
+  assert.equal(r.armsOk, false); assert.equal(r.pass, false)
+  const r8 = E.evaluate({ ...cfg, arms: [{ size: 8, len: 0, sizeSet: true }] })
+  assert.equal(r8.armsOk, true); assert.equal(r8.pass, true); assert.equal(r8.smallest, 6)
+  // the same hydrant on connection 1 (1 connection, even) is not affected: a 1,000 ft pipe each way
+  const one = E.evaluate({ ...cfg, sources: 1 })
+  assert.deepEqual(size(one, 6).intact.segs.map((g) => g.len), [1000, 1000])
+})
+
+test('engine v1.0.1: no zero-length segment and demand is conserved for 1-16 hydrants, 1 or 2 connections, far or even placement', () => {
+  for (const nHyd of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]) for (const sources of [1, 2]) for (const placement of ['far', 'even']) {
+    const r = E.evaluate({ ...SEA, nHyd, qreq: nHyd * 1250, qh: 1250, sources, placement })
+    for (const sz of r.sizes) {
+      const all = [sz.intact, ...(sz.intact.brk ? [] : [])]
+      for (const c of all) {
+        const tag = `n=${nHyd} s=${sources} ${placement} ${sz.nom}in`
+        assert.equal(c.hy.length, nHyd, tag)
+        if (c.segs.length > 1 || placement === 'even') assert.ok(c.segs.every((g) => g.len > 0), `${tag}: zero-length segment`)
+        assert.ok(c.hy.every((h) => Number.isFinite(h.residual)), tag)
+        near(Object.values(c.srcFlows || { 0: nHyd * 1250 }).reduce((a, b) => a + b, 0), nHyd * 1250, 1e-6)
+        assert.ok(Number.isFinite(c.maxVel) && c.maxVel >= 0, `${tag}: velocity ${c.maxVel}`)
+      }
+    }
+  }
+  // hydrant at either connection: 3 hydrants, 2 connections, even placement puts the middle one on connection 2
+  const r = E.evaluate({ ...SEA, nHyd: 3, qreq: 3750, sources: 2, placement: 'even' })
+  const six = size(r, 6)
+  assert.ok(six.intact.segs.every((g) => g.len > 0))
+  assert.equal(six.intact.segs.length, 4) // connection 1, H1, connection 2 (with H2), H3 around the ring
+  near(Object.values(six.intact.srcFlows).reduce((a, b) => a + b, 0), 3750, 1e-6)
+  assert.ok(Object.values(six.intact.srcFlows).every((x) => x > 0)) // both connections feed the ring
+})
+
+test('engine v1.0.1: demand equal to the available flow reads as at the supply limit, not "cannot deliver"', () => {
+  const at = (q, u) => E.evaluate({ ...SEA, nHyd: 4, qh: q / 4, qreq: q }, u)
+  const eq = at(3520)  // 3,520 gpm demand, 3,520.16 available at 20 psi: the check passes
+  assert.equal(eq.supply.ok, true)
+  assert.match(eq.summary, /demand 3,520 gpm is at the supply limit \(3,520 gpm available at 20\.0 psi\), so any friction loss in the loop drops the hydrants below 20\.0 psi/)
+  assert.doesNotMatch(eq.summary, /cannot deliver/)
+  const w = eq.warnings.find((x) => x.id === 'atlimit'); assert.ok(w); assert.equal(w.level, 'warn')
+  assert.ok(!eq.warnings.some((x) => x.id === 'supply'))
+  // 0.16 gpm over: the check fails but the wording is the same (the numbers round to the same value)
+  const over = at(3520.3)
+  assert.equal(over.supply.ok, false)
+  assert.match(over.summary, /is at the supply limit/); assert.doesNotMatch(over.summary, /cannot deliver/)
+  assert.equal(over.warnings.find((x) => x.id === 'atlimit').level, 'fail')
+  // clearly above or below the limit keeps the other wording
+  assert.match(at(3600).summary, /water supply cannot deliver 3,600 gpm at 20\.0 psi \(available 3,520 gpm\)/)
+  assert.doesNotMatch(at(3000).summary, /supply limit|cannot deliver/)
+  // metric text carries the display units
+  const m = at(3520, E.unitSet('metric', 'lpm', 'kpa'))
+  assert.match(m.summary, /demand 13,325 L\/min is at the supply limit \(13,325 L\/min available at 138 kPa\), so any friction loss in the loop drops the hydrants below 138 kPa/)
+  assert.doesNotMatch(m.summary, /gpm|psi/)
+  assert.doesNotMatch(m.summary, /\.\./)
+})
+
+test('engine v1.0.1: test-drop warning threshold defaults to 10%, is adjustable, and a blank value falls back to 10%', () => {
+  const lowDrop = { ...SEA, nHyd: 1, qreq: 1250, ps: 70, pr: 66 } // 5.7% drop
+  const ids = (o) => E.evaluate({ ...lowDrop, ...o }).warnings.filter((x) => x.id === 'drop')
+  assert.equal(ids({}).length, 1)
+  assert.match(ids({})[0].text, /under the 10% warning threshold/); assert.match(ids({})[0].text, /Flow Test Report uses 25%/)
+  assert.equal(E.evaluate(lowDrop).input.dropMin, 10)
+  assert.equal(ids({ dropMin: 5 }).length, 0)
+  assert.equal(ids({ dropMin: 25 }).length, 1); assert.match(ids({ dropMin: 25 })[0].text, /under the 25% warning threshold/)
+  assert.equal(ids({ dropMin: null }).length, 1); assert.match(ids({ dropMin: '' })[0].text, /10% warning threshold/)
+  // SEA test drop is 10.4%: under 25% warns, at the default does not
+  assert.equal(E.evaluate({ ...SEA, dropMin: 25 }).warnings.filter((x) => x.id === 'drop').length, 1)
+  assert.equal(E.evaluate(SEA).warnings.filter((x) => x.id === 'drop').length, 0)
+})
+
+test('engine v1.0.1: arm size and length are flagged as assumed unless the user set them', () => {
+  const r = E.evaluate({ ...SEA, arms: [{ size: 6, len: 0 }, { size: 6, len: 40, sizeSet: true }, { size: 8, len: 0 }, { size: 6, len: 0, sizeSet: true }] })
+  assert.deepEqual(r.arms.map((a) => a.sizeAssumed), [true, false, false, false])
+  assert.deepEqual(r.arms.map((a) => a.lenAssumed), [true, false, true, true])
+  assert.equal(E.evaluate(SEA).arms.every((a) => a.sizeAssumed && a.lenAssumed), true)
+})
+
+test('diagram v1.0.1: no label overlaps a line, a circle or another label for 1-16 hydrants, US and metric, 1 or 2 connections, far or even', () => {
+  const base = { basis: 'dod', ps: 90, pr: 80, qf: 3000, loopLen: 2000, material: 'di', breakMode: '50', qh: 500 }
+  let n = 0
+  for (const nHyd of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]) for (const sources of [1, 2]) for (const placement of ['even', 'far']) for (const metric of [false, true]) for (const displaySize of [6, 16]) {
+    const r = E.evaluate({ ...base, nHyd, qreq: 500 * nHyd, sources, placement, displaySize, arms: Array.from({ length: nHyd }, (_, i) => ({ size: i % 3 ? 8 : 6, len: i % 2 ? 100 : 0, sizeSet: i % 2 === 0 })) })
+    const lay = {}
+    const svg = E.diagramSvg(r, metric ? E.unitSet('metric', 'lpm', 'kpa') : E.unitSet('us'), { layout: lay }); n++
+    const tag = `n=${nHyd} s=${sources} ${placement} ${metric ? 'metric' : 'us'} ${displaySize}in`
+    assert.deepEqual(layoutProblems(lay), [], tag)
+    for (let h = 1; h <= nHyd; h++) assert.match(svg, new RegExp(`>H${h}<`), `${tag}: H${h} missing`)
+    assert.match(svg, new RegExp(`viewBox="0 0 ${lay.W} ${lay.H}"`), tag)
+  }
+  assert.equal(n, 16 * 2 * 2 * 2 * 2)
+  // the checker itself must catch an overlap: two labels dropped on the same spot
+  const bad = { W: 100, H: 100, cx: 50, cy: 50, R: 30, circles: [], lines: [], boxes: [{ kind: 'seg', x0: 40, x1: 60, y0: 40, y1: 50 }, { kind: 'seg', x0: 45, x1: 65, y0: 45, y1: 55 }] }
+  assert.ok(layoutProblems(bad).some((x) => /overlaps/.test(x)))
+})
+
 async function page(path) { const s = await serve(); try { return await dumpDom(`${s.base}${path}`, 8000) } finally { await s.close() } }
 const stateUrl = (o, extra = '') => `/hydrant-loop-sizer/?state=${encodeURIComponent(JSON.stringify(o))}${extra}`
 
 test('page: shows version, SEA numbers, supply-limited result, the DI nominal-to-ID table with the DN note, and the schematic', async () => {
   const html = await page('/hydrant-loop-sizer/?example=sea')
   const t = text(html)
-  assert.match(html, /id="appVersion">Version 1\.0\.0</)
+  assert.match(html, /id="appVersion">Version 1\.0\.1</)
   assert.match(html, /id="mQr">3,520 gpm</)
   assert.match(t, /DOES NOT PASS\. No size passes: the water supply cannot deliver 5,000 gpm at 20\.0 psi \(available 3,520 gpm\)/)
   assert.match(t, /Hydrant-only supply/i)
@@ -269,6 +381,46 @@ test('page: the printout says hydrant-only supply, carries the logo header, no d
   assert.doesNotMatch(t, /unofficial|disclaimer|not for construction|for reference only/i)
   assert.match(t, /Items to confirm/); assert.match(t, /confirm with AHJ\/edition|\(U\)|confirm/i)
   assert.match(t, /Prepared by/); assert.match(t, /Checked by \(QC\)/)
+})
+
+test('page v1.0.1: printout labels a default arm size and a missing arm length "assumed, confirm"; an arm the user set is not labeled', async () => {
+  const html = await page('/hydrant-loop-sizer/?example=sea')
+  const pr = html.slice(html.indexOf('id="printReport"'), html.indexOf('id="printAttachments"') > 0 ? html.indexOf('id="printAttachments"') : undefined)
+  const t = text(pr)
+  assert.match(t, /Hydrant arms All 4 arms: 6 in\. \(assumed, confirm\), length not entered, no arm friction \(assumed, confirm\)/)
+  assert.match(t, /6 in\. \(assumed, confirm\) × length not entered \(assumed, confirm\)/) // hydrant table row
+  assert.match(t, /assumed, confirm/)
+  // screen hint explains the label
+  assert.match(text(html), /left at the default size, or with no length, is marked "assumed, confirm" in the printout/)
+  // arms set by the user (6 in. chosen on purpose, length entered): no label anywhere in the printout or schematic
+  const set = await page(stateUrl({ ...SEA, arms: [0, 1, 2, 3].map(() => ({ size: 6, len: 60, sizeSet: true })) }))
+  const pr2 = set.slice(set.indexOf('id="printReport"'), set.indexOf('id="printAttachments"') > 0 ? set.indexOf('id="printAttachments"') : undefined)
+  assert.doesNotMatch(text(pr2), /assumed, confirm/)
+  assert.match(text(pr2), /All 4 arms: 6 in\., 60 ft/)
+  // mixed: one arm set, three default
+  const mix = await page(stateUrl({ ...SEA, arms: [{ size: 6, len: 60, sizeSet: true }, { size: 6, len: 0 }, { size: 6, len: 0 }, { size: 6, len: 0 }] }))
+  const pr3 = mix.slice(mix.indexOf('id="printReport"'), mix.indexOf('id="printAttachments"') > 0 ? mix.indexOf('id="printAttachments"') : undefined)
+  assert.match(text(pr3), /per hydrant \(see hydrant table\); 3 of 4 arms use a default size or no length: assumed, confirm/)
+  // the schematic legend carries the same label
+  assert.match(pr, /assumed, confirm/)
+})
+
+test('page v1.0.1: test-drop threshold is shown on screen with the Flow Test Report note, is adjustable, and prints', async () => {
+  const html = await page('/hydrant-loop-sizer/?example=sea')
+  assert.match(html, /id="dropMin"[^>]*>/)
+  assert.match(html, /id="mDropNote">Warns under 10% \(Flow Test Report: 25%\)</)
+  assert.match(text(html), /This tool defaults to 10% \(its spec\); the Flow Test Report app uses 25%/)
+  assert.match(text(html), /Test-drop warning threshold 10% of static \(default 10%, this tool's spec; Flow Test Report uses 25%\)/)
+  const h25 = await page(stateUrl({ ...SEA, dropMin: 25 }))
+  assert.match(h25, /id="mDropNote">Warns under 25% \(Flow Test Report: 25%\)</)
+  assert.match(text(h25), /under the 25% warning threshold/)
+})
+
+test('page v1.0.1: the at-limit wording shows in the banner and the printout (US)', async () => {
+  const html = await page(stateUrl({ ...SEA, qreq: 3520, qh: 880 }))
+  const t = text(html)
+  assert.match(t, /DOES NOT PASS\. No size passes: demand 3,520 gpm is at the supply limit \(3,520 gpm available at 20\.0 psi\)/)
+  assert.doesNotMatch(t, /supply cannot deliver 3,520/)
 })
 
 test('page: Florida basis lists its U items as "confirm with AHJ/edition"', async () => {
