@@ -21,7 +21,7 @@
   var BASIS_NOTE = {
     fl: "NFPA 1 Chapter 18 sets fire flow; Florida amendments and local overrides apply (U). Confirm the edition for the permit date.",
     ifc: "Appendix B and C apply only where adopted. Table B105.1(2) base text read in a code-site viewer (S).",
-    dod: "UFC requirements are mandatory on DoD work. Paragraph numbers are inferred from the text read (U).",
+    dod: "UFC requirements are mandatory on DoD work. UFC 3-600-01 Chapter 9 is cited at section level; its paragraph numbers are not confirmed (U).",
   };
 
   function blank() {
@@ -152,6 +152,7 @@
       window.print();
     });
     $("btnSave").addEventListener("click", saveReport);
+    if (window.FireToolshedSubmittal) window.FireToolshedSubmittal.mount({ afterId: "btnSave", onChange: function () { render(); } });
   }
 
   function doFF() {
@@ -221,7 +222,7 @@
     d.intact.hy.forEach(function (x, i) {
       var a = res.arms[i], p = "hy-" + (i + 1) + "-", okR = x.residual >= inp.minResidual - 1e-9, okV = a.ok;
       var why = []; if (!okR) why.push("residual"); if (!okV) why.push("arm velocity");
-      h += "<tr><td class=\"l\">H" + (i + 1) + "</td>" + td(E.fmt(u, "flow", x.q), "", p + "q", ids) + "<td>" + esc(sizeLbl(u, a.size)) + (a.sizeAssumed ? " (assumed, confirm)" : "") + " × " + (a.len > 0 ? E.fmt(u, "len", a.len) + " " + E.label(u, "len") : "length not entered (assumed, confirm)") + "</td>" +
+      h += "<tr><td class=\"l\">H" + (i + 1) + "</td>" + td(E.fmt(u, "flow", x.q), "", p + "q", ids) + "<td>" + esc(sizeLbl(u, a.size)) + (a.sizeAssumed ? " " + assumedTag(ids) : "") + " × " + (a.len > 0 ? E.fmt(u, "len", a.len) + " " + E.label(u, "len") : "length not entered " + assumedTag(ids)) + "</td>" +
         td(E.fmt(u, "vel", a.vel), okV ? "" : "fail", p + "av", ids) + td(E.fmt(u, "press", x.armLoss, u.kinds.press.digits + 1), "", p + "al", ids) + td(E.fmt(u, "press", x.nodeP), "", p + "np", ids) +
         td(E.fmt(u, "press", x.residual), okR ? "" : "fail", p + "res", ids) + td(why.length ? "FAIL: " + why.join(", ") : "PASS", why.length ? "fail l" : "pass l", p + "st", ids) + "</tr>";
     });
@@ -243,18 +244,21 @@
     h += '<tr class="sel"><td class="l">Demand ' + E.fmt(u, "flow", dem) + "</td>" + td(E.fmt(u, "press", E.supplyPressure(inp.ps, inp.pr, inp.qf, dem)), "", "cv-demand", ids) + "</tr>";
     return h + "</tbody></table></div><p class=\"hint\">P(Q) = Ps − (Ps − Pr)(Q/Qf)^1.85, as in the flow test curve. Available flow uses the NFPA 291 exponent 0.54.</p>";
   }
-  function tableIds(res, u) {
+  function tableIds(res, u, ids) {
     var m = res.material, metric = u.sys === "metric";
     var h = '<div class="tablewrap"><table class="data"><thead><tr><th class="l">Nominal (US)</th><th>DN</th><th>OD (in. / mm)</th>' + (m.wall ? "<th>Wall (in.)</th>" : "") + "<th>Actual ID (in.)</th><th>Actual ID (mm)</th>" + (metric ? "<th>ISO 2531 / EN 545 DN pipe OD (mm)</th>" : "") + "</tr></thead><tbody>";
     SIZES.forEach(function (s) {
       h += '<tr><td class="l">' + s.nom + " in.</td><td>DN" + s.dn + "</td><td>" + m.od[s.nom].toFixed(2) + " / " + (m.od[s.nom] * 25.4).toFixed(1) + "</td>" + (m.wall ? "<td>" + m.wall[s.nom].toFixed(2) + "</td>" : "") + "<td>" + m.ids[s.nom].toFixed(2) + "</td><td>" + (m.ids[s.nom] * 25.4).toFixed(1) + "</td>" + (metric ? "<td>" + E.ISO_OD_MM[s.dn] + "</td>" : "") + "</tr>";
     });
-    return h + "</tbody></table></div><p class=\"hint\">" + esc(m.name) + ", C = " + m.c + ", rating " + m.rating + " psi. " + esc(m.note) + " DN names are the metric labels for the US nominal sizes above: they are not the same pipe. ISO 2531 / EN 545 DN pipe has a different outside diameter than AWWA C151 (for example DN150 is 170 mm, C151 6 in. is 175.3 mm), so ID differs. This tool uses the IDs in this table in both unit systems; for ISO / EN pipe choose Custom and enter the IDs. <span class=\"flag U\">confirm with AHJ/edition</span></p>";
+    return h + "</tbody></table></div><p class=\"hint\">" + esc(m.name) + ", C = " + m.c + ", rating " + m.rating + " psi. " + esc(m.note) + " DN names are the metric labels for the US nominal sizes above: they are not the same pipe. ISO 2531 / EN 545 DN pipe has a different outside diameter than AWWA C151 (for example DN150 is 170 mm, C151 6 in. is 175.3 mm), so ID differs. This tool uses the IDs in this table in both unit systems; for ISO / EN pipe choose Custom and enter the IDs." + (subOn(ids) ? "" : " <span class=\"flag U\">confirm with AHJ/edition</span>") + "</p>";
   }
+  // Submittal mode (shared/submittal-mode.js): printout only, default off. Screen results are unchanged.
+  function subOn(ids) { return !ids && !!(window.FireToolshedSubmittal && window.FireToolshedSubmittal.isOn()); }
+  function assumedTag(ids) { return subOn(ids) ? "(assumed)" : "(assumed, confirm)"; }
   function listItems(res) { return "<ul>" + res.items.map(function (i) { return "<li>" + esc(i.text) + ' <span class="flag ' + i.flag + '">' + (i.flag === "U" ? "confirm with AHJ/edition" : "secondary source") + "</span></li>"; }).join("") + "</ul>"; }
-  function tableCriteria(res) {
-    var h = '<div class="tablewrap"><table class="data"><thead><tr><th class="l">Criterion</th><th class="l">Value used</th><th class="l">Source</th><th class="l">Status</th></tr></thead><tbody>';
-    res.criteria.forEach(function (c) { h += '<tr><td class="l">' + esc(c.item) + '</td><td class="l">' + esc(c.value) + '</td><td class="l">' + esc(c.cite) + '</td><td class="l">' + (c.flag === "U" ? "confirm with AHJ/edition" : c.flag === "S" ? "secondary source" : "primary text") + "</td></tr>"; });
+  function tableCriteria(res, noStatus) {
+    var h = '<div class="tablewrap"><table class="data"><thead><tr><th class="l">Criterion</th><th class="l">Value used</th><th class="l">Source</th>' + (noStatus ? "" : '<th class="l">Status</th>') + "</tr></thead><tbody>";
+    res.criteria.forEach(function (c) { h += '<tr><td class="l">' + esc(c.item) + '</td><td class="l">' + esc(c.value) + '</td><td class="l">' + esc(c.cite) + "</td>" + (noStatus ? "" : '<td class="l">' + (c.flag === "U" ? "confirm with AHJ/edition" : c.flag === "S" ? "secondary source" : "primary text") + "</td>") + "</tr>"; });
     return h + "</tbody></table></div>";
   }
   function dodAdvisory(res) {
@@ -279,9 +283,9 @@
     var same = A.length > 0 && A.every(function (a) { return a.size === f.size && a.len === f.len && a.sizeAssumed === f.sizeAssumed && a.lenAssumed === f.lenAssumed; });
     if (!same) {
       var n = A.filter(function (a) { return a.sizeAssumed || a.lenAssumed; }).length;
-      return "per hydrant (see hydrant table)" + (n ? "; " + n + " of " + A.length + " arm" + (A.length > 1 ? "s" : "") + " use a default size or no length: assumed, confirm" : "");
+      return "per hydrant (see hydrant table)" + (n ? "; " + n + " of " + A.length + " arm" + (A.length > 1 ? "s" : "") + " use a default size or no length: assumed" + (subOn(false) ? "" : ", confirm") : "");
     }
-    return "All " + A.length + " arms: " + sizeLbl(u, f.size) + (f.sizeAssumed ? " (assumed, confirm)" : "") + ", " + (f.len > 0 ? E.fmtU(u, "len", f.len) : "length not entered, no arm friction (assumed, confirm)");
+    return "All " + A.length + " arms: " + sizeLbl(u, f.size) + (f.sizeAssumed ? " " + assumedTag(false) : "") + ", " + (f.len > 0 ? E.fmtU(u, "len", f.len) : "length not entered, no arm friction " + assumedTag(false));
   }
   function inputsHtml(res, u) {
     var i = res.input, armNote = armSummary(res, u);
@@ -308,10 +312,10 @@
     h += "</section>";
     h += '<section class="panel rep"><h2>Loop schematic</h2><p class="hint">Showing the ' + esc(sizeLbl(u, d.nom)) + " main (" + (st.displaySize === "auto" ? "smallest passing size, or the largest if none passes" : "selected") + ').</p>' +
       '<p class="no-print"><label>Size shown<select id="displaySize"><option value="auto">Auto</option>' + SIZES.map(function (s) { return '<option value="' + s.nom + '"' + (String(st.displaySize) === String(s.nom) ? " selected" : "") + ">" + esc(sizeLbl(u, s.nom)) + "</option>"; }).join("") + "</select></label></p>" +
-      E.diagramSvg(res, u) + "</section>";
+      E.diagramSvg(res, u, { submittal: subOn(ids) }) + "</section>";
     h += '<section class="panel rep"><h2>Hydrants and arms, intact loop, ' + esc(sizeLbl(u, d.nom)) + "</h2>" + tableHyd(res, u, ids) + "<h3>Loop segments</h3>" + tableSeg(res, u, ids) + "</section>";
-    h += '<section class="panel rep"><h2>Pressure class</h2>' + pressureHtml(res, u, ids) + "<h3>Pipe dimensions</h3>" + tableIds(res, u) + "</section>";
-    h += '<section class="panel rep"><h2>Criteria used</h2>' + tableCriteria(res) + "<h3>Items to confirm</h3>" + listItems(res) + "</section>";
+    h += '<section class="panel rep"><h2>Pressure class</h2>' + pressureHtml(res, u, ids) + "<h3>Pipe dimensions</h3>" + tableIds(res, u, ids) + "</section>";
+    h += '<section class="panel rep"><h2>Criteria used</h2>' + tableCriteria(res, subOn(ids)) + (subOn(ids) ? "" : "<h3>Items to confirm</h3>" + listItems(res)) + "</section>";
     return h;
   }
 
@@ -324,8 +328,8 @@
     h += '<section class="panel"><h2>Inputs</h2>' + inputsHtml(res, u) + "</section>";
     h += '<section class="panel"><h2>Result</h2><p class="' + (res.pass ? "pass-t" : "fail-t") + '"><strong>' + (res.pass ? "PASS" : "DOES NOT PASS") + ".</strong> " + esc(res.summary) + "</p></section>";
     h += resultsHtml(res, u, false);
-    h += '<section class="panel"><h2>Validation</h2><table class="valid-block" style="width:100%;border-collapse:collapse"><tr><td style="width:50%">Prepared by: <br><br>Name: <br>Initials: <br>Date: </td><td>Checked by (QC): <br><br>Name: <br>Initials: <br>Date: </td></tr></table></section></div>';
-    return h;
+    if (!subOn(false)) h += '<section class="panel"><h2>Validation</h2><table class="valid-block" style="width:100%;border-collapse:collapse"><tr><td style="width:50%">Prepared by: <br><br>Name: <br>Initials: <br>Date: </td><td>Checked by (QC): <br><br>Name: <br>Initials: <br>Date: </td></tr></table></section>';
+    return h + "</div>";
   }
 
   // ---------- render ----------

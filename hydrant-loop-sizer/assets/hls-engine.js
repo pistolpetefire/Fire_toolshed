@@ -13,7 +13,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
-  var VERSION = "1.0.2";
+  var VERSION = "1.0.3";
   var PSI_PER_FT = 0.433; // spec 4.1
   var HW_EXP = 1.85;
   var CURVE_EXP = 1.85; // supply curve exponent (spec 4.1)
@@ -162,8 +162,8 @@
         var floor = (basis === "fl" && sprinkler === "sqr") ? 600 : 1000;
         gpm = Math.min(Math.max(red, floor), basis === "fl" ? 2000 : Infinity);
         note = basis === "fl"
-          ? "75% reduction, not less than " + floor + " gpm, not over 2,000 gpm (NFPA 1 s18.4.5.3.2 to .4, U)"
-          : "NFPA 1 value with sprinklers (75% reduction), not less than 1,000 gpm (UFC 3-600-01 s9-2.1, U)";
+          ? "75% reduction, not less than " + floor + " gpm, not over 2,000 gpm (NFPA 1 s18.4.5.3, U)"
+          : "NFPA 1 value with sprinklers (75% reduction), not less than 1,000 gpm (UFC 3-600-01 s9-2, U)";
       }
     }
     return { gpm: gpm, hours: durationFor(gpm), tableGpm: t.gpm, note: note };
@@ -466,8 +466,8 @@
       R("Adoption", "Appendices B and C apply only where the jurisdiction adopts them", "IFC Appendix B and C intro", "S");
     } else {
       R("Fire flow definition", "Flow rate at 20 psi residual available for firefighting", "UFC 3-600-01 s2-1.13", "P");
-      R("Hydrants and flow", "Not more than 1,250 gpm from any single hydrant", "UFC 3-600-01 s9-3.5.8.1 (inferred number)", "P");
-      R("Looping and break", "Service mains looped; at least 50% of fire flow with a single break; no dead ends", "UFC 3-600-01 s9-3.2.2, s9-3.2.3 (inferred numbers)", "P");
+      R("Hydrants and flow", "Not more than 1,250 gpm from any single hydrant", "UFC 3-600-01 s9-3.5 (Hydrants)", "P");
+      R("Looping and break", "Service mains looped; at least 50% of fire flow with a single break; no dead ends", "UFC 3-600-01 s9-3 (Service Mains and Laterals)", "P");
       R("Velocity", "Service laterals not over 10 ft/s; distribution mains 2 to 5 ft/s at design flow (should)", "UFC 3-600-01 s9-3.1.2; UFC 3-230-01 s5-3.3.1", "P");
       R("Residual pressure", "At least 20 psi while supplying fire flow and hose stream demand", "UFC 3-230-01 s5-3.2.2", "P");
       R("Minimum pipe size", "6 in. where mains provide fire flow", "UFC 3-230-01 s5-3.3", "P");
@@ -479,7 +479,7 @@
     R("Pipe pressure rating", "Not less than 150 psi", "NFPA 24 s10.1.2", "P");
     R("Available flow at the residual", "Q_R = Q_F ((Ps - Pmin) / (Ps - Pr))^0.54", "NFPA 291", "S");
     R("Velocity limit used", fmtU(u, "vel", inp.maxVel) + (b === "dod" ? " (UFC service lateral limit)" : " (UFC value used as the default; NFPA 24 states no limit)"), b === "dod" ? "UFC 3-600-01 s9-3.1.2" : "AHJ", b === "dod" ? "P" : "U");
-    R("Single-break rule used", inp.breakMode === "50" ? "50% of fire flow with one segment out" : inp.breakMode === "100" ? "100% of fire flow with one segment out" : "Not checked", b === "dod" ? "UFC 3-600-01 s9-3.2.2" : "AHJ", b === "dod" ? "P" : "U");
+    R("Single-break rule used", inp.breakMode === "50" ? "50% of fire flow with one segment out" : inp.breakMode === "100" ? "100% of fire flow with one segment out" : "Not checked", b === "dod" ? "UFC 3-600-01 s9-3 (Service Mains and Laterals)" : "AHJ", b === "dod" ? "P" : "U");
     return rows;
   }
   function itemsToConfirm(inp, mat, res, u) {
@@ -498,7 +498,7 @@
       I("IFC text was read through code-site viewers: confirm on ICC Digital Codes.");
       I("Break criterion: the IFC does not state one; the " + (inp.breakMode === "50" ? "50%" : inp.breakMode === "100" ? "100%" : "no-break") + " setting is a design choice to confirm with the AHJ.");
     } else {
-      I("UFC 3-600-01 and UFC 3-230-01 paragraph numbers are inferred and the documents have changed since Change 6 / Change 3: confirm with the DFPE.");
+      I("UFC 3-600-01 Chapter 9 is cited at section level because its paragraph numbers could not be confirmed, and both UFCs have changed since Change 6 / Change 3: confirm with the DFPE.");
       I("Duration for a sprinklered facility is not stated in UFC 3-600-01 s9-2: ask the DFPE.");
       I("Friction method: AWWA M31/M32; the C factor is not stated in the UFC text read: confirm with the DFPE.");
     }
@@ -615,7 +615,7 @@
     out = out.concat(body);
     out.push('<text x="14" y="' + (y0 + 2) + '" font-size="11" font-weight="700" fill="#1d4e89">Hydrants: arm size and length, flow, residual pressure at the hydrant</text>');
     out = out.concat(leg);
-    if (anyAssumed) out.push('<text x="14" y="' + (y0 + 16 + rows * 16 + 12) + '" font-size="10" fill="#92400e">* Arm size or length left at the default (6 in., length not entered): assumed, confirm.</text>');
+    if (anyAssumed) out.push('<text x="14" y="' + (y0 + 16 + rows * 16 + 12) + '" font-size="10" fill="#92400e">* Arm size or length left at the default (6 in., length not entered): assumed' + (o.submittal ? '' : ', confirm') + '.</text>');
     out.push("</svg>");
     lay.H = H;
     if (o.layout) o.layout.H = H;

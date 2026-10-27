@@ -1,4 +1,4 @@
-// Hydrant Loop Sizer v1.0.2: NFPA 291 available flow, NFPA 24 Hazen-Williams, ring network with hydrant arms, code tables,
+// Hydrant Loop Sizer v1.0.3: NFPA 291 available flow, NFPA 24 Hazen-Williams, ring network with hydrant arms, code tables,
 // US / metric equivalence, the loop schematic, the shared report logo, print gating and the Verification tab.
 // Expected numbers are independent hand calcs (validation/verify/hydrant_loop_sizer.py, formulas restated below), never the app's own output.
 import test from 'node:test'
@@ -362,7 +362,7 @@ const stateUrl = (o, extra = '') => `/hydrant-loop-sizer/?state=${encodeURICompo
 test('page: shows version, SEA numbers, supply-limited result, the DI nominal-to-ID table with the DN note, and the schematic', async () => {
   const html = await page('/hydrant-loop-sizer/?example=sea')
   const t = text(html)
-  assert.match(html, /id="appVersion">Version 1\.0\.2</)
+  assert.match(html, /id="appVersion">Version 1\.0\.3</)
   assert.match(html, /id="mQr">3,520 gpm</)
   assert.match(t, /DOES NOT PASS\. No size passes: the water supply cannot deliver 5,000 gpm at 20\.0 psi \(available 3,520 gpm\)/)
   assert.match(t, /Hydrant-only supply/i)
