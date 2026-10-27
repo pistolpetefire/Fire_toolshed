@@ -21,7 +21,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const APPS = {
   'flow-test-report': { v: '2.4.2', saved: 'btnSaveReport' },
   'fire-pump-sizer': { v: '2.7.2', saved: 'btnSaveReport' },
-  'sprinkler-system-estimator': { v: '1.6.1-prelim', host: '#reportLogoPrint', pdf: true },
+  'sprinkler-system-estimator': { v: '1.6.2-prelim', host: '#reportLogoPrint', pdf: true },
   'fa-power-extenders': { v: '1.1.2', host: '#printPackage .report-logo', pdf: true },
   'dry-sprinkler-delivery': { v: '1.5.1-prelim', host: '#reportLogoPrint', pdf: true },
   'occupant-egress': { v: '1.7.1', saved: 'btnSave', seed: ['occupantEgress.v1', '{"codePath":"ibc"}'] },

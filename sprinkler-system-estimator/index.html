@@ -19,7 +19,7 @@
       <div>
         <p class="eyebrow">Fire Toolshed</p>
         <h1>Sprinkler System Estimator</h1>
-        <p class="version" id="appVersion">Version 1.6.1-prelim</p>
+        <p class="version" id="appVersion">Version 1.6.2-prelim</p>
         <p class="version" id="codeEdition">Code basis: <strong>NFPA 13-2022</strong> (Florida 9th Edition reference) · UFC 3-600-01 · FM planning</p>
       </div>
       <div class="top-actions no-print">
@@ -531,7 +531,7 @@
       <div id="reportLogoPrint" class="report-logo-print"></div>
       <p class="eyebrow">Fire Toolshed · Preliminary Charette Report</p>
       <h1>Sprinkler System Demand Estimate</h1>
-      <p>Version <span id="printVersion">1.6.1-prelim</span> · Code basis: NFPA 13-2022 · Not a final Hazen-Williams hydraulic calculation</p>
+      <p>Version <span id="printVersion">1.6.2-prelim</span> · Code basis: NFPA 13-2022 · Not a final Hazen-Williams hydraulic calculation</p>
     </section>
     <section class="print-only print-meta">
       <div><b>Project</b> <span id="printProject">—</span></div>
@@ -595,10 +595,12 @@
         This report is for charette / concept discussion only. Verify all values against the adopted code edition,
         project specifications, and AHJ direction before design or construction use.
       </p>
-      <div class="sig-lines">
-        <div>Prepared by / date</div>
-        <div>Reviewed by (FPE) / date</div>
-        <div>AHJ discussion notes</div>
+      <div id="printSigHost">
+        <div class="sig-lines">
+          <div>Prepared by / date</div>
+          <div>Reviewed by (FPE) / date</div>
+          <div>AHJ discussion notes</div>
+        </div>
       </div>
       <p style="margin-top:1rem;font-size:0.8rem;color:var(--muted)">
         This estimate supports concept design and charette discussion only. Final design requires complete hydraulic calculations per the adopted code/standard, manufacturer data, and qualified professional seal where required.
@@ -694,6 +696,7 @@
 
   <script src="../shared/water-path-shell.js"></script>
   <script src="../shared/report-logo.js"></script>
+  <script src="../shared/submittal-mode.js"></script>
   <script src="./assets/app.js"></script>
 </body>
 </html>

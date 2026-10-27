@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.6.1-prelim";
+  const APP_VERSION = "1.6.2-prelim";
   const STORAGE_KEY = "sprinklerSystemEstimator.v1";
   /** Shared handoff payload for Fire Pump Sizer (and future tank sizer) */
   const HANDOFF_KEY = "fireToolshed.sprinklerHandoff.v1";
@@ -1882,6 +1882,15 @@
     $("lossTableBody")?.addEventListener("change", onChange);
 
     $("btnPrint")?.addEventListener("click", openCleanReport);
+    // Submittal mode (shared/submittal-mode.js), default off: leaves the blank sign-off block (Prepared by / Reviewed by / AHJ notes) out of the printout.
+    const sigHost = $("printSigHost");
+    const sigHtml = sigHost ? sigHost.innerHTML : "";
+    if (window.FireToolshedSubmittal && sigHost) {
+      window.FireToolshedSubmittal.mount({
+        afterId: "btnPrint",
+        onChange: (on) => { sigHost.innerHTML = on ? "" : sigHtml; },
+      });
+    }
     $("btnCleanReport")?.addEventListener("click", openCleanReport);
     $("btnSaveReport")?.addEventListener("click", saveReportFiles);
     $("btnCopyPump")?.addEventListener("click", () => captureForPumpSizer(false));
