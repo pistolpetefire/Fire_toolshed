@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.6.0-prelim";
+  const APP_VERSION = "1.6.1-prelim";
   const STORAGE_KEY = "sprinklerSystemEstimator.v1";
   /** Shared handoff payload for Fire Pump Sizer (and future tank sizer) */
   const HANDOFF_KEY = "fireToolshed.sprinklerHandoff.v1";

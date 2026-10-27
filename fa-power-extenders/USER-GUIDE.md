@@ -1,6 +1,6 @@
 # FA Power Extenders — User Guide
 
-**Version 1.1.1** · Fire Toolshed · Preliminary design tool only
+**Version 1.1.2** · Fire Toolshed · Preliminary design tool only
 
 This guide assumes you are **new to fire alarm design**. Every button and box is explained. If a word is in **bold** the first time, a plain-English meaning follows.
 
@@ -97,7 +97,7 @@ These boxes do **not** size the system. They label the report so someone else kn
 | **Custom source voltage** | Only if you picked Custom | Type the manufacturer’s starting voltage from the NAC calculator notes. |
 | **Spare capacity target** | Keep **20** unless the spec says otherwise | Means “do not fill a 2.0 A circuit past 1.6 A.” Leaves room for a few added devices. |
 | **Notes** | AHJ comments, manufacturer, “strobes must sync” | Prints on the report. |
-| **Report logo** | Benham, MeadHunt JV, Haskell (pick the project state), or upload | Shared with other Fire Toolshed report tools in this browser. |
+| **Report logo** | Benham, MeadHunt JV, AI&P + Benham (a Haskell Company), Haskell (pick the project state), or upload | Shared with other Fire Toolshed report tools in this browser. |
 
 ---
 

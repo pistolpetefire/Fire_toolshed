@@ -1,5 +1,5 @@
 /* Fire Pump Sizer — offline cache (network-first for app shell so updates show) */
-const CACHE = 'fire-pump-sizer-v8';
+const CACHE = 'fire-pump-sizer-v9';
 const ASSETS = [
   './',
   './index.html',

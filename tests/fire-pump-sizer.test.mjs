@@ -56,7 +56,7 @@ test('pump page: shows NFPA 20-2022 and the Verification tab passes 50/50 (duty 
   try {
     const page = await dumpDom(`${s.base}/fire-pump-sizer/`, 8000)
     assert.match(text(page), /NFPA 20-2022/)
-    assert.match(page, /id="appVersion">v2\.7\.1</)
+    assert.match(page, /id="appVersion">v2\.7\.2</)
     // Retry kept: with the service worker no longer registered during verification (v2.7.1), headless Chrome still leaves one
     // hidden verification frame blank in about 2 of 20 runs (one case); a rerun is clean. Up to 4 attempts, each logged.
     let st = ''

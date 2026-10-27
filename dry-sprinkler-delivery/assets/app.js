@@ -8,7 +8,7 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.5.0-prelim";
+  const APP_VERSION = "1.5.1-prelim";
 
   /**
    * NFPA 13 edition references (v1.5.0). The delivery-time table values, the 500 / 750 gal exemptions and the

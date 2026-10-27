@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.7.0";
+  var APP_VERSION = "1.7.1";
   var STORAGE_KEY = "occupantEgress.v1";
 
   /** Shared egress component types */

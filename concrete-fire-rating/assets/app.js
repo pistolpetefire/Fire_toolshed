@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.1.0";
+  var APP_VERSION = "1.1.1";
   var STORAGE_KEY = "concreteFireRating.v1";
   var IN_TO_MM = 25.4;
 

@@ -4,7 +4,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.1.1";
+  var APP_VERSION = "1.1.2";
   var STORAGE_KEY = "fireToolshed.faPowerExtenders.v1";
   var HISTORY_KEY = "fireToolshed.faPowerExtenders.history.v1";
   var THEME_KEY = "fireToolshed.faPowerExtenders.theme";

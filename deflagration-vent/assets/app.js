@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.2.0";
+  var APP_VERSION = "1.2.1";
   var EDITION = "NFPA 68-2023";
   var E = window.NFPA68;
   var STORAGE_KEY = "deflagrationVent.v1";

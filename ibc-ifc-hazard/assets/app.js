@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.6.1";
+  var APP_VERSION = "1.6.2";
   var STORAGE_KEY = "ibcIfcHazard.v1";
   /** Last HMIS assessment (not persisted) */
   var lastImport = null;

@@ -47,7 +47,7 @@ test('egress: in-app Verification tab passes (64 checks incl. 1020.5 dead-end ex
     assert.match(st, /^64 of 64 checks pass/)
     const page = await dumpDom(`${s.base}/occupant-egress/`, 8000)
     assert.match(page, /id="exitCheck"/)
-    assert.match(page, /Version 1\.7\.0/)
+    assert.match(page, /Version 1\.7\.1/)
   } finally { await s.close() }
 })
 

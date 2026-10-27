@@ -10,9 +10,9 @@
   const SPRINKLER_HANDOFF_KEY = 'fireToolshed.sprinklerHandoff.v1';
   /** Shared handoff to Fire Tank Sizer */
   const PUMP_HANDOFF_KEY = 'fireToolshed.pumpHandoff.v1';
-  const APP_VERSION = '2.7.1';
+  const APP_VERSION = '2.7.2';
   /** Current service worker cache name; keep in step with CACHE in sw.js. */
-  const SW_CACHE = 'fire-pump-sizer-v8';
+  const SW_CACHE = 'fire-pump-sizer-v9';
   /** NFPA 291 / water-supply curve exponent (matches Flow Test + Sprinkler apps) */
   const SUPPLY_EXPONENT = 1.85;
 

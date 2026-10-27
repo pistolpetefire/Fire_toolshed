@@ -4,7 +4,7 @@
 (function () {
   "use strict";
 
-  var APP_VERSION = "1.0.3";
+  var APP_VERSION = "1.0.4";
   var STORAGE_KEY = "flow-test-request:v1";
 
   var DEFAULT_JURISDICTION =

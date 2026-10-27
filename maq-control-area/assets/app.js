@@ -4,7 +4,7 @@
  */
 (function () {
   "use strict";
-  var APP_VERSION = "1.0.0";
+  var APP_VERSION = "1.0.1";
   var STORAGE_KEY = "maqControlArea.v1";
   var E = window.MAQEngine;
 

@@ -59,7 +59,7 @@ test('app: SEA ATCT screen shows 3520 gpm and the result row is labeled NFPA 291
     const html = await dom(`${s.base}/flow-test-report/`)
     assert.equal(el(html, 'mFireFlow20').trim(), '3520 gpm')
     assert.ok(text(html).includes(`Avail. flow @ 20 psi (${LABEL})`), 'result table row label')
-    assert.match(text(html), /Version 2\.4\.1/)
+    assert.match(text(html), /Version 2\.4\.2/)
   } finally { await s.close() }
 })
 

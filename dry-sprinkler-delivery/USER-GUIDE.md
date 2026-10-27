@@ -57,7 +57,7 @@ Also: system volume, volume to most remote node, simplified Hazen–Williams wal
 | **Date** | Report date (defaults to today). |
 | **Building / occupancy description** | Free-text occupancy (e.g. OH-2 manufacturing, dry pipe). Does not auto-select hazard—pick Hazard separately. |
 | **Notes** | AHJ notes, QOD listing, trip-test plan; printed on reports. |
-| **Report logo** | Benham, MeadHunt JV, Haskell (by state), or upload. Shared with other Fire Toolshed report tools in this browser. |
+| **Report logo** | Benham, MeadHunt JV, AI&P + Benham (a Haskell Company), Haskell (by state), or upload. Shared with other Fire Toolshed report tools in this browser. |
 
 ---
 
