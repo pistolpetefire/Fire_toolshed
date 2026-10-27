@@ -13,7 +13,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
-  var VERSION = "1.0.1";
+  var VERSION = "1.0.2";
   var PSI_PER_FT = 0.433; // spec 4.1
   var HW_EXP = 1.85;
   var CURVE_EXP = 1.85; // supply curve exponent (spec 4.1)

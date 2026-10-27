@@ -2,6 +2,7 @@
  * Embed brand PNGs as data URLs into shared/report-logo.js
  *   - shared/logos/benham.png → BENHAM_DATA_URL
  *   - shared/logos/meadhunt-jv.png → MEADHUNT_DATA_URL
+ *   - shared/logos/aip-benham.png → AIP_DATA_URL
  */
 import fs from "fs";
 import path from "path";
@@ -39,6 +40,7 @@ function inject(varName, dataUrl) {
 
 const benham = dataUrlFor("shared/logos/benham.png");
 const meadhunt = dataUrlFor("shared/logos/meadhunt-jv.png");
+const aip = dataUrlFor("shared/logos/aip-benham.png");
 
 if (!inject("BENHAM_DATA_URL", benham)) {
   console.error("Could not inject BENHAM_DATA_URL");
@@ -48,9 +50,14 @@ if (!inject("MEADHUNT_DATA_URL", meadhunt)) {
   console.error("Could not inject MEADHUNT_DATA_URL");
   process.exit(1);
 }
+if (!inject("AIP_DATA_URL", aip)) {
+  console.error("Could not inject AIP_DATA_URL");
+  process.exit(1);
+}
 
 fs.writeFileSync(jsPath, js);
 console.log("OK inject-report-logos");
 console.log("  benham", benham.length);
 console.log("  meadhunt", meadhunt.length);
+console.log("  aip", aip.length);
 console.log("  report-logo.js", fs.statSync(jsPath).size);

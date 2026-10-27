@@ -1,4 +1,4 @@
-// Hydrant Loop Sizer v1.0.1: NFPA 291 available flow, NFPA 24 Hazen-Williams, ring network with hydrant arms, code tables,
+// Hydrant Loop Sizer v1.0.2: NFPA 291 available flow, NFPA 24 Hazen-Williams, ring network with hydrant arms, code tables,
 // US / metric equivalence, the loop schematic, the shared report logo, print gating and the Verification tab.
 // Expected numbers are independent hand calcs (validation/verify/hydrant_loop_sizer.py, formulas restated below), never the app's own output.
 import test from 'node:test'
@@ -9,6 +9,10 @@ import vm from 'node:vm'
 import { join } from 'node:path'
 import { serve, dumpDom, text, verifyStatus, python, ROOT } from './helpers.mjs'
 import { layoutProblems } from './diagram-layout.mjs'
+import { withChrome } from './cdp.mjs'
+import { writeFileSync, mkdtempSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { execFileSync } from 'node:child_process'
 const require = createRequire(import.meta.url)
 const E = require('../hydrant-loop-sizer/assets/hls-engine.js')
 const near = (a, b, tol = 0.01) => assert.ok(Math.abs(a - b) <= tol, `${a} vs ${b} (tol ${tol})`)
@@ -358,7 +362,7 @@ const stateUrl = (o, extra = '') => `/hydrant-loop-sizer/?state=${encodeURICompo
 test('page: shows version, SEA numbers, supply-limited result, the DI nominal-to-ID table with the DN note, and the schematic', async () => {
   const html = await page('/hydrant-loop-sizer/?example=sea')
   const t = text(html)
-  assert.match(html, /id="appVersion">Version 1\.0\.1</)
+  assert.match(html, /id="appVersion">Version 1\.0\.2</)
   assert.match(html, /id="mQr">3,520 gpm</)
   assert.match(t, /DOES NOT PASS\. No size passes: the water supply cannot deliver 5,000 gpm at 20\.0 psi \(available 3,520 gpm\)/)
   assert.match(t, /Hydrant-only supply/i)
@@ -485,6 +489,69 @@ test('page: report logo uses the shared module and storage key, with the same op
   // on screen and in the printout header (default Benham)
   const html = await page('/hydrant-loop-sizer/?example=spec')
   assert.match(html.slice(html.indexOf('id="printReport"')), /id="reportLogoPrint"[^>]*>[\s\S]{0,400}(<svg|<img)/)
+})
+
+// ---- v1.0.2: AI&P + Benham (a Haskell Company) logo as a built-in report logo option (shared module) ----
+const AIP_PNG = readFileSync(join(ROOT, 'shared/logos/aip-benham.png'))
+const AIP_URL = 'data:image/png;base64,' + AIP_PNG.toString('base64')
+const AIP_LABEL = 'AI&P Alberti Ozzo & Partners + Benham (a Haskell Company)'
+function logoModule(initial) {
+  const store = initial ? { 'fireToolshed.reportLogo.v1': JSON.stringify(initial) } : {}
+  const g = { localStorage: { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v) } }, console, Date, JSON, Object, Math, String, Image: function () {} }
+  g.window = g; g.globalThis = g; g.document = { getElementById: () => null, createElement: () => ({ style: {} }) }
+  vm.runInNewContext(readFileSync(join(ROOT, 'shared/report-logo.js'), 'utf8'), g)
+  return { L: g.FireToolshedLogo, store }
+}
+
+test('logo v1.0.2: the AI&P + Benham logo is embedded in the repo byte for byte and selectable in the shared module (key unchanged, default still Benham)', () => {
+  assert.ok(AIP_PNG.length > 10000 && AIP_PNG.subarray(0, 8).toString('hex') === '89504e470d0a1a0a')
+  assert.equal(AIP_PNG.readUInt32BE(16), 282); assert.equal(AIP_PNG.readUInt32BE(20), 73)
+  const { L, store } = logoModule()
+  assert.equal(L.STORAGE_KEY, 'fireToolshed.reportLogo.v1')
+  assert.equal(L.load().source, 'benham') // default and the saved-logo behavior are untouched
+  assert.equal(L.BUILTIN.aip.file, 'aip-benham.png'); assert.equal(L.BUILTIN.aip.dataUrl, AIP_URL) // embedded bytes equal the file
+  L.save({ source: 'aip' })
+  assert.equal(JSON.parse(store['fireToolshed.reportLogo.v1']).source, 'aip')
+  assert.equal(L.load().source, 'aip')
+  assert.equal(L.getLogoSrc(), AIP_URL); assert.equal(L.getSourceLabel(), AIP_LABEL)
+  const hdr = L.reportHeaderHtml({ maxHeight: 52 })
+  assert.ok(hdr.includes(`<img src="${AIP_URL}"`)); assert.ok(hdr.includes('AI&amp;P Alberti Ozzo &amp; Partners + Benham (a Haskell Company)'))
+  // every other source keeps working and an unknown saved value still falls back to Benham
+  for (const [src, want] of [['benham', 'Benham'], ['meadhunt', 'MeadHunt JV']]) { L.save({ source: src }); assert.equal(L.getSourceLabel(), want); assert.notEqual(L.getLogoSrc(), AIP_URL) }
+  assert.equal(logoModule({ source: 'nope' }).L.load().source, 'benham')
+  L.save({ source: 'haskell', haskellState: 'FL' }); assert.match(L.reportHeaderHtml({}), /HASKELL/)
+  L.save({ source: 'upload', uploadDataUrl: 'data:image/png;base64,AAAA', uploadName: 'x.png' }); assert.equal(L.getLogoSrc(), 'data:image/png;base64,AAAA')
+  // the markup helper offers the option too
+  assert.match(L.fieldHtml(), /<option value="aip">AI&amp;P \+ Benham \(a Haskell Company\)<\/option>/)
+})
+
+test('page v1.0.2: AI&P + Benham appears in the Hydrant Loop Sizer report logo list, shows on screen, in the printout header and the printed PDF, and persists', async () => {
+  const s = await serve()
+  try {
+    const url = `${s.base}/hydrant-loop-sizer/?example=sea`
+    const pdfText = (pdf) => { const f = join(mkdtempSync(join(process.env.TMPDIR || tmpdir(), 'ft-hls-')), 'o.pdf'); writeFileSync(f, pdf); return execFileSync('pdftotext', ['-layout', f, '-'], { encoding: 'utf8' }).replace(/\s+/g, ' ') }
+    await withChrome(async (b) => {
+      const p = await b.page(url, 2500)
+      const opts = JSON.parse(await p.eval(`JSON.stringify([...document.querySelectorAll('#reportLogoSource option')].map(o=>[o.value,o.textContent]))`))
+      assert.deepEqual(opts.map((o) => o[0]), ['benham', 'meadhunt', 'aip', 'haskell', 'upload'])
+      assert.equal(opts.find((o) => o[0] === 'aip')[1], 'AI&P + Benham (a Haskell Company)')
+      assert.equal(await p.eval(`document.getElementById('reportLogoSource').value`), 'benham') // default unchanged
+      assert.equal(await p.eval(`document.querySelector('#reportLogoPrint img').src === FireToolshedLogo.BUILTIN.benham.dataUrl`), true)
+      // choose it
+      await p.eval(`(function(){var s=document.getElementById('reportLogoSource');s.value='aip';s.dispatchEvent(new Event('change',{bubbles:true}))})()`)
+      await new Promise((r) => setTimeout(r, 600))
+      assert.equal(await p.eval(`JSON.parse(localStorage.getItem('fireToolshed.reportLogo.v1')).source`), 'aip')
+      const url0 = JSON.stringify(AIP_URL)
+      assert.equal(await p.eval(`document.querySelector('#reportLogoPreview img').src === ${url0}`), true) // on screen
+      assert.equal(await p.eval(`document.querySelector('#reportLogoPrint img').src === ${url0}`), true) // printout header
+      assert.equal(await p.eval(`document.querySelector('#reportLogoPrint img').naturalWidth`), 282)
+      assert.equal(await p.eval(`document.querySelector('#reportLogoPrint img').alt`), AIP_LABEL)
+      const t = pdfText(await p.pdf())
+      assert.ok(t.includes(AIP_LABEL), 'printed PDF header carries the logo name')
+      assert.ok(t.includes('Hydrant Loop Sizer'))
+      await p.close()
+    })
+  } finally { await s.close() }
 })
 
 test('page: Verification tab runs and every check passes, including metric, two connections, arms and every IFC band edge', async () => {

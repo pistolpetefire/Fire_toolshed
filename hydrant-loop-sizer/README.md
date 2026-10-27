@@ -1,6 +1,6 @@
 # Hydrant Loop Sizer
 
-Sizes a private hydrant loop that is fed by hydrants only (no tank, no pump) from one hydrant flow test. Version 1.0.1. Static site, no build.
+Sizes a private hydrant loop that is fed by hydrants only (no tank, no pump) from one hydrant flow test. Version 1.0.2. Static site, no build.
 
 ## What it does
 - NFPA 291 available flow at 20 psi: Q_R = Q_F x ((Ps - Pmin) / (Ps - Pr))^0.54. The supply curve used inside the loop is P(Q) = Ps - (Ps - Pr)(Q/Qf)^1.85.
@@ -8,7 +8,7 @@ Sizes a private hydrant loop that is fed by hydrants only (no tank, no pump) fro
 - One or two connections, hydrants placed far or evenly, single-break case (50%, 100% or not checked), hydrant arms (default 6 in., optional length and size) whose friction and velocity go into each hydrant's residual.
 - Code bases: Florida (FFPC 8th / 9th), IBC/IFC, DoD (UFC 3-600-01, UFC 3-230-01). Items flagged U show "confirm with AHJ/edition".
 - A loop schematic (screen and printout) with pipe size, length and flow per segment; US customary or metric units (m, L/min or m3/h, kPa or bar); the ductile-iron nominal-to-ID table with the DN vs US nominal note.
-- Report logo: the shared module `shared/report-logo.js`, storage key `fireToolshed.reportLogo.v1`, same options as Flow Test Report and Fire Pump Sizer.
+- Report logo: the shared module `shared/report-logo.js`, storage key `fireToolshed.reportLogo.v1`, same options as Flow Test Report and Fire Pump Sizer (Benham, MeadHunt JV, AI&P + Benham, Haskell by state, upload).
 - Missing inputs are asked for before printing; nothing is defaulted silently.
 
 ## Modeling notes
@@ -23,5 +23,6 @@ URL options: `?example=sea|spec`, `?units=metric&flow=lpm|m3h&press=kpa|bar`.
 Test: `node --test tests/hydrant-loop-sizer.test.mjs`
 
 ## Changelog
+- **1.0.2.** Report logo list gains a built-in option "AI&P + Benham (a Haskell Company)" (AI&P Alberti Ozzo & Partners + Benham). The PNG is embedded in the shared module `shared/report-logo.js` (source `shared/logos/aip-benham.png`, source key `aip`), so it shows in the Report logo preview and in the printout header, and the printed header names it. The default is still Benham, the storage key is unchanged (`fireToolshed.reportLogo.v1`) and a saved choice is kept.
 - **1.0.1.** (1) A hydrant that sits exactly on a connection (for example 1 hydrant, 2 connections, even placement) is fed by that connection directly. The model no longer inserts a zero-length pipe carrying the full flow, so that case no longer reads 12.95 ft/s on the main and the smallest passing main is 6 in. (2) When demand equals the available flow at the minimum residual (within 0.5%), the summary says demand is at the supply limit and any friction loss drops the hydrants below the minimum residual, instead of "supply cannot deliver". (3) Loop schematic relaid out: hydrant labels inside the circles, a legend below the drawing with each arm's size, length, flow and residual, segment labels placed inside the ring without overlap, connection labels outside the stems; checked for 1 to 16 hydrants, US and metric, 1 or 2 connections, far and even placement (tests/diagram-layout.mjs). (4) The printout labels an arm size left at the default 6 in. and a missing arm length "assumed, confirm". (5) Test-drop warning threshold is shown on screen and in the printout, with a note that Flow Test Report uses 25%; default stays 10% (this tool's spec) and the value is user-adjustable. Blank means 10%. Python hand calc and Verification tab gained hydrant-on-connection cases (221 checks).
 - **1.0.0.** First release.
