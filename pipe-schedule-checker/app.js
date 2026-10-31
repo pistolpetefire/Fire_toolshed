@@ -39,11 +39,9 @@ function calc() {
   html += "<strong>Pipe schedule allowed?</strong> " + (allowed ? "<span class='good'>Yes</span>" : "<span class='bad'>No</span>") + "<br>";
   if (allowNotes.length) html += "<ul>" + allowNotes.map(function (n) { return "<li>" + n + "</li>"; }).join("") + "</ul>";
 
-  if (haz === "extra") {
-    html += "<span class='bad'>Pipe schedule method is not permitted for Extra Hazard.</span>";
-  } else if (max === undefined) {
+  if (haz !== "extra" && max === undefined) {
     html += "<span class='warn'>No sprinkler-count limit listed for " + size + "\" " + (haz === "light" ? "Light" : "Ordinary") + " Hazard. Light-hazard 4\" and larger are governed by area limits, not a fixed count.</span>";
-  } else {
+  } else if (haz !== "extra" && allowed && max !== undefined) {
     var ok = count <= max;
     html += "<strong>Max for " + size + "\" " + (haz === "light" ? "Light" : "Ordinary") + ":</strong> " + max + "<br>" +
             "<strong>Your count:</strong> " + count + " → <span class='" + (ok ? "good" : "bad") + "'>" +
