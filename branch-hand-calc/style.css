@@ -1,0 +1,24 @@
+:root {
+  --blue-900: #1e3a8a; --blue-700: #1d4ed8; --slate-50: #f8fafc; --slate-200: #e2e8f0;
+  --slate-500: #64748b; --slate-800: #1e293b; --emerald: #059669; --red: #dc2626;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+       background: var(--slate-50); color: var(--slate-800); padding: 1rem; line-height: 1.5; }
+.shell { max-width: 800px; margin: 0 auto; }
+.eyebrow { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue-700); margin: 0; }
+h1 { margin: 0.2rem 0; font-size: 1.5rem; }
+.version { font-size: 0.85rem; color: var(--slate-500); margin: 0.2rem 0 0.75rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 1rem; }
+.actions button, .actions select { min-height: 44px; padding: 0.4rem 0.8rem; border-radius: 0.5rem; border: 1px solid var(--slate-200); background: #fff; }
+.card { background: #fff; border: 1px solid var(--slate-200); border-radius: 1rem; padding: 1rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; }
+label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; }
+input, select { width: 100%; min-height: 44px; padding: 0.4rem; border: 1px solid var(--slate-200); border-radius: 0.5rem; font: inherit; }
+button.calc { background: var(--blue-700); color: #fff; border: none; border-radius: 0.5rem; padding: 0.6rem 1.2rem; min-height: 44px; font-weight: 600; margin-top: 0.75rem; cursor: pointer; }
+.results { margin-top: 1rem; padding: 0.85rem; background: var(--slate-50); border-radius: 0.75rem; }
+.good { color: var(--emerald); font-weight: 600; }
+.bad { color: var(--red); font-weight: 600; }
+.guide { background: #fff; border: 1px solid var(--slate-200); border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+@media print { .no-print { display: none !important; } }

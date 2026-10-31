@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Branch-Line Hand Calc · Fire Toolshed</title>
+  <link rel="stylesheet" href="./style.css?v=1.0.0">
+</head>
+<body>
+<div class="shell">
+  <header>
+    <p class="eyebrow">Fire Toolshed</p>
+    <h1>Branch-Line / Tree Hand Calc</h1>
+    <p class="version">v1.0.0 · NFPA 13-2022 hydraulics</p>
+    <div class="actions no-print">
+      <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
+      <label>Report logo <select id="logoSelect"></select></label>
+      <button type="button" onclick="printReport()">Print Report</button>
+    </div>
+  </header>
+  <div id="guide" class="guide hidden">
+    <h2>User Guide</h2>
+    <ul>
+      <li>Enter K, pressure at the most remote head, pipe size, length, C factor, and elevation change.</li>
+      <li>Q = K√P at the head. Friction uses Hazen-Williams. Elevation is 0.433 psi/ft.</li>
+      <li>Equivalent lengths for fittings should be confirmed for the edition and C factor.</li>
+      <li>Carry total flow and pressure to the next node or to the Junction Balancer.</li>
+    </ul>
+  </div>
+  <section class="card">
+    <div class="grid">
+      <div><label>K factor</label><input id="k" type="number" value="5.6" step="0.1"></div>
+      <div><label>Pressure at head (psi)</label><input id="pHead" type="number" value="7.0" step="0.1"></div>
+      <div><label>Pipe ID (in)</label><input id="diam" type="number" value="1.049" step="0.001"></div>
+      <div><label>Length (ft)</label><input id="len" type="number" value="20"></div>
+      <div><label>C factor</label><input id="c" type="number" value="120"></div>
+      <div><label>Elevation change (ft, + up)</label><input id="elev" type="number" value="0" step="0.1"></div>
+    </div>
+    <button class="calc" onclick="calc()">Calculate</button>
+    <div id="results" class="results" style="display:none"></div>
+  </section>
+</div>
+<script src="../shared.js?v=1.0.0"></script>
+<script src="./app.js?v=1.0.0"></script>
+<script>ToolshedShared.mountLogoSelect("logoSelect");</script>
+</body>
+</html>

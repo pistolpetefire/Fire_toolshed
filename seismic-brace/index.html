@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Seismic Brace Load · Fire Toolshed</title>
+  <link rel="stylesheet" href="./style.css?v=1.0.0">
+</head>
+<body>
+<div class="shell">
+  <header>
+    <p class="eyebrow">Fire Toolshed</p>
+    <h1>Seismic Brace Load Calc</h1>
+    <p class="version">v1.0.0 · NFPA 13-2022 Ch. 18</p>
+    <div class="actions no-print">
+      <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
+      <label>Report logo <select id="logoSelect"></select></label>
+      <button type="button" onclick="printReport()">Print Report</button>
+    </div>
+  </header>
+  <div id="guide" class="guide hidden">
+    <h2>User Guide</h2>
+    <ul>
+      <li>Wp = 1.15 × water-filled pipe weight in the zone of influence. Fpw = Cp × Wp.</li>
+      <li>Lateral braces at max 40 ft; longitudinal at max 80 ft.</li>
+      <li>Cp is an input (from project seismic data). Brace/fastener tables must be verified against a licensed copy of NFPA 13 before use.</li>
+    </ul>
+  </div>
+  <section class="card">
+    <div class="grid">
+      <div><label>Pipe size (in)</label>
+        <select id="psize"><option>2</option><option>2.5</option><option>3</option><option>4</option><option>6</option><option>8</option></select>
+      </div>
+      <div><label>Zone length (ft)</label><input id="zone" type="number" value="40"></div>
+      <div><label>Cp (seismic coefficient)</label><input id="cp" type="number" value="0.5" step="0.01"></div>
+      <div><label>Brace type</label>
+        <select id="brace"><option value="lat">Lateral (max 40 ft)</option><option value="long">Longitudinal (max 80 ft)</option></select>
+      </div>
+    </div>
+    <button class="calc" onclick="calc()">Calculate</button>
+    <div id="results" class="results" style="display:none"></div>
+  </section>
+</div>
+<script src="../shared.js?v=1.0.0"></script>
+<script src="./app.js?v=1.0.0"></script>
+<script>ToolshedShared.mountLogoSelect("logoSelect");</script>
+</body>
+</html>

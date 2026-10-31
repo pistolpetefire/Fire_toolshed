@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Hanger & Stocklist Helper · Fire Toolshed</title>
+  <link rel="stylesheet" href="./style.css?v=1.0.0">
+</head>
+<body>
+<div class="shell">
+  <header>
+    <p class="eyebrow">Fire Toolshed</p>
+    <h1>Hanger & Stocklist Helper</h1>
+    <p class="version">v1.0.0 · NFPA 13-2022 Ch. 17</p>
+    <div class="actions no-print">
+      <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
+      <label>Report logo <select id="logoSelect"></select></label>
+      <button type="button" onclick="printReport()">Print Report</button>
+    </div>
+  </header>
+  <div id="guide" class="guide hidden">
+    <h2>User Guide</h2>
+    <ul>
+      <li>Enter pipe size, run length, and maximum hanger spacing.</li>
+      <li>The tool counts hangers, suggests rod size, and checks the 5W + 250 lb load.</li>
+      <li>Fitting take-off lengths are editable defaults — printed as “assumed, confirm”.</li>
+      <li>Spacing and rod sizes should be verified against a licensed copy of NFPA 13.</li>
+    </ul>
+  </div>
+  <section class="card">
+    <div class="grid">
+      <div><label>Pipe size (in)</label>
+        <select id="psize"><option>1</option><option>1.25</option><option>1.5</option><option>2</option><option>2.5</option><option>3</option><option>4</option><option>6</option><option>8</option></select>
+      </div>
+      <div><label>Run length (ft)</label><input id="runLen" type="number" value="100" min="0"></div>
+      <div><label>Max hanger spacing (ft)</label><input id="maxSpace" type="number" value="12" min="1" step="0.5"></div>
+      <div><label>Fitting take-off (ft, assumed)</label><input id="takeoff" type="number" value="0.5" min="0" step="0.1"></div>
+    </div>
+    <button class="calc" onclick="calc()">Calculate</button>
+    <div id="results" class="results" style="display:none"></div>
+  </section>
+</div>
+<script src="../shared.js?v=1.0.0"></script>
+<script src="./app.js?v=1.0.0"></script>
+<script>ToolshedShared.mountLogoSelect("logoSelect");</script>
+</body>
+</html>
