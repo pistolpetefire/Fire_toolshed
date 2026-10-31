@@ -26,6 +26,7 @@ function calc() {
   var resQ = +document.getElementById("resQ").value;
   var pRated = +document.getElementById("pRated").value;
   var pPress = +document.getElementById("pPress").value;
+  if (res > stat) { alert("Residual pressure cannot exceed static pressure."); return; }
   var dQ = +document.getElementById("dQ").value;
   var dP = +document.getElementById("dP").value;
 
@@ -36,9 +37,19 @@ function calc() {
   var p150 = cityP(pRated * 1.5, stat, res, resQ) + pumpNet(pRated * 1.5, pRated, pPress);
   var churn = pumpNet(0, pRated, pPress);
   var atRated = pumpNet(pRated, pRated, pPress);
-  var suctionP = +(document.getElementById("suctionP") || {}).value || 0;
-  var over175 = comb > 175;
-  var suctionNote = suctionP >= 0 ? "Suction ≥ 0 psi OK" : (suctionP >= -3 ? "Suction in −3 psi tank range" : "Suction below −3 psi — not permitted");
+  var suctionEl = document.getElementById("suctionP");
+  var suctionRaw = suctionEl ? suctionEl.value : "";
+  if (suctionRaw === "" || isNaN(+suctionRaw)) { alert("Enter suction pressure."); return; }
+  var suctionP = +suctionRaw;
+  var supplyType = (document.getElementById("supplyType") || {}).value || "city";
+  if (suctionP < -3) { alert("Suction pressure below -3 psi is not permitted."); return; }
+  if (suctionP < 0 && supplyType !== "tank") {
+    alert("Negative suction (to -3 psi) is allowed only for a suction tank supply.");
+    return;
+  }
+  var churnPlusStatic = churn + stat;
+  var over175 = churnPlusStatic > 175;
+  var suctionNote = suctionP >= 0 ? "Suction ≥ 0 psi OK" : "Suction in −3 psi suction-tank range";
 
   var html =
     "<p class='note'><strong>Code basis:</strong> NFPA 20-2022 §6.2 (pump performance) · supply curve N^1.85</p>" +
@@ -49,7 +60,7 @@ function calc() {
     "<strong>Churn (0 flow):</strong> " + churn.toFixed(1) + " psi (" + ((churn / pPress) * 100).toFixed(0) + "% of rated)<br>" +
     "<strong>At rated flow:</strong> " + atRated.toFixed(1) + " psi<br>" +
     "<strong>At 150% (" + (pRated * 1.5).toFixed(0) + " gpm):</strong> " + p150.toFixed(1) + " psi<br>" +
-    "<strong>175 psi check:</strong> " + (over175 ? "<span class='bad'>Exceeds 175 psi</span>" : "<span class='good'>≤ 175 psi</span>") + "<br>" +
+    "<strong>175 psi check (churn + static):</strong> " + churnPlusStatic.toFixed(1) + " psi → " + (over175 ? "<span class='bad'>Exceeds 175 psi</span>" : "<span class='good'>≤ 175 psi</span>") + "<br>" +
     "<strong>Suction:</strong> " + suctionNote;
 
   document.getElementById("results").style.display = "block";

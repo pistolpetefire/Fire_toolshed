@@ -10,12 +10,10 @@ function calc() {
     return;
   }
   if (pAir >= pHigh) {
-    alert("Precharge is at or above high pressure — usable volume will be 0. Check inputs.");
-  }
-  if (false) {
-    alert("Volume must be positive and high pressure must exceed low pressure.");
+    alert("Precharge is at or above high pressure — usable volume is 0. Correct the inputs.");
     return;
   }
+
 
   var absAir = pAir + patm, absHigh = pHigh + patm, absLow = pLow + patm;
   var airHigh = Math.min(V, (absAir / absHigh) * V);   // cannot exceed tank volume
