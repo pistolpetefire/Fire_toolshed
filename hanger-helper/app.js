@@ -7,6 +7,7 @@ var PIPE = {
   "2.5": { w: 7.9, rod: "3/8", maxSpace: 15 },
   "3":   { w: 10.8, rod: "3/8", maxSpace: 15 },
   "4":   { w: 16.3, rod: "3/8", maxSpace: 15 },
+  "5":   { w: 23.0, rod: "1/2", maxSpace: 15 },
   "6":   { w: 31.7, rod: "1/2", maxSpace: 15 },
   "8":   { w: 50.0, rod: "1/2", maxSpace: 15 }
 };
@@ -22,6 +23,7 @@ function calc() {
   var span = Math.min(space, len);
   var load = 5 * info.w * span + 250;  // 5W + 250 on the span
   var spacingOk = space <= (info.maxSpace || 15);
+  if (!spacingOk) { alert("Spacing exceeds typical maximum for this pipe size. Reduce spacing."); return; }
   var cut = Math.max(0, len - takeoff);
   var html = "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 Ch. 17 (hangers). Spacing and rod sizes: verify against licensed copy.</p>" +
     "<strong>Hangers required:</strong> " + hangers + "<br>" +

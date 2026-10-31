@@ -11,7 +11,8 @@ function calc() {
   var L = +document.getElementById("len").value;
   var C = +document.getElementById("c").value;
   var elev = +document.getElementById("elev").value;
-  if (n < 1 || K <= 0 || pMin < 7 || d <= 0 || C <= 0 || L <= 0) {
+  if (!Number.isInteger(n) || n < 1 || n > 20) { alert("Number of heads must be a whole number from 1 to 20."); return; }
+  if (K <= 0 || pMin < 7 || d <= 0 || C <= 0 || L <= 0) {
     alert("Check inputs. End-head pressure should be at least 7 psi; C and length must be > 0.");
     return;
   }
@@ -44,10 +45,10 @@ function printReport() {
   if (!window.lastResult) { alert("Calculate first"); return; }
   var r = window.lastResult;
   var body = "<p>Code basis: NFPA 13-2022</p><table><tr><th>Item</th><th>Value</th></tr>" +
-    "<tr><td>K / P at head</td><td>" + r.K + " / " + r.pHead + " psi</td></tr>" +
-    "<tr><td>Flow q</td><td>" + r.q.toFixed(1) + " gpm</td></tr>" +
-    "<tr><td>Friction</td><td>" + r.pf.toFixed(2) + " psi</td></tr>" +
+    "<tr><td>Heads</td><td>" + r.n + "</td></tr>" +
+    "<tr><td>Total flow</td><td>" + r.Q.toFixed(1) + " gpm</td></tr>" +
+    "<tr><td>Friction</td><td>" + r.totalPf.toFixed(2) + " psi</td></tr>" +
     "<tr><td>Elevation</td><td>" + r.pe.toFixed(2) + " psi</td></tr>" +
-    "<tr><td>Total Pt</td><td>" + r.pt.toFixed(2) + " psi</td></tr></table>";
+    "<tr><td>Pressure at start</td><td>" + r.pt.toFixed(2) + " psi</td></tr></table>";
   ToolshedShared.openPrint("Branch-Line Hand Calc", body);
 }

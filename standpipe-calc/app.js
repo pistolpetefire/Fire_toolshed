@@ -4,7 +4,8 @@ function calc() {
   var sprink = document.getElementById("sprink").value === "yes";
   var h = +document.getElementById("height").value;
   var fric = +document.getElementById("fric").value;
-  if (n < 1 || h < 0) { alert("Check inputs."); return; }
+  if (!Number.isInteger(n) || n < 1) { alert("Number of standpipes must be a whole number ≥ 1."); return; }
+  if (h < 0 || fric < 0) { alert("Height and friction cannot be negative."); return; }
   var flow, residual;
   if (cls === "II") {
     flow = 100;
