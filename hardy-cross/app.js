@@ -6,19 +6,21 @@ function calc() {
   var tol = +document.getElementById("tol").value;
   var maxPass = +document.getElementById("maxPass").value;
   if (qA <= 0 || qB <= 0) { alert("Flows must be greater than 0."); return; }
+  // Store k so h = k * Q^1.85 on every pass
+  var kA = hA / Math.pow(qA, 1.85);
+  var kB = hB / Math.pow(qB, 1.85);
   var log = [];
   var converged = false;
   for (var i = 0; i < maxPass; i++) {
-    var sumH = hA - hB; // clockwise positive: A positive, B negative
-    var sumHQ = (hA / qA) + (hB / qB);
+    hA = kA * Math.pow(Math.abs(qA), 1.85);
+    hB = kB * Math.pow(Math.abs(qB), 1.85);
+    var sumH = hA - hB;
+    var sumHQ = (hA / Math.abs(qA)) + (hB / Math.abs(qB));
     var dQ = -sumH / (1.85 * sumHQ);
     qA += dQ;
     qB -= dQ;
-    // scale head losses roughly with Q^1.85 for next pass (simple model)
-    hA = Math.abs(hA) * Math.pow(Math.abs(qA) / (Math.abs(qA) + 0.001), 0); // keep user losses as fixed for first pass demo
     log.push({ pass: i + 1, dQ: dQ, qA: qA, qB: qB });
     if (Math.abs(dQ) < tol) { converged = true; break; }
-    // re-estimate h proportional to Q^1.85 from initial
   }
   var html = "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 hydraulics. Sign convention: clockwise positive.</p>" +
     "<strong>Converged:</strong> <span class='" + (converged ? "good" : "bad") + "'>" + (converged ? "Yes" : "No") + "</span><br>" +

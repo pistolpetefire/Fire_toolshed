@@ -1,14 +1,14 @@
 /* Approximate steel pipe weights (lb/ft, water-filled) and rod sizes — verify against NFPA 13-2022 */
 var PIPE = {
-  "1":   { w: 2.1, rod: "3/8" },
-  "1.25":{ w: 3.0, rod: "3/8" },
-  "1.5": { w: 3.6, rod: "3/8" },
-  "2":   { w: 5.1, rod: "3/8" },
-  "2.5": { w: 7.9, rod: "1/2" },
-  "3":   { w: 10.8, rod: "1/2" },
-  "4":   { w: 16.3, rod: "1/2" },
-  "6":   { w: 31.7, rod: "5/8" },
-  "8":   { w: 50.0, rod: "5/8" }
+  "1":   { w: 2.1, rod: "3/8", maxSpace: 12 },
+  "1.25":{ w: 3.0, rod: "3/8", maxSpace: 12 },
+  "1.5": { w: 3.6, rod: "3/8", maxSpace: 15 },
+  "2":   { w: 5.1, rod: "3/8", maxSpace: 15 },
+  "2.5": { w: 7.9, rod: "3/8", maxSpace: 15 },
+  "3":   { w: 10.8, rod: "3/8", maxSpace: 15 },
+  "4":   { w: 16.3, rod: "3/8", maxSpace: 15 },
+  "6":   { w: 31.7, rod: "1/2", maxSpace: 15 },
+  "8":   { w: 50.0, rod: "1/2", maxSpace: 15 }
 };
 
 function calc() {
@@ -19,12 +19,15 @@ function calc() {
   if (len <= 0 || space <= 0) { alert("Length and spacing must be greater than 0."); return; }
   var info = PIPE[size] || { w: 0, rod: "—" };
   var hangers = Math.ceil(len / space) + 1;
-  var load = 5 * info.w + 250;
+  var span = Math.min(space, len);
+  var load = 5 * info.w * span + 250;  // 5W + 250 on the span
+  var spacingOk = space <= (info.maxSpace || 15);
   var cut = Math.max(0, len - takeoff);
   var html = "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 Ch. 17 (hangers). Spacing and rod sizes: verify against licensed copy.</p>" +
     "<strong>Hangers required:</strong> " + hangers + "<br>" +
-    "<strong>Suggested rod size:</strong> " + info.rod + "\" (verify)<br>" +
-    "<strong>5W + 250 lb check:</strong> " + load.toFixed(0) + " lb<br>" +
+    "<strong>Suggested rod size:</strong> " + info.rod + "\" (verify against NFPA 13)<br>" +
+    "<strong>5W + 250 on span:</strong> " + load.toFixed(0) + " lb<br>" +
+    "<strong>Spacing check:</strong> " + (spacingOk ? "<span class='good'>Within typical limit</span>" : "<span class='bad'>Exceeds typical max for size</span>") + "<br>" +
     "<strong>Approx. cut length:</strong> " + cut.toFixed(1) + " ft <em>(take-off assumed, confirm)</em>";
   document.getElementById("results").style.display = "block";
   document.getElementById("results").innerHTML = html;

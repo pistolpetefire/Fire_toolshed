@@ -5,14 +5,20 @@ function calc() {
   var h = +document.getElementById("height").value;
   var fric = +document.getElementById("fric").value;
   if (n < 1 || h < 0) { alert("Check inputs."); return; }
-  var flow = 500 + (n - 1) * 250;
-  var cap = sprink ? 1000 : 1250;
-  flow = Math.min(flow, cap);
-  var residual = (cls === "II") ? 65 : 100;
+  var flow, residual;
+  if (cls === "II") {
+    flow = 100;
+    residual = 65;
+  } else {
+    flow = 500 + (n - 1) * 250;
+    var cap = sprink ? 1000 : 1250;
+    flow = Math.min(flow, cap);
+    residual = 100;
+  }
   var elev = h * 0.433;
   var base = residual + elev + fric;
-  var prd = base > 175 ? "PRD likely required at hose connections (>175 psi)" : "No PRD flag at hose connections";
-  var zone = base > 350 ? "Zone exceeds 350 psi — review zoning" : "Zone pressure OK";
+  var prd = base > 175 ? "Review PRDs — residual/base exceeds 175 psi (confirm with static/churn)" : "No PRD flag from residual alone";
+  var zone = base > 400 ? "Zone exceeds 400 psi (NFPA 14-2019) — review zoning" : "Zone pressure OK";
   var html = "<p class='note'><strong>Code basis:</strong> NFPA 14-2019</p>" +
     "<strong>Required flow:</strong> " + flow + " gpm<br>" +
     "<strong>Residual at top:</strong> " + residual + " psi<br>" +
