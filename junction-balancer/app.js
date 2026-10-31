@@ -25,13 +25,13 @@ function calc() {
       note = "Branch 2 raised to higher pressure.";
     }
   } else {
-    note = "Within 0.5 psi — no flow adjustment required (NFPA 13 hydraulic junction points).";
+    note = "Within 0.5 psi — no flow adjustment required (NFPA 13-2022).";
   }
 
   var total = adj1 + adj2;
 
   var html =
-    "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 hydraulic junction points (pressures within 0.5 psi; carry highest pressure) (pressures balance within 0.5 psi; carry highest pressure and adjusted flows)</p>" +
+    "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 (hydraulic junction points — balance within 0.5 psi; carry highest pressure and adjusted flows) (pressures balance within 0.5 psi; carry highest pressure and adjusted flows)</p>" +
     "<strong>ΔP:</strong> " + dP.toFixed(2) + " psi<br>" +
     "<strong>Adjusted Q1:</strong> " + adj1.toFixed(1) + " gpm<br>" +
     (q2in > 0 ? "<strong>Adjusted Q2:</strong> " + adj2.toFixed(1) + " gpm<br>" : "") +

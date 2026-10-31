@@ -21,7 +21,7 @@ function calc() {
   var usable = Math.max(0, airLow - airHigh);
 
   var html =
-    "<p class='note'><strong>Code basis:</strong> NFPA 22-2023 pressure tanks (Boyle’s law, absolute pressures)</p>" +
+    "<p class='note'><strong>Code basis:</strong> NFPA 22-2023 pressure tanks (Boyle’s law with absolute pressures; see air/water relationship provisions)</p>" +
     "<strong>Air volume at high pressure:</strong> " + airHigh.toFixed(0) + " gal<br>" +
     "<strong>Air volume at low pressure:</strong> " + airLow.toFixed(0) + " gal<br>" +
     "<strong>Usable water volume:</strong> <span class='good'>" + usable.toFixed(0) + " gal</span>";

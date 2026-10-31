@@ -23,23 +23,25 @@ function calc() {
   var allowNotes = [];
   if (haz === "extra") {
     allowed = false;
-    allowNotes.push("Pipe schedule is not permitted for Extra Hazard.");
+    allowNotes.push("Pipe schedule method is not permitted for Extra Hazard (NFPA 13-2022 19.2.2).");
   }
   if (isNew && area > 5000) {
     allowed = false;
-    allowNotes.push("New pipe-schedule systems are typically limited to 5,000 ft².");
+    allowNotes.push("New pipe-schedule systems are limited to 5,000 ft² (NFPA 13-2022 19.2.2).");
   }
   if (!supplyOk) {
     allowed = false;
     allowNotes.push("Adequate water supply is required for pipe schedule (NFPA 13-2022 19.2.2).");
   }
 
-  var max = (SCHED[haz] || {})[size];
+  var max = (haz === "extra") ? undefined : (SCHED[haz] || {})[size];
   var html = "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 pipe schedule method (Light & Ordinary Hazard only)</p>";
-  html += "<strong>Pipe schedule allowed?</strong> " + (allowed ? "<span class='good'>Yes (subject to supply check)</span>" : "<span class='bad'>No</span>") + "<br>";
+  html += "<strong>Pipe schedule allowed?</strong> " + (allowed ? "<span class='good'>Yes</span>" : "<span class='bad'>No</span>") + "<br>";
   if (allowNotes.length) html += "<ul>" + allowNotes.map(function (n) { return "<li>" + n + "</li>"; }).join("") + "</ul>";
 
-  if (max === undefined) {
+  if (haz === "extra") {
+    html += "<span class='bad'>Pipe schedule method is not permitted for Extra Hazard.</span>";
+  } else if (max === undefined) {
     html += "<span class='warn'>No sprinkler-count limit listed for " + size + "\" " + (haz === "light" ? "Light" : "Ordinary") + " Hazard. Light-hazard 4\" and larger are governed by area limits, not a fixed count.</span>";
   } else {
     var ok = count <= max;

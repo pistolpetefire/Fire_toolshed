@@ -27,6 +27,7 @@ function calc() {
   var pRated = +document.getElementById("pRated").value;
   var pPress = +document.getElementById("pPress").value;
   if (res > stat) { alert("Residual pressure cannot exceed static pressure."); return; }
+  if (resQ <= 0) { alert("Residual flow must be greater than 0."); return; }
   var dQ = +document.getElementById("dQ").value;
   var dP = +document.getElementById("dP").value;
 
