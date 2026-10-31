@@ -4,7 +4,9 @@ function calc() {
   var sprink = document.getElementById("sprink").value === "yes";
   var h = +document.getElementById("height").value;
   var fric = +document.getElementById("fric").value;
-  var staticP = +document.getElementById("staticP").value;
+  var staticRaw = document.getElementById("staticP").value;
+  var staticP = +staticRaw;
+  if (staticRaw === "" || isNaN(staticP) || staticP < 0) { alert("Enter a non-negative static/churn pressure."); return; }
   if (!Number.isInteger(n) || n < 1) { alert("Number of standpipes must be a whole number ≥ 1."); return; }
   if (h < 0 || fric < 0) { alert("Height and friction cannot be negative."); return; }
   var flow, residual;
@@ -19,8 +21,11 @@ function calc() {
   }
   var elev = h * 0.433;
   var base = residual + elev + fric;
-  var outletResidual = residual; // design residual at remote outlet
-  var prdResidual = (cls === "II" || cls === "III") && outletResidual > 100 ? "1½ in. outlets: residual > 100 psi — PRD required (7.2.3.1)" : "";
+  if (staticP === "" || isNaN(staticP) || staticP < 0) { alert("Enter a non-negative static/churn pressure."); return; }
+  if (staticP < residual) { alert("Static/churn cannot be lower than the residual demand."); return; }
+  // Residual at lowest 1½ in. outlet ≈ base pressure minus elevation of that outlet (assume at base for governing case)
+  var lowestOutletResidual = base; // governing (lowest) outlet
+  var prdResidual = (cls === "II" || cls === "III") && lowestOutletResidual > 100 ? "1½ in. outlets: residual at lowest > 100 psi — PRD required (7.2.3.1)" : "";
   var prdStatic = staticP > 175 ? "Static/churn > 175 psi — PRD required at outlets (7.2.3.1.3 / 7.2.3.2)" : "";
   var prd = (prdResidual || prdStatic) ? (prdResidual + " " + prdStatic).trim() : "No PRD flag";
   var zone = base > 400 ? "Zone exceeds 400 psi (NFPA 14-2019 7.2.1) — review zoning" : "Zone pressure OK";
