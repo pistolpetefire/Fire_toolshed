@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Junction Balancer · Fire Toolshed</title>
+  <link rel="stylesheet" href="./style.css?v=1.0.0">
+</head>
+<body>
+<div class="shell">
+  <header>
+    <p class="eyebrow">Fire Toolshed</p>
+    <h1>Junction Balancer / Equivalent-K</h1>
+    <p class="version">v1.0.0 · NFPA 13 hydraulic junction points</p>
+    <div class="actions no-print">
+      <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
+      <label>Report logo <select id="logoSelect"></select></label>
+      <button type="button" onclick="printReport()">Print Report</button>
+    </div>
+  </header>
+
+  <div id="guide" class="guide hidden">
+    <h2>User Guide</h2>
+    <ul>
+      <li>Enter the calculated flow and pressure at the first junction (Q1, P1).</li>
+      <li>Enter the actual pressure available at the second junction (P2).</li>
+      <li>The tool computes the adjusted flow Q2 = Q1 × √(P2/P1) and the equivalent K of the line (Keq = Q1 / √P1).</li>
+      <li>It checks whether the pressure difference is within the normal 0.5 psi balance tolerance used at hydraulic junction points.</li>
+      <li>Carry the highest pressure and the adjusted flows forward in the calculation.</li>
+    </ul>
+  </div>
+
+  <section class="card">
+    <div class="grid">
+      <div><label>Q1 (gpm)</label><input id="q1" type="number" value="77.1" step="0.1"></div>
+      <div><label>P1 (psi)</label><input id="p1" type="number" value="15.1" step="0.1"></div>
+      <div><label>P2 (psi)</label><input id="p2" type="number" value="16.0" step="0.1"></div>
+    </div>
+    <button class="calc" onclick="calc()">Calculate</button>
+    <div id="results" class="results" style="display:none"></div>
+  </section>
+</div>
+<script src="../shared.js?v=1.0.0"></script>
+<script src="./app.js?v=1.0.0"></script>
+<script>ToolshedShared.mountLogoSelect("logoSelect");</script>
+</body>
+</html>

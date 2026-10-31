@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pump + Supply Overlay · Fire Toolshed</title>
+  <link rel="stylesheet" href="./style.css?v=1.0.0">
+</head>
+<body>
+<div class="shell">
+  <header>
+    <p class="eyebrow">Fire Toolshed</p>
+    <h1>Pump + Supply Curve Overlay</h1>
+    <p class="version">v1.0.0 · NFPA 20 pump + city supply</p>
+    <div class="actions no-print">
+      <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
+      <label>Report logo <select id="logoSelect"></select></label>
+      <button type="button" onclick="printReport()">Print Report</button>
+    </div>
+  </header>
+  <div id="guide" class="guide hidden">
+    <h2>User Guide</h2>
+    <ul>
+      <li>Enter city static pressure, residual pressure and the flow at which the residual was measured.</li>
+      <li>Enter pump rated flow and rated net pressure.</li>
+      <li>Enter the system demand flow and pressure.</li>
+      <li>The tool approximates the city curve (N^1.85 style) and a simple pump net curve, adds them, and reports the margin at demand and the pressure at 150% flow.</li>
+      <li>Intended to extend the existing chart in Fire Pump Sizer. Confirm with the manufacturer pump curve for final design.</li>
+    </ul>
+  </div>
+  <section class="card">
+    <div class="grid">
+      <div><label>City static (psi)</label><input id="stat" type="number" value="60" step="0.1"></div>
+      <div><label>City residual (psi)</label><input id="res" type="number" value="40" step="0.1"></div>
+      <div><label>Residual flow (gpm)</label><input id="resQ" type="number" value="800"></div>
+      <div><label>Pump rated flow (gpm)</label><input id="pRated" type="number" value="500"></div>
+      <div><label>Pump rated pressure (psi net)</label><input id="pPress" type="number" value="100" step="0.1"></div>
+      <div><label>Demand flow (gpm)</label><input id="dQ" type="number" value="450"></div>
+      <div><label>Demand pressure (psi)</label><input id="dP" type="number" value="70" step="0.1"></div>
+    </div>
+    <button class="calc" onclick="calc()">Calculate</button>
+    <div id="results" class="results" style="display:none"></div>
+  </section>
+</div>
+<script src="../shared.js?v=1.0.0"></script>
+<script src="./app.js?v=1.0.0"></script>
+<script>ToolshedShared.mountLogoSelect("logoSelect");</script>
+</body>
+</html>

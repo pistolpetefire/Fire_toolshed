@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pressure Tank · Fire Toolshed</title>
+  <link rel="stylesheet" href="./style.css?v=1.0.0">
+</head>
+<body>
+<div class="shell">
+  <header>
+    <p class="eyebrow">Fire Toolshed</p>
+    <h1>Pressure Tank (Boyle’s Law)</h1>
+    <p class="version">v1.0.0 · NFPA 22 pressure tanks</p>
+    <div class="actions no-print">
+      <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
+      <label>Report logo <select id="logoSelect"></select></label>
+      <button type="button" onclick="printReport()">Print Report</button>
+    </div>
+  </header>
+  <div id="guide" class="guide hidden">
+    <h2>User Guide</h2>
+    <ul>
+      <li>Enter total tank volume, pre-charge (or initial air) pressure, high and low operating pressures, and atmospheric pressure.</li>
+      <li>The tool uses Boyle’s law with absolute pressures to find the air volume at high and low pressure and the usable water volume (drawdown).</li>
+      <li>Intended as a tab on Fire Tank Sizer; existing volume results stay unchanged.</li>
+    </ul>
+  </div>
+  <section class="card">
+    <div class="grid">
+      <div><label>Total volume V (gal)</label><input id="tankV" type="number" value="1000"></div>
+      <div><label>Initial air (psig)</label><input id="pAir" type="number" value="40" step="0.1"></div>
+      <div><label>High pressure (psig)</label><input id="pHigh" type="number" value="100" step="0.1"></div>
+      <div><label>Low pressure (psig)</label><input id="pLow" type="number" value="40" step="0.1"></div>
+      <div><label>Atmospheric (psia)</label><input id="patm" type="number" value="14.7" step="0.1"></div>
+    </div>
+    <button class="calc" onclick="calc()">Calculate</button>
+    <div id="results" class="results" style="display:none"></div>
+  </section>
+</div>
+<script src="../shared.js?v=1.0.0"></script>
+<script src="./app.js?v=1.0.0"></script>
+<script>ToolshedShared.mountLogoSelect("logoSelect");</script>
+</body>
+</html>

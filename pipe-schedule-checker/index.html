@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pipe Schedule Checker · Fire Toolshed</title>
+  <link rel="stylesheet" href="./style.css?v=1.0.0">
+</head>
+<body>
+<div class="shell">
+  <header>
+    <p class="eyebrow">Fire Toolshed</p>
+    <h1>Pipe Schedule Checker</h1>
+    <p class="version">v1.0.0 · NFPA 13 light & ordinary hazard steel</p>
+    <div class="actions no-print">
+      <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
+      <label>Report logo <select id="logoSelect"></select></label>
+      <button type="button" onclick="printReport()">Print Report</button>
+    </div>
+  </header>
+  <div id="guide" class="guide hidden">
+    <h2>User Guide</h2>
+    <ul>
+      <li>Select hazard (Light or Ordinary) and pipe size.</li>
+      <li>Enter the number of sprinklers supplied by that pipe section and all downstream piping.</li>
+      <li>The tool shows the maximum allowed by the NFPA 13 pipe schedule tables and whether your count is within limits.</li>
+      <li>Pipe schedule is permitted only for Light and Ordinary Hazard. Exceeding the limit requires a full hydraulic calculation.</li>
+    </ul>
+  </div>
+  <section class="card">
+    <div class="grid">
+      <div><label>Hazard</label>
+        <select id="haz"><option value="light">Light Hazard</option><option value="ord">Ordinary Hazard</option></select>
+      </div>
+      <div><label>Pipe size (in)</label>
+        <select id="psize">
+          <option>1</option><option>1.25</option><option>1.5</option><option>2</option>
+          <option>2.5</option><option>3</option><option>3.5</option><option>4</option>
+          <option>5</option><option>6</option><option>8</option>
+        </select>
+      </div>
+      <div><label>Sprinklers on this pipe + downstream</label><input id="scount" type="number" value="5" min="0"></div>
+    </div>
+    <button class="calc" onclick="calc()">Check</button>
+    <div id="results" class="results" style="display:none"></div>
+  </section>
+</div>
+<script src="../shared.js?v=1.0.0"></script>
+<script src="./app.js?v=1.0.0"></script>
+<script>ToolshedShared.mountLogoSelect("logoSelect");</script>
+</body>
+</html>
