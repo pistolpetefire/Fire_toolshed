@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Junction Balancer · Fire Toolshed</title>
-  <link rel="stylesheet" href="./style.css?v=1.0.0">
+  <link rel="stylesheet" href="./style.css?v=1.0.1">
 </head>
 <body>
 <div class="shell">
   <header>
     <p class="eyebrow">Fire Toolshed</p>
     <h1>Junction Balancer / Equivalent-K</h1>
-    <p class="version">v1.0.0 · NFPA 13 hydraulic junction points</p>
+    <p class="version">v1.0.1 · NFPA 13 hydraulic junction points</p>
     <div class="actions no-print">
       <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
       <label>Report logo <select id="logoSelect"></select></label>
@@ -34,14 +34,15 @@
     <div class="grid">
       <div><label>Q1 (gpm)</label><input id="q1" type="number" value="77.1" step="0.1"></div>
       <div><label>P1 (psi)</label><input id="p1" type="number" value="15.1" step="0.1"></div>
+      <div><label>Q2 (gpm, optional)</label><input id="q2in" type="number" value="77.1" step="0.1"></div>
       <div><label>P2 (psi)</label><input id="p2" type="number" value="16.0" step="0.1"></div>
     </div>
     <button class="calc" onclick="calc()">Calculate</button>
     <div id="results" class="results" style="display:none"></div>
   </section>
 </div>
-<script src="../shared.js?v=1.0.0"></script>
-<script src="./app.js?v=1.0.0"></script>
+<script src="../shared.js?v=1.0.1"></script>
+<script src="./app.js?v=1.0.1"></script>
 <script>ToolshedShared.mountLogoSelect("logoSelect");</script>
 </body>
 </html>

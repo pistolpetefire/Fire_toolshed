@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Pipe Schedule Checker · Fire Toolshed</title>
-  <link rel="stylesheet" href="./style.css?v=1.0.0">
+  <link rel="stylesheet" href="./style.css?v=1.0.1">
 </head>
 <body>
 <div class="shell">
   <header>
     <p class="eyebrow">Fire Toolshed</p>
     <h1>Pipe Schedule Checker</h1>
-    <p class="version">v1.0.0 · NFPA 13 light & ordinary hazard steel</p>
+    <p class="version">v1.0.1 · NFPA 13 light & ordinary hazard steel</p>
     <div class="actions no-print">
       <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
       <label>Report logo <select id="logoSelect"></select></label>
@@ -40,13 +40,16 @@
         </select>
       </div>
       <div><label>Sprinklers on this pipe + downstream</label><input id="scount" type="number" value="5" min="0"></div>
+      <div><label>System area (ft²)</label><input id="area" type="number" value="4000" min="0"></div>
+      <div><label><input id="isNew" type="checkbox" checked> New system</label></div>
+      <div><label><input id="supplyOk" type="checkbox" checked> Adequate water supply verified</label></div>
     </div>
     <button class="calc" onclick="calc()">Check</button>
     <div id="results" class="results" style="display:none"></div>
   </section>
 </div>
-<script src="../shared.js?v=1.0.0"></script>
-<script src="./app.js?v=1.0.0"></script>
+<script src="../shared.js?v=1.0.1"></script>
+<script src="./app.js?v=1.0.1"></script>
 <script>ToolshedShared.mountLogoSelect("logoSelect");</script>
 </body>
 </html>
