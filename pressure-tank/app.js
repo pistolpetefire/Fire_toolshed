@@ -1,4 +1,7 @@
 function calc() {
+  if (document.getElementById("reqMode") && document.getElementById("reqMode").checked) {
+    return calcRequired();
+  }
   var V = +document.getElementById("tankV").value;
   var pAir = +document.getElementById("pAir").value;
   var pHigh = +document.getElementById("pHigh").value;
@@ -40,4 +43,21 @@ function printReport() {
     "<tr><td>Air at low pressure</td><td>" + r.airLow.toFixed(0) + " gal</td></tr>" +
     "<tr><td>Usable water</td><td>" + r.usable.toFixed(0) + " gal</td></tr></table>";
   ToolshedShared.openPrint("Pressure Tank (Boyle’s Law)", body);
+}
+
+function calcRequired() {
+  var V = +document.getElementById("tankV").value;
+  var usableWant = +document.getElementById("usableWant").value;
+  var A = +document.getElementById("areaRatio").value;
+  var patm = +document.getElementById("patm").value;
+  if (V <= 0 || usableWant <= 0 || A <= 0) { alert("Enter positive volume, usable water, and area ratio."); return; }
+  // Approximate required pressure: P = (Pa + 15)/A - 15 (simplified Boyle form used in pressure-tank sizing)
+  var Pa = patm;
+  var P = ((Pa + 15) / A) - 15;
+  var html = "<p class='note'><strong>Code basis:</strong> NFPA 22-2023 pressure tanks</p>" +
+             "<strong>Required pressure (approx.):</strong> <span class='good'>" + P.toFixed(1) + " psig</span><br>" +
+             "<em>P = (Pa + 15)/A − 15. Confirm with full air/water balance.</em>";
+  document.getElementById("results").style.display = "block";
+  document.getElementById("results").innerHTML = html;
+  window.lastResult = { mode: "required", P: P, usableWant: usableWant };
 }

@@ -61,6 +61,7 @@ function calc() {
     "<strong>Churn (0 flow):</strong> " + churn.toFixed(1) + " psi (" + ((churn / pPress) * 100).toFixed(0) + "% of rated)<br>" +
     "<strong>At rated flow:</strong> " + atRated.toFixed(1) + " psi<br>" +
     "<strong>At 150% (" + (pRated * 1.5).toFixed(0) + " gpm):</strong> " + p150.toFixed(1) + " psi<br>" +
+    "<em>Pump net is shown as code-limit segments (≤140% churn, 100% rated, ≥65% at 150%). Confirm with manufacturer curve.</em><br>" +
     "<strong>175 psi check (churn + static):</strong> " + churnPlusStatic.toFixed(1) + " psi → " + (over175 ? "<span class='bad'>Exceeds 175 psi</span>" : "<span class='good'>≤ 175 psi</span>") + "<br>" +
     "<strong>Suction:</strong> " + suctionNote;
 

@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Pressure Tank · Fire Toolshed</title>
-  <link rel="stylesheet" href="./style.css?v=1.0.5">
+  <link rel="stylesheet" href="./style.css?v=1.0.7">
 </head>
 <body>
 <div class="shell">
   <header>
     <p class="eyebrow">Fire Toolshed</p>
     <h1>Pressure Tank (Boyle’s Law)</h1>
-    <p class="version">v1.0.5 · NFPA 22 pressure tanks</p>
+    <p class="version">v1.0.7 · NFPA 22 pressure tanks</p>
     <div class="actions no-print">
       <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
       <label>Report logo <select id="logoSelect"></select></label>
@@ -34,12 +34,31 @@
       <div><label>Low pressure (psig)</label><input id="pLow" type="number" value="40" step="0.1"></div>
       <div><label>Atmospheric (psia)</label><input id="patm" type="number" value="14.7" step="0.1"></div>
     </div>
-    <button class="calc" onclick="calc()">Calculate</button>
+    <div style="margin-top:0.75rem">
+        <label><input type="checkbox" id="reqMode"> Solve for required pressure (given usable volume and area ratio)</label>
+      </div>
+      <div id="reqFields" class="grid" style="display:none;margin-top:0.5rem">
+        <div><label>Desired usable water (gal)</label><input id="usableWant" type="number" value="500"></div>
+        <div><label>Area ratio A (air/water)</label><input id="areaRatio" type="number" value="0.5" step="0.01"></div>
+      </div>
+      <button class="calc" onclick="calc()">Calculate</button>
     <div id="results" class="results" style="display:none"></div>
   </section>
 </div>
-<script src="../shared.js?v=1.0.5"></script>
-<script src="./app.js?v=1.0.5"></script>
-<script>ToolshedShared.mountLogoSelect("logoSelect");</script>
+<script src="../shared.js?v=1.0.7"><script>
+document.getElementById("reqMode").onchange = function () {
+  document.getElementById("reqFields").style.display = this.checked ? "grid" : "none";
+};
+</script>
+<script src="./app.js?v=1.0.7"><script>
+document.getElementById("reqMode").onchange = function () {
+  document.getElementById("reqFields").style.display = this.checked ? "grid" : "none";
+};
+</script>
+<script>ToolshedShared.mountLogoSelect("logoSelect");<script>
+document.getElementById("reqMode").onchange = function () {
+  document.getElementById("reqFields").style.display = this.checked ? "grid" : "none";
+};
+</script>
 </body>
 </html>
