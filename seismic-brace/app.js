@@ -12,7 +12,7 @@ function calc() {
   var Fpw = cp * Wp;
   var maxSpace = brace === "lat" ? 40 : 80;
   var spacingOk = zone <= maxSpace;
-  var html = "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 Ch. 18. Weights and tables: verify against licensed copy before use.</p>" +
+  var html = "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 18.5.9.3 (Cp), Tables 18.5.11.8(a)–(f) (brace capacity). Verify against licensed copy.</p>" +
     "<strong>Wp (1.15 × water-filled weight):</strong> " + Wp.toFixed(0) + " lb<br>" +
     "<strong>Fpw = Cp × Wp:</strong> <span class='good'>" + Fpw.toFixed(0) + " lb</span><br>" +
     "<strong>Max spacing for this brace type:</strong> " + maxSpace + " ft → " +
