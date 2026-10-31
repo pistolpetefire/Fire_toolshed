@@ -30,7 +30,8 @@ function calc() {
     allowNotes.push("New pipe-schedule systems are typically limited to 5,000 ft².");
   }
   if (!supplyOk) {
-    allowNotes.push("Adequate water supply must be verified before using pipe schedule.");
+    allowed = false;
+    allowNotes.push("Adequate water supply is required for pipe schedule (NFPA 13-2022 19.2.2).");
   }
 
   var max = (SCHED[haz] || {})[size];

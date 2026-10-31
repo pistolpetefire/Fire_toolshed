@@ -6,9 +6,17 @@ var PIPE_IDS = {
 function calc() {
   var rated = +document.getElementById("ratedQ").value;
   var d = +document.getElementById("diam").value;
-  var suctionP = +document.getElementById("suctionP").value;
+  var suctionP = document.getElementById("suctionP").value;
+  var supplyType = document.getElementById("supplyType").value;
 
-  if (d <= 0 || rated < 0) { alert("Diameter must be > 0 and flow cannot be negative."); return; }
+  if (suctionP === "" || isNaN(+suctionP)) { alert("Enter suction pressure."); return; }
+  suctionP = +suctionP;
+  if (d <= 0 || rated <= 0) { alert("Diameter and rated flow must be greater than 0."); return; }
+  if (suctionP < -3) { alert("Suction pressure below -3 psi is not permitted."); return; }
+  if (suctionP < 0 && supplyType !== "tank") {
+    alert("Negative suction (to -3 psi) is allowed only for a suction tank supply (NFPA 20-2022 4.16.3.2).");
+    return;
+  }
 
   var q150 = rated * 1.5;
   var v = 0.4085 * q150 / (d * d);

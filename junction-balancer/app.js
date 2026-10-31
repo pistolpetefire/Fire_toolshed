@@ -5,6 +5,8 @@ function calc() {
   var p2 = +document.getElementById("p2").value;
 
   if (p1 <= 0 || p2 <= 0) { alert("Both pressures must be greater than 0"); return; }
+  if (q1 < 0 || q2in < 0) { alert("Flows cannot be negative."); return; }
+  if (p2 < p1 && q2in <= 0) { alert("Branch 2 is the lower-pressure branch — enter its flow (Q2)."); return; }
 
   var dP = Math.abs(p2 - p1);
   var higherP = Math.max(p1, p2);
