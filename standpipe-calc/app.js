@@ -22,7 +22,7 @@ function calc() {
   var elev = h * 0.433;
   var base = residual + elev + fric;
   if (staticP === "" || isNaN(staticP) || staticP < 0) { alert("Enter a non-negative static/churn pressure."); return; }
-  if (staticP < residual) { alert("Static/churn cannot be lower than the residual demand."); return; }
+  if (staticP < base) { alert("Static/churn cannot be lower than the base demand."); return; }
   // Residual at lowest 1½ in. outlet ≈ base pressure minus elevation of that outlet (assume at base for governing case)
   var lowestOutletResidual = base; // governing (lowest) outlet
   var prdResidual = (cls === "II" || cls === "III") && lowestOutletResidual > 100 ? "1½ in. outlets: residual at lowest > 100 psi — PRD required (7.2.3.1)" : "";
