@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Branch-Line Hand Calc · Fire Toolshed</title>
-  <link rel="stylesheet" href="./style.css?v=1.0.1">
+  <link rel="stylesheet" href="./style.css?v=1.0.2">
 </head>
 <body>
 <div class="shell">
   <header>
     <p class="eyebrow">Fire Toolshed</p>
     <h1>Branch-Line / Tree Hand Calc</h1>
-    <p class="version">v1.0.1 · NFPA 13-2022 hydraulics</p>
+    <p class="version">v1.0.2 · NFPA 13-2022 hydraulics</p>
     <div class="actions no-print">
       <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
       <label>Report logo <select id="logoSelect"></select></label>
@@ -29,19 +29,21 @@
   </div>
   <section class="card">
     <div class="grid">
+      <div><label>Number of heads</label><input id="nHeads" type="number" value="1" min="1" max="10"></div>
       <div><label>K factor</label><input id="k" type="number" value="5.6" step="0.1"></div>
-      <div><label>Pressure at head (psi)</label><input id="pHead" type="number" value="7.0" step="0.1"></div>
+      <div><label>Min end-head pressure (psi)</label><input id="pHead" type="number" value="7.0" step="0.1"></div>
       <div><label>Pipe ID (in)</label><input id="diam" type="number" value="1.049" step="0.001"></div>
-      <div><label>Length (ft)</label><input id="len" type="number" value="20"></div>
+      <div><label>Length between heads (ft)</label><input id="len" type="number" value="10"></div>
       <div><label>C factor</label><input id="c" type="number" value="120"></div>
       <div><label>Elevation change (ft, + up)</label><input id="elev" type="number" value="0" step="0.1"></div>
     </div>
+    <p class="note" style="font-size:0.85rem">Simple multi-head: equal K, equal spacing. Fitting equivalent lengths not yet included — add manually to length if needed.</p>
     <button class="calc" onclick="calc()">Calculate</button>
     <div id="results" class="results" style="display:none"></div>
   </section>
 </div>
-<script src="../shared.js?v=1.0.1"></script>
-<script src="./app.js?v=1.0.1"></script>
+<script src="../shared.js?v=1.0.2"></script>
+<script src="./app.js?v=1.0.2"></script>
 <script>ToolshedShared.mountLogoSelect("logoSelect");</script>
 </body>
 </html>

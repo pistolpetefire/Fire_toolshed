@@ -4,25 +4,41 @@ function hazen(q, d, c, L) {
   return 4.52 * Math.pow(q, 1.85) / (Math.pow(c, 1.85) * Math.pow(d, 4.87)) * L;
 }
 function calc() {
+  var n = +document.getElementById("nHeads").value || 1;
   var K = +document.getElementById("k").value;
-  var pHead = +document.getElementById("pHead").value;
+  var pMin = +document.getElementById("pHead").value;
   var d = +document.getElementById("diam").value;
   var L = +document.getElementById("len").value;
   var C = +document.getElementById("c").value;
   var elev = +document.getElementById("elev").value;
-  if (K <= 0 || pHead <= 0 || d <= 0) { alert("K, pressure, and diameter must be greater than 0."); return; }
-  var q = K * Math.sqrt(pHead);
-  var pf = hazen(q, d, C, L);
+  if (n < 1 || K <= 0 || pMin < 7 || d <= 0 || C <= 0 || L <= 0) {
+    alert("Check inputs. End-head pressure should be at least 7 psi; C and length must be > 0.");
+    return;
+  }
+  // Simple equal-K branch: start at most remote, accumulate flow and pressure
+  var p = pMin;
+  var Q = 0;
+  var totalPf = 0;
+  for (var i = 0; i < n; i++) {
+    var q = K * Math.sqrt(p);
+    Q += q;
+    if (i < n - 1) {
+      var pf = hazen(Q, d, C, L);
+      totalPf += pf;
+      p += pf;
+    }
+  }
   var pe = elev * 0.433;
-  var pt = pHead + pf + pe;
-  var html = "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 hydraulics (Q = K√P, Hazen-Williams, 0.433 psi/ft)</p>" +
-    "<strong>Flow at head:</strong> " + q.toFixed(1) + " gpm<br>" +
-    "<strong>Friction loss:</strong> " + pf.toFixed(2) + " psi<br>" +
+  var pt = p + pe;
+  var html = "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 hydraulics (Q = K√P, Hazen-Williams, 0.433 psi/ft). Simple equal-K branch; fittings not included.</p>" +
+    "<strong>Heads:</strong> " + n + "<br>" +
+    "<strong>Total flow:</strong> " + Q.toFixed(1) + " gpm<br>" +
+    "<strong>Friction (sum):</strong> " + totalPf.toFixed(2) + " psi<br>" +
     "<strong>Elevation:</strong> " + pe.toFixed(2) + " psi<br>" +
-    "<strong>Total pressure at start of pipe:</strong> <span class='good'>" + pt.toFixed(2) + " psi</span>";
+    "<strong>Pressure at start of branch:</strong> <span class='good'>" + pt.toFixed(2) + " psi</span>";
   document.getElementById("results").style.display = "block";
   document.getElementById("results").innerHTML = html;
-  window.lastResult = { q: q, pf: pf, pe: pe, pt: pt, K: K, pHead: pHead };
+  window.lastResult = { n: n, Q: Q, totalPf: totalPf, pe: pe, pt: pt };
 }
 function printReport() {
   if (!window.lastResult) { alert("Calculate first"); return; }
