@@ -31,7 +31,7 @@ function calc() {
   var total = adj1 + adj2;
 
   var html =
-    "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 (hydraulic junction points — balance within 0.5 psi; carry highest pressure and adjusted flows) (pressures balance within 0.5 psi; carry highest pressure and adjusted flows)</p>" +
+    "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 hydraulic junction points (pressures balance within 0.5 psi; carry highest pressure and adjusted flows)</p>" +
     "<strong>ΔP:</strong> " + dP.toFixed(2) + " psi<br>" +
     "<strong>Adjusted Q1:</strong> " + adj1.toFixed(1) + " gpm<br>" +
     (q2in > 0 ? "<strong>Adjusted Q2:</strong> " + adj2.toFixed(1) + " gpm<br>" : "") +
