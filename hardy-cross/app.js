@@ -6,6 +6,7 @@ function calc() {
   var tol = +document.getElementById("tol").value;
   var maxPass = +document.getElementById("maxPass").value;
   if (qA <= 0 || qB <= 0) { alert("Flows must be greater than 0."); return; }
+  if (hA <= 0 || hB <= 0) { alert("Head losses must be greater than 0."); return; }
   // Store k so h = k * Q^1.85 on every pass
   var kA = hA / Math.pow(qA, 1.85);
   var kB = hB / Math.pow(qB, 1.85);

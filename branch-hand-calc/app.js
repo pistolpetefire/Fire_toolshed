@@ -4,16 +4,18 @@ function hazen(q, d, c, L) {
   return 4.52 * Math.pow(q, 1.85) / (Math.pow(c, 1.85) * Math.pow(d, 4.87)) * L;
 }
 function calc() {
-  var n = +document.getElementById("nHeads").value || 1;
+  var nRaw = document.getElementById("nHeads").value;
+  var n = +nRaw;
+  if (nRaw === "" || isNaN(n) || n < 1) { alert("Number of heads must be at least 1."); return; }
   var K = +document.getElementById("k").value;
   var pMin = +document.getElementById("pHead").value;
   var d = +document.getElementById("diam").value;
   var L = +document.getElementById("len").value;
   var C = +document.getElementById("c").value;
   var elev = +document.getElementById("elev").value;
-  if (!Number.isInteger(n) || n < 1 || n > 20) { alert("Number of heads must be a whole number from 1 to 20."); return; }
+  if (!Number.isInteger(n) || n > 20) { alert("Number of heads must be a whole number from 1 to 20."); return; }
   if (K <= 0 || pMin < 7 || d <= 0 || C <= 0 || L <= 0) {
-    alert("Check inputs. End-head pressure should be at least 7 psi; C and length must be > 0.");
+    alert("Check inputs. End-head pressure should be positive (7 psi is a common minimum for many applications); C and length must be > 0.");
     return;
   }
   // Simple equal-K branch: start at most remote, accumulate flow and pressure

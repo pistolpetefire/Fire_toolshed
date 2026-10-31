@@ -18,9 +18,11 @@ function calc() {
   }
   var elev = h * 0.433;
   var base = residual + elev + fric;
-  var prd = base > 175 ? "Review PRDs — residual/base exceeds 175 psi (confirm with static/churn)" : "No PRD flag from residual alone";
-  var zone = base > 400 ? "Zone exceeds 400 psi (NFPA 14-2019) — review zoning" : "Zone pressure OK";
-  var html = "<p class='note'><strong>Code basis:</strong> NFPA 14-2019</p>" +
+  var prdResidual = residual > 100 && cls !== "I" ? "1½ in. outlets: residual > 100 psi — PRD required (7.2.3.1)" : "";
+  var prdStatic = base > 175 ? "Static/base > 175 psi — PRD required at outlets (7.2.3.1.3 / 7.2.3.2)" : "";
+  var prd = (prdResidual || prdStatic) ? (prdResidual + " " + prdStatic).trim() : "No PRD flag";
+  var zone = base > 400 ? "Zone exceeds 400 psi (NFPA 14-2019 7.2.1) — review zoning" : "Zone pressure OK";
+  var html = "<p class='note'><strong>Code basis:</strong> NFPA 14-2019 (7.10 flow, 7.8.1 residual, 7.2.1 max pressure)</p>" +
     "<strong>Required flow:</strong> " + flow + " gpm<br>" +
     "<strong>Residual at top:</strong> " + residual + " psi<br>" +
     "<strong>Elevation:</strong> " + elev.toFixed(1) + " psi<br>" +

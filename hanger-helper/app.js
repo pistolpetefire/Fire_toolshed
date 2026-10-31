@@ -25,7 +25,7 @@ function calc() {
   var spacingOk = space <= (info.maxSpace || 15);
   if (!spacingOk) { alert("Spacing exceeds typical maximum for this pipe size. Reduce spacing."); return; }
   var cut = Math.max(0, len - takeoff);
-  var html = "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 Ch. 17 (hangers). Spacing and rod sizes: verify against licensed copy.</p>" +
+  var html = "<p class='note'><strong>Code basis:</strong> NFPA 13-2022 17.1.2(1) (5W+250), Table 17.4.2.1(a) (spacing). Verify against licensed copy.</p>" +
     "<strong>Hangers required:</strong> " + hangers + "<br>" +
     "<strong>Suggested rod size:</strong> " + info.rod + "\" (verify against NFPA 13)<br>" +
     "<strong>5W + 250 on span:</strong> " + load.toFixed(0) + " lb<br>" +
