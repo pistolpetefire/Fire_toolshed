@@ -1,0 +1,386 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fire Toolshed Service Line Sizer input v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "project",
+    "preparedBy",
+    "basis",
+    "system",
+    "pump",
+    "demandGpm",
+    "upstreamHoseGpm",
+    "leadHoseGpm",
+    "requiredPsi",
+    "supplyMode",
+    "availablePsi",
+    "staticPsi",
+    "residualPsi",
+    "testGpm",
+    "leadLengthFt",
+    "leadFittingsFt",
+    "leadElevationFt",
+    "leadC",
+    "leadMaterial",
+    "minLeadIn",
+    "riserLengthFt",
+    "riserFittingsFt",
+    "riserElevationFt",
+    "riserC",
+    "riserMaterial",
+    "minRiserIn",
+    "leadTargetFps",
+    "riserTargetFps",
+    "marginPsi",
+    "valveLossPsi",
+    "bfpType",
+    "bfpLossPsi",
+    "bfpCurve",
+    "pumpRatedGpm",
+    "pumpDischargePsi",
+    "suctionMinPsi",
+    "notes"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "project": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "preparedBy": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "basis": {
+      "enum": [
+        "nfpa",
+        "ufc"
+      ]
+    },
+    "system": {
+      "enum": [
+        "wet",
+        "dry",
+        "single",
+        "double",
+        "non",
+        "deluge"
+      ]
+    },
+    "pump": {
+      "type": "boolean"
+    },
+    "sizingMode": {
+      "enum": [
+        "quick",
+        "known"
+      ]
+    },
+    "demandGpm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "upstreamHoseGpm": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "leadHoseGpm": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "requiredPsi": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "supplyMode": {
+      "enum": [
+        "fixed",
+        "test"
+      ]
+    },
+    "availablePsi": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "staticPsi": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "residualPsi": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "testGpm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "leadLengthFt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "leadFittingsFt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "leadElevationFt": {
+      "type": "number"
+    },
+    "leadC": {
+      "type": "number",
+      "minimum": 80,
+      "maximum": 150
+    },
+    "leadMaterial": {
+      "enum": [
+        "sch40",
+        "sch10",
+        "pvc18"
+      ]
+    },
+    "minLeadIn": {
+      "enum": [
+        2.5,
+        3,
+        4,
+        6,
+        8,
+        10,
+        12
+      ]
+    },
+    "riserLengthFt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "riserFittingsFt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "riserElevationFt": {
+      "type": "number"
+    },
+    "riserC": {
+      "type": "number",
+      "minimum": 80,
+      "maximum": 150
+    },
+    "riserMaterial": {
+      "enum": [
+        "sch40",
+        "sch10"
+      ]
+    },
+    "minRiserIn": {
+      "enum": [
+        2.5,
+        3,
+        4,
+        6,
+        8,
+        10,
+        12
+      ]
+    },
+    "leadTargetFps": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "riserTargetFps": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "marginPsi": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "valveLossPsi": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "bfpType": {
+      "enum": [
+        "dc",
+        "rp"
+      ]
+    },
+    "bfpLossPsi": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "bfpCurve": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/curve"
+        }
+      ]
+    },
+    "bfpLocation": {
+      "enum": [
+        "indoor",
+        "outdoor"
+      ]
+    },
+    "bfpOrientation": {
+      "enum": [
+        "horizontal",
+        "vertical"
+      ]
+    },
+    "pumpRatedGpm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "pumpDischargePsi": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "suctionMinPsi": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "hazardEstimate": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "hazard",
+            "heightFt",
+            "kFactor",
+            "coverageFt2",
+            "minPressurePsi",
+            "allowancePct"
+          ],
+          "properties": {
+            "fm": {
+              "type": "boolean"
+            },
+            "hazard": {
+              "enum": [
+                "light",
+                "oh1",
+                "oh2",
+                "eh1",
+                "eh2",
+                "budget1100",
+                "budget1300",
+                "budget1400",
+                "esfr40"
+              ]
+            },
+            "heightFt": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 100
+            },
+            "kFactor": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0,
+              "maximum": 40
+            },
+            "coverageFt2": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0,
+              "maximum": 225
+            },
+            "minPressurePsi": {
+              "type": "number",
+              "minimum": 7,
+              "maximum": 175
+            },
+            "allowancePct": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "curve": {
+      "type": "object",
+      "required": [
+        "model",
+        "sizeIn",
+        "points"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sizeIn": {
+          "enum": [
+            2.5,
+            3,
+            4,
+            6,
+            8,
+            10,
+            12
+          ]
+        },
+        "points": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 100,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "referencePoint": "system-side-riser",
+  "demandGpm": 500,
+  "requiredPsi": 40,
+  "source": "Example only - replace with your calculation summary"
+}
