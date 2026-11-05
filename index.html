@@ -144,9 +144,25 @@
       color: var(--slate-500);
     }
     footer strong { color: var(--slate-600); }
+  
+    html { scroll-behavior:smooth; }
+    .guide-highlight {background:#eaf2ff;border:2px solid #315caa;border-radius:1.25rem;padding:1.5rem;margin-bottom:1.25rem;}
+    .guide-highlight h2 {margin:0 0 .5rem;font-size:1.4rem;}
+    .guide-highlight p {margin:.5rem 0 1rem;}
+    .guide-link {display:inline-block;background:#1e3a8a;color:white;padding:.75rem 1rem;border-radius:.6rem;text-decoration:none;font-weight:650;}
+    .topic-nav {display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0 2rem;}
+    .topic-nav a {padding:.6rem .8rem;border:1px solid #cbd5e1;border-radius:2rem;background:white;color:#1e3a8a;text-decoration:none;font-size:.85rem;}
+    .topic {scroll-margin-top:1rem;margin:2.5rem 0;}
+    .topic>h2 {border-bottom:2px solid #dbeafe;padding-bottom:.65rem;font-size:1.35rem;}
+    .topic .card h3 {margin:0 0 .35rem;font-size:1.15rem;letter-spacing:-.02em;}
+    .guide-entry {padding:1.25rem;background:white;border:1px solid #e2e8f0;border-radius:.8rem;margin:1rem 0;break-inside:avoid;}
+    .guide-entry h3 {margin:0 0 .6rem;}.guide-entry p {margin:0;line-height:1.65;}
+    a:focus-visible {outline:3px solid #2563eb;outline-offset:4px;}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+    @media print {.topic-nav,.guide-link,.back-top{display:none;}body{background:white;padding:0;}.guide-entry{border:0;padding:.5rem 0;}a{color:inherit;text-decoration:none;}}
   </style>
 </head>
-<body>
+<body id="top">
   <div class="wrap">
     <header>
       <div class="logo" aria-hidden="true">ET</div>
@@ -156,273 +172,248 @@
       </div>
     </header>
 
-    <p class="tool-count">
-      <a href="./water-supply/" style="color:var(--blue-900);font-weight:650;text-decoration:none">Water supply path hub</a>
-      — Flow Test → Sprinkler → Pump → Tank ·
-      <a href="./atrium-path/" style="color:var(--blue-900);font-weight:650;text-decoration:none">Atrium path checklist</a>
-      — screen here, then FDS
-    </p>
-
-    <section class="grid" aria-label="Available tools">
-      <a class="card" href="./pe-fpe/" id="card-pe-fpe" style="grid-column:1/-1;min-height:auto;background:linear-gradient(135deg,#e8eef4,#fff)">
-        <span class="badge beta">PE exam · beta</span>
-        <h2>PE Fire Protection practice exam</h2>
-        <p>April 2027 CBT dress rehearsal. Form A style lock is live (15 of 85 items: Analysis + Fire Science). Handbook/code search, 8:30 clock, optional 50-minute break. Not an NCEES product.</p>
-        <span class="open">Open Form A →</span>
-      </a>
-
-      <a class="card" href="./water-supply/" id="card-water-hub" style="grid-column:1/-1;min-height:auto;background:linear-gradient(135deg,#eff6ff,#fff)">
+    <section class="guide-highlight" aria-labelledby="guide-title"><h2 id="guide-title">Find the right tool</h2><p>Explore 39 apps and workflow hubs, organized by topic. The tools guide explains what each app does, when to use it and where its scope ends.</p><a class="guide-link" href="./tools-guide.html">Read the complete tools guide →</a></section>
+<nav class="topic-nav" aria-label="Browse tools by topic"><a href="#water">Water supply, pumps &amp; tanks</a><a href="#sprinklers">Sprinklers, standpipes &amp; hydraulics</a><a href="#alarm">Fire alarm &amp; notification</a><a href="#egress">Occupants, egress &amp; evacuation</a><a href="#smoke">Atrium &amp; smoke control</a><a href="#hazards">Hazardous materials &amp; fire-resistant construction</a><a href="#projects">Project coordination</a><a href="#learning">Learning &amp; practice</a><a href="#breaks">Games &amp; breaks</a></nav><section class="topic" id="water" aria-labelledby="heading-water"><h2 id="heading-water">Water supply, pumps &amp; tanks <small>(11)</small></h2><div class="grid"><a class="card" href="./water-supply/" id="card-water-hub">
         <span class="badge">Water path</span>
-        <h2>Open water supply path</h2>
+        <h3>Open water supply path</h3>
         <p>Light shell across all four tools: step strip, capture status, next-step links. Each calculator still opens alone if you bookmark it.</p>
         <span class="open">Path hub →</span>
       </a>
-
-      <a class="card" href="./flow-test-request/" id="card-flow-request">
+<a class="card" href="./flow-test-request/" id="card-flow-request">
         <span class="badge">Request</span>
-        <h2>Flow Test Request</h2>
+        <h3>Flow Test Request</h3>
         <p>Stock hydrant flow test request (suppression or fire flow). NFPA 291 procedures for 2½″ outlets only — base building number, location, hydrant selection reasons, jurisdiction ask.</p>
         <span class="open">Open request form →</span>
       </a>
-
-      <a class="card" href="./flow-test-report/" id="card-flow-test">
+<a class="card" href="./flow-test-report/" id="card-flow-test">
         <span class="badge">1 · Live</span>
-        <h2>Flow Test Report</h2>
+        <h3>Flow Test Report</h3>
         <p>Hydrant static/residual/pitot GPM, N<sup>1.85</sup> supply curve, fire flow @ 20 psi. Capture results for the Sprinkler Estimator (no system demand here).</p>
         <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./sprinkler-system-estimator/" id="card-sprinkler">
+<a class="card" href="./sprinkler-system-estimator/" id="card-sprinkler">
         <span class="badge">2 · Live</span>
-        <h2>Sprinkler System Estimator</h2>
+        <h3>Sprinkler System Estimator</h3>
         <p>Prelim demand + pressure stack + duration (NFPA 13 / UFC / FM). Overlay flow-test supply curve; capture duty for Fire Pump Sizer.</p>
         <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./service-line-sizer/" id="card-service-line">
+<a class="card" href="./service-line-sizer/" id="card-service-line">
         <span class="badge">Live · v1.3.0</span>
-        <h2>Service Line Sizer</h2>
+        <h3>Service Line Sizer</h3>
         <p>Estimate lead-in, backflow and riser sizes from hazard or known demand. NFPA / UFC guidance, ESFR and FM planning, illustrated arrangements and branded reports.</p>
         <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./dry-sprinkler-delivery/" id="card-dry-delivery">
-        <span class="badge">Live · v1.5.1</span>
-        <h2>Dry Sprinkler Water Delivery</h2>
-        <p>Dry / double-interlock delivery time · wet rejected · 10–12″ mains · PDF multi-page fixture import · HW + valves. Preliminary — not a listed method.</p>
-        <span class="open">Open tool →</span>
-      </a>
-
-      <a class="card" href="./fire-pump-sizer/" id="card-pump">
+<a class="card" href="./fire-pump-sizer/" id="card-pump">
         <span class="badge">3 · Live · v2.7.2</span>
-        <h2>Fire Pump Sizer</h2>
+        <h3>Fire Pump Sizer</h3>
         <p>Import sprinkler duty (flow, pressure, duration). NFPA 20 / UFC preliminary pump, driver, curve, and room sizing.</p>
         <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./fire-tank-sizer/" id="card-tank">
+<a class="card" href="./fire-tank-sizer/" id="card-tank">
         <span class="badge">4 · Live</span>
-        <h2>Fire Tank Sizer</h2>
+        <h3>Fire Tank Sizer</h3>
         <p>Flow × duration + NFPA/UFC/FM safety, US-typical prefab steel sizes, max H/⌀ limits, concrete pad, plan diagram.</p>
         <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./hydrant-loop-sizer/" id="card-hydrant-loop">
+<a class="card" href="./hydrant-loop-sizer/" id="card-hydrant-loop">
         <span class="badge">Live · v1.0.3</span>
-        <h2>Hydrant Loop Sizer</h2>
+        <h3>Hydrant Loop Sizer</h3>
         <p>Hydrant-only supply: NFPA 291 available flow, ring hydraulics with hydrant arms, velocity, single-break case, loop schematic. US or metric.</p>
         <span class="open">Open tool →</span>
       </a>
-      <a class="card" href="./junction-balancer/" id="card-junction">
+<a class="card" href="./pump-overlay/" id="card-overlay">
         <span class="badge">New · v1.0.7</span>
-        <h2>Junction Balancer</h2>
-        <p>Equivalent-K and 0.5 psi balance check at hydraulic junction points. Q2 = Q1·√(P2/P1).</p>
-        <span class="open">Open tool →</span>
-      </a>
-      <a class="card" href="./pipe-schedule-checker/" id="card-schedule">
-        <span class="badge">New · v1.0.7</span>
-        <h2>Pipe Schedule Checker</h2>
-        <p>Sprinkler counts per pipe size for light and ordinary hazard steel. Checks when pipe schedule is allowed.</p>
-        <span class="open">Open tool →</span>
-      </a>
-      <a class="card" href="./pressure-tank/" id="card-pressure-tank">
-        <span class="badge">New · v1.0.7</span>
-        <h2>Pressure Tank (Boyle)</h2>
-        <p>Air/water split, start/end pressure, and usable volume for pressure tanks.</p>
-        <span class="open">Open tool →</span>
-      </a>
-      <a class="card" href="./velocity-suction/" id="card-velocity">
-        <span class="badge">New · v1.0.7</span>
-        <h2>Velocity / Suction Check</h2>
-        <p>v = 0.4085Q/d². Checks pump suction velocity ≤ 15 ft/s at 150% flow.</p>
-        <span class="open">Open tool →</span>
-      </a>
-      <a class="card" href="./pump-overlay/" id="card-overlay">
-        <span class="badge">New · v1.0.7</span>
-        <h2>Pump + Supply Overlay</h2>
+        <h3>Pump + Supply Overlay</h3>
         <p>Adds pump net curve to city supply, overlays demand, reports margin and 150% point.</p>
         <span class="open">Open tool →</span>
       </a>
-            <a class="card" href="./hanger-helper/" id="card-hanger">
+<a class="card" href="./pressure-tank/" id="card-pressure-tank">
         <span class="badge">New · v1.0.7</span>
-        <h2>Hanger & Stocklist Helper</h2>
-        <p>Hanger count, rod size, 5W+250 lb check, cut lengths. NFPA 13-2022 Ch. 17.</p>
+        <h3>Pressure Tank (Boyle)</h3>
+        <p>Air/water split, start/end pressure, and usable volume for pressure tanks.</p>
         <span class="open">Open tool →</span>
       </a>
-      <a class="card" href="./branch-hand-calc/" id="card-branch">
+<a class="card" href="./velocity-suction/" id="card-velocity">
         <span class="badge">New · v1.0.7</span>
-        <h2>Branch-Line Hand Calc</h2>
+        <h3>Velocity / Suction Check</h3>
+        <p>v = 0.4085Q/d². Checks pump suction velocity ≤ 15 ft/s at 150% flow.</p>
+        <span class="open">Open tool →</span>
+      </a>
+</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
+<section class="topic" id="sprinklers" aria-labelledby="heading-sprinklers"><h2 id="heading-sprinklers">Sprinklers, standpipes &amp; hydraulics <small>(8)</small></h2><div class="grid"><a class="card" href="./branch-hand-calc/" id="card-branch">
+        <span class="badge">New · v1.0.7</span>
+        <h3>Branch-Line Hand Calc</h3>
         <p>Node-by-node Q = K√P, Hazen-Williams, elevation. NFPA 13-2022.</p>
         <span class="open">Open tool →</span>
       </a>
-      <a class="card" href="./standpipe-calc/" id="card-standpipe">
+<a class="card" href="./junction-balancer/" id="card-junction">
         <span class="badge">New · v1.0.7</span>
-        <h2>Standpipe Calculator</h2>
-        <p>Class I/II/III flows, residual at top, base demand. NFPA 14-2019.</p>
+        <h3>Junction Balancer</h3>
+        <p>Equivalent-K and 0.5 psi balance check at hydraulic junction points. Q2 = Q1·√(P2/P1).</p>
         <span class="open">Open tool →</span>
       </a>
-      <a class="card" href="./hardy-cross/" id="card-hardy">
+<a class="card" href="./hardy-cross/" id="card-hardy">
         <span class="badge">New · v1.0.7</span>
-        <h2>Hardy Cross Loop Solver</h2>
+        <h3>Hardy Cross Loop Solver</h3>
         <p>Two-path split, ΔQ correction, convergence. NFPA 13-2022 hydraulics.</p>
         <span class="open">Open tool →</span>
       </a>
-      <a class="card" href="./seismic-brace/" id="card-seismic">
+<a class="card" href="./pipe-schedule-checker/" id="card-schedule">
         <span class="badge">New · v1.0.7</span>
-        <h2>Seismic Brace Load</h2>
+        <h3>Pipe Schedule Checker</h3>
+        <p>Sprinkler counts per pipe size for light and ordinary hazard steel. Checks when pipe schedule is allowed.</p>
+        <span class="open">Open tool →</span>
+      </a>
+<a class="card" href="./dry-sprinkler-delivery/" id="card-dry-delivery">
+        <span class="badge">Live · v1.5.1</span>
+        <h3>Dry Sprinkler Water Delivery</h3>
+        <p>Dry / double-interlock delivery time · wet rejected · 10–12″ mains · PDF multi-page fixture import · HW + valves. Preliminary — not a listed method.</p>
+        <span class="open">Open tool →</span>
+      </a>
+<a class="card" href="./standpipe-calc/" id="card-standpipe">
+        <span class="badge">New · v1.0.7</span>
+        <h3>Standpipe Calculator</h3>
+        <p>Class I/II/III flows, residual at top, base demand. NFPA 14-2019.</p>
+        <span class="open">Open tool →</span>
+      </a>
+<a class="card" href="./hanger-helper/" id="card-hanger">
+        <span class="badge">New · v1.0.7</span>
+        <h3>Hanger & Stocklist Helper</h3>
+        <p>Hanger count, rod size, 5W+250 lb check, cut lengths. NFPA 13-2022 Ch. 17.</p>
+        <span class="open">Open tool →</span>
+      </a>
+<a class="card" href="./seismic-brace/" id="card-seismic">
+        <span class="badge">New · v1.0.7</span>
+        <h3>Seismic Brace Load</h3>
         <p>Wp, Fpw = Cp×Wp, 40/80 ft spacing. NFPA 13-2022 Ch. 18. Verify tables.</p>
         <span class="open">Open tool →</span>
       </a>
-<a class="card" href="./occupant-egress/" id="card-egress">
-        <span class="badge">Live · v1.7.1</span>
-        <h2>Occupant Load &amp; Egress Capacity</h2>
-        <p>IBC-style occupant load factors, means of egress width capacity, minimum exits (Table 1006.3.3) and loss-of-one-exit (1005.5), travel / common path / dead-end checks — life-safety basis of design.</p>
-        <span class="open">Open tool →</span>
-      </a>
-
-      <a class="card" href="./fa-power-extenders/" id="card-fa-power">
+</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
+<section class="topic" id="alarm" aria-labelledby="heading-alarm"><h2 id="heading-alarm">Fire alarm &amp; notification <small>(1)</small></h2><div class="grid"><a class="card" href="./fa-power-extenders/" id="card-fa-power">
         <span class="badge">Live · v1.1.2</span>
-        <h2>FA Power Extenders</h2>
+        <h3>FA Power Extenders</h3>
         <p>NAC horn/strobe + speaker taps (25/70 V), voltage drop, booster / remote-amp warrant. NFPA 72 / UFC. Preliminary — not a listed calc.</p>
         <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./rset-tool/" id="card-rset">
-        <span class="badge">Live · v0.1.7</span>
-        <h2>Transparent RSET Tool</h2>
-        <p>Educational Required Safe Egress Time calculator — full plain-language guide plus technical chapters; Detection + Notification + Pre-movement + Movement with assumptions log and session export.</p>
+</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
+<section class="topic" id="egress" aria-labelledby="heading-egress"><h2 id="heading-egress">Occupants, egress &amp; evacuation <small>(4)</small></h2><div class="grid"><a class="card" href="./occupant-egress/" id="card-egress">
+        <span class="badge">Live · v1.7.1</span>
+        <h3>Occupant Load &amp; Egress Capacity</h3>
+        <p>IBC-style occupant load factors, means of egress width capacity, minimum exits (Table 1006.3.3) and loss-of-one-exit (1005.5), travel / common path / dead-end checks — life-safety basis of design.</p>
         <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./aset-screener/" id="card-aset">
-        <span class="badge">Live · v1.2.0</span>
-        <h2>ASET Screener</h2>
-        <p>Screening ASET: smoke layer descent (NFPA 92 + two-zone), hands off to RSET Tool, and exports an FDS starter file for review. Screening only.</p>
-        <span class="open">Open tool →</span>
-      </a>
-
-      <a class="card" href="./stair-merge-queue/" id="card-stair-merge">
+<a class="card" href="./travel-distance/" id="card-travel-distance">
         <span class="badge">Live · v1.0.1</span>
-        <h2>Stair Merge &amp; Queue Screener</h2>
-        <p>Multi-floor stair egress: SFPE hydraulic model with landing merges, door queues, phased vs simultaneous, loss of one stair; hands off movement to RSET Tool. Screening only.</p>
-        <span class="open">Open tool →</span>
-      </a>
-
-      <a class="card" href="./travel-distance/" id="card-travel-distance">
-        <span class="badge">Live · v1.0.1</span>
-        <h2>Travel Distance &amp; Nearest-Exit Checker</h2>
+        <h3>Travel Distance &amp; Nearest-Exit Checker</h3>
         <p>Draw or import a plan with obstructions; shortest real path to the nearest exit and to the next exit if it is blocked, with areas over your limit shaded. Screening only.</p>
         <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./project-file/" id="card-project-file">
-        <span class="badge">Live · v1.0.0</span>
-        <h2>Project File Hub</h2>
-        <p>One shared project file (fireToolshed.project.v1) across Occupant Load, atrium tools, ASET, RSET, Stair Merge and Travel Distance, with cross-app checks and per-app extract. Screening only.</p>
-        <span class="open">Open tool →</span>
-      </a>
-
-      <a class="card" href="./ibc-ifc-hazard/" id="card-hazard">
-        <span class="badge">Live · v1.6.2</span>
-        <h2>IBC / IFC Hazard Impacts</h2>
-        <p>H occupancy + material hazards → construction &amp; mitigations from IBC 414/415/315 and IFC Ch. 50+, with drivers and high-cost flags (2015–2024).</p>
-        <span class="open">Open tool →</span>
-      </a>
-
-      <a class="card" href="./maq-control-area/" id="card-maq">
+<a class="card" href="./stair-merge-queue/" id="card-stair-merge">
         <span class="badge">Live · v1.0.1</span>
-        <h2>MAQ &amp; Control Area Calculator</h2>
-        <p>Storage / use-closed / use-open vs. MAQ per control area (IFC Tables 5003.1.1(1)/(2), sprinkler and cabinet increases, Table 5003.8.3.2 story % and count) → Group H needed or not. 2021/2024, Florida Building Code 9th Edition label.</p>
+        <h3>Stair Merge &amp; Queue Screener</h3>
+        <p>Multi-floor stair egress: SFPE hydraulic model with landing merges, door queues, phased vs simultaneous, loss of one stair; hands off movement to RSET Tool. Screening only.</p>
         <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./concrete-fire-rating/" id="card-concrete-frr">
-        <span class="badge">Live · v1.1.1</span>
-        <h2>Concrete Fire Rating Thickness</h2>
-        <p>Minimum concrete / CMU thickness for 1–4 hour fire ratings by material makeup (siliceous, carbonate, lightweight, masonry aggregates) — IBC / ACI 216.1 calculated method.</p>
+<a class="card" href="./rset-tool/" id="card-rset">
+        <span class="badge">Live · v0.1.7</span>
+        <h3>Transparent RSET Tool</h3>
+        <p>Educational Required Safe Egress Time calculator — full plain-language guide plus technical chapters; Detection + Notification + Pre-movement + Movement with assumptions log and session export.</p>
         <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./deflagration-vent/" id="card-deflag">
-        <span class="badge">Live · v1.2.1</span>
-        <h2>Deflagration Vent Sizing</h2>
-        <p>NFPA 68-2023 <strong>room</strong> and process vent sizing (L×W×H, K<sub>St</sub>/P<sub>max</sub> dust, S<sub>u</sub> gas, P<sub>red</sub>) with IBC/IFC explosion-control context.</p>
-        <span class="open">Open tool →</span>
-      </a>
-
-      <a class="card" href="./atrium-path/" id="card-atrium-path" style="grid-column:1/-1;min-height:auto;background:linear-gradient(135deg,#fff7ed,#fff)">
+</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
+<section class="topic" id="smoke" aria-labelledby="heading-smoke"><h2 id="heading-smoke">Atrium &amp; smoke control <small>(7)</small></h2><div class="grid"><a class="card" href="./atrium-path/" id="card-atrium-path">
         <span class="badge">Atrium path</span>
-        <h2>Atrium staff checklist</h2>
+        <h3>Atrium staff checklist</h3>
         <p>Start here. Occupant load through the AHJ kickoff, then FDS and Smokeview for the submittal, then the report and commissioning. Checks stay in this browser with the shared atrium project.</p>
         <span class="open">Open checklist →</span>
       </a>
-
-      <a class="card" href="./atrium-smoke-exhaust/" id="card-atrium-smoke">
+<a class="card" href="./atrium-smoke-exhaust/" id="card-atrium-smoke">
         <span class="badge">Live · R5</span>
-        <h2>Atrium Smoke Exhaust</h2>
+        <h3>Atrium Smoke Exhaust</h3>
         <p>Hub: IBC/NFPA 101, suitability, NFPA 92 algebraic, systems/SI, links to native zone &amp; multi-cell field engines — all browser-only.</p>
         <span class="open">Open hub →</span>
       </a>
-
-      <a class="card" href="./atrium-zone-model/" id="card-atrium-zone">
+<a class="card" href="./atrium-zone-model/" id="card-atrium-zone">
         <span class="badge">Live · Tier 2</span>
-        <h2>Atrium Zone Model</h2>
+        <h3>Atrium Zone Model</h3>
         <p>Self-contained two-zone smoke-layer engine (fill + exhaust, ASET, steady size). No CFAST install.</p>
         <span class="open">Open zone model →</span>
       </a>
-
-      <a class="card" href="./atrium-field-model/" id="card-atrium-field">
+<a class="card" href="./atrium-field-model/" id="card-atrium-field">
         <span class="badge">Live · Tier 3</span>
-        <h2>Atrium Field Model</h2>
+        <h3>Atrium Field Model</h3>
         <p>Self-contained multi-cell column model for atrium-height filling sensitivity. Not FDS/LES — fully in-browser.</p>
         <span class="open">Open field model →</span>
       </a>
-
-      <a class="card" href="./smoke-exhaust-lab/app/" id="card-smoke-exhaust">
+<a class="card" href="./smoke-exhaust-lab/app/" id="card-smoke-exhaust">
         <span class="badge beta">Beta</span>
-        <h2>Smoke Exhaust Scenario Lab</h2>
+        <h3>Smoke Exhaust Scenario Lab</h3>
         <p>Design-fire scenarios, plume/exhaust calculations, makeup air &amp; plugholing checks, Full/Excel modes, and auditable report packages.</p>
         <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./games/" id="card-games">
-        <span class="badge">Games</span>
-        <h2>Games</h2>
-        <p>Team arcade breaks in the browser — Punch-Out!!, Frogger, and Ms. Pac Maze fan remakes (touch + keyboard).</p>
-        <span class="open">Open games →</span>
+<a class="card" href="./aset-screener/" id="card-aset">
+        <span class="badge">Live · v1.2.0</span>
+        <h3>ASET Screener</h3>
+        <p>Screening ASET: smoke layer descent (NFPA 92 + two-zone), hands off to RSET Tool, and exports an FDS starter file for review. Screening only.</p>
+        <span class="open">Open tool →</span>
       </a>
-
-      <a class="card" href="./study-buddy/" id="card-study-buddy" style="grid-column:1/-1;background:linear-gradient(135deg,#eef2ff,#faf5ff)">
-        <span class="badge" style="background:#4f46e5;color:#fff">Study</span>
-        <h2>Study Buddy</h2>
+<a class="card" href="./atrium-report/" id="card-atrium-report"><span class="badge">Report</span><h3>Atrium Screening Package</h3><p>Assemble shared atrium screening results and an AHJ kickoff handout for printing or Word.</p><span class="open">Open tool →</span></a>
+</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
+<section class="topic" id="hazards" aria-labelledby="heading-hazards"><h2 id="heading-hazards">Hazardous materials &amp; fire-resistant construction <small>(4)</small></h2><div class="grid"><a class="card" href="./ibc-ifc-hazard/" id="card-hazard">
+        <span class="badge">Live · v1.6.2</span>
+        <h3>IBC / IFC Hazard Impacts</h3>
+        <p>H occupancy + material hazards → construction &amp; mitigations from IBC 414/415/315 and IFC Ch. 50+, with drivers and high-cost flags (2015–2024).</p>
+        <span class="open">Open tool →</span>
+      </a>
+<a class="card" href="./maq-control-area/" id="card-maq">
+        <span class="badge">Live · v1.0.1</span>
+        <h3>MAQ &amp; Control Area Calculator</h3>
+        <p>Storage / use-closed / use-open vs. MAQ per control area (IFC Tables 5003.1.1(1)/(2), sprinkler and cabinet increases, Table 5003.8.3.2 story % and count) → Group H needed or not. 2021/2024, Florida Building Code 9th Edition label.</p>
+        <span class="open">Open tool →</span>
+      </a>
+<a class="card" href="./deflagration-vent/" id="card-deflag">
+        <span class="badge">Live · v1.2.1</span>
+        <h3>Deflagration Vent Sizing</h3>
+        <p>NFPA 68-2023 <strong>room</strong> and process vent sizing (L×W×H, K<sub>St</sub>/P<sub>max</sub> dust, S<sub>u</sub> gas, P<sub>red</sub>) with IBC/IFC explosion-control context.</p>
+        <span class="open">Open tool →</span>
+      </a>
+<a class="card" href="./concrete-fire-rating/" id="card-concrete-frr">
+        <span class="badge">Live · v1.1.1</span>
+        <h3>Concrete Fire Rating Thickness</h3>
+        <p>Minimum concrete / CMU thickness for 1–4 hour fire ratings by material makeup (siliceous, carbonate, lightweight, masonry aggregates) — IBC / ACI 216.1 calculated method.</p>
+        <span class="open">Open tool →</span>
+      </a>
+</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
+<section class="topic" id="projects" aria-labelledby="heading-projects"><h2 id="heading-projects">Project coordination <small>(1)</small></h2><div class="grid"><a class="card" href="./project-file/" id="card-project-file">
+        <span class="badge">Live · v1.0.0</span>
+        <h3>Project File Hub</h3>
+        <p>One shared project file (fireToolshed.project.v1) across Occupant Load, atrium tools, ASET, RSET, Stair Merge and Travel Distance, with cross-app checks and per-app extract. Screening only.</p>
+        <span class="open">Open tool →</span>
+      </a>
+</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
+<section class="topic" id="learning" aria-labelledby="heading-learning"><h2 id="heading-learning">Learning &amp; practice <small>(2)</small></h2><div class="grid"><a class="card" href="./pe-fpe/" id="card-pe-fpe">
+        <span class="badge beta">PE exam · beta</span>
+        <h3>PE Fire Protection practice exam</h3>
+        <p>April 2027 CBT dress rehearsal. Form A style lock is live (15 of 85 items: Analysis + Fire Science). Handbook/code search, 8:30 clock, optional 50-minute break. Not an NCEES product.</p>
+        <span class="open">Open Form A →</span>
+      </a>
+<a class="card" href="./study-buddy/" id="card-study-buddy">
+        <span class="badge">Study</span>
+        <h3>Study Buddy</h3>
         <p>Class-by-class study apps — start with OCCC Human Anatomy &amp; Physiology (BIO 1314 / BIO 1414): diagrams, flashcards, quizzes, atlas.</p>
         <span class="open">Open Study Buddy →</span>
       </a>
-    </section>
-
+</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
+<section class="topic" id="breaks" aria-labelledby="heading-breaks"><h2 id="heading-breaks">Games &amp; breaks <small>(1)</small></h2><div class="grid"><a class="card" href="./games/" id="card-games">
+        <span class="badge">Games</span>
+        <h3>Games</h3>
+        <p>Team arcade breaks in the browser — Punch-Out!!, Frogger, and Ms. Pac Maze fan remakes (touch + keyboard).</p>
+        <span class="open">Open games →</span>
+      </a>
+</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
     <footer>
       <p><strong>For qualified engineers only.</strong> Preliminary tools — not a substitute for sealed design documents, manufacturer curves, or AHJ approval.</p>
-      <p>Hosted on GitHub Pages · data stays in your browser · portal rev 2026-07-23 · tools + games + Study Buddy + RSET</p>
+      <p>Hosted on GitHub Pages · data stays in your browser · portal updated November 5, 2026 · organized by topic</p>
     </footer>
   </div>
 </body>

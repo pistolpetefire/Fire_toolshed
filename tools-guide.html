@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Engineering tools portal — fire protection and field calculators for team use.">
+  <title>Tools Guide · Fire Toolshed</title>
+  <style>
+    :root {
+      --blue-900: #1e3a8a;
+      --blue-950: #172554;
+      --slate-50: #f8fafc;
+      --slate-200: #e2e8f0;
+      --slate-500: #64748b;
+      --slate-600: #475569;
+      --slate-800: #1e293b;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--slate-50);
+      color: var(--slate-800);
+      padding: calc(1.25rem + var(--safe-top)) 1.25rem calc(2rem + var(--safe-bottom));
+      line-height: 1.5;
+    }
+    .wrap { max-width: 880px; margin: 0 auto; }
+    header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.9rem;
+      margin-bottom: 1.75rem;
+    }
+    .logo {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 1rem;
+      background: var(--blue-900);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.65rem;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+    .sub {
+      margin: 0.25rem 0 0;
+      color: var(--slate-500);
+      font-size: 0.9rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (min-width: 960px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1100px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: #fff;
+      border: 1px solid var(--slate-200);
+      border-radius: 1.25rem;
+      padding: 1.25rem 1.35rem;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+      min-height: 8rem;
+    }
+    a.card:hover, a.card:focus-visible {
+      border-color: #93c5fd;
+      box-shadow: 0 8px 24px rgba(30, 58, 138, 0.1);
+      transform: translateY(-1px);
+      outline: none;
+    }
+    a.card.soon {
+      opacity: 0.65;
+      pointer-events: none;
+      cursor: default;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: var(--blue-900);
+      margin-bottom: 0.55rem;
+    }
+    .badge.beta {
+      background: #ffedd5;
+      color: #9a3412;
+    }
+    .badge.soon-badge {
+      background: #f1f5f9;
+      color: var(--slate-500);
+    }
+    .tool-count {
+      margin: -0.5rem 0 1.25rem;
+      font-size: 0.8rem;
+      color: var(--slate-500);
+    }
+    .card h2 {
+      margin: 0 0 0.35rem;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+    .card p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--slate-600);
+    }
+    .open {
+      display: inline-block;
+      margin-top: 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--blue-900);
+    }
+    footer {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--slate-500);
+    }
+    footer strong { color: var(--slate-600); }
+  
+    html { scroll-behavior:smooth; }
+    .guide-highlight {background:#eaf2ff;border:2px solid #315caa;border-radius:1.25rem;padding:1.5rem;margin-bottom:1.25rem;}
+    .guide-highlight h2 {margin:0 0 .5rem;font-size:1.4rem;}
+    .guide-highlight p {margin:.5rem 0 1rem;}
+    .guide-link {display:inline-block;background:#1e3a8a;color:white;padding:.75rem 1rem;border-radius:.6rem;text-decoration:none;font-weight:650;}
+    .topic-nav {display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0 2rem;}
+    .topic-nav a {padding:.6rem .8rem;border:1px solid #cbd5e1;border-radius:2rem;background:white;color:#1e3a8a;text-decoration:none;font-size:.85rem;}
+    .topic {scroll-margin-top:1rem;margin:2.5rem 0;}
+    .topic>h2 {border-bottom:2px solid #dbeafe;padding-bottom:.65rem;font-size:1.35rem;}
+    .topic .card h3 {margin:0 0 .35rem;font-size:1.15rem;letter-spacing:-.02em;}
+    .guide-entry {padding:1.25rem;background:white;border:1px solid #e2e8f0;border-radius:.8rem;margin:1rem 0;break-inside:avoid;}
+    .guide-entry h3 {margin:0 0 .6rem;}.guide-entry p {margin:0;line-height:1.65;}
+    a:focus-visible {outline:3px solid #2563eb;outline-offset:4px;}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+    @media print {.topic-nav,.guide-link,.back-top{display:none;}body{background:white;padding:0;}.guide-entry{border:0;padding:.5rem 0;}a{color:inherit;text-decoration:none;}}
+  </style>
+</head>
+<body id="top"><main class="wrap"><header><div><a href="./">← Fire Toolshed homepage</a><h1>Tools guide</h1><p class="sub">A short explanation of every app and workflow hub.</p></div></header><nav class="topic-nav" aria-label="Browse tools by topic"><a href="#water">Water supply, pumps &amp; tanks</a><a href="#sprinklers">Sprinklers, standpipes &amp; hydraulics</a><a href="#alarm">Fire alarm &amp; notification</a><a href="#egress">Occupants, egress &amp; evacuation</a><a href="#smoke">Atrium &amp; smoke control</a><a href="#hazards">Hazardous materials &amp; fire-resistant construction</a><a href="#projects">Project coordination</a><a href="#learning">Learning &amp; practice</a><a href="#breaks">Games &amp; breaks</a></nav><section class="topic" id="water"><h2>Water supply, pumps &amp; tanks</h2><article class="guide-entry"><h3><a href="./water-supply/">Open water supply path ↗</a></h3><p>Guides a water-supply study from the hydrant flow test through sprinkler demand, fire pump selection and tank sizing. Use it to follow the sequence, see captured results and move between the individual calculators.</p></article><article class="guide-entry"><h3><a href="./flow-test-request/">Flow Test Request ↗</a></h3><p>Prepares a hydrant flow-test request with building and location details, selected hydrants and the purpose of the test. It supports suppression-supply or fire-flow requests and provides NFPA 291 procedure guidance for 2½-inch outlets.</p></article><article class="guide-entry"><h3><a href="./flow-test-report/">Flow Test Report ↗</a></h3><p>Turns hydrant static, residual and pitot readings into flow results and a water-supply curve, including available fire flow at 20 psi. It records the available supply for use in the Sprinkler System Estimator; it does not calculate building sprinkler demand.</p></article><article class="guide-entry"><h3><a href="./sprinkler-system-estimator/">Sprinkler System Estimator ↗</a></h3><p>Estimates preliminary sprinkler flow, pressure and water-supply duration using NFPA 13, UFC or FM criteria. Compare that demand with a flow-test supply curve, then pass the resulting duty to the Fire Pump Sizer.</p></article><article class="guide-entry"><h3><a href="./service-line-sizer/">Service Line Sizer ↗</a></h3><p>Estimates the fire-service lead-in, backflow assembly and riser sizes from a hazard-based planning demand or known hydraulic calculations. Includes ESFR and FM planning examples, indoor/outdoor and vertical/horizontal backflow illustrations, company sizing preferences, a user guide and branded printable reports.</p></article><article class="guide-entry"><h3><a href="./fire-pump-sizer/">Fire Pump Sizer ↗</a></h3><p>Uses sprinkler duty to explore preliminary fire pump flow and pressure, driver requirements, pump curves and room sizing under NFPA 20 and UFC criteria. It helps establish a selection basis before checking actual manufacturer performance and the final system design.</p></article><article class="guide-entry"><h3><a href="./fire-tank-sizer/">Fire Tank Sizer ↗</a></h3><p>Converts flow and duration into preliminary fire-water storage requirements, with NFPA, UFC and FM allowances. It compares typical prefabricated steel tank sizes and height-to-diameter limits, and provides a concrete-pad estimate and plan diagram.</p></article><article class="guide-entry"><h3><a href="./hydrant-loop-sizer/">Hydrant Loop Sizer ↗</a></h3><p>Sizes a hydrant-only supply loop using available flow, ring-pipe hydraulics, hydrant branches and velocity checks. It includes a single-break scenario and a loop schematic, with US or metric units.</p></article><article class="guide-entry"><h3><a href="./pump-overlay/">Pump + Supply Overlay ↗</a></h3><p>Combines a fire pump’s net pressure curve with the city water-supply curve and overlays the required system demand. Use it to examine pressure margin and the pump’s 150-percent-flow point.</p></article><article class="guide-entry"><h3><a href="./pressure-tank/">Pressure Tank (Boyle) ↗</a></h3><p>Uses Boyle’s law to explore the air and water split in a pressure tank, its starting and ending pressure, and usable water volume. It supports preliminary tank calculations rather than selection of a listed assembly.</p></article><article class="guide-entry"><h3><a href="./velocity-suction/">Velocity / Suction Check ↗</a></h3><p>Calculates water velocity from flow and pipe inside diameter and checks pump suction velocity at 150 percent of rated flow against the tool’s 15 ft/s criterion. Use it for a focused pipe-velocity or suction-sizing check.</p></article></section><section class="topic" id="sprinklers"><h2>Sprinklers, standpipes &amp; hydraulics</h2><article class="guide-entry"><h3><a href="./branch-hand-calc/">Branch-Line Hand Calc ↗</a></h3><p>Builds a sprinkler branch-line hydraulic calculation one node at a time using sprinkler discharge, Hazen–Williams friction and elevation changes. It makes the hand-calculation sequence visible for checking or learning NFPA 13 hydraulics.</p></article><article class="guide-entry"><h3><a href="./junction-balancer/">Junction Balancer ↗</a></h3><p>Balances hydraulic demands where branches meet using equivalent K-factors and pressure-adjusted flow. It reports the junction pressure difference against a 0.5 psi balance check to help reconcile connecting calculations.</p></article><article class="guide-entry"><h3><a href="./hardy-cross/">Hardy Cross Loop Solver ↗</a></h3><p>Solves a two-path hydraulic loop using successive Hardy Cross flow corrections. It shows the flow split and convergence so users can follow how the paths reach a balanced pressure loss.</p></article><article class="guide-entry"><h3><a href="./pipe-schedule-checker/">Pipe Schedule Checker ↗</a></h3><p>Checks sprinkler counts against steel-pipe sizes for light and ordinary hazard pipe-schedule systems. It also checks whether pipe-schedule sizing is applicable before presenting the result.</p></article><article class="guide-entry"><h3><a href="./dry-sprinkler-delivery/">Dry Sprinkler Water Delivery ↗</a></h3><p>Screens water-delivery time for dry-pipe and double-interlock systems using pipe and valve inputs, including large mains and multi-page fixture PDF imports. Wet systems are rejected; the result is a preliminary estimate, not a listed delivery-time method.</p></article><article class="guide-entry"><h3><a href="./standpipe-calc/">Standpipe Calculator ↗</a></h3><p>Calculates standpipe flow requirements, residual pressure at the top outlet and the resulting base demand for Class I, II and III systems. Its stated design basis is NFPA 14 (2019).</p></article><article class="guide-entry"><h3><a href="./hanger-helper/">Hanger & Stocklist Helper ↗</a></h3><p>Estimates hanger quantities, rod sizes and pipe cut lengths for a preliminary stocklist. It includes the 5W + 250 lb load check and references NFPA 13 (2022), Chapter 17.</p></article><article class="guide-entry"><h3><a href="./seismic-brace/">Seismic Brace Load ↗</a></h3><p>Calculates sprinkler seismic-brace load from supported pipe weight and the seismic coefficient, with spacing guidance. Use it to develop and review preliminary brace loads; verify the applicable NFPA 13 tables and actual brace assemblies.</p></article></section><section class="topic" id="alarm"><h2>Fire alarm &amp; notification</h2><article class="guide-entry"><h3><a href="./fa-power-extenders/">FA Power Extenders ↗</a></h3><p>Estimates notification-appliance circuit loads and voltage drop, including horn/strobes and 25/70 V speaker taps. It helps identify when a power booster or remote amplifier may be needed under NFPA 72/UFC criteria; final equipment calculations still depend on the selected listed products.</p></article></section><section class="topic" id="egress"><h2>Occupants, egress &amp; evacuation</h2><article class="guide-entry"><h3><a href="./occupant-egress/">Occupant Load &amp; Egress Capacity ↗</a></h3><p>Checks occupant loads, egress-width capacity, minimum exits and the effect of losing one exit using IBC-style criteria. It also supports travel-distance, common-path and dead-end checks for a preliminary life-safety basis of design.</p></article><article class="guide-entry"><h3><a href="./travel-distance/">Travel Distance &amp; Nearest-Exit Checker ↗</a></h3><p>Lets users draw or import a floor plan with obstructions and find the shortest available path to an exit. It can test the next available exit when one is blocked and highlight areas exceeding an entered travel-distance limit.</p></article><article class="guide-entry"><h3><a href="./stair-merge-queue/">Stair Merge &amp; Queue Screener ↗</a></h3><p>Screens multi-floor stair evacuation with landing merges, door queues and phased or simultaneous evacuation. It can test loss of one stair and pass the estimated movement time to the RSET Tool.</p></article><article class="guide-entry"><h3><a href="./rset-tool/">Transparent RSET Tool ↗</a></h3><p>Estimates Required Safe Egress Time by combining detection, notification, pre-movement and movement time. Includes a plain-language guide, technical explanations, an assumptions log and session export for educational and screening studies.</p></article></section><section class="topic" id="smoke"><h2>Atrium &amp; smoke control</h2><article class="guide-entry"><h3><a href="./atrium-path/">Atrium staff checklist ↗</a></h3><p>Provides a staff checklist for an atrium study, from occupant loads and the authority-having-jurisdiction kickoff through FDS/Smokeview analysis, reporting and commissioning. Checklist progress is kept in the browser with the shared atrium project.</p></article><article class="guide-entry"><h3><a href="./atrium-smoke-exhaust/">Atrium Smoke Exhaust ↗</a></h3><p>Acts as the atrium smoke-control hub, bringing together code considerations, suitability checks, NFPA 92 algebraic calculations and system information. It links to the browser-based zone and field models for further screening.</p></article><article class="guide-entry"><h3><a href="./atrium-zone-model/">Atrium Zone Model ↗</a></h3><p>Uses a self-contained two-zone model to explore smoke-layer filling and exhaust, available safe egress time and steady exhaust sizing. It runs in the browser without installing CFAST and is intended for screening.</p></article><article class="guide-entry"><h3><a href="./atrium-field-model/">Atrium Field Model ↗</a></h3><p>Uses a multi-cell column model to examine how atrium smoke filling responds to height and other assumptions. This browser model supports sensitivity studies; it is not FDS or a large-eddy simulation.</p></article><article class="guide-entry"><h3><a href="./smoke-exhaust-lab/app/">Smoke Exhaust Scenario Lab ↗</a></h3><p>Explores design-fire scenarios, plume and exhaust calculations, makeup air and plugholing checks. Provides full and Excel-oriented modes and report packages that document the calculation basis; the app is labeled beta.</p></article><article class="guide-entry"><h3><a href="./aset-screener/">ASET Screener ↗</a></h3><p>Screens Available Safe Egress Time from smoke-layer descent using NFPA 92 and two-zone methods. It can hand results to the RSET Tool and export an FDS starter file for review, but does not replace a validated fire-model study.</p></article><article class="guide-entry"><h3><a href="./atrium-report/">Atrium Screening Package ↗</a></h3><p>Collects shared atrium baseline information, screening results and an AHJ kickoff handout into a report package. Users can print the package or download it for Word to support review and coordination.</p></article></section><section class="topic" id="hazards"><h2>Hazardous materials &amp; fire-resistant construction</h2><article class="guide-entry"><h3><a href="./ibc-ifc-hazard/">IBC / IFC Hazard Impacts ↗</a></h3><p>Connects material hazards and Group H occupancy considerations with construction requirements and mitigation measures under IBC/IFC criteria. It highlights the provisions driving a decision and potentially costly impacts across the supported code editions.</p></article><article class="guide-entry"><h3><a href="./maq-control-area/">MAQ &amp; Control Area Calculator ↗</a></h3><p>Compares hazardous-material storage and open/closed use quantities with maximum allowable quantities per control area. It accounts for applicable sprinkler, cabinet and story adjustments to screen whether Group H occupancy may be required.</p></article><article class="guide-entry"><h3><a href="./deflagration-vent/">Deflagration Vent Sizing ↗</a></h3><p>Calculates preliminary room and process deflagration vent areas under NFPA 68 (2023), using enclosure geometry and dust or gas properties. It also provides IBC/IFC explosion-control context for the selected scenario.</p></article><article class="guide-entry"><h3><a href="./concrete-fire-rating/">Concrete Fire Rating Thickness ↗</a></h3><p>Looks up calculated minimum concrete or concrete-masonry thickness for one- through four-hour fire resistance based on material and aggregate type. It supports preliminary comparisons using the IBC/ACI 216.1 calculated-method basis.</p></article></section><section class="topic" id="projects"><h2>Project coordination</h2><article class="guide-entry"><h3><a href="./project-file/">Project File Hub ↗</a></h3><p>Coordinates one shared project file across occupant-load, atrium, ASET, RSET, stair and travel-distance tools. It provides cross-app checks and extracts individual app data so the screening studies can share a consistent project basis.</p></article></section><section class="topic" id="learning"><h2>Learning &amp; practice</h2><article class="guide-entry"><h3><a href="./pe-fpe/">PE Fire Protection practice exam ↗</a></h3><p>Provides a beta PE Fire Protection computer-based practice-exam experience with a timed session, optional break and handbook/code search. The portal identifies Form A as partially populated; this is a practice resource, not an NCEES product.</p></article><article class="guide-entry"><h3><a href="./study-buddy/">Study Buddy ↗</a></h3><p>Organizes class-specific study resources, including anatomy and physiology diagrams, flashcards, quizzes and an atlas. Use the hub to open the available classes and their learning activities.</p></article></section><section class="topic" id="breaks"><h2>Games &amp; breaks</h2><article class="guide-entry"><h3><a href="./games/">Games ↗</a></h3><p>Offers browser-based team arcade breaks, including Punch-Out!!, Frogger and Ms. Pac Maze fan remakes. The games support touch and keyboard controls.</p></article></section><footer><p>Summaries describe the current tools; each app provides its own assumptions, code basis and limitations. Preliminary engineering results require project-specific verification.</p><a href="./">Back to Fire Toolshed</a></footer></main></body></html>
