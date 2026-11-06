@@ -140,6 +140,23 @@ export function Dashboard() {
         </div>
       </section>
 
+      <section className="card border-brand-200 p-5 dark:border-brand-800">
+        <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">Exam 4 focus</p>
+        <h2 className="mt-1 font-display text-lg font-semibold">Nervous system study guide (Ch 12–14)</h2>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+          Units 7–8: 30 study-guide prompts with answers, lecture notes, and 30 new flashcards.
+          Practice the full Exam 4 mix or study neurophysiology and the CNS separately.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link to={p('/quizzes/exam/4/guide')} className="btn-primary text-sm">Open Exam 4 study guide</Link>
+          <Link to={p('/quizzes/exam/4')} className="btn-secondary text-sm">Exam 4 practice</Link>
+          <Link to={p('/flashcards?unit=unit-7')} className="btn-secondary text-sm">Neuron / AP flashcards</Link>
+          <Link to={p('/flashcards?unit=unit-8')} className="btn-secondary text-sm">CNS flashcards</Link>
+          <Link to={p('/units/unit-7?mode=quiz')} className="btn-ghost text-sm">Unit 7 quiz</Link>
+          <Link to={p('/units/unit-8?mode=quiz')} className="btn-ghost text-sm">Unit 8 quiz</Link>
+        </div>
+      </section>
+
       {/* Progress + quick start */}
       <div className="grid gap-6 lg:grid-cols-3">
         <section className="card p-5 lg:col-span-1">

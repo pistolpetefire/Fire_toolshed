@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { build } from 'esbuild';
 const result = await build({ stdin: { contents: `
 export { EXAM4_STUDY_GUIDE, exam4StudyGuideFlashcards, exam4StudyGuideQuestions } from './apps/occc-bio-ap/src/data/exam4StudyGuide';
 export { getQuestionsForUnit } from './apps/occc-bio-ap/src/data/unitQuestions';
 export { getExamPracticeDeck } from './apps/occc-bio-ap/src/data/examPractice';
+export { getFlashcardsForUnit } from './apps/occc-bio-ap/src/data/flashcardUnits';
 export { getUnitById } from './apps/occc-bio-ap/src/data/courseUnits';
 `, resolveDir: process.cwd() }, bundle: true, write: false, platform: 'node', format: 'esm' });
 const data = await import('data:text/javascript;base64,' + Buffer.from(result.outputFiles[0].text).toString('base64'));
@@ -31,3 +33,11 @@ for (let i = 0; i < 10; i++) {
   }
 }
 console.log('Exam 4: 30 prompts, 30 flashcards, 30 questions; valid objectives; all source questions included; no leakage to other exam cycles.');
+
+assert.equal(data.getFlashcardsForUnit('unit-7').filter(c => c.id.startsWith('e4-')).length, 20);
+assert.equal(data.getFlashcardsForUnit('unit-8').filter(c => c.id.startsWith('e4-')).length, 10);
+assert.equal(data.getFlashcardsForUnit('unit-9').filter(c => c.id.startsWith('e4-')).length, 0);
+const dashboard = readFileSync('apps/occc-bio-ap/src/pages/Dashboard.tsx', 'utf8');
+assert.ok(dashboard.indexOf('Exam 4 focus') > dashboard.indexOf('Exam 3 focus'));
+assert.ok(dashboard.includes("p('/quizzes/exam/4/guide')"));
+console.log('Dashboard Exam 4 entry and unit-specific flashcard isolation verified.');

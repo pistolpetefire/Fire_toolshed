@@ -138,7 +138,9 @@ export const unitFlashcardExtras: Flashcard[] = [
 
 export function getFlashcardsForUnit(unitId: UnitId): Flashcard[] {
   const topics = UNIT_FLASHCARD_TOPICS[unitId] ?? [];
-  const fromTopics = builtInFlashcards.filter((c) => topics.includes(c.systemId));
+  const fromTopics = builtInFlashcards.filter((c) =>
+    c.unitIds?.length ? c.unitIds.includes(unitId) : topics.includes(c.systemId)
+  );
   const extras = unitFlashcardExtras.filter((c) => c.unitIds?.includes(unitId));
   const seen = new Set<string>();
   const out: Flashcard[] = [];
