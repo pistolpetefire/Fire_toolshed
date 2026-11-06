@@ -82,4 +82,324 @@ export const catalog={
  ['Impairment and single-break scenarios','Identify isolation consequences, unavailable protection areas and required redundancy/mitigation evidence.'],
  ['Acceptance and turnover','Review flushing/testing, pump/tank acceptance, utility coordination, witness requirements and record documents.']]]]}
 };
+Object.assign(catalog,{
+  "life-safety-review": {
+    "name": "Life Safety & Egress Plan Review",
+    "short": "Life safety",
+    "discipline": "Occupant load, egress, and life safety",
+    "intro": "Trace occupant loads and exit routes from each occupied space through final discharge, with documented criteria and plan evidence.",
+    "basis": [
+      "Occupancy / actual uses / population",
+      "Governing life-safety and building-code editions",
+      "New / existing / alteration scope",
+      "Evacuation strategy / accessibility / special occupants"
+    ],
+    "documents": [
+      "Life-safety plans and occupant-load schedule",
+      "Architectural plans, sections and door/stair schedules",
+      "G-sheet code analysis and adopted criteria",
+      "Emergency lighting and exit-sign plans",
+      "Accessibility, locking and special-use narratives"
+    ],
+    "tools": [
+      [
+        "Occupant Load & Egress",
+        "occupant-egress"
+      ],
+      [
+        "Travel Distance",
+        "travel-distance"
+      ],
+      [
+        "G-Sheet Code Review",
+        "g-sheet-review"
+      ]
+    ],
+    "matrixName": "Space / exit-route review",
+    "matrixHint": "Use one row per space or route. Record units, criteria citations and actual provided values; do not combine incompatible code methods. This is a review record, not an automatic compliance calculation.",
+    "matrixFields": [
+      "Space / floor / route / plan revision",
+      "Use / area / load factor / calculated occupants",
+      "Required vs provided exits / capacity / width",
+      "Travel / common path / dead end: measured vs permitted",
+      "Door / stair / accessible route / discharge",
+      "Governing citations / G-sheet reference"
+    ],
+    "groups": [
+      [
+        "Basis & population",
+        [
+          [
+            "Governing criteria and scope",
+            "Record applicable editions, amendments, existing-building provisions and review boundaries."
+          ],
+          [
+            "Actual use and occupancy",
+            "Compare the room labels with intended activities, occupant characteristics and occupancy basis."
+          ],
+          [
+            "Occupant-load calculation",
+            "Trace net/gross areas, factors, fixed seating and rounding to the selected criteria and current plans."
+          ],
+          [
+            "Cumulative and shared loads",
+            "Track occupants joining shared routes, stairs and discharge paths; reconcile floor and building totals."
+          ],
+          [
+            "Special occupant needs",
+            "Review assisted evacuation, sleeping, detention, healthcare or other special-use assumptions where applicable."
+          ]
+        ]
+      ],
+      [
+        "Routes & capacity",
+        [
+          [
+            "Exit number and availability",
+            "Compare required and provided independent exits for each space and story under documented criteria."
+          ],
+          [
+            "Exit separation and arrangement",
+            "Review remoteness, route choice and loss of a single route using actual plan geometry."
+          ],
+          [
+            "Travel distance",
+            "Trace the actual walking path and measurement endpoints; compare measured distance with the applicable limit and basis."
+          ],
+          [
+            "Common path of travel",
+            "Identify where independent choices become available and document the measurement and applicable limit."
+          ],
+          [
+            "Dead-end corridors",
+            "Identify dead ends and verify length, configuration and any claimed allowance."
+          ],
+          [
+            "Egress width and capacity",
+            "Compare required and clear provided widths by component, including pinch points and permitted capacity factors."
+          ],
+          [
+            "Stair and discharge convergence",
+            "Trace combined loads at converging routes and changes in available capacity."
+          ]
+        ]
+      ],
+      [
+        "Components & protection",
+        [
+          [
+            "Doors and hardware",
+            "Review clear opening, swing, maneuvering, hardware and operation for the actual occupant load and use."
+          ],
+          [
+            "Locks and access control",
+            "Review release conditions, power-loss behavior, emergency operation and fire-alarm interfaces."
+          ],
+          [
+            "Stairs and ramps",
+            "Review geometry, landings, headroom, guards and handrails against the governing provisions."
+          ],
+          [
+            "Accessible means of egress",
+            "Review the required accessible routes, refuge/assistance provisions and communication arrangements."
+          ],
+          [
+            "Exit enclosures and continuity",
+            "Follow rated enclosures, openings and penetrations through each floor to termination."
+          ],
+          [
+            "Exit discharge",
+            "Verify continuity to the required safe destination, capacity, exterior conditions and any interior-discharge basis."
+          ]
+        ]
+      ],
+      [
+        "Coordination & evidence",
+        [
+          [
+            "Emergency lighting",
+            "Review coverage, power arrangements and acceptance evidence along required routes."
+          ],
+          [
+            "Exit signs and wayfinding",
+            "Review sign placement, visibility, directional changes and consistency with exit routes."
+          ],
+          [
+            "Special arrangements and phased work",
+            "Review atriums, assembly layouts, temporary routes, phased occupancy and approved alternative strategies."
+          ],
+          [
+            "G-sheet and discipline consistency",
+            "Reconcile loads, exit counts, sprinkler assumptions and rated routes with the code summary and other disciplines."
+          ]
+        ]
+      ]
+    ]
+  },
+  "g-sheet-review": {
+    "name": "G-Sheet Building & Fire Code Analysis Review",
+    "short": "G-sheet",
+    "discipline": "Occupant load, egress, and life safety",
+    "intro": "Reconcile the building code summary with the actual building, life-safety plans, specifications and fire-protection design.",
+    "basis": [
+      "Jurisdiction / adopted editions / amendments",
+      "Project type / scope / existing-building approach",
+      "Occupancies / mixed-use strategy",
+      "Construction type / sprinkler basis / special conditions"
+    ],
+    "documents": [
+      "G-sheet building and fire code summary",
+      "Architectural plans, elevations and area schedules",
+      "Life-safety plans and occupant/egress schedules",
+      "Rated assemblies, opening and penetration details",
+      "Fire-protection specifications and special-condition analyses"
+    ],
+    "tools": [
+      [
+        "Life Safety & Egress Review",
+        "life-safety-review"
+      ],
+      [
+        "Hazard Screening",
+        "ibc-ifc-hazard"
+      ],
+      [
+        "MAQ / Control Areas",
+        "maq-control-area"
+      ],
+      [
+        "Sprinkler Review",
+        "sprinkler-review"
+      ]
+    ],
+    "matrixName": "Code-summary / drawing reconciliation",
+    "matrixHint": "Use one row per code claim, building portion or floor. Record the permitted criterion and actual proposed condition separately, with citations and document revisions. No automatic approval is implied.",
+    "matrixFields": [
+      "Building / story / code-summary topic",
+      "G-sheet claim / proposed value / units",
+      "Permitted criterion / edition / section / exceptions",
+      "Plan / elevation / specification evidence and revision",
+      "Reconciled actual condition / discrepancy",
+      "Related life-safety or protection-system record"
+    ],
+    "groups": [
+      [
+        "Jurisdiction & occupancy",
+        [
+          [
+            "Authority and governing editions",
+            "Identify the reviewing authorities, adopted building/fire codes, referenced editions and local amendments."
+          ],
+          [
+            "Project and existing-building scope",
+            "Reconcile new construction, addition, alteration or change-of-use scope with the selected compliance approach."
+          ],
+          [
+            "Occupancy classification and actual use",
+            "Check each classification against intended activities, operations and occupant characteristics."
+          ],
+          [
+            "Mixed occupancy strategy",
+            "Document separated, nonseparated or other applicable treatment and verify its implementation across drawings."
+          ],
+          [
+            "Accessory and incidental uses",
+            "Review each claimed allowance and required separation or protection against the selected criteria."
+          ]
+        ]
+      ],
+      [
+        "Height, area & construction",
+        [
+          [
+            "Construction type",
+            "Reconcile declared type with actual structural materials, assemblies and permitted uses."
+          ],
+          [
+            "Building height and stories",
+            "Compare proposed height, grade-plane assumptions and story counts with permitted values and cited allowances."
+          ],
+          [
+            "Allowable building area",
+            "Trace tabular basis, proposed floor areas and applicable adjustments without duplicating allowances."
+          ],
+          [
+            "Frontage basis",
+            "Review qualifying perimeter, open-space dimensions and supporting site measurements for claimed increases."
+          ],
+          [
+            "Sprinkler-dependent allowances",
+            "Confirm the required protection extent and system basis supporting height, area or other allowances."
+          ],
+          [
+            "Fire areas and building boundaries",
+            "Reconcile fire walls, fire barriers and fire-area boundaries with the area analysis and actual continuity."
+          ]
+        ]
+      ],
+      [
+        "Ratings & protection",
+        [
+          [
+            "Structural fire-resistance ratings",
+            "Compare required member and assembly ratings with schedules, details and specified systems."
+          ],
+          [
+            "Occupancy separations",
+            "Trace required separation ratings and continuity through plans, sections and openings."
+          ],
+          [
+            "Shafts and vertical openings",
+            "Review shaft/enclosure requirements, permitted openings and protection of vertical connections."
+          ],
+          [
+            "Exterior walls and openings",
+            "Reconcile separation-distance assumptions, wall ratings and opening protection with site and elevation evidence."
+          ],
+          [
+            "Opening and penetration protection",
+            "Coordinate doors, glazing, dampers, joints and penetration systems with rated construction."
+          ],
+          [
+            "Required protection systems",
+            "Reconcile sprinkler, standpipe, alarm, detection, smoke-control and emergency-power triggers with discipline designs."
+          ]
+        ]
+      ],
+      [
+        "Life safety & special triggers",
+        [
+          [
+            "Occupant loads and exits",
+            "Reconcile G-sheet loads and exit counts with room uses, floor totals and life-safety schedules."
+          ],
+          [
+            "Travel and egress dimensions",
+            "Cross-check travel, common paths, dead ends, widths, stairs and discharge with measured plan evidence."
+          ],
+          [
+            "Lighting and signage",
+            "Verify the summary requirements appear in emergency-lighting and exit-sign documentation."
+          ],
+          [
+            "High-rise and atrium conditions",
+            "Review geometry and selected definitions for applicable special requirements and supporting analyses."
+          ],
+          [
+            "Assembly and ambulatory conditions",
+            "Review actual uses and occupants for special provisions rather than relying solely on sheet labels."
+          ],
+          [
+            "Industrial and hazardous conditions",
+            "Reconcile process/material inventories, storage and control-area assumptions with special-use triggers."
+          ],
+          [
+            "Cross-document consistency",
+            "Resolve conflicts between the G-sheet, plans, elevations, life-safety drawings, specifications and fire-protection records."
+          ]
+        ]
+      ]
+    ]
+  }
+});
 export const paths=Object.keys(catalog);

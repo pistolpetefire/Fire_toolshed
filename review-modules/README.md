@@ -1,6 +1,6 @@
 # Technical review modules — release 1
 
-Three independent static apps share the review engine in `review-modules`:
+Five independent static apps share the review engine in `review-modules`:
 
 - `fire-alarm-review`: 22 prompts plus cause-and-effect worksheet.
 - `sprinkler-review`: 21 prompts plus system/design-area worksheet.
@@ -27,6 +27,10 @@ Run:
 
 Covers standalone persistence, JSON round-trip, invalid states, missing requirements, explicit validation, candidate exclusion, required information blockers, wrong-project rejection, duplicate/revised handoffs, coverage supersession, and open findings with full coverage. Browser checks exercise worksheets, validation, handoff preview/confirmation, duplicate detection, central receipt, narrow layouts and independent module loading.
 
+## Life safety and G-sheet release
+
+Two connected modules add 22 life-safety prompts and 24 G-sheet prompts. Their worksheets record route/space checks and code-summary/drawing reconciliation. Both use the same validation, portable files and Case File revision handling. Numeric code limits are supplied and cited by the reviewer.
+
 ## Next planned modules
 
-Life Safety and Egress; G-Sheet Building/Fire Code Analysis; Standpipe; Florida submittals; UFC design analysis and site compliance; hazardous materials, passive protection, special suppression and commissioning. These are not represented as completed in this release.
+Standpipe; Florida submittals; UFC design analysis and site compliance; hazardous materials, passive protection, special suppression and commissioning. These are not represented as completed in this release.
