@@ -38,3 +38,8 @@ Tests cover numeric metadata, missing/unsupported scales and nonuniform factors.
 The runner now includes pipe_velocity, sprinkler_discharge and pipe_friction. Download hydraulics.mjs alongside tools.mjs and run.mjs. Inputs use explicit US units (gpm, inches, feet, psi); actual pipe inside diameter is required. These expose arithmetic from existing apps, not their entire workflows or code checks. No code limit is inferred. Operating flow is supplied explicitly; use 150% of rated flow only when the governing scenario requires it.
 
 Example: `{"tool":"sprinkler_discharge","arguments":{"kGpmPerSqrtPsi":5.6,"pressurePsi":25}}` returns 28 gpm plus method, inputs and limitations. Run `node ai-review/hydraulics.test.mjs` for known-answer, existing-app parity and invalid-input checks.
+
+## Controlled pilot release
+Start with START-HERE.md and pilot-kit.zip. Six review workflows and eleven callable JSON tools are included, plus local PDF scale and text-evidence readers. Direct provider connectors are not included. A session must support tool execution; reading a link alone is insufficient. The website now accepts assignment/results JSON locally and exports a new FPE Case File. Drawings never need to be sent to Toolshed.
+
+The synthetic demo validates software handoff only; it is explicitly not a model accuracy test or a real project review. Its document hashes are placeholders. New tests exercise complete coverage, retained corrections, FPE disposition and refusal to overwrite an existing output file. Core export now retains AI checklist determinations, with an explicit outstanding FPE scope/evidence review requirement.

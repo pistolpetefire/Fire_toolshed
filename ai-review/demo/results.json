@@ -1,0 +1,170 @@
+{
+  "workOrderId": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+  "model": "synthetic fixture — no model run",
+  "limitations": [
+    "Synthetic software acceptance fixture; document hashes are placeholders, not real project evidence."
+  ],
+  "results": [
+    {
+      "checkId": "sprinkler-review:Q-1-1",
+      "status": "proposed finding",
+      "explanation": "Synthetic design says 30 minutes of storage; synthetic owner criterion requires 60 minutes for the same scenario.",
+      "evidence": [
+        {
+          "documentId": "D1",
+          "page": 1,
+          "description": "Synthetic design duration: 30 minutes"
+        }
+      ],
+      "criteria": [
+        {
+          "documentId": "C1",
+          "page": 1,
+          "description": "Synthetic owner requirement: 60 minutes"
+        }
+      ],
+      "correction": "Reconcile the design duration with the owner criterion and update the calculation.",
+      "severity": "Major"
+    },
+    {
+      "checkId": "sprinkler-review:Q-1-2",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-1-3",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-1-4",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-1-5",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-2-1",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-2-2",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-2-3",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-2-4",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-2-5",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-2-6",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-2-7",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-3-1",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-3-2",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-3-3",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-3-4",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-3-5",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-3-6",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-4-1",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-4-2",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    },
+    {
+      "checkId": "sprinkler-review:Q-4-3",
+      "status": "unable to verify",
+      "explanation": "Required evidence is not supplied in this synthetic fixture.",
+      "evidence": [],
+      "criteria": []
+    }
+  ]
+}

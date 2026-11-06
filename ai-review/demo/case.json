@@ -1,0 +1,1269 @@
+{
+  "schema": "fireToolshed.peerReview.v1",
+  "version": "1.0.0",
+  "project": {
+    "name": "SYNTHETIC TRAINING — not a real project",
+    "phase": "75%",
+    "reviewType": "Independent peer review",
+    "reviewDate": "2026-11-06",
+    "number": "DEMO-001"
+  },
+  "scope": {
+    "statement": "Demonstrate a sprinkler design-basis discrepancy and missing records. All other checks remain unresolved.",
+    "exclusions": "",
+    "independence": ""
+  },
+  "codeBasis": {
+    "summary": "Synthetic owner criterion C1; no code-compliance claim",
+    "criteria": ""
+  },
+  "disciplines": [
+    "Sprinklers, standpipes, and hydraulics"
+  ],
+  "documents": [
+    {
+      "title": "Synthetic-design.txt",
+      "type": "Other",
+      "expected": true,
+      "status": "Received",
+      "expectation": "Received; not reviewed",
+      "reference": "D1; SHA256 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "notes": "Included in AI input manifest; page accuracy and completeness require verification.",
+      "id": "DOC-001",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "title": "Synthetic-criteria.txt",
+      "type": "Other",
+      "expected": true,
+      "status": "Received",
+      "expectation": "Received; not reviewed",
+      "reference": "C1; SHA256 bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "notes": "Included in AI input manifest; page accuracy and completeness require verification.",
+      "id": "DOC-002",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    }
+  ],
+  "checklistItems": [
+    {
+      "question": "Occupancy and hazard basis",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Candidate concern",
+      "notes": "AI first-pass determination: Synthetic design says 30 minutes of storage; synthetic owner criterion requires 60 minutes for the same scenario.",
+      "source": "D1, PDF p.1: Synthetic design duration: 30 minutes",
+      "citation": "C1, PDF p.1: Synthetic owner requirement: 60 minutes",
+      "toolResult": "EV-001",
+      "id": "CK-001",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "question": "Commodity and storage configuration",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-002",
+      "id": "CK-002",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "question": "System type and environmental conditions",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-003",
+      "id": "CK-003",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "question": "Design criteria and duration",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-004",
+      "id": "CK-004",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "question": "ESFR, CMSA and in-rack applications",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-005",
+      "id": "CK-005",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "question": "Remote-area selection",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-006",
+      "id": "CK-006",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "question": "Sprinkler flow and pressure",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-007",
+      "id": "CK-007",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Pipe inputs and friction",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-008",
+      "id": "CK-008",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Supply curve and reference point",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-009",
+      "id": "CK-009",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Hose allowance and demand margin",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-010",
+      "id": "CK-010",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Backflow and equipment losses",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-011",
+      "id": "CK-011",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Calculation-to-drawing coordination",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-012",
+      "id": "CK-012",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Coverage, spacing and obstructions",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-013",
+      "id": "CK-013",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Riser, valves, drains and tests",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-014",
+      "id": "CK-014",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "FDC and underground interfaces",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-015",
+      "id": "CK-015",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Dry and preaction details",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-016",
+      "id": "CK-016",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Hangers, restraints and seismic",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-017",
+      "id": "CK-017",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Product listing and installation limits",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-018",
+      "id": "CK-018",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Existing system modifications",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-019",
+      "id": "CK-019",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Inspection and acceptance tests",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-020",
+      "id": "CK-020",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "question": "Turnover and operating limitations",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "applicability": "Applicable",
+      "result": "Needs information",
+      "notes": "AI first-pass determination: Required evidence is not supplied in this synthetic fixture.",
+      "source": "",
+      "citation": "",
+      "toolResult": "EV-021",
+      "id": "CK-021",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    }
+  ],
+  "candidateItems": [
+    {
+      "title": "Occupancy and hazard basis",
+      "description": "Synthetic design says 30 minutes of storage; synthetic owner criterion requires 60 minutes for the same scenario.",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "severity": "Major",
+      "source": "D1, PDF p.1: Synthetic design duration: 30 minutes",
+      "citation": "C1, PDF p.1: Synthetic owner requirement: 60 minutes",
+      "correction": "Reconcile the design duration with the owner criterion and update the calculation.",
+      "disposition": "",
+      "related": "CK-001",
+      "reason": "AI proposal awaiting FPE validation",
+      "owner": "",
+      "milestone": "IFC/final",
+      "id": "CI-001",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    }
+  ],
+  "findings": [],
+  "outstandingRequirements": [
+    {
+      "title": "Commodity and storage configuration",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-002",
+      "id": "OI-001",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "title": "System type and environmental conditions",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-003",
+      "id": "OI-002",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "title": "Design criteria and duration",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-004",
+      "id": "OI-003",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "title": "ESFR, CMSA and in-rack applications",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-005",
+      "id": "OI-004",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "title": "Remote-area selection",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-006",
+      "id": "OI-005",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Sprinkler flow and pressure",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-007",
+      "id": "OI-006",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Pipe inputs and friction",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-008",
+      "id": "OI-007",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Supply curve and reference point",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-009",
+      "id": "OI-008",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Hose allowance and demand margin",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-010",
+      "id": "OI-009",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Backflow and equipment losses",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-011",
+      "id": "OI-010",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Calculation-to-drawing coordination",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-012",
+      "id": "OI-011",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Coverage, spacing and obstructions",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-013",
+      "id": "OI-012",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Riser, valves, drains and tests",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-014",
+      "id": "OI-013",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "FDC and underground interfaces",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-015",
+      "id": "OI-014",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Dry and preaction details",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-016",
+      "id": "OI-015",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Hangers, restraints and seismic",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-017",
+      "id": "OI-016",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Product listing and installation limits",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-018",
+      "id": "OI-017",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Existing system modifications",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-019",
+      "id": "OI-018",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Inspection and acceptance tests",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-020",
+      "id": "OI-019",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Turnover and operating limitations",
+      "missing": "Required evidence is not supplied in this synthetic fixture.",
+      "reason": "AI could not complete this verification",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "Unassigned",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "related": "CK-021",
+      "id": "OI-020",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "FPE review of AI scope, coverage and evidence",
+      "missing": "Review the completed AI coverage and document inventory; confirm source revisions and disposition proposed findings and limitations.",
+      "reason": "AI completion is not professional approval.",
+      "discipline": "Sprinklers, standpipes, and hydraulics",
+      "owner": "FPE reviewer",
+      "milestone": "IFC/final",
+      "category": "Other",
+      "status": "Open",
+      "treatment": "Needed before final review",
+      "id": "OI-021",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    }
+  ],
+  "limitations": [
+    {
+      "title": "AI first-pass review",
+      "description": "All model determinations and references require FPE review. No automatic finding validation or compliance approval. Synthetic software acceptance fixture; document hashes are placeholders, not real project evidence.",
+      "id": "LIM-001",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    }
+  ],
+  "evidence": [
+    {
+      "title": "Occupancy and hazard basis",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-1-1\",\"status\":\"proposed finding\",\"explanation\":\"Synthetic design says 30 minutes of storage; synthetic owner criterion requires 60 minutes for the same scenario.\",\"evidence\":[{\"documentId\":\"D1\",\"page\":1,\"description\":\"Synthetic design duration: 30 minutes\"}],\"criteria\":[{\"documentId\":\"C1\",\"page\":1,\"description\":\"Synthetic owner requirement: 60 minutes\"}],\"correction\":\"Reconcile the design duration with the owner criterion and update the calculation.\",\"severity\":\"Major\"}",
+      "id": "EV-001",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "title": "Commodity and storage configuration",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-1-2\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-002",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "title": "System type and environmental conditions",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-1-3\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-003",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "title": "Design criteria and duration",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-1-4\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-004",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "title": "ESFR, CMSA and in-rack applications",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-1-5\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-005",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "title": "Remote-area selection",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-2-1\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-006",
+      "created": "2026-11-06T02:23:59.005Z",
+      "updated": "2026-11-06T02:23:59.005Z"
+    },
+    {
+      "title": "Sprinkler flow and pressure",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-2-2\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-007",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Pipe inputs and friction",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-2-3\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-008",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Supply curve and reference point",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-2-4\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-009",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Hose allowance and demand margin",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-2-5\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-010",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Backflow and equipment losses",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-2-6\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-011",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Calculation-to-drawing coordination",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-2-7\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-012",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Coverage, spacing and obstructions",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-3-1\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-013",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Riser, valves, drains and tests",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-3-2\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-014",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "FDC and underground interfaces",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-3-3\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-015",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Dry and preaction details",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-3-4\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-016",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Hangers, restraints and seismic",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-3-5\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-017",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Product listing and installation limits",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-3-6\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-018",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Existing system modifications",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-4-1\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-019",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Inspection and acceptance tests",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-4-2\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-020",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    },
+    {
+      "title": "Turnover and operating limitations",
+      "appVersion": "synthetic fixture — no model run",
+      "reference": "d8a3dc4e-2e48-492d-9ee4-08439938cb51",
+      "summary": "{\"checkId\":\"sprinkler-review:Q-4-3\",\"status\":\"unable to verify\",\"explanation\":\"Required evidence is not supplied in this synthetic fixture.\",\"evidence\":[],\"criteria\":[]}",
+      "id": "EV-021",
+      "created": "2026-11-06T02:23:59.006Z",
+      "updated": "2026-11-06T02:23:59.006Z"
+    }
+  ],
+  "activityLog": [
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "DOC-001"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "DOC-002"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-001"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-001"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CI-001"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-002"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-002"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-001"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-003"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-003"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-002"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-004"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-004"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-003"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-005"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-005"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-004"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-006"
+    },
+    {
+      "at": "2026-11-06T02:23:59.005Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-006"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-005"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-007"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-007"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-006"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-008"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-008"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-007"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-009"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-009"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-008"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-010"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-010"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-009"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-011"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-011"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-010"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-012"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-012"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-011"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-013"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-013"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-012"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-014"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-014"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-013"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-015"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-015"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-014"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-016"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-016"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-015"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-017"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-017"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-016"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-018"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-018"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-017"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-019"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-019"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-018"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-020"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-020"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-019"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "EV-021"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "CK-021"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-020"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "OI-021"
+    },
+    {
+      "at": "2026-11-06T02:23:59.006Z",
+      "actor": "Reviewer not identified",
+      "action": "Created",
+      "record": "LIM-001"
+    }
+  ],
+  "reportSettings": {
+    "status": "Not started",
+    "firm": "",
+    "conclusion": ""
+  }
+}

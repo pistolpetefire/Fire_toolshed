@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {workOrder,toCase,inspectResult} from './core.mjs';
+import {validateCandidate,parseCase,metrics} from '../peer-review/core.mjs';
+const job=workOrder({project:{name:'Synthetic sprinkler pilot',basis:'Synthetic owner requirements; not code',scope:'Training only'},modules:['sprinkler-review'],documents:[{id:'D1',name:'Design.txt',pages:1,role:'design',sha256:'a'.repeat(64)},{id:'C1',name:'Criteria.txt',pages:1,role:'criteria',sha256:'b'.repeat(64)}]});
+const results={workOrderId:job.id,model:'synthetic-contract-test',limitations:['Not an AI model run'],results:job.checks.map(c=>({checkId:c.id,status:'unable to verify',explanation:'Not supplied in synthetic fixture',evidence:[],criteria:[]}))};
+Object.assign(results.results[0],{status:'proposed finding',explanation:'Synthetic discrepancy',severity:'Major',correction:'Reconcile synthetic design with owner criteria',evidence:[{documentId:'D1',page:1,description:'Design condition'}],criteria:[{documentId:'C1',page:1,description:'Owner requirement'}]});
+let c=parseCase(JSON.stringify(toCase(job,results)));assert.equal(c.checklistItems.length,job.checks.length);assert.equal(c.findings.length,0);assert.equal(c.candidateItems[0].correction,results.results[0].correction);assert.equal(metrics(c).ready,false);
+c.project.reviewer='Synthetic FPE';validateCandidate(c,c.candidateItems[0],'Validate Finding');assert.equal(c.findings.length,1);assert.equal(c.findings[0].correction,results.results[0].correction);parseCase(JSON.stringify(c));
+const altered=structuredClone(job);altered.checks.pop();assert.throws(()=>inspectResult(altered,results),/checks changed/);
+console.log('PASS complete AI coverage -> portable Case File -> FPE validates correction; incomplete scope remains blocked; changed workflow rejected.');
+const {tools}=await import('./tools.mjs');
+const replay=structuredClone(results);replay.toolRuns=[{id:'T1',tool:'storage_demand',arguments:{flowGpm:500,durationMinutes:60},output:tools.storage_demand({flowGpm:500,durationMinutes:60})}];replay.results[0].toolRunIds=['T1'];inspectResult(job,replay);replay.toolRuns[0].output.usableGallons=1;assert.throws(()=>inspectResult(job,replay),/does not reproduce/);console.log('PASS submitted calculation replay rejects altered numeric results.');

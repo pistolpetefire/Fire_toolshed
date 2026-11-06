@@ -2,6 +2,12 @@
   "version": "1.0.0",
   "transport": "Download ES modules and execute in an authorized JavaScript runtime. GitHub Pages does not provide a POST API or MCP server.",
   "runner": "run.mjs",
+  "reviewRunner": "review.mjs",
+  "evidenceReader": {
+    "file": "evidence_index.py",
+    "runtime": "Python with pypdf",
+    "scope": "Local PDF text index and quote-presence checks; no visual or semantic verification"
+  },
   "pdfScaleReader": {
     "file": "pdf_scale.py",
     "runtime": "Python with pypdf",
@@ -9,6 +15,54 @@
     "scope": "Standard isotropic rectilinear viewport scales; verify against dimension"
   },
   "tools": [
+    {
+      "name": "pressure_budget",
+      "inputs": {
+        "availablePsi": "nonnegative",
+        "requiredPsi": "nonnegative",
+        "lossPsi": "nonnegative",
+        "riseFt": "signed finite; positive upwards"
+      },
+      "scope": "Same-flow pressure comparison; no pump or supply curve interpolation"
+    },
+    {
+      "name": "storage_demand",
+      "inputs": {
+        "flowGpm": "nonnegative",
+        "durationMinutes": "nonnegative",
+        "unusableGallons": "optional nonnegative"
+      },
+      "scope": "Volume arithmetic; no refill credit"
+    },
+    {
+      "name": "occupant_load",
+      "inputs": {
+        "areaSqFt": "nonnegative",
+        "factorSqFtPerPerson": "positive",
+        "areaBasis": "net | gross"
+      },
+      "scope": "Supplied factor; ceiling rounding"
+    },
+    {
+      "name": "battery_capacity",
+      "inputs": {
+        "standbyAmps": "nonnegative",
+        "standbyHours": "nonnegative",
+        "alarmAmps": "nonnegative",
+        "alarmMinutes": "nonnegative",
+        "multiplier": "at least 1"
+      },
+      "scope": "Supplied loads, durations and allowance"
+    },
+    {
+      "name": "circuit_voltage",
+      "inputs": {
+        "sourceVolts": "nonnegative",
+        "currentAmps": "nonnegative",
+        "loopResistanceOhms": "nonnegative"
+      },
+      "scope": "Lumped-load circuit only"
+    },
     {
       "name": "pipe_velocity",
       "inputs": {
