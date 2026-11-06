@@ -3,6 +3,7 @@ import { extraUnitQuestions } from './unitQuestionsExtra';
 import { vocabUnitQuestions } from './unitVocabQuestions';
 import { exam1StudyGuideQuestions } from './exam1StudyGuide';
 import { exam2StudyGuideQuestions } from './exam2StudyGuide';
+import { exam4StudyGuideQuestions } from './exam4StudyGuide';
 import { exam3StudyGuideQuestions } from './exam3StudyGuide';
 import { boneLabQuestions } from './boneLabExam';
 import { getUnitById } from './courseUnits';
@@ -1120,6 +1121,7 @@ export function getQuestionsForUnit(unitId: UnitId): UnitQuestion[] {
     ...exam1StudyGuideQuestions,
     ...exam2StudyGuideQuestions,
     ...exam3StudyGuideQuestions,
+    ...exam4StudyGuideQuestions,
     ...boneLabQuestions,
   ].filter((q) => q.unitId === unitId);
 }

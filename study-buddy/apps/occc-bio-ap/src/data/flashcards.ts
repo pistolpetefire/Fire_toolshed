@@ -1,6 +1,7 @@
 import type { Flashcard } from '../types';
 import { labTermFlashcards } from './exam1LabTerms';
 import { boneLabFlashcards } from './boneLabExam';
+import { exam4StudyGuideFlashcards } from './exam4StudyGuide';
 import { exam3StudyGuideFlashcards } from './exam3StudyGuide';
 
 /**
@@ -1540,6 +1541,7 @@ export const builtInFlashcards: Flashcard[] = [
   ...labTermFlashcards,
   ...boneLabFlashcards,
   ...exam3StudyGuideFlashcards,
+    ...exam4StudyGuideFlashcards,
 ];
 
 export function getFlashcardsBySystem(systemId: string): Flashcard[] {

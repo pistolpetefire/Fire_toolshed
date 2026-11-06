@@ -55,7 +55,7 @@ export const EXAM_BLOCKS: {
     id: 4,
     title: 'Exam 4',
     unitIds: ['unit-7', 'unit-8'],
-    note: 'Neuroanatomy / neurophysiology + CNS',
+    note: 'Nervous system guide (30 prompts), Chapter 12 lecture + CNS review (Ch 13–14)',
   },
   {
     id: 5,

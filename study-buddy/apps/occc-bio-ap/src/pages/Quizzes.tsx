@@ -103,6 +103,11 @@ export function Quizzes() {
                     Unit 3/4 lab exam (tissues, cell, tonicity) <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 )}
+                {block.id === 4 && (
+                  <Link to={p('/quizzes/exam/4/guide')} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-brand-600 dark:text-slate-300">
+                    Nervous system study guide + lecture notes <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
                 {block.id === 3 && (
                   <Link
                     to={p('/quizzes/exam/3/guide')}
