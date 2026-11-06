@@ -402,4 +402,174 @@ Object.assign(catalog,{
     ]
   }
 });
+catalog["standpipe-review"]={
+  "name": "Standpipe Plan & Hydraulic Review",
+  "short": "Standpipes",
+  "discipline": "Sprinklers, standpipes, and hydraulics",
+  "intro": "Trace standpipe coverage, hydraulic demand and pressure zones through supply, fire-department operations and acceptance evidence.",
+  "basis": [
+    "System class / automatic or manual / wet or dry",
+    "Building height / elevations / pressure zones",
+    "Required flow / pressure / simultaneous demand basis",
+    "Fire-department operations / supply and FDC strategy"
+  ],
+  "documents": [
+    "Standpipe plans, risers and hose-connection schedules",
+    "Hydraulic calculations and supply / pump curves",
+    "Pressure-zone and regulating-device schedules / listings",
+    "FDC details and fire-department operating requirements",
+    "Acceptance tests, commissioning and maintenance records"
+  ],
+  "tools": [
+    [
+      "Standpipe Calculator",
+      "standpipe-calc"
+    ],
+    [
+      "Water Supply Review",
+      "water-supply-review"
+    ],
+    [
+      "Sprinkler Review",
+      "sprinkler-review"
+    ],
+    [
+      "Pump + Supply Overlay",
+      "pump-overlay"
+    ]
+  ],
+  "matrixName": "Zone / hose-connection scenario review",
+  "matrixHint": "Record one hydraulic scenario per row. Include units, elevation datum and calculation references. Separate required residual pressure, static pressure and device settings; this worksheet does not calculate compliance.",
+  "matrixFields": [
+    "System / zone / class / scenario",
+    "Controlling outlets / elevations / reference datum",
+    "Required flow / residual pressure / criteria citation",
+    "Available pressure at demand / losses / calculation reference",
+    "Maximum static or operating pressure / device rating and setting",
+    "Supply / pump / FDC operating condition / test reference"
+  ],
+  "groups": [
+    [
+      "Basis & system arrangement",
+      [
+        [
+          "Governing criteria and system class",
+          "Record adopted editions, amendments, project criteria and the Class I, II or III basis."
+        ],
+        [
+          "Automatic or manual system basis",
+          "Reconcile system type with the building use, height, required operation and approved fire-department strategy."
+        ],
+        [
+          "Wet or dry service",
+          "Review environmental conditions, freezing protection, air supply and delivery/operating assumptions where applicable."
+        ],
+        [
+          "System boundaries and existing conditions",
+          "Identify protected portions, existing equipment evidence, phased work and impairment responsibilities."
+        ]
+      ]
+    ],
+    [
+      "Hose connections & coverage",
+      [
+        [
+          "Connection locations and coverage",
+          "Check required locations and actual hose routes against geometry, obstructions and selected criteria."
+        ],
+        [
+          "Access and mounting",
+          "Review mounting, clearances, cabinet arrangements and unobstructed operation in the installed condition."
+        ],
+        [
+          "Valve and hose equipment",
+          "Verify sizes, connections, threads, listings and compatibility with intended users and responding equipment."
+        ],
+        [
+          "Stair, floor and roof coordination",
+          "Reconcile hose connections with stairs, floor access, roof access and the fire-department operating approach."
+        ],
+        [
+          "Identification and signage",
+          "Verify zone, connection and operating labels match plans, schedules and required instructions."
+        ]
+      ]
+    ],
+    [
+      "Hydraulic demand & supply",
+      [
+        [
+          "Required flow and residual pressure",
+          "Trace minimum demand criteria to the selected class, adopted edition and controlling hose outlets."
+        ],
+        [
+          "Simultaneous standpipe demand",
+          "Review the number and location of operating outlets and standpipes used in each required scenario."
+        ],
+        [
+          "Combined sprinkler demand",
+          "Review how combined systems and simultaneous demands are treated under the selected criteria; avoid unsupported additions or omissions."
+        ],
+        [
+          "Elevation and reference point",
+          "Align outlet elevations, supply datum and required/available pressure at matching physical points."
+        ],
+        [
+          "Pipe and device losses",
+          "Verify inside diameters, materials, fittings, lengths and equipment loss data against current drawings."
+        ],
+        [
+          "Pump and source performance",
+          "Review demand against applicable pump/source curves, suction conditions and reliability scenarios."
+        ],
+        [
+          "FDC supply scenario",
+          "Review connection arrangement, required inlet pressure, achievable apparatus supply and the documented operating strategy."
+        ]
+      ]
+    ],
+    [
+      "Pressure zones & components",
+      [
+        [
+          "Maximum system pressure",
+          "Check static and operating scenarios, pump conditions and component pressure ratings at relevant elevations."
+        ],
+        [
+          "Zone boundaries and isolation",
+          "Trace zone breaks, interconnections, isolation and supervision; identify unintended pressure exposure or loss of coverage."
+        ],
+        [
+          "Pressure-regulating devices",
+          "Review listing, inlet/outlet operating ranges, flow conditions, settings and manufacturer evidence."
+        ],
+        [
+          "Regulating-device test provisions",
+          "Verify suitable test flow paths, drainage, access and the ability to test settings under required conditions."
+        ],
+        [
+          "Sprinkler, tank and pump interfaces",
+          "Coordinate shared equipment, check valves, backflow, controls and responsibilities across system boundaries."
+        ]
+      ]
+    ],
+    [
+      "Acceptance & operations",
+      [
+        [
+          "Acceptance and commissioning",
+          "Record required flow/pressure tests, witnesses, outlet selection, equipment setup and deficiency resolution."
+        ],
+        [
+          "Records and maintenance",
+          "Review as-built zones, settings, test records, instructions and inspection/maintenance responsibilities."
+        ],
+        [
+          "Operational and impairment plan",
+          "Review fire-department instructions, outages, temporary protection and restoration procedures."
+        ]
+      ]
+    ]
+  ]
+};
 export const paths=Object.keys(catalog);

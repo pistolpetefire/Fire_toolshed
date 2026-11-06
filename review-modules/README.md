@@ -1,6 +1,6 @@
 # Technical review modules — release 1
 
-Five independent static apps share the review engine in `review-modules`:
+Six independent static apps share the review engine in `review-modules`:
 
 - `fire-alarm-review`: 22 prompts plus cause-and-effect worksheet.
 - `sprinkler-review`: 21 prompts plus system/design-area worksheet.
@@ -31,6 +31,10 @@ Covers standalone persistence, JSON round-trip, invalid states, missing requirem
 
 Two connected modules add 22 life-safety prompts and 24 G-sheet prompts. Their worksheets record route/space checks and code-summary/drawing reconciliation. Both use the same validation, portable files and Case File revision handling. Numeric code limits are supplied and cited by the reviewer.
 
+## Standpipe release
+
+Standpipe Review adds 24 prompts and a zone/hose-connection scenario worksheet for project-specific criteria, demand, pressure limits, supply conditions and testing evidence.
+
 ## Next planned modules
 
-Standpipe; Florida submittals; UFC design analysis and site compliance; hazardous materials, passive protection, special suppression and commissioning. These are not represented as completed in this release.
+Florida submittals; UFC design analysis and site compliance; hazardous materials, passive protection, special suppression and commissioning. These are not represented as completed in this release.
