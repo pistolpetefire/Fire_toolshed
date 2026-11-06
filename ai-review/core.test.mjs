@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {workOrder,inspectResult,toCase} from './core.mjs';
+import {parseCase,metrics} from '../peer-review/core.mjs';
+const job=workOrder({project:{name:'Synthetic QA',basis:'Test criteria only',scope:'Test'},modules:['standpipe-review'],documents:[{id:'D1',name:'Synthetic.pdf',pages:2,role:'design',sha256:'a'.repeat(64)},{id:'C1',name:'Criteria.pdf',pages:1,role:'criteria',sha256:'b'.repeat(64)}]});
+const r={workOrderId:job.id,model:'synthetic-test-not-a-model-run',limitations:['Synthetic fixture'],results:job.checks.map(c=>({checkId:c.id,status:'unable to verify',explanation:'No real documents supplied',evidence:[],criteria:[]}))};
+assert.equal(inspectResult(job,r).checks,24);assert.throws(()=>inspectResult(job,{...r,results:r.results.slice(1)}),/Incomplete/);assert.throws(()=>inspectResult(job,{...r,workOrderId:'other'}),/wrong/);
+r.results[0]={...r.results[0],status:'proposed finding',severity:'Major',correction:'Reconcile synthetic mismatch',evidence:[{documentId:'D1',page:2,description:'Synthetic design mismatch'}],criteria:[{documentId:'C1',page:1,description:'Synthetic criterion'}]};
+const c=toCase(job,r);assert.equal(c.findings.length,0);assert.equal(c.candidateItems.length,1);assert.equal(metrics(c).ready,false);parseCase(JSON.stringify(c));
+r.results[0].evidence[0].page=3;assert.throws(()=>inspectResult(job,r),/locator/);r.results[0].evidence[0].page=2;r.results[0].criteria[0].documentId='D1';assert.throws(()=>inspectResult(job,r),/criteria document/);
+console.log('PASS AI work order, complete coverage, wrong-run rejection, page bounds, criteria provenance, unvalidated case export and final readiness blocking.');

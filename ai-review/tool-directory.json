@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "transport": "Download ES modules and execute in an authorized JavaScript runtime. GitHub Pages does not provide a POST API or MCP server.",
+  "runner": "run.mjs",
+  "tools": [
+    {
+      "name": "measure_route",
+      "inputs": {
+        "documentId": "string",
+        "page": "positive integer",
+        "viewport": {
+          "id": "string",
+          "bounds": "[xmin,ymin,xmax,ymax]"
+        },
+        "unitsPerCoordinate": "positive number; actual distance per input coordinate unit",
+        "unit": "ft | m | in | mm",
+        "verification": {
+          "points": "two coordinate pairs",
+          "length": "known positive length in output unit",
+          "source": "labeled dimension reference"
+        },
+        "points": "route coordinate pairs"
+      },
+      "limitations": "Scale extraction and route identification are caller responsibilities. Coordinates must share one page/viewport space."
+    },
+    {
+      "name": "compare_values",
+      "inputs": {
+        "quantity": "string",
+        "unit": "common unit",
+        "tolerance": "nonnegative number, default 0",
+        "observations": "array of {value,unit,documentId,page,reference}"
+      },
+      "limitations": "Caller establishes common scenario, datum and revision."
+    },
+    {
+      "name": "review_coverage",
+      "inputs": {
+        "expectedIds": "unique string array",
+        "results": "array of {checkId,status,explanation}"
+      },
+      "limitations": "Does not establish technical accuracy or compliance."
+    }
+  ],
+  "existingCalculators": {
+    "availability": "Browser interfaces only; not yet automated adapters",
+    "source": "workflows.json modules[].tools"
+  }
+}
