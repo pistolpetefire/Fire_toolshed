@@ -33,3 +33,8 @@ PDF scale/viewport extraction in the AI document environment; verified adapters 
 Run `python pdf_scale.py drawing.pdf` in the AI file environment. Requires pypdf (tested 6.10.0). Reads standard isotropic rectilinear viewport metadata, page crop, rotation, UserUnit and document hash. No network calls or document modifications. Candidate scales still require a labeled-dimension verification. Raw PDF coordinates must not be mixed with rendered pixel coordinates. Overlapping viewports require last-containing selection in PDF order; split routes crossing scales. Proprietary, reversed, nonuniform and geospatial scales are flagged, not guessed.
 Reference: Adobe PDF 32000-1:2008 section 12.9, tables 260–263, https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf
 Tests cover numeric metadata, missing/unsupported scales and nonuniform factors. A 15-page real PDF without viewport scales was also read; scaled construction-sheet integration remains to be tested.
+
+## Hydraulic arithmetic adapters
+The runner now includes pipe_velocity, sprinkler_discharge and pipe_friction. Download hydraulics.mjs alongside tools.mjs and run.mjs. Inputs use explicit US units (gpm, inches, feet, psi); actual pipe inside diameter is required. These expose arithmetic from existing apps, not their entire workflows or code checks. No code limit is inferred. Operating flow is supplied explicitly; use 150% of rated flow only when the governing scenario requires it.
+
+Example: `{"tool":"sprinkler_discharge","arguments":{"kGpmPerSqrtPsi":5.6,"pressurePsi":25}}` returns 28 gpm plus method, inputs and limitations. Run `node ai-review/hydraulics.test.mjs` for known-answer, existing-app parity and invalid-input checks.

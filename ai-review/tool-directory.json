@@ -10,6 +10,35 @@
   },
   "tools": [
     {
+      "name": "pipe_velocity",
+      "inputs": {
+        "flowGpm": "nonnegative finite number",
+        "insideDiameterIn": "positive actual inside diameter"
+      },
+      "sourceApp": "velocity-suction",
+      "scope": "Velocity arithmetic only; operating flow supplied explicitly"
+    },
+    {
+      "name": "sprinkler_discharge",
+      "inputs": {
+        "kGpmPerSqrtPsi": "positive finite number",
+        "pressurePsi": "nonnegative finite number"
+      },
+      "sourceApp": "branch-hand-calc",
+      "scope": "Discharge arithmetic only; no design criteria selection"
+    },
+    {
+      "name": "pipe_friction",
+      "inputs": {
+        "flowGpm": "nonnegative finite number",
+        "insideDiameterIn": "positive finite number",
+        "cFactor": "positive finite number",
+        "lengthFt": "nonnegative finite number"
+      },
+      "sourceApp": "branch-hand-calc",
+      "scope": "Hazen-Williams segment friction only"
+    },
+    {
       "name": "measure_route",
       "inputs": {
         "documentId": "string",
@@ -49,7 +78,7 @@
     }
   ],
   "existingCalculators": {
-    "availability": "Browser interfaces only; not yet automated adapters",
+    "availability": "Three arithmetic adapters available; remaining full calculator workflows are browser-only",
     "source": "workflows.json modules[].tools"
   }
 }

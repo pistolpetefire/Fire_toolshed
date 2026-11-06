@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import {readFileSync} from 'node:fs';
+import {pipeVelocity,sprinklerDischarge,pipeFriction} from './hydraulics.mjs';
+const branch={};vm.createContext(branch);vm.runInContext(readFileSync(new URL('../branch-hand-calc/app.js',import.meta.url),'utf8'),branch);
+for(const q of [0,25,100,500,1500])for(const d of [1.049,2.067,6.065])assert.ok(Math.abs(pipeFriction({flowGpm:q,insideDiameterIn:d,cFactor:120,lengthFt:100}).lossPsi-branch.hazen(q,d,120,100)) <= 1e-12*Math.max(1,branch.hazen(q,d,120,100)));
+assert.equal(sprinklerDischarge({kGpmPerSqrtPsi:5.6,pressurePsi:25}).flowGpm,28);
+const fields={ratedQ:{value:'1000'},diam:{value:'6.065'},suctionP:{value:'20'},supplyType:{value:'tank'},results:{style:{}}};
+const velocity={document:{getElementById:id=>fields[id]},window:{},alert:m=>{throw Error(m)}};vm.createContext(velocity);vm.runInContext(readFileSync(new URL('../velocity-suction/app.js',import.meta.url),'utf8'),velocity);velocity.calc();assert.equal(pipeVelocity({flowGpm:1500,insideDiameterIn:6.065}).velocityFtPerSec,velocity.window.lastResult.v);
+assert.equal(pipeFriction({flowGpm:100,insideDiameterIn:2,cFactor:120,lengthFt:0}).lossPsi,0);
+assert.throws(()=>pipeVelocity({flowGpm:'100',insideDiameterIn:2}));assert.throws(()=>pipeVelocity({flowGpm:100,insideDiameterIn:0}));assert.throws(()=>sprinklerDischarge({kGpmPerSqrtPsi:5.6,pressurePsi:-1}));assert.throws(()=>pipeFriction({flowGpm:100,insideDiameterIn:2,cFactor:NaN,lengthFt:100}));assert.throws(()=>pipeVelocity({flowGpm:1e308,insideDiameterIn:1e-308}),/overflow/);
+console.log('PASS hydraulic known value, existing-app parity, explicit operating flow, zero flow/length, invalid inputs and overflow.');

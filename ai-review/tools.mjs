@@ -1,3 +1,4 @@
+import {hydraulicTools} from './hydraulics.mjs';
 // Pure tools: callers retain documents and supply provenance-tagged inputs.
 export const VERSION='1.0.0';
 function positive(x,name){if(!Number.isFinite(x)||x<=0)throw Error(name+' must be positive and finite.');}
@@ -29,4 +30,4 @@ export function coverage({expectedIds,results}){
  const missing=expectedIds.filter(x=>!seen.has(x));const unresolved=results.filter(x=>['needs information','unable to verify'].includes(x.status)).map(x=>x.checkId);
  return {tool:'review_coverage',version:VERSION,total:expectedIds.length,returned:seen.size,missing,unresolved,allChecksAddressed:!missing.length,allChecksResolved:!missing.length&&!unresolved.length,notice:'Coverage is not compliance or FPE approval.'};
 }
-export const tools={measure_route:measureRoute,compare_values:compareValues,review_coverage:coverage};
+export const tools={...hydraulicTools,measure_route:measureRoute,compare_values:compareValues,review_coverage:coverage};
