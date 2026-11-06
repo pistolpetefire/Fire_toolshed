@@ -826,5 +826,5 @@ if(location.hash==="#fdstest"){const o=[];try{const r=fdsRender();o.push("built=
 function unwrapShared(o){if(o&&o.schema==="fireToolshed.project.v1"&&o.apps&&typeof o.apps==="object"){for(const k of ["asetScreener","rsetTool"]){const sec=o.apps[k];if(sec&&sec.data&&typeof sec.data==="object")return sec.data;}throw new Error("This shared project file has no section for this app.");}return o;}
 if(location.hash==="#sharedtest"){const r=[];try{r.push("unwrap="+(unwrapShared({schema:"fireToolshed.project.v1",apps:{asetScreener:{data:{x:1}}}}).x===1));r.push("passthrough="+(unwrapShared({y:2}).y===2));try{unwrapShared({schema:"fireToolshed.project.v1",apps:{}});r.push("missing=false")}catch(e){r.push("missing=true")}}catch(e){r.push("ERR "+e.message)}document.title="SHAREDTEST "+r.join(" | ");}
 </script>
-</body>
+<aside class="noprint" style="padding:12px 20px;text-align:center;font:14px system-ui"><a href="../peer-review/" target="_blank" rel="noopener">Use this result in a Peer Review Case ↗</a></aside></body>
 </html>
