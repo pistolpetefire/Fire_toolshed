@@ -2,6 +2,12 @@
   "version": "1.0.0",
   "transport": "Download ES modules and execute in an authorized JavaScript runtime. GitHub Pages does not provide a POST API or MCP server.",
   "runner": "run.mjs",
+  "pdfScaleReader": {
+    "file": "pdf_scale.py",
+    "runtime": "Python with pypdf",
+    "command": "python pdf_scale.py drawing.pdf",
+    "scope": "Standard isotropic rectilinear viewport scales; verify against dimension"
+  },
   "tools": [
     {
       "name": "measure_route",
