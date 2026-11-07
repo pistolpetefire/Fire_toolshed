@@ -20,9 +20,11 @@ Browser smoke tests on localhost verified search, proposal save, revised PDF sel
 
 Synthetic summary and RFI DOCX files were parsed successfully with Python python-docx and all OOXML parts parsed as XML. ZIP checksums passed. No actual engineering review or code determination was performed.
 
+The remote workflow run 42382039612 passed both contract validation and document rendering. LibreOffice rendered the synthetic revised-plan summary to three pages and the RFI list to one page. All four PNG pages were visually inspected; text, headings, page breaks and margins were clean. The original Fujifilm case JSON also parsed unchanged with 22 checklist records and two candidate comments.
+
 ## Outstanding verification
 
-Visual Word pagination has not been verified: the packaged document renderer failed because LibreOffice soffice.exe is absent from this host. Do not represent the documents as visually approved. Review actual Word output in a Word/LibreOffice-equipped environment before production use.
+The local packaged renderer could not run because LibreOffice is absent from the host; the remote LibreOffice rendering and visual inspection above completed the synthetic layout check. Actual project content may produce different pagination and should be checked before issuance.
 
 The in-app browser did not deliver a download event for the Word button within the automation timeout. No application validation error appeared. The shared CLI exporter and OOXML content passed tests, but end-to-end browser download completion remains unverified.
 
