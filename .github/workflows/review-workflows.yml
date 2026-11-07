@@ -1,0 +1,32 @@
+name: Review workflow contracts
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate legacy and new contracts
+        run: |
+          node peer-review/core.test.mjs
+          node peer-review/qc.test.mjs
+          node review-modules/core.test.mjs
+          node ai-review/core.test.mjs
+          node ai-review/pilot.test.mjs
+          node ai-review/cli.test.mjs
+          node ai-review/tools.test.mjs
+          node ai-review/review-tools.test.mjs
+          node ai-review/hydraulics.test.mjs
+          node proposal-review/core.test.mjs
+          node directory/catalog.test.mjs
+      - name: Check generated catalogs
+        run: |
+          node directory/build.mjs
+          node proposal-review/build.mjs
+          node ai-review/build.mjs
+          git diff --exit-code -- index.html automation/index.html proposal-review/template.json ai-review/workflows.json ai-review/tool-directory.json ai-review/modules

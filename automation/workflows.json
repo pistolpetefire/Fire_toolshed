@@ -1,0 +1,11 @@
+{
+  "schema": "fireToolshed.automationWorkflows.v1",
+  "version": "1.0.0",
+  "catalog": "../directory/catalog.json",
+  "start": "START-HERE.md",
+  "workflows": [
+    {"id":"design-qc","name":"Design QC and designer response","description":"Prepare evidence-backed review candidates, then use EOR decisions and designer responses to resolve comments.","status":"Supervised pilot","execution":"AI environment plus human validation","instructions":"../ai-review/START-HERE.md","humanUrl":"../peer-review/","output":"fireToolshed.peerReview.v1"},
+    {"id":"shop-submittal","name":"Shop submittal review","description":"Compare sprinkler, fire alarm, standpipe and extinguisher submissions with the issued design and applicable requirements.","status":"Supervised pilot","execution":"AI environment plus review runner","instructions":"SHOP-REVIEW.md","humanUrl":"../shop-review/","modules":["sprinkler-shop-review","fire-alarm-shop-review","standpipe-shop-review","extinguisher-shop-review"],"output":"fireToolshed.peerReview.v1"},
+    {"id":"proposal","name":"RFP and proposal review","description":"Extract the preliminary fire protection scope, supported sizing scenarios and outstanding RFIs. Export a concise Word summary.","status":"Supervised pilot","execution":"AI analysis plus local document exporter","instructions":"PROPOSAL-REVIEW.md","humanUrl":"../proposal-review/","output":"fireToolshed.proposalReview.v1","template":"../proposal-review/template.json"}
+  ]
+}

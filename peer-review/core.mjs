@@ -1,5 +1,5 @@
 export const SCHEMA='fireToolshed.peerReview.v1';
-export const disciplines=['Water supply, fire pumps, and tanks','Sprinklers, standpipes, and hydraulics','Fire alarm and notification','Occupant load, egress, and life safety','Smoke control and performance-based analysis','Hazardous materials and special hazards','Passive fire protection','Special suppression systems','Field verification and commissioning'];
+export const disciplines=['Water supply, fire pumps, and tanks','Sprinklers, standpipes, and hydraulics','Fire alarm and notification','Occupant load, egress, and life safety','Smoke control and performance-based analysis','Hazardous materials and special hazards','Passive fire protection','Special suppression systems','Field verification and commissioning','Portable fire extinguishers'];
 export const seeds=[
  ['Supply test basis and reliability','Demand and supply at the same reference point','Pump, tank, underground and fire-department interfaces'],
  ['Hazard, commodity and storage basis','Hydraulic criteria, calculations and supply','Layout, listings, valves, restraints and acceptance tests'],
@@ -9,8 +9,9 @@ export const seeds=[
  ['Material inventory and classification','Control areas, quantities and separation','Process safeguards and explosion-protection basis'],
  ['Rated assemblies and continuity','Opening protectives and dampers','Penetrations, joints and listed details'],
  ['Hazard and agent suitability','Listings, design calculations and controls','Discharge, safety and acceptance requirements'],
- ['Existing conditions and inspection records','Test procedures and responsible parties','Acceptance evidence and unresolved field items']];
-export const expected=['Flow test and supply analysis','Drawings and hydraulic calculations','Alarm drawings and sequence of operations','Life-safety plans and code summary','Smoke-control analysis and test plan','Hazardous-material inventory and analysis','Rated-assembly and firestop details','Special suppression design and product data','Inspection records and acceptance test reports'];
+ ['Existing conditions and inspection records','Test procedures and responsible parties','Acceptance evidence and unresolved field items'],
+ ['Hazards and extinguisher selection','Coverage, travel distance and access','Product data and inspection responsibilities']];
+export const expected=['Flow test and supply analysis','Drawings and hydraulic calculations','Alarm drawings and sequence of operations','Life-safety plans and code summary','Smoke-control analysis and test plan','Hazardous-material inventory and analysis','Rated-assembly and firestop details','Special suppression design and product data','Inspection records and acceptance test reports','Extinguisher plans, schedules and product data'];
 export const now=()=>new Date().toISOString();
 export function fresh(){return {schema:SCHEMA,version:'1.0.0',project:{name:'',phase:'75%',reviewType:'Independent peer review',reviewDate:new Date().toISOString().slice(0,10)},scope:{statement:'',exclusions:'',independence:''},codeBasis:{summary:'',criteria:''},disciplines:[],documents:[],checklistItems:[],candidateItems:[],findings:[],outstandingRequirements:[],limitations:[],evidence:[],activityLog:[],reportSettings:{status:'Not started',firm:'',conclusion:''}};}
 export function id(c,collection,prefix){let n=1;const used=new Set(c[collection].map(x=>x.id));while(used.has(`${prefix}-${String(n).padStart(3,'0')}`))n++;return `${prefix}-${String(n).padStart(3,'0')}`;}
