@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {fresh,material,validate,issues,review,invalidate,workbookRows} from './core.mjs';
 import {xlsxBytes} from './xlsx.mjs';
+import {databaseStatus} from './databases.mjs';
 import {mkdtemp,writeFile,readFile,access,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -12,6 +13,7 @@ r.hazards[0].databaseChecks[0].result='Conflicts with hazard';assert.throws(()=>
 r.name='=HYPERLINK("https://invalid.example")';const bytes=xlsxBytes(m);const text=new TextDecoder().decode(bytes);assert.ok(text.includes('t="inlineStr"'));assert.ok(!text.includes('<f>'));assert.ok(text.includes('autoFilter'));assert.ok(text.includes('state="frozen"'));assert.ok(text.includes('Hazard register'));assert.equal(bytes[0],80);assert.equal(bytes[1],75);
 const unknown=material('M2');m.materials.push(unknown);assert.ok(workbookRows(m)[1].rows.some(x=>x[0]==='UNCLASSIFIED'));m.project.basis='NFPA 400';validate(m);m.project.basis='made up';assert.throws(()=>validate(m));
 console.log('PASS hazard duplication, unique inventory, unknown versus zero, review gating, source integrity, both bases and safe XLSX strings.');
+const safeConclusion={type:'No applicable code hazard identified',databaseChecks:[{...r.hazards[0].databaseChecks[0],result:'Not found'}]};assert.equal(databaseStatus(safeConclusion),'Not corroborated');safeConclusion.databaseChecks[0].result='Supports no-hazard conclusion';assert.equal(databaseStatus(safeConclusion),'Corroborated');safeConclusion.type='Test hazard A';assert.equal(databaseStatus(safeConclusion),'Not corroborated');
 const temp=await mkdtemp(join(tmpdir(),'toolshed-sds-'));
 try{
  const cli=fileURLToPath(new URL('run.mjs',import.meta.url)),a=join(temp,'a.pdf'),b=join(temp,'b.pdf'),file=join(temp,'assessment.json');
