@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {readFile,access} from 'node:fs/promises';
+import {matches} from './search.mjs';
+import {catalog} from '../review-modules/catalog.mjs';
+import {workOrder,inspectResult,toCase} from '../ai-review/core.mjs';
+import {parseCase} from '../peer-review/core.mjs';
+const root=new URL('../',import.meta.url),data=JSON.parse(await readFile(new URL('catalog.json',import.meta.url),'utf8'));
+assert.equal(new Set(data.tools.map(t=>t.id)).size,data.tools.length);
+for(const t of data.tools){assert.ok(t.name&&t.description&&t.task&&t.automation.mode);const url=new URL(t.url,root);await access(url.pathname.endsWith('/')?new URL('index.html',url):url);}
+assert.ok(data.tools.filter(t=>matches(t,{query:'battery'})).some(t=>t.id==='fa-power-extenders'));
+assert.ok(data.tools.filter(t=>matches(t,{query:'alarm',task:'Review',discipline:'Fire alarm & notification'})).some(t=>t.id==='fire-alarm-shop-review'));
+assert.ok(data.tools.filter(t=>matches(t,{query:'RFP'})).some(t=>t.id==='proposal-review'));
+assert.equal(data.tools.filter(t=>matches(t,{query:'zznomatchzz'})).length,0);
+const modules=Object.keys(catalog).filter(id=>id.endsWith('-shop-review'));assert.equal(modules.length,4);
+const job=workOrder({project:{name:'Synthetic shop review',basis:'Synthetic criteria, not real NFPA text',scope:'All four shop modules'},modules,documents:[{id:'S1',name:'Shop.pdf',role:'design',pages:1,sha256:'a'.repeat(64)},{id:'B1',name:'Baseline.pdf',role:'criteria',pages:1,sha256:'b'.repeat(64)}]});
+const result={workOrderId:job.id,model:'Synthetic software test',limitations:['No engineering review'],results:job.checks.map(c=>({checkId:c.id,status:'unable to verify',explanation:'Synthetic documents unavailable',evidence:[],criteria:[]}))};
+assert.equal(inspectResult(job,result).checks,job.checks.length);const c=parseCase(JSON.stringify(toCase(job,result)));assert.equal(c.findings.length,0);assert.ok(c.outstandingRequirements.length>0);
+assert.throws(()=>inspectResult(job,{...result,results:result.results.slice(1)}),/Incomplete/);
+const generated=JSON.parse(await readFile(new URL('ai-review/workflows.json',root),'utf8'));assert.deepEqual(generated.modules,catalog);
+console.log(`PASS ${data.tools.length} unique working tool links, search/filter discovery and ${job.checks.length} shop checks exported without automatic approval.`);

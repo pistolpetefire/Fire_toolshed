@@ -1,3 +1,4 @@
+import {shopModules} from './shop-catalog.mjs';
 // Original review prompts. Project-selected editions and record documents govern.
 export const catalog={
  'fire-alarm-review':{name:'Fire Alarm & Emergency Communications Review',short:'Fire alarm',discipline:'Fire alarm and notification',intro:'Trace detection, notification, power and equipment interfaces from the design basis to acceptance evidence.',basis:['System purpose / protected areas','Occupancy and emergency communication needs','Panel / network architecture','Monitoring and response organization'],documents:['Fire alarm plans, riser and device schedule','Sequence of operations / cause-and-effect matrix','Battery and voltage-drop calculations','Product data, compatibility and listings','Acceptance plan and monitoring requirements'],tools:[['Power extenders & voltage drop','fa-power-extenders']],matrixName:'Cause-and-effect review',matrixHint:'Record one initiating event and expected response per row. Separate actual documented behavior from your review determination.',matrixFields:['Initiating event / condition','Affected equipment / output','Expected operation / response','Delay / priority','Reset / restoration','Drawing / sequence reference'],groups:[
@@ -572,4 +573,5 @@ catalog["standpipe-review"]={
     ]
   ]
 };
+Object.assign(catalog,shopModules(catalog));
 export const paths=Object.keys(catalog);

@@ -1,444 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#1e3a8a">
-  <meta name="description" content="Engineering tools portal — fire protection and field calculators for team use.">
-  <title>Fire Toolshed · Engineering tools</title>
-  <style>
-    :root {
-      --blue-900: #1e3a8a;
-      --blue-950: #172554;
-      --slate-50: #f8fafc;
-      --slate-200: #e2e8f0;
-      --slate-500: #64748b;
-      --slate-600: #475569;
-      --slate-800: #1e293b;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100dvh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--slate-50);
-      color: var(--slate-800);
-      padding: calc(1.25rem + var(--safe-top)) 1.25rem calc(2rem + var(--safe-bottom));
-      line-height: 1.5;
-    }
-    .wrap { max-width: 880px; margin: 0 auto; }
-    header {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.9rem;
-      margin-bottom: 1.75rem;
-    }
-    .logo {
-      width: 3rem;
-      height: 3rem;
-      border-radius: 1rem;
-      background: var(--blue-900);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.85rem;
-      flex-shrink: 0;
-    }
-    h1 {
-      margin: 0;
-      font-size: 1.65rem;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-    }
-    .sub {
-      margin: 0.25rem 0 0;
-      color: var(--slate-500);
-      font-size: 0.9rem;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-    @media (min-width: 640px) {
-      .grid { grid-template-columns: 1fr 1fr; }
-    }
-    @media (min-width: 960px) {
-      .grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (min-width: 1100px) {
-      .grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    a.card {
-      display: block;
-      text-decoration: none;
-      color: inherit;
-      background: #fff;
-      border: 1px solid var(--slate-200);
-      border-radius: 1.25rem;
-      padding: 1.25rem 1.35rem;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-      transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
-      min-height: 8rem;
-    }
-    a.card:hover, a.card:focus-visible {
-      border-color: #93c5fd;
-      box-shadow: 0 8px 24px rgba(30, 58, 138, 0.1);
-      transform: translateY(-1px);
-      outline: none;
-    }
-    a.card.soon {
-      opacity: 0.65;
-      pointer-events: none;
-      cursor: default;
-    }
-    .badge {
-      display: inline-block;
-      font-size: 0.65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 0.2rem 0.5rem;
-      border-radius: 999px;
-      background: #dbeafe;
-      color: var(--blue-900);
-      margin-bottom: 0.55rem;
-    }
-    .badge.beta {
-      background: #ffedd5;
-      color: #9a3412;
-    }
-    .badge.soon-badge {
-      background: #f1f5f9;
-      color: var(--slate-500);
-    }
-    .tool-count {
-      margin: -0.5rem 0 1.25rem;
-      font-size: 0.8rem;
-      color: var(--slate-500);
-    }
-    .card h2 {
-      margin: 0 0 0.35rem;
-      font-size: 1.15rem;
-      letter-spacing: -0.02em;
-    }
-    .card p {
-      margin: 0;
-      font-size: 0.875rem;
-      color: var(--slate-600);
-    }
-    .open {
-      display: inline-block;
-      margin-top: 0.85rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--blue-900);
-    }
-    footer {
-      margin-top: 2rem;
-      font-size: 0.75rem;
-      color: var(--slate-500);
-    }
-    footer strong { color: var(--slate-600); }
-  
-    html { scroll-behavior:smooth; }
-    .guide-highlight {background:#eaf2ff;border:2px solid #315caa;border-radius:1.25rem;padding:1.5rem;margin-bottom:1.25rem;}
-    .guide-highlight h2 {margin:0 0 .5rem;font-size:1.4rem;}
-    .guide-highlight p {margin:.5rem 0 1rem;}
-    .guide-link {display:inline-block;background:#1e3a8a;color:white;padding:.75rem 1rem;border-radius:.6rem;text-decoration:none;font-weight:650;}
-    .topic-nav {display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0 2rem;}
-    .topic-nav a {padding:.6rem .8rem;border:1px solid #cbd5e1;border-radius:2rem;background:white;color:#1e3a8a;text-decoration:none;font-size:.85rem;}
-    .topic {scroll-margin-top:1rem;margin:2.5rem 0;}
-    .topic>h2 {border-bottom:2px solid #dbeafe;padding-bottom:.65rem;font-size:1.35rem;}
-    .topic .card h3 {margin:0 0 .35rem;font-size:1.15rem;letter-spacing:-.02em;}
-    .guide-entry {padding:1.25rem;background:white;border:1px solid #e2e8f0;border-radius:.8rem;margin:1rem 0;break-inside:avoid;}
-    .guide-entry h3 {margin:0 0 .6rem;}.guide-entry p {margin:0;line-height:1.65;}
-    a:focus-visible {outline:3px solid #2563eb;outline-offset:4px;}
-    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
-    @media print {.topic-nav,.guide-link,.back-top{display:none;}body{background:white;padding:0;}.guide-entry{border:0;padding:.5rem 0;}a{color:inherit;text-decoration:none;}}
-  
-/* Toolshed visual refresh — Benham-inspired navy and gold */
-:root{--blue-900:#234e70;--slate-800:#193a56;--slate-600:#526578;--slate-500:#63758a;--slate-50:#f4f6f9;--slate-200:#dde4ec;}
-body{background:radial-gradient(ellipse at 100% 0,#e5ebf3,transparent 42%),#f4f6f9;padding:clamp(16px,3vw,44px);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;}
-.wrap{max-width:1160px;margin:auto;}
-header{position:relative;overflow:hidden;background:#193a56;color:#fff;border-radius:24px;padding:clamp(28px,5vw,64px);margin-bottom:24px;min-height:230px;align-items:center;gap:24px;box-shadow:0 18px 45px #193a5612;}
-header:after{content:"";position:absolute;right:-60px;top:-105px;width:360px;height:360px;border:1px solid #f9bd383b;border-radius:50%;box-shadow:0 0 0 42px #f9bd380a,0 0 0 84px #f9bd3808;pointer-events:none;}
-header>div{position:relative;z-index:1;}header h1{font-size:clamp(32px,5vw,56px);letter-spacing:-.055em;line-height:1.06;font-weight:750;max-width:680px;}header .sub{font-size:clamp(14px,1.5vw,17px);color:#d3dfed;max-width:610px;margin-top:15px;line-height:1.65;}header a{color:#ffbf38;display:inline-block;margin-bottom:16px;text-decoration:none;}
-.logo{background:#ffbf38;color:#193a56;width:64px;height:64px;border-radius:18px;box-shadow:0 0 0 8px #ffffff08;font-size:19px;letter-spacing:-1px;}
-.eyebrow{font-size:11px;font-weight:750;letter-spacing:.18em;text-transform:uppercase;color:#ffcb59;margin:0 0 14px;}
-.guide-highlight{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 36px;background:#fff4d8;border:1px solid #e8cf91;padding:28px 32px;border-radius:18px;margin-bottom:24px;}
-.guide-highlight h2{font-size:23px;letter-spacing:-.035em;margin:0;}.guide-highlight p{grid-column:1;max-width:680px;font-size:14px;line-height:1.7;color:#566477;margin:0;}.guide-link{grid-column:2;grid-row:1/3;white-space:nowrap;background:#193a56;color:white;padding:14px 20px;border-radius:10px;font-size:13px;box-shadow:0 4px 8px #193a5610;}.guide-link:hover{background:#28577e;}
-.topic-nav{gap:8px;margin:0 0 40px;}.topic-nav a{background:#ffffffa8;border:1px solid #d7e0eb;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:600;color:#35516e;transition:background .15s;}.topic-nav a:hover{background:#fff4d8;border-color:#d1aa4f;}
-.topic{--topic-accent:#234e70;margin:46px 0;}.topic:nth-of-type(3n){--topic-accent:#3d6b98;}.topic:nth-of-type(3n+1){--topic-accent:#9a711c;}
-.topic>h2{display:flex;align-items:center;gap:12px;font-size:22px;letter-spacing:-.03em;border:0;padding:0;margin:0 0 20px;}.topic>h2:before{content:"";width:5px;height:24px;border-radius:4px;background:var(--topic-accent);flex:none;}.topic>h2 small{font-size:12px;letter-spacing:0;font-weight:500;color:#6a7c90;}
-.grid{gap:16px;grid-template-columns:repeat(3,minmax(0,1fr));}a.card{position:relative;border:1px solid #dce4ee;border-radius:16px;padding:24px;min-height:235px;background:#eaf2fb;box-shadow:0 3px 8px #193a5610;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s,border-color .18s;}
-a.card:hover,a.card:focus-visible{transform:translateY(-4px);border-color:#c3a054;box-shadow:0 12px 28px #193a5612;}.badge{align-self:flex-start;color:#365572;background:#edf2f8;border-radius:5px;font-size:9px;letter-spacing:.07em;font-weight:700;padding:4px 7px;margin-bottom:16px;}.badge.beta{background:#fff0df;color:#986031;}.topic .card h3{font-size:18px;line-height:1.3;letter-spacing:-.025em;margin:0 0 10px;}.card p{font-size:13px;line-height:1.7;color:#566a7e;}.open{margin-top:auto;padding-top:20px;color:var(--topic-accent);font-size:12px;font-weight:700;}.back-top{text-align:right;margin-top:14px;}.back-top a{color:#5f7390;font-size:11px;text-decoration:none;}
-.guide-entry{border:1px solid #dce4ee;border-left:4px solid var(--topic-accent);border-radius:12px;padding:24px 28px;box-shadow:0 2px 6px #193a5606;}.guide-entry h3{font-size:18px;letter-spacing:-.02em;}.guide-entry h3 a{color:#234e70;text-decoration:none;}.guide-entry h3 a:hover{text-decoration:underline;}.guide-entry p{font-size:15px;color:#52677b;max-width:90ch;line-height:1.8;}
-footer{border-top:1px solid #d7e0eb;padding:24px 0;font-size:12px;color:#62758a;}footer a{color:#234e70;}a:focus-visible{outline:3px solid #b98718;outline-offset:4px;}
-@media(max-width:950px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));}.guide-highlight{grid-template-columns:1fr;}.guide-link{grid-column:1;grid-row:auto;justify-self:start;margin-top:8px;}}
-@media(max-width:580px){header{display:block;min-height:0;border-radius:18px;padding:28px 24px;}.logo{width:44px;height:44px;font-size:14px;border-radius:12px;margin-bottom:25px;}.grid{grid-template-columns:1fr;}a.card{min-height:0;padding:22px;}.guide-highlight{padding:23px;border-radius:14px;}.topic-nav{gap:7px;}.topic-nav a{font-size:11px;padding:9px 10px;}.topic>h2{font-size:20px;line-height:1.3;}.guide-entry{padding:20px;}.guide-entry p{font-size:14px;}.guide-link{white-space:normal;}header:after{right:-200px;}.topic{margin:34px 0;}}
-@media(prefers-reduced-motion:reduce){a.card{transition:none;}a.card:hover{transform:none;}}
-@media print{body{background:white;}header{background:white;color:#193a56;box-shadow:none;min-height:0;padding:0;}.logo,header:after{display:none;}header .sub{color:#52677b;}.guide-entry{box-shadow:none;}.grid{grid-template-columns:1fr 1fr;}a.card{box-shadow:none;break-inside:avoid;}}
-
-</style>
-</head>
-<body id="top">
-  <div class="wrap">
-    <header>
-      <div class="logo" aria-hidden="true">FT</div>
-      <div>
-        <p class="eyebrow">Built for fire protection engineers</p><h1>Fire Toolshed</h1>
-        <p class="sub">From first estimate to design review. Practical calculators, field tools and learning resources—all in your browser.</p>
-      </div>
-    </header>
-
-    <section class="guide-highlight" aria-labelledby="guide-title"><h2 id="guide-title">Your next calculation starts here.</h2><p>Explore 47 apps and workflow hubs, organized by topic. The tools guide explains what each app does, when to use it and where its scope ends.</p><a class="guide-link" href="./tools-guide.html">Explore the tools guide →</a></section>
-<nav class="topic-nav" aria-label="Browse tools by topic"><a href="#peer-review">Peer Review &amp; Quality Assurance</a><a href="#water">Water supply, pumps &amp; tanks</a><a href="#sprinklers">Sprinklers, standpipes &amp; hydraulics</a><a href="#alarm">Fire alarm &amp; notification</a><a href="#egress">Occupants, egress &amp; evacuation</a><a href="#smoke">Atrium &amp; smoke control</a><a href="#hazards">Hazardous materials &amp; fire-resistant construction</a><a href="#projects">Project coordination</a><a href="#learning">Learning &amp; practice</a><a href="#breaks">Games &amp; breaks</a></nav><section class="topic" id="peer-review" aria-labelledby="heading-peer-review"><h2 id="heading-peer-review">Peer Review &amp; Quality Assurance <small>(8)</small></h2><div class="grid"><a class="card" href="./ai-review/"><span class="badge">AI workflow</span><h3>AI Review Toolkit</h3><p>Model-readable review workflows, scale-checked measurements, value comparison and coverage tracking. Project files remain with your AI.</p><span class="open">Open AI toolkit →</span></a><a class="card" href="./peer-review/" id="card-peer-review"><span class="badge">Review workflow</span><h3>Peer Review Case File</h3><p>Run an independent fire-protection review from scope and document intake through validated findings, outstanding final-review needs, and a client-ready report.</p><span class="open">Start a Peer Review Case →</span></a><a class="card" href="./fire-alarm-review/"><span class="badge">Technical review</span><h3>Fire Alarm &amp; Emergency Communications Review</h3><p>Review detection, notification, secondary power, pathways and equipment interfaces with a cause-and-effect worksheet.</p><span class="open">Start technical review →</span></a><a class="card" href="./sprinkler-review/"><span class="badge">Technical review</span><h3>Sprinkler &amp; Suppression Submittal Review</h3><p>Review hazard/storage criteria, hydraulic calculations, system arrangements and acceptance evidence by system or remote area.</p><span class="open">Start technical review →</span></a><a class="card" href="./water-supply-review/"><span class="badge">Technical review</span><h3>Water Supply &amp; Site Fire-Water Review</h3><p>Review flow tests, supply reliability, pumps, tanks and site-water interfaces with a supply-demand scenario worksheet.</p><span class="open">Start technical review →</span></a><a class="card" href="./life-safety-review/"><span class="badge">Technical review</span><h3>Life Safety &amp; Egress Plan Review</h3><p>Trace occupant loads and exit routes from each occupied space through final discharge, with documented criteria and plan evidence.</p><span class="open">Start technical review →</span></a><a class="card" href="./g-sheet-review/"><span class="badge">Technical review</span><h3>G-Sheet Building &amp; Fire Code Analysis Review</h3><p>Reconcile the building code summary with the actual building, life-safety plans, specifications and fire-protection design.</p><span class="open">Start technical review →</span></a><a class="card" href="./standpipe-review/"><span class="badge">Technical review</span><h3>Standpipe Plan &amp; Hydraulic Review</h3><p>Trace standpipe coverage, hydraulic demand and pressure zones through supply, fire-department operations and acceptance evidence.</p><span class="open">Start technical review →</span></a></div></section><section class="topic" id="water" aria-labelledby="heading-water"><h2 id="heading-water">Water supply, pumps &amp; tanks <small>(11)</small></h2><div class="grid"><a class="card" href="./water-supply/" id="card-water-hub">
-        <span class="badge">Water path</span>
-        <h3>Open water supply path</h3>
-        <p>Light shell across all four tools: step strip, capture status, next-step links. Each calculator still opens alone if you bookmark it.</p>
-        <span class="open">Path hub →</span>
-      </a>
-<a class="card" href="./flow-test-request/" id="card-flow-request">
-        <span class="badge">Request</span>
-        <h3>Flow Test Request</h3>
-        <p>Stock hydrant flow test request (suppression or fire flow). NFPA 291 procedures for 2½″ outlets only — base building number, location, hydrant selection reasons, jurisdiction ask.</p>
-        <span class="open">Open request form →</span>
-      </a>
-<a class="card" href="./flow-test-report/" id="card-flow-test">
-        <span class="badge">1 · Live</span>
-        <h3>Flow Test Report</h3>
-        <p>Hydrant static/residual/pitot GPM, N<sup>1.85</sup> supply curve, fire flow @ 20 psi. Capture results for the Sprinkler Estimator (no system demand here).</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./sprinkler-system-estimator/" id="card-sprinkler">
-        <span class="badge">2 · Live</span>
-        <h3>Sprinkler System Estimator</h3>
-        <p>Prelim demand + pressure stack + duration (NFPA 13 / UFC / FM). Overlay flow-test supply curve; capture duty for Fire Pump Sizer.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./service-line-sizer/" id="card-service-line">
-        <span class="badge">Live · v1.3.0</span>
-        <h3>Service Line Sizer</h3>
-        <p>Estimate lead-in, backflow and riser sizes from hazard or known demand. NFPA / UFC guidance, ESFR and FM planning, illustrated arrangements and branded reports.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./fire-pump-sizer/" id="card-pump">
-        <span class="badge">3 · Live · v2.7.2</span>
-        <h3>Fire Pump Sizer</h3>
-        <p>Import sprinkler duty (flow, pressure, duration). NFPA 20 / UFC preliminary pump, driver, curve, and room sizing.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./fire-tank-sizer/" id="card-tank">
-        <span class="badge">4 · Live</span>
-        <h3>Fire Tank Sizer</h3>
-        <p>Flow × duration + NFPA/UFC/FM safety, US-typical prefab steel sizes, max H/⌀ limits, concrete pad, plan diagram.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./hydrant-loop-sizer/" id="card-hydrant-loop">
-        <span class="badge">Live · v1.0.3</span>
-        <h3>Hydrant Loop Sizer</h3>
-        <p>Hydrant-only supply: NFPA 291 available flow, ring hydraulics with hydrant arms, velocity, single-break case, loop schematic. US or metric.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./pump-overlay/" id="card-overlay">
-        <span class="badge">New · v1.0.7</span>
-        <h3>Pump + Supply Overlay</h3>
-        <p>Adds pump net curve to city supply, overlays demand, reports margin and 150% point.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./pressure-tank/" id="card-pressure-tank">
-        <span class="badge">New · v1.0.7</span>
-        <h3>Pressure Tank (Boyle)</h3>
-        <p>Air/water split, start/end pressure, and usable volume for pressure tanks.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./velocity-suction/" id="card-velocity">
-        <span class="badge">New · v1.0.7</span>
-        <h3>Velocity / Suction Check</h3>
-        <p>v = 0.4085Q/d². Checks pump suction velocity ≤ 15 ft/s at 150% flow.</p>
-        <span class="open">Open tool →</span>
-      </a>
-</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
-<section class="topic" id="sprinklers" aria-labelledby="heading-sprinklers"><h2 id="heading-sprinklers">Sprinklers, standpipes &amp; hydraulics <small>(8)</small></h2><div class="grid"><a class="card" href="./branch-hand-calc/" id="card-branch">
-        <span class="badge">New · v1.0.7</span>
-        <h3>Branch-Line Hand Calc</h3>
-        <p>Node-by-node Q = K√P, Hazen-Williams, elevation. NFPA 13-2022.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./junction-balancer/" id="card-junction">
-        <span class="badge">New · v1.0.7</span>
-        <h3>Junction Balancer</h3>
-        <p>Equivalent-K and 0.5 psi balance check at hydraulic junction points. Q2 = Q1·√(P2/P1).</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./hardy-cross/" id="card-hardy">
-        <span class="badge">New · v1.0.7</span>
-        <h3>Hardy Cross Loop Solver</h3>
-        <p>Two-path split, ΔQ correction, convergence. NFPA 13-2022 hydraulics.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./pipe-schedule-checker/" id="card-schedule">
-        <span class="badge">New · v1.0.7</span>
-        <h3>Pipe Schedule Checker</h3>
-        <p>Sprinkler counts per pipe size for light and ordinary hazard steel. Checks when pipe schedule is allowed.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./dry-sprinkler-delivery/" id="card-dry-delivery">
-        <span class="badge">Live · v1.5.1</span>
-        <h3>Dry Sprinkler Water Delivery</h3>
-        <p>Dry / double-interlock delivery time · wet rejected · 10–12″ mains · PDF multi-page fixture import · HW + valves. Preliminary — not a listed method.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./standpipe-calc/" id="card-standpipe">
-        <span class="badge">New · v1.0.7</span>
-        <h3>Standpipe Calculator</h3>
-        <p>Class I/II/III flows, residual at top, base demand. NFPA 14-2019.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./hanger-helper/" id="card-hanger">
-        <span class="badge">New · v1.0.7</span>
-        <h3>Hanger & Stocklist Helper</h3>
-        <p>Hanger count, rod size, 5W+250 lb check, cut lengths. NFPA 13-2022 Ch. 17.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./seismic-brace/" id="card-seismic">
-        <span class="badge">New · v1.0.7</span>
-        <h3>Seismic Brace Load</h3>
-        <p>Wp, Fpw = Cp×Wp, 40/80 ft spacing. NFPA 13-2022 Ch. 18. Verify tables.</p>
-        <span class="open">Open tool →</span>
-      </a>
-</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
-<section class="topic" id="alarm" aria-labelledby="heading-alarm"><h2 id="heading-alarm">Fire alarm &amp; notification <small>(1)</small></h2><div class="grid"><a class="card" href="./fa-power-extenders/" id="card-fa-power">
-        <span class="badge">Live · v1.1.2</span>
-        <h3>FA Power Extenders</h3>
-        <p>NAC horn/strobe + speaker taps (25/70 V), voltage drop, booster / remote-amp warrant. NFPA 72 / UFC. Preliminary — not a listed calc.</p>
-        <span class="open">Open tool →</span>
-      </a>
-</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
-<section class="topic" id="egress" aria-labelledby="heading-egress"><h2 id="heading-egress">Occupants, egress &amp; evacuation <small>(4)</small></h2><div class="grid"><a class="card" href="./occupant-egress/" id="card-egress">
-        <span class="badge">Live · v1.7.1</span>
-        <h3>Occupant Load &amp; Egress Capacity</h3>
-        <p>IBC-style occupant load factors, means of egress width capacity, minimum exits (Table 1006.3.3) and loss-of-one-exit (1005.5), travel / common path / dead-end checks — life-safety basis of design.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./travel-distance/" id="card-travel-distance">
-        <span class="badge">Live · v1.0.1</span>
-        <h3>Travel Distance &amp; Nearest-Exit Checker</h3>
-        <p>Draw or import a plan with obstructions; shortest real path to the nearest exit and to the next exit if it is blocked, with areas over your limit shaded. Screening only.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./stair-merge-queue/" id="card-stair-merge">
-        <span class="badge">Live · v1.0.1</span>
-        <h3>Stair Merge &amp; Queue Screener</h3>
-        <p>Multi-floor stair egress: SFPE hydraulic model with landing merges, door queues, phased vs simultaneous, loss of one stair; hands off movement to RSET Tool. Screening only.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./rset-tool/" id="card-rset">
-        <span class="badge">Live · v0.1.7</span>
-        <h3>Transparent RSET Tool</h3>
-        <p>Educational Required Safe Egress Time calculator — full plain-language guide plus technical chapters; Detection + Notification + Pre-movement + Movement with assumptions log and session export.</p>
-        <span class="open">Open tool →</span>
-      </a>
-</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
-<section class="topic" id="smoke" aria-labelledby="heading-smoke"><h2 id="heading-smoke">Atrium &amp; smoke control <small>(7)</small></h2><div class="grid"><a class="card" href="./atrium-path/" id="card-atrium-path">
-        <span class="badge">Atrium path</span>
-        <h3>Atrium staff checklist</h3>
-        <p>Start here. Occupant load through the AHJ kickoff, then FDS and Smokeview for the submittal, then the report and commissioning. Checks stay in this browser with the shared atrium project.</p>
-        <span class="open">Open checklist →</span>
-      </a>
-<a class="card" href="./atrium-smoke-exhaust/" id="card-atrium-smoke">
-        <span class="badge">Live · R5</span>
-        <h3>Atrium Smoke Exhaust</h3>
-        <p>Hub: IBC/NFPA 101, suitability, NFPA 92 algebraic, systems/SI, links to native zone &amp; multi-cell field engines — all browser-only.</p>
-        <span class="open">Open hub →</span>
-      </a>
-<a class="card" href="./atrium-zone-model/" id="card-atrium-zone">
-        <span class="badge">Live · Tier 2</span>
-        <h3>Atrium Zone Model</h3>
-        <p>Self-contained two-zone smoke-layer engine (fill + exhaust, ASET, steady size). No CFAST install.</p>
-        <span class="open">Open zone model →</span>
-      </a>
-<a class="card" href="./atrium-field-model/" id="card-atrium-field">
-        <span class="badge">Live · Tier 3</span>
-        <h3>Atrium Field Model</h3>
-        <p>Self-contained multi-cell column model for atrium-height filling sensitivity. Not FDS/LES — fully in-browser.</p>
-        <span class="open">Open field model →</span>
-      </a>
-<a class="card" href="./smoke-exhaust-lab/app/" id="card-smoke-exhaust">
-        <span class="badge beta">Beta</span>
-        <h3>Smoke Exhaust Scenario Lab</h3>
-        <p>Design-fire scenarios, plume/exhaust calculations, makeup air &amp; plugholing checks, Full/Excel modes, and auditable report packages.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./aset-screener/" id="card-aset">
-        <span class="badge">Live · v1.2.0</span>
-        <h3>ASET Screener</h3>
-        <p>Screening ASET: smoke layer descent (NFPA 92 + two-zone), hands off to RSET Tool, and exports an FDS starter file for review. Screening only.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./atrium-report/" id="card-atrium-report"><span class="badge">Report</span><h3>Atrium Screening Package</h3><p>Assemble shared atrium screening results and an AHJ kickoff handout for printing or Word.</p><span class="open">Open tool →</span></a>
-</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
-<section class="topic" id="hazards" aria-labelledby="heading-hazards"><h2 id="heading-hazards">Hazardous materials &amp; fire-resistant construction <small>(4)</small></h2><div class="grid"><a class="card" href="./ibc-ifc-hazard/" id="card-hazard">
-        <span class="badge">Live · v1.6.2</span>
-        <h3>IBC / IFC Hazard Impacts</h3>
-        <p>H occupancy + material hazards → construction &amp; mitigations from IBC 414/415/315 and IFC Ch. 50+, with drivers and high-cost flags (2015–2024).</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./maq-control-area/" id="card-maq">
-        <span class="badge">Live · v1.0.1</span>
-        <h3>MAQ &amp; Control Area Calculator</h3>
-        <p>Storage / use-closed / use-open vs. MAQ per control area (IFC Tables 5003.1.1(1)/(2), sprinkler and cabinet increases, Table 5003.8.3.2 story % and count) → Group H needed or not. 2021/2024, Florida Building Code 9th Edition label.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./deflagration-vent/" id="card-deflag">
-        <span class="badge">Live · v1.2.1</span>
-        <h3>Deflagration Vent Sizing</h3>
-        <p>NFPA 68-2023 <strong>room</strong> and process vent sizing (L×W×H, K<sub>St</sub>/P<sub>max</sub> dust, S<sub>u</sub> gas, P<sub>red</sub>) with IBC/IFC explosion-control context.</p>
-        <span class="open">Open tool →</span>
-      </a>
-<a class="card" href="./concrete-fire-rating/" id="card-concrete-frr">
-        <span class="badge">Live · v1.1.1</span>
-        <h3>Concrete Fire Rating Thickness</h3>
-        <p>Minimum concrete / CMU thickness for 1–4 hour fire ratings by material makeup (siliceous, carbonate, lightweight, masonry aggregates) — IBC / ACI 216.1 calculated method.</p>
-        <span class="open">Open tool →</span>
-      </a>
-</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
-<section class="topic" id="projects" aria-labelledby="heading-projects"><h2 id="heading-projects">Project coordination <small>(1)</small></h2><div class="grid"><a class="card" href="./project-file/" id="card-project-file">
-        <span class="badge">Live · v1.0.0</span>
-        <h3>Project File Hub</h3>
-        <p>One shared project file (fireToolshed.project.v1) across Occupant Load, atrium tools, ASET, RSET, Stair Merge and Travel Distance, with cross-app checks and per-app extract. Screening only.</p>
-        <span class="open">Open tool →</span>
-      </a>
-</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
-<section class="topic" id="learning" aria-labelledby="heading-learning"><h2 id="heading-learning">Learning &amp; practice <small>(2)</small></h2><div class="grid"><a class="card" href="./pe-fpe/" id="card-pe-fpe">
-        <span class="badge beta">PE exam · beta</span>
-        <h3>PE Fire Protection practice exam</h3>
-        <p>April 2027 CBT dress rehearsal. Form A style lock is live (15 of 85 items: Analysis + Fire Science). Handbook/code search, 8:30 clock, optional 50-minute break. Not an NCEES product.</p>
-        <span class="open">Open Form A →</span>
-      </a>
-<a class="card" href="./study-buddy/" id="card-study-buddy">
-        <span class="badge">Study</span>
-        <h3>Study Buddy</h3>
-        <p>Class-by-class study apps — start with OCCC Human Anatomy &amp; Physiology (BIO 1314 / BIO 1414): diagrams, flashcards, quizzes, atlas.</p>
-        <span class="open">Open Study Buddy →</span>
-      </a>
-</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
-<section class="topic" id="breaks" aria-labelledby="heading-breaks"><h2 id="heading-breaks">Games &amp; breaks <small>(1)</small></h2><div class="grid"><a class="card" href="./games/" id="card-games">
-        <span class="badge">Games</span>
-        <h3>Games</h3>
-        <p>Team arcade breaks in the browser — Punch-Out!!, Frogger, and Ms. Pac Maze fan remakes (touch + keyboard).</p>
-        <span class="open">Open games →</span>
-      </a>
-</div><p class="back-top"><a href="#top">Back to topics ↑</a></p></section>
-    <footer>
-      <p><strong>For qualified engineers only.</strong> Preliminary tools — not a substitute for sealed design documents, manufacturer curves, or AHJ approval.</p>
-      <p>Hosted on GitHub Pages · data stays in your browser · portal updated November 5, 2026 · organized by topic</p>
-    </footer>
-  </div>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Fire protection tools and evidence-based workflows for people and AI."><link rel="alternate" type="application/json" href="./directory/catalog.json" title="Shared tool catalog"><link rel="stylesheet" href="./directory/style.css"><title>Find a tool · Fire Toolshed</title></head><body><a class="skip" href="#main">Skip to content</a><header><a class="brand" href="./">FIRE TOOLSHED</a><nav aria-label="Main navigation"><a href="./">Find a tool</a><a href="./automation/">AI &amp; Automation</a><a href="./peer-review/">Review case</a><a href="./?task=Learn">Learning</a></nav></header><main id="main"><section class="hero"><span class="eyebrow">Fire protection engineering</span><h1>Find the right tool.<br>Move the project forward.</h1><p>Calculate, review a design, or prepare a deliverable. Start with a task or search for what you need.</p><p><a href="./automation/">Working with AI? Start with AI &amp; Automation →</a></p></section><div class="workflow-nav" aria-label="Start a workflow"><a href="./proposal-review/">Review an RFP</a><a href="./shop-review/">Review shop submittals</a><a href="./peer-review/">Manage design QC</a><a href="?task=Calculate" data-task="Calculate">Run a calculation</a></div><form class="filters" id="filters" role="search"><label>What do you need to do?<input id="query" name="query" type="search" placeholder="Try battery, tank, sprinkler, QC or proposal"></label><label>Task<select name="task"><option value="">All tasks</option><option>Review</option><option>Calculate</option><option>Collect field information</option><option>Prepare a report</option><option>Learn</option></select></label><label>Discipline<select name="discipline"><option value="">All disciplines</option><option>Atrium &amp; smoke control</option><option>Fire alarm &amp; notification</option><option>Games &amp; breaks</option><option>Hazardous materials &amp; fire-resistant construction</option><option>Learning &amp; practice</option><option>Occupants, egress &amp; evacuation</option><option>Peer Review &amp; Quality Assurance</option><option>Portable fire extinguishers</option><option>Project coordination</option><option>Project planning</option><option>Sprinklers, standpipes &amp; hydraulics</option><option>Water supply, pumps &amp; tanks</option></select></label></form><div class="actions"><span id="count" role="status">52 tools and workflows</span><button class="secondary" id="reset" type="button">Clear filters</button><a href="./tools-guide.html">Detailed tools guide</a></div><noscript><p>Search requires JavaScript. All tools are listed below.</p></noscript><p id="empty" hidden>No matches. Try fewer words or clear the filters.</p><section class="grid" aria-label="Tools and workflows"><article class="card" id="tool-ai-review"><span class="badge">Review · Supervised pilot</span><h3>AI Review Toolkit</h3><p>Model-readable review workflows, scale-checked measurements, value comparison and coverage tracking. Project files remain with your AI.</p><a href="./ai-review/">Open AI Review Toolkit →</a></article>
+<article class="card" id="tool-peer-review"><span class="badge">Review · Available</span><h3>Peer Review Case File</h3><p>Manage EOR review comments, designer responses, outstanding items and verified closure.</p><a href="./peer-review/">Open Peer Review Case File →</a></article>
+<article class="card" id="tool-fire-alarm-review"><span class="badge">Review · Available</span><h3>Fire Alarm Design Review</h3><p>Review detection, notification, power and interfaces during design QC. For shop packages, use Fire Alarm Shop Submittal Review.</p><a href="./fire-alarm-review/">Open Fire Alarm Design Review →</a></article>
+<article class="card" id="tool-sprinkler-review"><span class="badge">Review · Available</span><h3>Sprinkler Design Review</h3><p>Review hazard/storage criteria, hydraulics and installation design. For shop packages, use Sprinkler Shop Submittal Review.</p><a href="./sprinkler-review/">Open Sprinkler Design Review →</a></article>
+<article class="card" id="tool-water-supply-review"><span class="badge">Review · Available</span><h3>Water Supply &amp; Site Fire-Water Review</h3><p>Review flow tests, supply reliability, pumps, tanks and site-water interfaces with a supply-demand scenario worksheet.</p><a href="./water-supply-review/">Open Water Supply &amp; Site Fire-Water Review →</a></article>
+<article class="card" id="tool-life-safety-review"><span class="badge">Review · Available</span><h3>Life Safety &amp; Egress Plan Review</h3><p>Trace occupant loads and exit routes from each occupied space through final discharge, with documented criteria and plan evidence.</p><a href="./life-safety-review/">Open Life Safety &amp; Egress Plan Review →</a></article>
+<article class="card" id="tool-g-sheet-review"><span class="badge">Review · Available</span><h3>G-Sheet Building &amp; Fire Code Analysis Review</h3><p>Reconcile the building code summary with the actual building, life-safety plans, specifications and fire-protection design.</p><a href="./g-sheet-review/">Open G-Sheet Building &amp; Fire Code Analysis Review →</a></article>
+<article class="card" id="tool-standpipe-review"><span class="badge">Review · Available</span><h3>Standpipe Design Review</h3><p>Review standpipe design, hydraulic demand and pressure zones. For shop packages, use Standpipe Shop Submittal Review.</p><a href="./standpipe-review/">Open Standpipe Design Review →</a></article>
+<article class="card" id="tool-water-supply"><span class="badge">Calculate · Available</span><h3>Water Supply Workflow</h3><p>Follow the water-supply review from flow testing through preliminary sprinkler demand, pump and tank sizing.</p><a href="./water-supply/">Open Water Supply Workflow →</a></article>
+<article class="card" id="tool-flow-test-request"><span class="badge">Collect field information · Available</span><h3>Flow Test Request</h3><p>Stock hydrant flow test request (suppression or fire flow). NFPA 291 procedures for 2½″ outlets only — base building number, location, hydrant selection reasons, jurisdiction ask.</p><a href="./flow-test-request/">Open Flow Test Request →</a></article>
+<article class="card" id="tool-flow-test-report"><span class="badge">Collect field information · Available</span><h3>Flow Test Report</h3><p>Hydrant static/residual/pitot GPM, N1.85 supply curve, fire flow @ 20 psi. Capture results for the Sprinkler Estimator (no system demand here).</p><a href="./flow-test-report/">Open Flow Test Report →</a></article>
+<article class="card" id="tool-sprinkler-system-estimator"><span class="badge">Calculate · Available</span><h3>Sprinkler System Estimator</h3><p>Prelim demand + pressure stack + duration (NFPA 13 / UFC / FM). Overlay flow-test supply curve; capture duty for Fire Pump Sizer.</p><a href="./sprinkler-system-estimator/">Open Sprinkler System Estimator →</a></article>
+<article class="card" id="tool-service-line-sizer"><span class="badge">Calculate · Available</span><h3>Service Line Sizer</h3><p>Estimate lead-in, backflow and riser sizes from hazard or known demand. NFPA / UFC guidance, ESFR and FM planning, illustrated arrangements and branded reports.</p><a href="./service-line-sizer/">Open Service Line Sizer →</a></article>
+<article class="card" id="tool-fire-pump-sizer"><span class="badge">Calculate · Available</span><h3>Fire Pump Sizer</h3><p>Import sprinkler duty (flow, pressure, duration). NFPA 20 / UFC preliminary pump, driver, curve, and room sizing.</p><a href="./fire-pump-sizer/">Open Fire Pump Sizer →</a></article>
+<article class="card" id="tool-fire-tank-sizer"><span class="badge">Calculate · Available</span><h3>Fire Tank Sizer</h3><p>Flow × duration + NFPA/UFC/FM safety, US-typical prefab steel sizes, max H/⌀ limits, concrete pad, plan diagram.</p><a href="./fire-tank-sizer/">Open Fire Tank Sizer →</a></article>
+<article class="card" id="tool-hydrant-loop-sizer"><span class="badge">Calculate · Available</span><h3>Hydrant Loop Sizer</h3><p>Hydrant-only supply: NFPA 291 available flow, ring hydraulics with hydrant arms, velocity, single-break case, loop schematic. US or metric.</p><a href="./hydrant-loop-sizer/">Open Hydrant Loop Sizer →</a></article>
+<article class="card" id="tool-pump-overlay"><span class="badge">Calculate · Available</span><h3>Pump + Supply Overlay</h3><p>Adds pump net curve to city supply, overlays demand, reports margin and 150% point.</p><a href="./pump-overlay/">Open Pump + Supply Overlay →</a></article>
+<article class="card" id="tool-pressure-tank"><span class="badge">Calculate · Available</span><h3>Pressure Tank (Boyle)</h3><p>Air/water split, start/end pressure, and usable volume for pressure tanks.</p><a href="./pressure-tank/">Open Pressure Tank (Boyle) →</a></article>
+<article class="card" id="tool-velocity-suction"><span class="badge">Calculate · Available</span><h3>Velocity / Suction Check</h3><p>v = 0.4085Q/d². Checks pump suction velocity ≤ 15 ft/s at 150% flow.</p><a href="./velocity-suction/">Open Velocity / Suction Check →</a></article>
+<article class="card" id="tool-branch-hand-calc"><span class="badge">Calculate · Available</span><h3>Branch-Line Hand Calc</h3><p>Node-by-node Q = K√P, Hazen-Williams, elevation. NFPA 13-2022.</p><a href="./branch-hand-calc/">Open Branch-Line Hand Calc →</a></article>
+<article class="card" id="tool-junction-balancer"><span class="badge">Calculate · Available</span><h3>Junction Balancer</h3><p>Equivalent-K and 0.5 psi balance check at hydraulic junction points. Q2 = Q1·√(P2/P1).</p><a href="./junction-balancer/">Open Junction Balancer →</a></article>
+<article class="card" id="tool-hardy-cross"><span class="badge">Calculate · Available</span><h3>Hardy Cross Loop Solver</h3><p>Two-path split, ΔQ correction, convergence. NFPA 13-2022 hydraulics.</p><a href="./hardy-cross/">Open Hardy Cross Loop Solver →</a></article>
+<article class="card" id="tool-pipe-schedule-checker"><span class="badge">Calculate · Available</span><h3>Pipe Schedule Checker</h3><p>Sprinkler counts per pipe size for light and ordinary hazard steel. Checks when pipe schedule is allowed.</p><a href="./pipe-schedule-checker/">Open Pipe Schedule Checker →</a></article>
+<article class="card" id="tool-dry-sprinkler-delivery"><span class="badge">Calculate · Available</span><h3>Dry Sprinkler Water Delivery</h3><p>Dry / double-interlock delivery time · wet rejected · 10–12″ mains · PDF multi-page fixture import · HW + valves. Preliminary — not a listed method.</p><a href="./dry-sprinkler-delivery/">Open Dry Sprinkler Water Delivery →</a></article>
+<article class="card" id="tool-standpipe-calc"><span class="badge">Calculate · Available</span><h3>Standpipe Calculator</h3><p>Class I/II/III flows, residual at top, base demand. NFPA 14-2019.</p><a href="./standpipe-calc/">Open Standpipe Calculator →</a></article>
+<article class="card" id="tool-hanger-helper"><span class="badge">Calculate · Available</span><h3>Hanger &amp; Stocklist Helper</h3><p>Hanger count, rod size, 5W+250 lb check, cut lengths. NFPA 13-2022 Ch. 17.</p><a href="./hanger-helper/">Open Hanger &amp; Stocklist Helper →</a></article>
+<article class="card" id="tool-seismic-brace"><span class="badge">Calculate · Available</span><h3>Seismic Brace Load</h3><p>Wp, Fpw = Cp×Wp, 40/80 ft spacing. NFPA 13-2022 Ch. 18. Verify tables.</p><a href="./seismic-brace/">Open Seismic Brace Load →</a></article>
+<article class="card" id="tool-fa-power-extenders"><span class="badge">Calculate · Available</span><h3>FA Power Extenders</h3><p>NAC horn/strobe + speaker taps (25/70 V), voltage drop, booster / remote-amp warrant. NFPA 72 / UFC. Preliminary — not a listed calc.</p><a href="./fa-power-extenders/">Open FA Power Extenders →</a></article>
+<article class="card" id="tool-occupant-egress"><span class="badge">Calculate · Available</span><h3>Occupant Load &amp; Egress Capacity</h3><p>IBC-style occupant load factors, means of egress width capacity, minimum exits (Table 1006.3.3) and loss-of-one-exit (1005.5), travel / common path / dead-end checks — life-safety basis of design.</p><a href="./occupant-egress/">Open Occupant Load &amp; Egress Capacity →</a></article>
+<article class="card" id="tool-travel-distance"><span class="badge">Calculate · Available</span><h3>Travel Distance &amp; Nearest-Exit Checker</h3><p>Draw or import a plan with obstructions; shortest real path to the nearest exit and to the next exit if it is blocked, with areas over your limit shaded. Screening only.</p><a href="./travel-distance/">Open Travel Distance &amp; Nearest-Exit Checker →</a></article>
+<article class="card" id="tool-stair-merge-queue"><span class="badge">Calculate · Available</span><h3>Stair Merge &amp; Queue Screener</h3><p>Multi-floor stair egress: SFPE hydraulic model with landing merges, door queues, phased vs simultaneous, loss of one stair; hands off movement to RSET Tool. Screening only.</p><a href="./stair-merge-queue/">Open Stair Merge &amp; Queue Screener →</a></article>
+<article class="card" id="tool-rset-tool"><span class="badge">Calculate · Available</span><h3>Transparent RSET Tool</h3><p>Educational Required Safe Egress Time calculator — full plain-language guide plus technical chapters; Detection + Notification + Pre-movement + Movement with assumptions log and session export.</p><a href="./rset-tool/">Open Transparent RSET Tool →</a></article>
+<article class="card" id="tool-atrium-path"><span class="badge">Review · Available</span><h3>Atrium Review Workflow</h3><p>Work through occupant load, smoke-control analysis, authority coordination and reporting.</p><a href="./atrium-path/">Open Atrium Review Workflow →</a></article>
+<article class="card" id="tool-atrium-smoke-exhaust"><span class="badge">Calculate · Available</span><h3>Atrium Smoke Exhaust</h3><p>Hub: IBC/NFPA 101, suitability, NFPA 92 algebraic, systems/SI, links to native zone &amp; multi-cell field engines — all browser-only.</p><a href="./atrium-smoke-exhaust/">Open Atrium Smoke Exhaust →</a></article>
+<article class="card" id="tool-atrium-zone-model"><span class="badge">Calculate · Available</span><h3>Atrium Zone Model</h3><p>Self-contained two-zone smoke-layer engine (fill + exhaust, ASET, steady size). No CFAST install.</p><a href="./atrium-zone-model/">Open Atrium Zone Model →</a></article>
+<article class="card" id="tool-atrium-field-model"><span class="badge">Calculate · Available</span><h3>Atrium Field Model</h3><p>Self-contained multi-cell column model for atrium-height filling sensitivity. Not FDS/LES — fully in-browser.</p><a href="./atrium-field-model/">Open Atrium Field Model →</a></article>
+<article class="card" id="tool-smoke-exhaust-lab-app"><span class="badge">Calculate · Available</span><h3>Smoke Exhaust Scenario Lab</h3><p>Design-fire scenarios, plume/exhaust calculations, makeup air &amp; plugholing checks, Full/Excel modes, and auditable report packages.</p><a href="./smoke-exhaust-lab/app/">Open Smoke Exhaust Scenario Lab →</a></article>
+<article class="card" id="tool-aset-screener"><span class="badge">Calculate · Available</span><h3>ASET Screener</h3><p>Screening ASET: smoke layer descent (NFPA 92 + two-zone), hands off to RSET Tool, and exports an FDS starter file for review. Screening only.</p><a href="./aset-screener/">Open ASET Screener →</a></article>
+<article class="card" id="tool-atrium-report"><span class="badge">Prepare a report · Available</span><h3>Atrium Screening Package</h3><p>Assemble shared atrium screening results and an AHJ kickoff handout for printing or Word.</p><a href="./atrium-report/">Open Atrium Screening Package →</a></article>
+<article class="card" id="tool-ibc-ifc-hazard"><span class="badge">Calculate · Available</span><h3>IBC / IFC Hazard Impacts</h3><p>H occupancy + material hazards → construction &amp; mitigations from IBC 414/415/315 and IFC Ch. 50+, with drivers and high-cost flags (2015–2024).</p><a href="./ibc-ifc-hazard/">Open IBC / IFC Hazard Impacts →</a></article>
+<article class="card" id="tool-maq-control-area"><span class="badge">Calculate · Available</span><h3>MAQ &amp; Control Area Calculator</h3><p>Storage / use-closed / use-open vs. MAQ per control area (IFC Tables 5003.1.1(1)/(2), sprinkler and cabinet increases, Table 5003.8.3.2 story % and count) → Group H needed or not. 2021/2024, Florida Building Code 9th Edition label.</p><a href="./maq-control-area/">Open MAQ &amp; Control Area Calculator →</a></article>
+<article class="card" id="tool-deflagration-vent"><span class="badge">Calculate · Available</span><h3>Deflagration Vent Sizing</h3><p>NFPA 68-2023 room and process vent sizing (L×W×H, KSt/Pmax dust, Su gas, Pred) with IBC/IFC explosion-control context.</p><a href="./deflagration-vent/">Open Deflagration Vent Sizing →</a></article>
+<article class="card" id="tool-concrete-fire-rating"><span class="badge">Calculate · Available</span><h3>Concrete Fire Rating Thickness</h3><p>Minimum concrete / CMU thickness for 1–4 hour fire ratings by material makeup (siliceous, carbonate, lightweight, masonry aggregates) — IBC / ACI 216.1 calculated method.</p><a href="./concrete-fire-rating/">Open Concrete Fire Rating Thickness →</a></article>
+<article class="card" id="tool-project-file"><span class="badge">Prepare a report · Available</span><h3>Project File Hub</h3><p>One shared project file (fireToolshed.project.v1) across Occupant Load, atrium tools, ASET, RSET, Stair Merge and Travel Distance, with cross-app checks and per-app extract. Screening only.</p><a href="./project-file/">Open Project File Hub →</a></article>
+<article class="card" id="tool-pe-fpe"><span class="badge">Learn · Available</span><h3>PE Fire Protection practice exam</h3><p>April 2027 CBT dress rehearsal. Form A style lock is live (15 of 85 items: Analysis + Fire Science). Handbook/code search, 8:30 clock, optional 50-minute break. Not an NCEES product.</p><a href="./pe-fpe/">Open PE Fire Protection practice exam →</a></article>
+<article class="card" id="tool-study-buddy"><span class="badge">Learn · Available</span><h3>Study Buddy</h3><p>Class-by-class study apps — start with OCCC Human Anatomy &amp; Physiology (BIO 1314 / BIO 1414): diagrams, flashcards, quizzes, atlas.</p><a href="./study-buddy/">Open Study Buddy →</a></article>
+<article class="card" id="tool-games"><span class="badge">Learn · Available</span><h3>Games</h3><p>Team arcade breaks in the browser — Punch-Out!!, Frogger, and Ms. Pac Maze fan remakes (touch + keyboard).</p><a href="./games/">Open Games →</a></article>
+<article class="card" id="tool-sprinkler-shop-review"><span class="badge">Review · Supervised pilot</span><h3>Sprinkler Shop Submittal Review</h3><p>Compare submitted drawings and product data with the design baseline and project-selected NFPA 13, UFC and FM requirements.</p><a href="./sprinkler-shop-review/">Open Sprinkler Shop Submittal Review →</a></article>
+<article class="card" id="tool-fire-alarm-shop-review"><span class="badge">Review · Supervised pilot</span><h3>Fire Alarm Shop Submittal Review</h3><p>Compare submitted drawings and product data with the design baseline and project-selected NFPA 72, UFC and FM requirements.</p><a href="./fire-alarm-shop-review/">Open Fire Alarm Shop Submittal Review →</a></article>
+<article class="card" id="tool-standpipe-shop-review"><span class="badge">Review · Supervised pilot</span><h3>Standpipe Shop Submittal Review</h3><p>Compare submitted drawings and product data with the design baseline and project-selected NFPA 14, UFC and FM requirements.</p><a href="./standpipe-shop-review/">Open Standpipe Shop Submittal Review →</a></article>
+<article class="card" id="tool-extinguisher-shop-review"><span class="badge">Review · Supervised pilot</span><h3>Fire Extinguisher Shop Submittal Review</h3><p>Compare submitted drawings and product data with the design baseline and project-selected NFPA 10, UFC and FM requirements.</p><a href="./extinguisher-shop-review/">Open Fire Extinguisher Shop Submittal Review →</a></article>
+<article class="card" id="tool-proposal-review"><span class="badge">Prepare a report · Supervised pilot</span><h3>RFP &amp; Proposal Fire Protection Review</h3><p>Build an evidence-backed preliminary scope, Word summary and RFI list from RFPs and drawings.</p><a href="./proposal-review/">Open RFP &amp; Proposal Fire Protection Review →</a></article></section></main><footer>Shared tools. Human judgment. Project-selected requirements govern. Files stay in your browser or your chosen AI environment; export files for backup.</footer><script id="catalog-data" type="application/json">{"schema":"fireToolshed.catalog.v1","version":"1.0.0","tools":[{"id":"ai-review","name":"AI Review Toolkit","description":"Model-readable review workflows, scale-checked measurements, value comparison and coverage tracking. Project files remain with your AI.","url":"./ai-review/","task":"Review","disciplines":["Peer Review & Quality Assurance"],"keywords":[],"status":"Supervised pilot","automation":{"mode":"executable workflow","instructions":"./ai-review/START-HERE.md"}},{"id":"peer-review","name":"Peer Review Case File","description":"Manage EOR review comments, designer responses, outstanding items and verified closure.","url":"./peer-review/","task":"Review","disciplines":["Peer Review & Quality Assurance"],"keywords":["QC","EOR","designer","comments"],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"fire-alarm-review","name":"Fire Alarm Design Review","description":"Review detection, notification, power and interfaces during design QC. For shop packages, use Fire Alarm Shop Submittal Review.","url":"./fire-alarm-review/","task":"Review","disciplines":["Peer Review & Quality Assurance","Fire alarm & notification"],"keywords":[],"status":"Available","automation":{"mode":"AI-assisted checklist","instructions":"./ai-review/START-HERE.md"}},{"id":"sprinkler-review","name":"Sprinkler Design Review","description":"Review hazard/storage criteria, hydraulics and installation design. For shop packages, use Sprinkler Shop Submittal Review.","url":"./sprinkler-review/","task":"Review","disciplines":["Peer Review & Quality Assurance","Sprinklers, standpipes & hydraulics"],"keywords":[],"status":"Available","automation":{"mode":"AI-assisted checklist","instructions":"./ai-review/START-HERE.md"}},{"id":"water-supply-review","name":"Water Supply & Site Fire-Water Review","description":"Review flow tests, supply reliability, pumps, tanks and site-water interfaces with a supply-demand scenario worksheet.","url":"./water-supply-review/","task":"Review","disciplines":["Peer Review & Quality Assurance","Water supply, pumps & tanks"],"keywords":[],"status":"Available","automation":{"mode":"AI-assisted checklist","instructions":"./ai-review/START-HERE.md"}},{"id":"life-safety-review","name":"Life Safety & Egress Plan Review","description":"Trace occupant loads and exit routes from each occupied space through final discharge, with documented criteria and plan evidence.","url":"./life-safety-review/","task":"Review","disciplines":["Peer Review & Quality Assurance","Occupants, egress & evacuation"],"keywords":[],"status":"Available","automation":{"mode":"AI-assisted checklist","instructions":"./ai-review/START-HERE.md"}},{"id":"g-sheet-review","name":"G-Sheet Building & Fire Code Analysis Review","description":"Reconcile the building code summary with the actual building, life-safety plans, specifications and fire-protection design.","url":"./g-sheet-review/","task":"Review","disciplines":["Peer Review & Quality Assurance","Occupants, egress & evacuation"],"keywords":[],"status":"Available","automation":{"mode":"AI-assisted checklist","instructions":"./ai-review/START-HERE.md"}},{"id":"standpipe-review","name":"Standpipe Design Review","description":"Review standpipe design, hydraulic demand and pressure zones. For shop packages, use Standpipe Shop Submittal Review.","url":"./standpipe-review/","task":"Review","disciplines":["Peer Review & Quality Assurance","Sprinklers, standpipes & hydraulics"],"keywords":[],"status":"Available","automation":{"mode":"AI-assisted checklist","instructions":"./ai-review/START-HERE.md"}},{"id":"water-supply","name":"Water Supply Workflow","description":"Follow the water-supply review from flow testing through preliminary sprinkler demand, pump and tank sizing.","url":"./water-supply/","task":"Calculate","disciplines":["Water supply, pumps & tanks"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"flow-test-request","name":"Flow Test Request","description":"Stock hydrant flow test request (suppression or fire flow). NFPA 291 procedures for 2½″ outlets only — base building number, location, hydrant selection reasons, jurisdiction ask.","url":"./flow-test-request/","task":"Collect field information","disciplines":["Water supply, pumps & tanks"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"flow-test-report","name":"Flow Test Report","description":"Hydrant static/residual/pitot GPM, N1.85 supply curve, fire flow @ 20 psi. Capture results for the Sprinkler Estimator (no system demand here).","url":"./flow-test-report/","task":"Collect field information","disciplines":["Water supply, pumps & tanks"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"sprinkler-system-estimator","name":"Sprinkler System Estimator","description":"Prelim demand + pressure stack + duration (NFPA 13 / UFC / FM). Overlay flow-test supply curve; capture duty for Fire Pump Sizer.","url":"./sprinkler-system-estimator/","task":"Calculate","disciplines":["Water supply, pumps & tanks"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"service-line-sizer","name":"Service Line Sizer","description":"Estimate lead-in, backflow and riser sizes from hazard or known demand. NFPA / UFC guidance, ESFR and FM planning, illustrated arrangements and branded reports.","url":"./service-line-sizer/","task":"Calculate","disciplines":["Water supply, pumps & tanks"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"fire-pump-sizer","name":"Fire Pump Sizer","description":"Import sprinkler duty (flow, pressure, duration). NFPA 20 / UFC preliminary pump, driver, curve, and room sizing.","url":"./fire-pump-sizer/","task":"Calculate","disciplines":["Water supply, pumps & tanks"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"fire-tank-sizer","name":"Fire Tank Sizer","description":"Flow × duration + NFPA/UFC/FM safety, US-typical prefab steel sizes, max H/⌀ limits, concrete pad, plan diagram.","url":"./fire-tank-sizer/","task":"Calculate","disciplines":["Water supply, pumps & tanks"],"keywords":["storage","tank","duration"],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"hydrant-loop-sizer","name":"Hydrant Loop Sizer","description":"Hydrant-only supply: NFPA 291 available flow, ring hydraulics with hydrant arms, velocity, single-break case, loop schematic. US or metric.","url":"./hydrant-loop-sizer/","task":"Calculate","disciplines":["Water supply, pumps & tanks"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"pump-overlay","name":"Pump + Supply Overlay","description":"Adds pump net curve to city supply, overlays demand, reports margin and 150% point.","url":"./pump-overlay/","task":"Calculate","disciplines":["Water supply, pumps & tanks"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"pressure-tank","name":"Pressure Tank (Boyle)","description":"Air/water split, start/end pressure, and usable volume for pressure tanks.","url":"./pressure-tank/","task":"Calculate","disciplines":["Water supply, pumps & tanks"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"velocity-suction","name":"Velocity / Suction Check","description":"v = 0.4085Q/d². Checks pump suction velocity ≤ 15 ft/s at 150% flow.","url":"./velocity-suction/","task":"Calculate","disciplines":["Water supply, pumps & tanks"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"branch-hand-calc","name":"Branch-Line Hand Calc","description":"Node-by-node Q = K√P, Hazen-Williams, elevation. NFPA 13-2022.","url":"./branch-hand-calc/","task":"Calculate","disciplines":["Sprinklers, standpipes & hydraulics"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"junction-balancer","name":"Junction Balancer","description":"Equivalent-K and 0.5 psi balance check at hydraulic junction points. Q2 = Q1·√(P2/P1).","url":"./junction-balancer/","task":"Calculate","disciplines":["Sprinklers, standpipes & hydraulics"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"hardy-cross","name":"Hardy Cross Loop Solver","description":"Two-path split, ΔQ correction, convergence. NFPA 13-2022 hydraulics.","url":"./hardy-cross/","task":"Calculate","disciplines":["Sprinklers, standpipes & hydraulics"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"pipe-schedule-checker","name":"Pipe Schedule Checker","description":"Sprinkler counts per pipe size for light and ordinary hazard steel. Checks when pipe schedule is allowed.","url":"./pipe-schedule-checker/","task":"Calculate","disciplines":["Sprinklers, standpipes & hydraulics"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"dry-sprinkler-delivery","name":"Dry Sprinkler Water Delivery","description":"Dry / double-interlock delivery time · wet rejected · 10–12″ mains · PDF multi-page fixture import · HW + valves. Preliminary — not a listed method.","url":"./dry-sprinkler-delivery/","task":"Calculate","disciplines":["Sprinklers, standpipes & hydraulics"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"standpipe-calc","name":"Standpipe Calculator","description":"Class I/II/III flows, residual at top, base demand. NFPA 14-2019.","url":"./standpipe-calc/","task":"Calculate","disciplines":["Sprinklers, standpipes & hydraulics"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"hanger-helper","name":"Hanger & Stocklist Helper","description":"Hanger count, rod size, 5W+250 lb check, cut lengths. NFPA 13-2022 Ch. 17.","url":"./hanger-helper/","task":"Calculate","disciplines":["Sprinklers, standpipes & hydraulics"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"seismic-brace","name":"Seismic Brace Load","description":"Wp, Fpw = Cp×Wp, 40/80 ft spacing. NFPA 13-2022 Ch. 18. Verify tables.","url":"./seismic-brace/","task":"Calculate","disciplines":["Sprinklers, standpipes & hydraulics"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"fa-power-extenders","name":"FA Power Extenders","description":"NAC horn/strobe + speaker taps (25/70 V), voltage drop, booster / remote-amp warrant. NFPA 72 / UFC. Preliminary — not a listed calc.","url":"./fa-power-extenders/","task":"Calculate","disciplines":["Fire alarm & notification"],"keywords":["battery","voltage drop","NAC","alarm power"],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"occupant-egress","name":"Occupant Load & Egress Capacity","description":"IBC-style occupant load factors, means of egress width capacity, minimum exits (Table 1006.3.3) and loss-of-one-exit (1005.5), travel / common path / dead-end checks — life-safety basis of design.","url":"./occupant-egress/","task":"Calculate","disciplines":["Occupants, egress & evacuation"],"keywords":["exit","occupancy","occupants","stairs"],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"travel-distance","name":"Travel Distance & Nearest-Exit Checker","description":"Draw or import a plan with obstructions; shortest real path to the nearest exit and to the next exit if it is blocked, with areas over your limit shaded. Screening only.","url":"./travel-distance/","task":"Calculate","disciplines":["Occupants, egress & evacuation"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"stair-merge-queue","name":"Stair Merge & Queue Screener","description":"Multi-floor stair egress: SFPE hydraulic model with landing merges, door queues, phased vs simultaneous, loss of one stair; hands off movement to RSET Tool. Screening only.","url":"./stair-merge-queue/","task":"Calculate","disciplines":["Occupants, egress & evacuation"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"rset-tool","name":"Transparent RSET Tool","description":"Educational Required Safe Egress Time calculator — full plain-language guide plus technical chapters; Detection + Notification + Pre-movement + Movement with assumptions log and session export.","url":"./rset-tool/","task":"Calculate","disciplines":["Occupants, egress & evacuation"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"atrium-path","name":"Atrium Review Workflow","description":"Work through occupant load, smoke-control analysis, authority coordination and reporting.","url":"./atrium-path/","task":"Review","disciplines":["Atrium & smoke control"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"atrium-smoke-exhaust","name":"Atrium Smoke Exhaust","description":"Hub: IBC/NFPA 101, suitability, NFPA 92 algebraic, systems/SI, links to native zone & multi-cell field engines — all browser-only.","url":"./atrium-smoke-exhaust/","task":"Calculate","disciplines":["Atrium & smoke control"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"atrium-zone-model","name":"Atrium Zone Model","description":"Self-contained two-zone smoke-layer engine (fill + exhaust, ASET, steady size). No CFAST install.","url":"./atrium-zone-model/","task":"Calculate","disciplines":["Atrium & smoke control"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"atrium-field-model","name":"Atrium Field Model","description":"Self-contained multi-cell column model for atrium-height filling sensitivity. Not FDS/LES — fully in-browser.","url":"./atrium-field-model/","task":"Calculate","disciplines":["Atrium & smoke control"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"smoke-exhaust-lab-app","name":"Smoke Exhaust Scenario Lab","description":"Design-fire scenarios, plume/exhaust calculations, makeup air & plugholing checks, Full/Excel modes, and auditable report packages.","url":"./smoke-exhaust-lab/app/","task":"Calculate","disciplines":["Atrium & smoke control"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"aset-screener","name":"ASET Screener","description":"Screening ASET: smoke layer descent (NFPA 92 + two-zone), hands off to RSET Tool, and exports an FDS starter file for review. Screening only.","url":"./aset-screener/","task":"Calculate","disciplines":["Atrium & smoke control"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"atrium-report","name":"Atrium Screening Package","description":"Assemble shared atrium screening results and an AHJ kickoff handout for printing or Word.","url":"./atrium-report/","task":"Prepare a report","disciplines":["Atrium & smoke control"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"ibc-ifc-hazard","name":"IBC / IFC Hazard Impacts","description":"H occupancy + material hazards → construction & mitigations from IBC 414/415/315 and IFC Ch. 50+, with drivers and high-cost flags (2015–2024).","url":"./ibc-ifc-hazard/","task":"Calculate","disciplines":["Hazardous materials & fire-resistant construction"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"maq-control-area","name":"MAQ & Control Area Calculator","description":"Storage / use-closed / use-open vs. MAQ per control area (IFC Tables 5003.1.1(1)/(2), sprinkler and cabinet increases, Table 5003.8.3.2 story % and count) → Group H needed or not. 2021/2024, Florida Building Code 9th Edition label.","url":"./maq-control-area/","task":"Calculate","disciplines":["Hazardous materials & fire-resistant construction"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"deflagration-vent","name":"Deflagration Vent Sizing","description":"NFPA 68-2023 room and process vent sizing (L×W×H, KSt/Pmax dust, Su gas, Pred) with IBC/IFC explosion-control context.","url":"./deflagration-vent/","task":"Calculate","disciplines":["Hazardous materials & fire-resistant construction"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"concrete-fire-rating","name":"Concrete Fire Rating Thickness","description":"Minimum concrete / CMU thickness for 1–4 hour fire ratings by material makeup (siliceous, carbonate, lightweight, masonry aggregates) — IBC / ACI 216.1 calculated method.","url":"./concrete-fire-rating/","task":"Calculate","disciplines":["Hazardous materials & fire-resistant construction"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"project-file","name":"Project File Hub","description":"One shared project file (fireToolshed.project.v1) across Occupant Load, atrium tools, ASET, RSET, Stair Merge and Travel Distance, with cross-app checks and per-app extract. Screening only.","url":"./project-file/","task":"Prepare a report","disciplines":["Project coordination"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"pe-fpe","name":"PE Fire Protection practice exam","description":"April 2027 CBT dress rehearsal. Form A style lock is live (15 of 85 items: Analysis + Fire Science). Handbook/code search, 8:30 clock, optional 50-minute break. Not an NCEES product.","url":"./pe-fpe/","task":"Learn","disciplines":["Learning & practice"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"study-buddy","name":"Study Buddy","description":"Class-by-class study apps — start with OCCC Human Anatomy & Physiology (BIO 1314 / BIO 1414): diagrams, flashcards, quizzes, atlas.","url":"./study-buddy/","task":"Learn","disciplines":["Learning & practice"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"games","name":"Games","description":"Team arcade breaks in the browser — Punch-Out!!, Frogger, and Ms. Pac Maze fan remakes (touch + keyboard).","url":"./games/","task":"Learn","disciplines":["Games & breaks"],"keywords":[],"status":"Available","automation":{"mode":"browser","instructions":null}},{"id":"sprinkler-shop-review","name":"Sprinkler Shop Submittal Review","description":"Compare submitted drawings and product data with the design baseline and project-selected NFPA 13, UFC and FM requirements.","url":"./sprinkler-shop-review/","task":"Review","disciplines":["Sprinklers, standpipes & hydraulics"],"keywords":["shop","submittal","NFPA 13","UFC","FM"],"status":"Supervised pilot","automation":{"mode":"AI-assisted checklist","instructions":"./automation/SHOP-REVIEW.md"}},{"id":"fire-alarm-shop-review","name":"Fire Alarm Shop Submittal Review","description":"Compare submitted drawings and product data with the design baseline and project-selected NFPA 72, UFC and FM requirements.","url":"./fire-alarm-shop-review/","task":"Review","disciplines":["Fire alarm & notification"],"keywords":["shop","submittal","NFPA 72","UFC","FM"],"status":"Supervised pilot","automation":{"mode":"AI-assisted checklist","instructions":"./automation/SHOP-REVIEW.md"}},{"id":"standpipe-shop-review","name":"Standpipe Shop Submittal Review","description":"Compare submitted drawings and product data with the design baseline and project-selected NFPA 14, UFC and FM requirements.","url":"./standpipe-shop-review/","task":"Review","disciplines":["Sprinklers, standpipes & hydraulics"],"keywords":["shop","submittal","NFPA 14","UFC","FM"],"status":"Supervised pilot","automation":{"mode":"AI-assisted checklist","instructions":"./automation/SHOP-REVIEW.md"}},{"id":"extinguisher-shop-review","name":"Fire Extinguisher Shop Submittal Review","description":"Compare submitted drawings and product data with the design baseline and project-selected NFPA 10, UFC and FM requirements.","url":"./extinguisher-shop-review/","task":"Review","disciplines":["Portable fire extinguishers"],"keywords":["shop","submittal","NFPA 10","UFC","FM"],"status":"Supervised pilot","automation":{"mode":"AI-assisted checklist","instructions":"./automation/SHOP-REVIEW.md"}},{"id":"proposal-review","name":"RFP & Proposal Fire Protection Review","description":"Build an evidence-backed preliminary scope, Word summary and RFI list from RFPs and drawings.","url":"./proposal-review/","task":"Prepare a report","disciplines":["Project planning"],"keywords":["RFP","proposal","bid","scope","pump","tank","hydrant","ESFR","rack storage","water loop"],"status":"Supervised pilot","automation":{"mode":"AI-assisted workflow","instructions":"./automation/PROPOSAL-REVIEW.md"}}]}</script><script type="module" src="./directory/search.mjs"></script></body></html>

@@ -4,7 +4,7 @@ import {fresh,parse,validate,transfer,summary} from './core.mjs';
 import {metrics,parseCase} from '../peer-review/core.mjs';
 for(const path of paths){
  const m=fresh(path);Object.assign(m.project,{name:'Training review',number:'QA-001',reviewer:'Reviewer A',basis:'Project-selected editions and amendments',scope:'Test scope'});
- assert.ok(m.items.length>=20);assert.equal(summary(m).coverage,0);assert.deepEqual(parse(JSON.stringify(m)),m);
+ assert.equal(m.items.length,catalog[path].groups.reduce((n,[,rows])=>n+rows.length,0));assert.ok(m.items.length>0);assert.equal(summary(m).coverage,0);assert.deepEqual(parse(JSON.stringify(m)),m);
  const initial=transfer(m,null);assert.equal(initial.counts.checklists,m.items.length);assert.equal(metrics(initial.caseFile).ready,false);assert.equal(initial.caseFile.findings.length,0);assert.equal(transfer(m,initial.caseFile).duplicate,true);assert.deepEqual(parseCase(JSON.stringify(initial.caseFile)),initial.caseFile);
  const x=m.items[0];Object.assign(x,{applicability:'Applicable',result:'Candidate concern',notes:'Observed concern',source:'Drawing Rev B',citation:'Owner criterion 4',action:'Revise detail',owner:'Designer'});
  const pending=transfer(m,initial.caseFile);assert.equal(pending.caseFile.candidateItems.length,1);assert.equal(pending.caseFile.findings.length,0);assert.equal(pending.caseFile.checklistItems.filter(x=>!x.superseded).length,m.items.length);
