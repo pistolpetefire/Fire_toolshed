@@ -14,6 +14,10 @@ This is the canonical entry for AI models. Human entry: ../index.html. Shared ca
 
 ## Workflows
 
+- HAZARDOUS-MATERIALS.md: batch SDS classification under IBC Chapter 3 or NFPA 400, Excel register and future HMMP inventory.
+  This workflow uses its assessment JSON and `hazardous-materials/run.mjs`, not the checklist-module JSON files referenced above.
+- [HMIS-NOTES.md](HMIS-NOTES.md): room-based Revit text, late quantity-change history, stale-review detection and human revalidation. Continue from the hazardous materials assessment; preserve the same JSON and stable IDs.
+
 - SHOP-REVIEW.md: sprinkler (NFPA 13), alarm (NFPA 72), standpipe (NFPA 14), extinguishers (NFPA 10), with project-specific UFC and FM overlays.
 - PROPOSAL-REVIEW.md: RFP scope, preliminary scenarios, Word summary and RFIs.
 - ../ai-review/START-HERE.md: design review assignment, checks and Case File handoff.

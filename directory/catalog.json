@@ -3,6 +3,33 @@
   "version": "1.0.0",
   "tools": [
     {
+      "id": "hazardous-materials",
+      "name": "Hazardous Materials Assessor",
+      "description": "Assess SDS hazards under IBC Chapter 3 or NFPA 400. Export Excel, prepare HMIS room notes for Revit, and track late quantity changes for re-review.",
+      "url": "./hazardous-materials/",
+      "task": "Review",
+      "disciplines": [
+        "Hazardous materials"
+      ],
+      "keywords": [
+        "SDS",
+        "HMMP",
+        "HMIS",
+        "chemical",
+        "inventory",
+        "NFPA 400",
+        "IBC",
+        "Revit",
+        "room notes",
+        "quantity changes"
+      ],
+      "status": "Supervised pilot",
+      "automation": {
+        "mode": "executable workflow",
+        "instructions": "./automation/HAZARDOUS-MATERIALS.md"
+      }
+    },
+    {
       "id": "ai-review",
       "name": "AI Review Toolkit",
       "description": "Model-readable review workflows, scale-checked measurements, value comparison and coverage tracking. Project files remain with your AI.",
