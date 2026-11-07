@@ -3,7 +3,7 @@ from pathlib import Path
 from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 root=Path(__file__).resolve().parent.parent
 files=[]
-for folder in ['ai-review','automation','proposal-review','review-modules','peer-review','directory']:
+for folder in ['ai-review','automation','proposal-review','review-modules','peer-review','directory','shared']:
     for p in (root/folder).rglob('*'):
         if p.is_file() and p.suffix in ['.mjs','.py','.md','.json','.html','.css','.txt'] and '__pycache__' not in p.parts:
             files.append(p)

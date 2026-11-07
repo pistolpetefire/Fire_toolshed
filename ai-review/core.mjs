@@ -38,6 +38,7 @@ export function inspectResult(job,r){
 }
 export function toCase(job,result){
  inspectResult(job,result);const c=fresh();Object.assign(c.project,{name:job.project.name,number:job.project.number||'',phase:job.project.phase||'75%'});c.scope.statement=job.project.scope;c.codeBasis.summary=job.project.basis;c.reportSettings.status='Not started';
+ c.project.reviewWorkflow=job.modules.every(id=>id.endsWith('-shop-review'))?'Shop Submittal':'Review';
  c.disciplines=[...new Set(job.modules.map(m=>catalog[m].discipline))];
  const locator=e=>e.map(x=>`${x.documentId}, PDF p.${x.page}: ${x.description}`).join('\n');
  for(const d of job.documents)add(c,'documents','DOC',{title:d.name,type:'Other',expected:true,status:'Received',expectation:'Received; not reviewed',reference:`${d.id}; SHA256 ${d.sha256}`,notes:'Included in AI input manifest; page accuracy and completeness require verification.'});

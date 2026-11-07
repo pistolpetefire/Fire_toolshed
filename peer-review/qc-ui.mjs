@@ -1,3 +1,4 @@
+import {exportName,reviewKind} from '../shared/export-name.mjs';
 import {responseChoices,decisionChoices,events,status,queueFor,recordResponse,recordDecision,responsePackage,previewResponses} from './qc.mjs';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let role='EOR',actor='',queue='All open',search='';
@@ -16,7 +17,7 @@ export function mountQC(c,commit,download){
   const dialog=el.querySelector('#qcDialog');dialog.showModal();el.querySelector('#qcCancel').onclick=()=>dialog.close();
   el.querySelector('#qcForm').onsubmit=e=>{e.preventDefault();try{const d=Object.fromEntries(new FormData(e.target)),next=structuredClone(c);actor=d.actor;if(role==='EOR')recordDecision(next,f.id,{...d,evidence:d.drawing});else recordResponse(next,f.id,d);dialog.close();commit(next);}catch(err){el.querySelector('#qcError').textContent=err.message;}};
  });
- el.querySelector('#qcExport').onclick=()=>{try{const next=structuredClone(c),p=responsePackage(next);if(commit(next)!==false)download((c.project.number||'case')+'-designer-responses.json',JSON.stringify(p,null,2),'application/json');}catch(e){alert(e.message);}};
+ el.querySelector('#qcExport').onclick=()=>{try{const next=structuredClone(c),p=responsePackage(next);if(commit(next)!==false)download(exportName(c.project,reviewKind(c)+' - Designer Responses'),JSON.stringify(p,null,2),'application/json');}catch(e){alert(e.message);}};
  el.querySelector('#qcImport').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>10*1024*1024)throw Error('Response file exceeds 10 MB.');const incoming=JSON.parse(await file.text()),preview=previewResponses(c,incoming);
   el.querySelector('#qcContent').innerHTML=`<h2>Review response import</h2><p>${preview.accepted.length} new responses · ${preview.duplicates.length} already imported · ${preview.conflicts.length} conflicts skipped.</p><p>EOR decisions, original comments and unrelated case records are preserved.</p>${preview.conflicts.map(x=>`<div class="notice"><b>${esc(x.commentId)}</b>: ${esc(x.reason)}<p>${esc(incoming.responses.find(e=>e.id===x.id)?.note)}</p></div>`).join('')}<div class="actions"><button id="qcApply" ${preview.accepted.length?'':'disabled'}>Import ${preview.accepted.length} non-conflicting responses</button><button id="qcCancel" class="secondary">Cancel</button></div>`;
   const dialog=el.querySelector('#qcDialog');dialog.showModal();el.querySelector('#qcCancel').onclick=()=>dialog.close();el.querySelector('#qcApply').onclick=()=>{dialog.close();commit(preview.caseFile);};

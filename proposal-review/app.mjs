@@ -1,3 +1,4 @@
+import {exportName} from '../shared/export-name.mjs';
 import {fresh,parse,validate,readiness,clearReview,reviewTopic,beginRevision,TOPICS,CLASSIFICATIONS} from './core.mjs';
 import {documentBytes} from './docx.mjs';
 const $=s=>document.querySelector(s),KEY='fireToolshed.proposalReview.v1.active';
@@ -18,7 +19,7 @@ function render(){const p=model.project;$('#revisionHistory').textContent=(model
  document.querySelectorAll('[data-rfi]').forEach(b=>b.onclick=guard(()=>{const next=read();next.rfis.push({id:'RFI-'+crypto.randomUUID().slice(0,8),topicId:b.dataset.rfi,question:'Describe the information needed.',reason:'Explain the scope or estimate affected.',source:'',priority:'Normal',owner:'',status:'Open',response:''});clearReview(next);persist(next);render();}));showStatus();}
 function download(name,bytes,type){const url=URL.createObjectURL(new Blob([bytes],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 $('#save').onclick=guard(()=>{persist(read());render();});
-$('#export').onclick=guard(()=>{const next=read();download('proposal-review.json',JSON.stringify(next,null,2),'application/json');});
+$('#export').onclick=guard(()=>{const next=read();download(exportName(next.project,'Proposal'),JSON.stringify(next,null,2),'application/json');});
 $('#import').onchange=guard(async()=>{const file=$('#import').files[0];if(!file)return;const next=parse(await file.text());if(!confirm('Replace the current proposal with this file? Export your current JSON first if you need a backup.'))return;if(storageBlocked){storageBlocked=false;lastRaw=localStorage.getItem(KEY);}persist(next);render();$('#import').value='';});
 $('#new').onclick=guard(()=>{if(!confirm('Start a new proposal? Export your current JSON first to retain it.'))return;if(storageBlocked){storageBlocked=false;lastRaw=localStorage.getItem(KEY);}persist(fresh());render();});
 $('#word').onclick=guard(()=>download('proposal-summary.docx',documentBytes(read(),'summary'),'application/vnd.openxmlformats-officedocument.wordprocessingml.document'));
