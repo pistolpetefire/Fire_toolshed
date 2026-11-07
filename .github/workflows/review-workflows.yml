@@ -30,3 +30,27 @@ jobs:
           node proposal-review/build.mjs
           node ai-review/build.mjs
           git diff --exit-code -- index.html automation/index.html proposal-review/template.json ai-review/workflows.json ai-review/tool-directory.json ai-review/modules
+  render-documents:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install document rendering tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libreoffice-writer poppler-utils fonts-crosextra-carlito
+      - name: Render synthetic proposal deliverables
+        run: |
+          node proposal-review/render-fixture.mjs /tmp/proposal-render
+          libreoffice -env:UserInstallation=file:///tmp/lo-proposal-qa --headless --convert-to pdf --outdir /tmp/proposal-render /tmp/proposal-render/*.docx
+          test -s /tmp/proposal-render/synthetic-summary.pdf
+          test -s /tmp/proposal-render/synthetic-rfis.pdf
+          pdftoppm -scale-to 1400 -png /tmp/proposal-render/synthetic-summary.pdf /tmp/proposal-render/summary
+          pdftoppm -scale-to 1400 -png /tmp/proposal-render/synthetic-rfis.pdf /tmp/proposal-render/rfis
+      - uses: actions/upload-artifact@v4
+        with:
+          name: proposal-layout-qa
+          path: /tmp/proposal-render/
+          retention-days: 7
