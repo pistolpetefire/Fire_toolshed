@@ -24,6 +24,7 @@ jobs:
           node ai-review/hydraulics.test.mjs
           node proposal-review/core.test.mjs
           node hazardous-materials/core.test.mjs
+          node hazardous-materials/hmis.test.mjs
           node directory/catalog.test.mjs
       - name: Check generated catalogs
         run: |

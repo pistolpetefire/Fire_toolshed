@@ -44,7 +44,7 @@
     {
       "id": "hazardous-materials",
       "name": "Hazardous materials assessment",
-      "description": "Read SDS packages, classify every applicable code hazard, resolve inventory questions, and export an Excel hazard register.",
+      "description": "Assess SDS hazards, export Excel, prepare HMIS room notes and record late quantity changes for human re-review and Revit placement.",
       "status": "Supervised pilot",
       "execution": "AI analysis plus offline Excel exporter",
       "instructions": "HAZARDOUS-MATERIALS.md",

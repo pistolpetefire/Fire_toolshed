@@ -8,6 +8,7 @@ Shared fire protection tools with human and AI entrances.
 - [Human directory](index.html)
 - [Shop submittal workflow](automation/SHOP-REVIEW.md)
 - [Hazardous materials workflow](automation/HAZARDOUS-MATERIALS.md)
+- [HMIS notes and late quantity changes](automation/HMIS-NOTES.md)
 - [Proposal workflow](automation/PROPOSAL-REVIEW.md)
 - [Design review workflow](ai-review/START-HERE.md)
 - [Callable arithmetic tools](ai-review/tool-directory.json)

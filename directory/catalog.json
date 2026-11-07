@@ -5,7 +5,7 @@
     {
       "id": "hazardous-materials",
       "name": "Hazardous Materials Assessor",
-      "description": "Assess batches of SDS against IBC Chapter 3 or NFPA 400. Validate classifications and export an Excel register grouped by every applicable hazard.",
+      "description": "Assess SDS hazards under IBC Chapter 3 or NFPA 400. Export Excel, prepare HMIS room notes for Revit, and track late quantity changes for re-review.",
       "url": "./hazardous-materials/",
       "task": "Review",
       "disciplines": [
@@ -18,7 +18,10 @@
         "chemical",
         "inventory",
         "NFPA 400",
-        "IBC"
+        "IBC",
+        "Revit",
+        "room notes",
+        "quantity changes"
       ],
       "status": "Supervised pilot",
       "automation": {
