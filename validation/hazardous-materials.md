@@ -9,3 +9,9 @@ Synthetic software fixtures only; no real chemical classification or engineering
 - The directory test verifies the new tool link and existing shared-catalog/search contracts. Existing proposal contracts also pass. CI runs the new core suite alongside prior review suites.
 
 The browser is an offline intake/reviewer/export workspace. The selected AI environment must actually read SDS files and visit relevant database records. Structural checks cannot prove chemical identity, source truth, completeness of hazard classification, or compliance with a selected code edition. These require reviewer verification.
+
+## Preferred output form
+
+The user-supplied workbook was inspected for sheet names, merged headers, columns, widths, freeze panes and visual layout. Its project-specific facts, code thresholds, formulas and conclusions were not adopted as generic criteria. The exporter now starts with Chemical Inventory, MAQ Tables and Control Area Analysis, retaining the green inventory and blue analysis headings. Supporting unique inventory, outstanding items and document register remain available.
+
+Synthetic checks verify numeric total quantities, physical/health classification columns, repeated hazard sections, location/unit-separated inventory totals, and explicitly unassessed limits. Previous assessment JSON remains parseable with new fields initialized blank. Generated spreadsheets were imported and rendered independently for layout inspection.
