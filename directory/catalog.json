@@ -3,6 +3,30 @@
   "version": "1.0.0",
   "tools": [
     {
+      "id": "hazardous-materials",
+      "name": "Hazardous Materials Assessor",
+      "description": "Assess batches of SDS against IBC Chapter 3 or NFPA 400. Validate classifications and export an Excel register grouped by every applicable hazard.",
+      "url": "./hazardous-materials/",
+      "task": "Review",
+      "disciplines": [
+        "Hazardous materials"
+      ],
+      "keywords": [
+        "SDS",
+        "HMMP",
+        "HMIS",
+        "chemical",
+        "inventory",
+        "NFPA 400",
+        "IBC"
+      ],
+      "status": "Supervised pilot",
+      "automation": {
+        "mode": "executable workflow",
+        "instructions": "./automation/HAZARDOUS-MATERIALS.md"
+      }
+    },
+    {
       "id": "ai-review",
       "name": "AI Review Toolkit",
       "description": "Model-readable review workflows, scale-checked measurements, value comparison and coverage tracking. Project files remain with your AI.",
