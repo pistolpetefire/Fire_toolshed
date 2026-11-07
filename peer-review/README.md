@@ -1,5 +1,17 @@
 # Peer Review Case File
 
+## EOR / designer internal QC
+
+Review decision replaces the candidate Disposition action. The dialog accepts the reviewer name directly and collects the owner, rationale, milestone and verification evidence needed by the selected decision. Issue comment to designer retains the legacy `Validate Finding` disposition value, so old case records and technical-module integration remain compatible.
+
+Work Queue separates designer progress/corrections/disagreements/questions from EOR closure, return, direction, withdrawal and reopening. Designer corrections require a revised drawing reference and remain open until an EOR decision. EOR closure requires verification evidence. Each action retains the typed actor, timestamp, explanation and reference in history, including the exported report. These roles are local workflow guidance, not authenticated access controls.
+
+For the first handoff, export the full case from this version and send it to the designer. That assigns `project.qcCaseId`. The designer imports the full case, records responses in Work Queue, and exports a `fireToolshed.designerResponses.v1` file. The EOR imports that response file through Work Queue, previews conflicts, and applies only non-conflicting responses. Response import never replaces case records or EOR decisions. Replays are ignored; changed original comments, EOR decisions, diverged response chains, changed previously imported events and unrelated cases are rejected or skipped. Resolve conflicts with the designer; do not use full-case replacement as a merge. Subsequent handoffs should use the EOR's latest full case.
+
+Case schema/version and browser storage key remain v1 / 1.0.0. Existing JSON imports without migration. New optional record fields are scalar values, with `qcHistory` containing a JSON-encoded event list to remain acceptable to the old flat-record parser. Keep original exports as backups. Older app versions do not understand the new QC behavior; use the updated app for all ongoing response/closure work. Saving Case Setup no longer generates extra checklist rows; use the separate Add starter checklist records button when desired. Unknown imported select values, including custom submission phases, are preserved.
+
+Tests: `node peer-review/qc.test.mjs` plus existing peer-review, AI-review and technical-module tests. Browser smoke checks cover legacy import, inline reviewer identity, issuing a comment, designer correction, required verification evidence and EOR closure. No shared storage, server upload or authentication added.
+
 Static browser-local Phase 1 module for Fire Toolshed. No backend, accounts, analytics or project uploads. Open through HTTP/GitHub Pages; ES modules require HTTP rather than file://.
 
 ## Workflow
