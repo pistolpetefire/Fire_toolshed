@@ -26,6 +26,8 @@ Every hazard needs at least one complete supporting database record before revie
 
 The AI environment performs online research. The browser does not send project data to these databases automatically. The reviewer can inspect the recorded URLs, evidence and match rationale before confirming the assessment.
 
+For an evidence-supported conclusion that no code hazard applies, use the exact hazard type `No applicable code hazard identified` and the database result `Supports no-hazard conclusion`. This requires affirmative, applicable evidence and review of the selected code's scope. A database search returning nothing does not support this conclusion.
+
 ## Result contract and validation
 
 Use schema `fireToolshed.hazardousMaterials.v1`, defined in [core.mjs](../hazardous-materials/core.mjs). Start from the registered JSON; preserve project and source identities. Each material has name, manufacturer, cas, physicalState, location, process, storage, closedUse, openUse, unit, inventorySource, sdsIds, hazards, questions, reviewedBy, reviewedAt. Leave reviewer fields empty: the AI cannot validate itself. Quantities must be nonnegative numbers or null, never strings. Cite actual code sources; do not invent sections.
