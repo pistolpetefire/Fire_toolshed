@@ -48,3 +48,11 @@ Reference orientation: [ICC explains SDS/GHS versus code classifications](https:
 # Room notes and late inventory revisions
 
 Continue with [HMIS room notes](HMIS-NOTES.md) to assign inventory to rooms, prepare Revit-ready narrative and record late quantity changes without losing the preceding assessment. The [detailed human guide](../hazardous-materials/how-to.html) covers setup, review, changes, handoff and Revit placement. Existing JSON remains compatible. The browser now records quantity edits through **Record quantities / late change**; use the corresponding `recordQuantities()` function for AI revisions.
+
+## Bulk owner SDS deliveries
+
+Use the [bulk SDS workspace](../hazardous-materials/bulk.html) for PDF/ZIP intake, confirmed page ranges, permanent product identities, controlled AI batches and owner-workbook reconciliation. The [bulk SDS user guide](../hazardous-materials/bulk-guide.html) explains upload, combined PDFs, OCR, duplicates, quantity collection, 1,500-material workflows and backups.
+
+Bulk analysis uses `fireToolshed.sdsAnalysisBatch.v1` as its merge contract. Return the batch envelope, documents with original fingerprints, and unchanged material IDs/SDS IDs. Preview merges preserve separately located inventory; missing batch results remain pending. Analysis still runs in the user's AI environment. The browser does not host an AI service, perform OCR or calculate MAQ compliance.
+
+Owner workbooks retain Material ID and Inventory ID. Unknown quantities stay unknown; zero requires confirmation. Explicit updates are previewed before applying; absent rows remain retained and original values/history are preserved. Export assessment JSON for the existing reviewer/HMIS workflow. Browser storage is local to one device; retain complete backups and original owner deliveries.
