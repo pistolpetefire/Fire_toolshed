@@ -1,0 +1,89 @@
+:root {
+  --blue: #1e3a8a;
+  --blue-soft: #dbeafe;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --paper: #f8fafc;
+  --surface: #fff;
+  --ok: #065f46;
+  --ok-bg: #ecfdf5;
+  --bad: #991b1b;
+  --bad-bg: #fef2f2;
+  --warn: #9a3412;
+  --warn-bg: #fffbeb;
+  --touch: 44px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.45;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button {
+  cursor: pointer;
+  min-height: var(--touch);
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.5rem 0.9rem;
+  font-weight: 700;
+}
+button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+button.ghost { background: transparent; }
+a.btn-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch);
+  padding: 0.5rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--blue);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.shell { max-width: 1080px; margin: 0 auto; padding: 1rem 1.15rem 2.5rem; }
+.top { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; margin-bottom: 1rem; }
+.eyebrow { margin: 0; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.top h1 { margin: 0.15rem 0 0; font-size: 1.45rem; letter-spacing: -0.03em; }
+.version { margin: 0.2rem 0 0; font-size: 0.85rem; color: var(--muted); }
+.lead { margin: 0.4rem 0 0; max-width: 42rem; color: var(--muted); font-size: 0.9rem; }
+.top-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
+.metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.65rem; margin-bottom: 1rem; }
+@media (min-width: 720px) { .metrics { grid-template-columns: repeat(4, 1fr); } }
+.metric { background: var(--surface); border: 1px solid var(--line); border-radius: 1rem; padding: 0.75rem 0.9rem; }
+.metric .label { font-size: 0.72rem; font-weight: 650; color: var(--muted); }
+.metric .value { font-size: 1.4rem; font-weight: 750; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; margin-top: 0.15rem; }
+.metric .unit { font-size: 0.75rem; color: var(--muted); }
+.tabs { display: flex; gap: 0.35rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.tab { background: transparent; border: 1px solid var(--line); }
+.tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 1rem; padding: 1rem 1.1rem; margin-bottom: 1rem; }
+.card h2 { margin: 0 0 0.65rem; font-size: 1.05rem; }
+.grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
+@media (min-width: 560px) { .grid { grid-template-columns: 1fr 1fr; } }
+.field.full { grid-column: 1 / -1; }
+.field label { display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.3rem; }
+.field input, .field select, .field textarea { width: 100%; min-height: 2.5rem; padding: 0.45rem 0.65rem; border: 1px solid var(--line); border-radius: 0.65rem; background: #f8fafc; }
+.field .sub { display: block; margin-top: 0.3rem; font-size: 0.75rem; color: var(--muted); }
+.row { display: flex; align-items: center; gap: 0.4rem; }
+.row input { flex: 1; }
+.suffix { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+.warnings .warn { background: var(--warn-bg); color: var(--warn); border-radius: 0.5rem; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; font-size: 0.88rem; }
+.note { font-size: 0.82rem; color: var(--muted); margin-top: 0.75rem; }
+.modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(15,23,42,0.45); }
+.modal-card { background: #fff; border-radius: 1rem; padding: 1.25rem; max-width: 640px; width: 90%; max-height: 80dvh; overflow: auto; }
+.print-only { display: none; }
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block; }
+  body { background: #fff; }
+}
