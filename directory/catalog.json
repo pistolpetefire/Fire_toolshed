@@ -944,6 +944,30 @@
         "mode": "browser",
         "instructions": null
       }
+    },
+    {
+      "id": "rated-wall-opening-screener",
+      "name": "Rated Wall Opening Reliability & Exposure Screener",
+      "description": "Preliminary screener for opening geometry, protective reliability (AND/OR fault trees), and radiant exposure near a closed protective. Not an equivalency or fire-rating tool.",
+      "url": "./rated-wall-opening-screener/",
+      "task": "Calculate",
+      "disciplines": [
+        "Fire resistance & barriers",
+        "Fire protection engineering"
+      ],
+      "keywords": [
+        "opening",
+        "reliability",
+        "fault tree",
+        "radiation",
+        "heat flux",
+        "rated wall"
+      ],
+      "status": "Available",
+      "automation": {
+        "mode": "browser",
+        "instructions": null
+      }
     }
   ]
 }

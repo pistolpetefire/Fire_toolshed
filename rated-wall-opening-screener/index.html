@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Preliminary screener for rated wall opening geometry, protective reliability, and radiant exposure.">
+  <title>Rated Wall Opening Reliability & Exposure Screener · Fire Toolshed</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+  <script src="../shared/verify-tab.js"></script>
+  <script src="./assets/verify-cases.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Fire Toolshed</p>
+        <h1>Rated Wall Opening Reliability & Exposure Screener</h1>
+        <p class="version" id="appVersion">Version 0.1.0</p>
+        <p class="lead">
+          Separately screen opening geometry, protective-operation reliability, and radiant exposure near a closed protective.
+          <strong>Preliminary engineering screener only</strong> — not an equivalency approval, fire-rating prediction, or code-compliance tool.
+        </p>
+      </div>
+      <div class="top-actions no-print">
+        <button type="button" id="btnHelp" class="ghost">Help</button>
+        <button type="button" id="btnExample" class="ghost">Load worked example</button>
+        <button type="button" id="btnPrint" class="primary">Print report</button>
+        <button type="button" id="btnSave">Save JSON</button>
+        <button type="button" id="btnLoad">Load JSON</button>
+        <a class="btn-link" href="../">Portal</a>
+        <button type="button" id="btnReset" class="ghost">Reset</button>
+      </div>
+    </header>
+
+    <div class="metrics" id="metrics">
+      <div class="metric">
+        <div class="label">Opening percentage</div>
+        <div class="value" id="metricPct">—</div>
+        <div class="unit">%</div>
+      </div>
+      <div class="metric">
+        <div class="label">OR failure prob</div>
+        <div class="value" id="metricOR">—</div>
+        <div class="unit">per demand</div>
+      </div>
+      <div class="metric">
+        <div class="label">AND failure prob</div>
+        <div class="value" id="metricAND">—</div>
+        <div class="unit">per demand</div>
+      </div>
+      <div class="metric">
+        <div class="label">Est. clearance</div>
+        <div class="value" id="metricClear">—</div>
+        <div class="unit" id="unitClear">m</div>
+      </div>
+    </div>
+
+    <div class="layout" id="workbench">
+      <div>
+        <section class="panel">
+          <h2>Project & jurisdiction</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="projectName">Project name</label>
+              <input id="projectName" type="text" autocomplete="off" placeholder="Optional">
+            </div>
+            <div class="field">
+              <label for="jurisdiction">Jurisdiction / adopted editions</label>
+              <input id="jurisdiction" type="text" placeholder="e.g. IBC 2021, NFPA 80">
+            </div>
+          </div>
+          <div class="field" style="margin-top:0.75rem">
+            <label for="assumptions">Assumptions, sources & references</label>
+            <textarea id="assumptions" rows="3" placeholder="Record sources for failure probabilities, heat-flux criteria, emissivity, etc. Do not invent values."></textarea>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Units & wall geometry</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="unitSystem">Unit system</label>
+              <select id="unitSystem">
+                <option value="us" selected>US (ft, °F)</option>
+                <option value="si">SI (m, °C)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="wallLength">Wall length</label>
+              <div class="row">
+                <input id="wallLength" type="number" min="0" step="0.1" value="100">
+                <span class="suffix" id="sufLength">ft</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="wallType">Wall type</label>
+              <input id="wallType" type="text" value="Rated masonry / concrete" placeholder="e.g. 2-hr CMU">
+            </div>
+            <div class="field">
+              <label for="openingLimit">User-verified opening limit</label>
+              <div class="row">
+                <input id="openingLimit" type="number" min="0" step="0.1" value="25">
+                <span class="suffix">%</span>
+              </div>
+              <span class="sub">User-entered. Equality meets the limit.</span>
+            </div>
+          </div>
+          <div class="field" style="margin-top:0.75rem">
+            <label>Opening schedule (widths)</label>
+            <div id="openingsList"></div>
+            <button type="button" id="btnAddOpening" class="ghost" style="margin-top:0.4rem">+ Add opening</button>
+            <span class="sub">Enter individual opening widths. Aggregate checked against limit.</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Protective reliability (transparent fault tree)</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="p1">Component 1 failure probability (per demand)</label>
+              <input id="p1" type="number" min="0" max="1" step="0.01" value="0.1">
+            </div>
+            <div class="field">
+              <label for="p2">Component 2 failure probability (per demand)</label>
+              <input id="p2" type="number" min="0" max="1" step="0.01" value="0.2">
+            </div>
+            <div class="field">
+              <label for="commonCause">Common-cause / shared failure probability</label>
+              <input id="commonCause" type="number" min="0" max="1" step="0.01" value="0">
+              <span class="sub">Applied in addition to independent terms. Explicit.</span>
+            </div>
+            <div class="field">
+              <label for="inspectInterval">Inspection interval</label>
+              <div class="row">
+                <input id="inspectInterval" type="number" min="0" step="0.1" value="1">
+                <span class="suffix">years</span>
+              </div>
+            </div>
+          </div>
+          <p class="sub" style="margin-top:0.5rem">Independence assumed for the OR/AND calculation unless common-cause is entered. Probability per demand ≠ failure rate ≠ unavailability. Never invent probabilities.</p>
+        </section>
+
+        <section class="panel">
+          <h2>Radiant exposure (closed protective)</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="sourceTemp">Source temperature</label>
+              <div class="row">
+                <input id="sourceTemp" type="number" step="1" value="800">
+                <span class="suffix" id="sufTemp">°F</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="targetTemp">Target / ambient temperature</label>
+              <div class="row">
+                <input id="targetTemp" type="number" step="1" value="70">
+                <span class="suffix" id="sufTgt">°F</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="emissivity">Emissivity ε</label>
+              <input id="emissivity" type="number" min="0" max="1" step="0.01" value="0.8">
+            </div>
+            <div class="field">
+              <label for="fluxCriterion">Cited heat-flux criterion</label>
+              <div class="row">
+                <input id="fluxCriterion" type="number" min="0" step="0.1" value="5">
+                <span class="suffix">kW/m²</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="rectWidth">Source width</label>
+              <div class="row">
+                <input id="rectWidth" type="number" min="0" step="0.1" value="3">
+                <span class="suffix" id="sufW">ft</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="rectHeight">Source height</label>
+              <div class="row">
+                <input id="rectHeight" type="number" min="0" step="0.1" value="7">
+                <span class="suffix" id="sufH">ft</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="targetDist">Target distance from protective</label>
+              <div class="row">
+                <input id="targetDist" type="number" min="0" step="0.1" value="5">
+                <span class="suffix" id="sufDist">ft</span>
+              </div>
+            </div>
+          </div>
+          <p class="sub">Rectangular-source approximation. A protective’s rating does not establish its unexposed-face temperature. User supplies temperatures and criterion.</p>
+        </section>
+      </div>
+
+      <div class="sticky">
+        <section class="panel result-panel">
+          <h2>Results</h2>
+          <div id="resultBox" class="result-box">
+            <p>Enter parameters.</p>
+          </div>
+          <canvas id="fluxCurve" width="320" height="180" style="width:100%;height:auto;margin-top:0.75rem;border:1px solid var(--line);border-radius:8px"></canvas>
+          <div class="callout warn" style="margin-top:0.75rem">
+            <strong>Limits:</strong> Never invent failure probabilities. Distinguish per-demand probability from rate and unavailability. State independence and common-cause explicitly. No fire-rating or equivalency prediction. Protective rating ≠ unexposed-face temperature.
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <section class="print-package panel" id="printPackage">
+      <div id="reportLogoPrint"></div>
+      <div id="printBody"></div>
+    </section>
+
+    <footer class="site-foot no-print">
+      Rated Wall Opening Reliability & Exposure Screener · Fire Toolshed · Screening tool only.
+      Confirm all inputs, probabilities, temperatures, and criteria with project-specific analysis and AHJ.
+      <a href="../">Portal</a>
+    </footer>
+  </div>
+
+  <div class="modal hidden" id="helpModal" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>Help & limits</h2>
+        <button type="button" class="ghost" data-close>Close</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Purpose:</strong> Separately screen opening geometry, protective reliability, and radiant exposure.</p>
+        <p><strong>Geometry:</strong> Aggregate opening width / wall length compared to user-entered limit. Equality meets the limit.</p>
+        <p><strong>Reliability:</strong> Transparent AND/OR for independent probabilities. OR = 1 − (1−p1)(1−p2). AND = p1×p2. Common-cause added explicitly. Per demand ≠ rate ≠ unavailability.</p>
+        <p><strong>Radiation:</strong> Rectangular source view-factor approximation. Net flux ∝ εσ(T⁴−T_amb⁴)×F(distance). Zero ΔT → zero net flux. Distance reduces flux.</p>
+        <p><strong>Do not invent</strong> failure probabilities, temperatures, emissivity, or criteria. Identify all sources.</p>
+        <p><strong>Limits:</strong> No equivalency approval or fire-rating prediction. Protective rating does not establish unexposed-face temperature.</p>
+        <p>See README.md for worked examples and verification cases.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/report-logo.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
