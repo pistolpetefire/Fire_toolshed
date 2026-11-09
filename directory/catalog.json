@@ -920,6 +920,30 @@
         "mode": "AI-assisted workflow",
         "instructions": "./automation/PROPOSAL-REVIEW.md"
       }
+    },
+    {
+      "id": "door-leakage-screener",
+      "name": "Door Leakage & Corridor Smoke Screener",
+      "description": "Preliminary screener for closed-door leakage (orifice) and well-mixed corridor smoke concentration/visibility. Not an approval or code-compliance tool.",
+      "url": "./door-leakage-screener/",
+      "task": "Calculate",
+      "disciplines": [
+        "Smoke control & egress",
+        "Fire protection engineering"
+      ],
+      "keywords": [
+        "door",
+        "leakage",
+        "smoke",
+        "visibility",
+        "orifice",
+        "corridor"
+      ],
+      "status": "Available",
+      "automation": {
+        "mode": "browser",
+        "instructions": null
+      }
     }
   ]
 }
