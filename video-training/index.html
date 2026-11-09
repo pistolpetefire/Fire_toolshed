@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Video Training · Fire Toolshed</title>
+<link rel="stylesheet" href="../directory/style.css">
+<style>
+video{width:100%;max-width:900px;border-radius:12px;border:1px solid #d6e0e3;background:#000}
+.video-card{background:white;border:1px solid #d6e0e3;border-radius:14px;padding:22px;margin:20px 0}
+.video-card h2{margin-top:0}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.steps a{background:#f6e5ac;color:#17365d;padding:6px 12px;border-radius:6px;text-decoration:none;font-size:.85rem;font-weight:650}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+<a class="brand" href="../">FIRE TOOLSHED</a>
+<nav aria-label="Main navigation">
+<a href="../">Find a tool</a>
+<a href="../automation/">AI & Automation</a>
+<a href="../hazardous-materials/">Hazardous Materials</a>
+<a href="./" aria-current="page">Video Training</a>
+</nav>
+</header>
+<main id="main">
+<section class="hero">
+<span class="eyebrow">Learn · Video Training</span>
+<h1>Video Training</h1>
+<p>Walkthroughs of Fire Toolshed workflows. All examples use clearly labeled training data — not real project classifications or site facts.</p>
+</section>
+
+<section class="video-card" id="bulk-sds">
+<h2>Bulk SDS Workspace Walkthrough</h2>
+<p>Practical tour of the owner SDS package workflow: receive documents, review products, AI handoff, and quantity confirmation. Companion to the <a href="../hazardous-materials/bulk-guide.html">Bulk SDS user guide</a>.</p>
+<p class="muted">Duration ~10 minutes · Training examples only · No engineering conclusions issued</p>
+
+<video controls preload="metadata" poster="">
+<source src="./Tool_Shed_Bulk_SDS_Walkthrough_Balanced.mp4" type="video/mp4">
+Your browser does not support the video tag. <a href="./Tool_Shed_Bulk_SDS_Walkthrough_Balanced.mp4">Download the walkthrough</a>.
+</video>
+
+<div class="steps">
+<a href="#bulk-sds">Full walkthrough</a>
+<a href="../hazardous-materials/bulk.html">Open bulk workspace</a>
+<a href="../hazardous-materials/bulk-guide.html">User guide</a>
+<a href="../hazardous-materials/">Assessment / HMIS</a>
+</div>
+
+<h3>What the walkthrough covers</h3>
+<ul>
+<li>Project and code basis setup</li>
+<li>Receiving the SDS package (PDFs or ZIP), receipt log, and duplicate handling</li>
+<li>Confirming documents and page ranges (including combined PDFs)</li>
+<li>Readability checks and extracted text review</li>
+<li>Selecting controlled analysis batches (25–50 products) for your AI environment</li>
+<li>Previewing and merging returned analysis results (missing records stay pending)</li>
+<li>Downloading the prefilled owner workbook and mapping returned inventory columns</li>
+<li>Reviewing quantity conversions, unknowns, and applying the import</li>
+<li>Import history, backups, and recovery guardrails</li>
+<li>Scaling notes for large inventories (~1,500 materials)</li>
+</ul>
+<p class="muted">Upload is only the first step. Account for every file and page, confirm product identities, reconcile analysis results, obtain owner inventory facts, and review remaining questions before drawing facility conclusions.</p>
+</section>
+
+<section class="panel">
+<h2>Using the training videos</h2>
+<p>Open the corresponding tool alongside the video. The Bulk SDS workspace stores one active workspace in your browser on this device — it is not shared team storage. Download a complete backup after important milestones.</p>
+<p>The companion guides linked from each tool provide the written sequence and field definitions.</p>
+</section>
+</main>
+<footer>
+<p>Fire Toolshed · Video training examples only. Confirm classifications and site conditions before issuing an assessment.</p>
+</footer>
+</body>
+</html>
