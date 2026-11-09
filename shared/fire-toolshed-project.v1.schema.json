@@ -58,7 +58,8 @@
           "asetScreener",
           "rsetTool",
           "stairMerge",
-          "travelDistance"
+          "travelDistance",
+          "vaporSpillLFL"
         ]
       },
       "additionalProperties": {
