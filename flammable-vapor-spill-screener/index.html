@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Preliminary screener for flammable vapor spill evaporation rate and room %LFL under well-mixed ventilation assumptions.">
+  <title>Flammable Vapor Spill & Ventilation Dilution Screener · Fire Toolshed</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+  <script src="../shared/verify-tab.js"></script>
+  <script src="./assets/verify-cases.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Fire Toolshed</p>
+        <h1>Flammable Vapor Spill & Ventilation Dilution Screener (%LFL)</h1>
+        <p class="version" id="appVersion">Version 0.1.0</p>
+        <p class="lead">
+          Estimate spill evaporation and the resulting room vapor concentration as %LFL at a given exhaust rate.
+          Also sizes exhaust to stay under a target fraction of the LFL.
+          <strong>Preliminary engineering screener only</strong> — not an approval, design, or code-compliance tool.
+          Well-mixed assumptions only. No heavy-vapor pockets, stratification, or local plumes.
+        </p>
+      </div>
+      <div class="top-actions no-print">
+        <button type="button" id="btnHelp" class="ghost">Help</button>
+        <button type="button" id="btnExample" class="ghost">Load worked example</button>
+        <button type="button" id="btnPrint" class="primary">Print report</button>
+        <button type="button" id="btnSave">Save JSON</button>
+        <button type="button" id="btnLoad">Load JSON</button>
+        <a class="btn-link" href="../">Portal</a>
+        <button type="button" id="btnReset" class="ghost">Reset</button>
+      </div>
+    </header>
+
+    <div class="metrics" id="metrics">
+      <div class="metric">
+        <div class="label">Evaporation rate</div>
+        <div class="value" id="metricM">—</div>
+        <div class="unit">kg/s</div>
+      </div>
+      <div class="metric">
+        <div class="label">Vapor volume rate</div>
+        <div class="value" id="metricG">—</div>
+        <div class="unit">m³/s</div>
+      </div>
+      <div class="metric">
+        <div class="label">Steady %LFL</div>
+        <div class="value" id="metricLFL">—</div>
+        <div class="unit">%</div>
+      </div>
+      <div class="metric">
+        <div class="label">Required exhaust</div>
+        <div class="value" id="metricQreq">—</div>
+        <div class="unit">m³/s</div>
+      </div>
+    </div>
+
+    <nav class="tabs no-print" role="tablist">
+      <button type="button" class="tab active" data-tab="inputs">Inputs</button>
+      <button type="button" class="tab" data-tab="results">Results</button>
+      <button type="button" class="tab" data-tab="sensitivity">Sensitivity</button>
+      <button type="button" class="tab" data-tab="verify">Verification</button>
+    </nav>
+
+    <main>
+      <section id="tab-inputs" class="tab-panel active">
+        <div class="card">
+          <h2>Unit system & citations</h2>
+          <div class="grid">
+            <div class="field">
+              <label for="unitSystem">Unit system</label>
+              <select id="unitSystem">
+                <option value="si" selected>SI (m, kg, Pa, K)</option>
+                <option value="us">US (ft, lb, in wc, °F)</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="citationNote">Overall citation note (required for calculation)</label>
+              <input id="citationNote" type="text" placeholder="e.g. Mackay & Matsugu 1973; SFPE Handbook 5th ed. §...">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Liquid / vapor properties (all must be cited)</h2>
+          <div class="grid">
+            <div class="field">
+              <label for="MW">Molecular weight</label>
+              <div class="row">
+                <input id="MW" type="number" min="1" step="0.1" value="78">
+                <span class="suffix">g/mol</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="LFL">LFL</label>
+              <div class="row">
+                <input id="LFL" type="number" min="0" step="0.01" value="1.2">
+                <span class="suffix">vol %</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="Tliq">Liquid temperature</label>
+              <div class="row">
+                <input id="Tliq" type="number" step="0.1" value="20">
+                <span class="suffix" id="sufT">°C</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="Tair">Air temperature</label>
+              <div class="row">
+                <input id="Tair" type="number" step="0.1" value="20">
+                <span class="suffix" id="sufTair">°C</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="P">Pressure</label>
+              <div class="row">
+                <input id="P" type="number" min="0" step="100" value="101325">
+                <span class="suffix">Pa</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="mRate">Evaporation rate m (direct entry)</label>
+              <div class="row">
+                <input id="mRate" type="number" min="0" step="0.0001" value="0.001">
+                <span class="suffix">kg/s</span>
+              </div>
+            </div>
+            <div class="field full">
+              <label for="propCitation">Property & rate citation (required)</label>
+              <input id="propCitation" type="text" placeholder="Source, edition, section for MW, LFL, m or correlation">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Spill & room</h2>
+          <div class="grid">
+            <div class="field">
+              <label for="area">Spill area (optional, for sensitivity)</label>
+              <div class="row">
+                <input id="area" type="number" min="0" step="0.1" value="1">
+                <span class="suffix" id="sufArea">m²</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="V">Room volume</label>
+              <div class="row">
+                <input id="V" type="number" min="0" step="1" value="100">
+                <span class="suffix" id="sufV">m³</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="Q">Exhaust rate Q</label>
+              <div class="row">
+                <input id="Q" type="number" min="0" step="0.01" value="1">
+                <span class="suffix" id="sufQ">m³/s</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="Kmix">Mixing factor K_mix (0 < K_mix ≤ 1)</label>
+              <input id="Kmix" type="number" min="0.01" max="1" step="0.01" value="1">
+            </div>
+            <div class="field">
+              <label for="fTarget">Target fraction of LFL (f)</label>
+              <input id="fTarget" type="number" min="0.01" max="1" step="0.01" value="0.25">
+            </div>
+            <div class="field full">
+              <label for="roomCitation">Room / exhaust / K_mix citation (required)</label>
+              <input id="roomCitation" type="text" placeholder="Source for mixing factor, exhaust, volume assumptions">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-results" class="tab-panel">
+        <div class="card">
+          <h2>Results</h2>
+          <div id="warnings" class="warnings"></div>
+          <div id="resultsSummary"></div>
+          <canvas id="curveCanvas" width="640" height="280" style="max-width:100%; height:auto; border:1px solid var(--line); border-radius:8px; margin-top:1rem;"></canvas>
+          <p class="note">Standing note: Model assumes well-mixed room, no heavy-vapor pockets, no stratification, and no local plumes. Correlation validity must be confirmed by the user for the entered temperatures.</p>
+        </div>
+      </section>
+
+      <section id="tab-sensitivity" class="tab-panel">
+        <div class="card">
+          <h2>Sensitivity table</h2>
+          <div id="sensitivityTable"></div>
+        </div>
+      </section>
+
+      <section id="tab-verify" class="tab-panel">
+        <div class="card">
+          <h2>Verification</h2>
+          <div id="verifyMount"></div>
+        </div>
+      </section>
+    </main>
+
+    <div id="printReport" class="print-only"></div>
+  </div>
+
+  <input type="file" id="fileInput" accept=".json" style="display:none">
+
+  <div id="helpModal" class="modal no-print" hidden>
+    <div class="modal-card">
+      <h2>Help · Flammable Vapor Spill Screener</h2>
+      <p>This is a screening tool only. Enter every material property, correlation coefficient, and criterion with its source, edition, and section. Calculation is blocked if a required citation is missing.</p>
+      <ul>
+        <li>Evaporation rate m may be entered directly or derived from a user-cited correlation (e.g. Mackay–Matsugu form) and spill area.</li>
+        <li>Vapor volume rate G = m·R·T/(P·MW).</li>
+        <li>Steady concentration C_ss = G / Q_eff where Q_eff = Q · K_mix.</li>
+        <li>Transient: C(t) = C_ss · (1 − e^(−Q_eff·t/V)).</li>
+        <li>Required exhaust Q = G / (K_mix · f · LFL).</li>
+      </ul>
+      <p>If your source uses a safety factor K ≥ 1, enter K_mix = 1/K.</p>
+      <button type="button" id="btnCloseHelp" class="primary">Close</button>
+    </div>
+  </div>
+
+  <script src="../shared/report-logo.js"></script>
+  <script src="../shared/submittal-mode.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
