@@ -968,6 +968,30 @@
         "mode": "browser",
         "instructions": null
       }
+    },
+    {
+      "id": "structural-fire-member-screener",
+      "name": "Structural Fire Member Temperature Screener",
+      "description": "Preliminary screener for steel temperature histories under specified fire exposure using lumped capacitance. Not structural capacity or fire-rating determination.",
+      "url": "./structural-fire-member-screener/",
+      "task": "Calculate",
+      "disciplines": [
+        "Structural fire engineering",
+        "Fire protection engineering"
+      ],
+      "keywords": [
+        "steel",
+        "temperature",
+        "lumped",
+        "section factor",
+        "fire exposure",
+        "protection"
+      ],
+      "status": "Available",
+      "automation": {
+        "mode": "browser",
+        "instructions": null
+      }
     }
   ]
 }
