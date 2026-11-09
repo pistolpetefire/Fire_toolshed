@@ -59,7 +59,8 @@
           "rsetTool",
           "stairMerge",
           "travelDistance",
-          "vaporSpillLFL"
+          "vaporSpillLFL",
+          "hvacSmokeRecirc"
         ]
       },
       "additionalProperties": {
