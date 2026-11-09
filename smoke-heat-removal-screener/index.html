@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Preliminary screener for prescriptive natural vents, mechanical exhaust, and idealized post-fire purge.">
+  <title>Smoke/Heat Removal & Purge Screener · Fire Toolshed</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+  <script src="../shared/verify-tab.js"></script>
+  <script src="./assets/verify-cases.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div>
+        <p class="eyebrow">Fire Toolshed</p>
+        <h1>Smoke/Heat Removal & Purge Screener</h1>
+        <p class="version" id="appVersion">Version 0.1.0</p>
+        <p class="lead">
+          Three distinct workflows: prescriptive natural vents, prescriptive mechanical exhaust, and idealized post-fire purge.
+          <strong>Preliminary engineering screener only</strong> — not engineered smoke control, NFPA 92 design, tenability, or safe-reentry determination.
+        </p>
+      </div>
+      <div class="top-actions no-print">
+        <button type="button" id="btnHelp" class="ghost">Help</button>
+        <button type="button" id="btnExample" class="ghost">Load worked example</button>
+        <button type="button" id="btnPrint" class="primary">Print report</button>
+        <button type="button" id="btnSave">Save JSON</button>
+        <button type="button" id="btnLoad">Load JSON</button>
+        <a class="btn-link" href="../">Portal</a>
+        <button type="button" id="btnReset" class="ghost">Reset</button>
+      </div>
+    </header>
+
+    <div class="metrics" id="metrics">
+      <div class="metric">
+        <div class="label">Required vent / exhaust</div>
+        <div class="value" id="metricReq">—</div>
+        <div class="unit" id="unitReq">ft² / cfm</div>
+      </div>
+      <div class="metric">
+        <div class="label">Provided</div>
+        <div class="value" id="metricProv">—</div>
+        <div class="unit" id="unitProv">ft² / cfm</div>
+      </div>
+      <div class="metric">
+        <div class="label">Shortfall</div>
+        <div class="value" id="metricShort">—</div>
+        <div class="unit" id="unitShort">%</div>
+      </div>
+      <div class="metric">
+        <div class="label">Time to target</div>
+        <div class="value" id="metricTime">—</div>
+        <div class="unit">min</div>
+      </div>
+    </div>
+
+    <div class="layout" id="workbench">
+      <div>
+        <section class="panel">
+          <h2>Project & jurisdiction</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="projectName">Project name</label>
+              <input id="projectName" type="text" autocomplete="off" placeholder="Optional">
+            </div>
+            <div class="field">
+              <label for="jurisdiction">Jurisdiction / adopted editions</label>
+              <input id="jurisdiction" type="text" placeholder="e.g. IBC 2021, NFPA 204">
+            </div>
+          </div>
+          <div class="field" style="margin-top:0.75rem">
+            <label for="assumptions">Applicability, criteria sources & assumptions</label>
+            <textarea id="assumptions" rows="3" placeholder="Record user-verified applicability and criteria. Do not invent code sections or design values."></textarea>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Workflow</h2>
+          <div class="field">
+            <label for="workflow">Select workflow</label>
+            <select id="workflow">
+              <option value="natural">Prescriptive natural vents</option>
+              <option value="mechanical">Prescriptive mechanical exhaust</option>
+              <option value="purge">Idealized post-fire purge</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Units & geometry</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="unitSystem">Unit system</label>
+              <select id="unitSystem">
+                <option value="us" selected>US (ft, cfm)</option>
+                <option value="si">SI (m, m³/s)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="floorArea">Floor area</label>
+              <div class="row">
+                <input id="floorArea" type="number" min="0" step="100" value="50000">
+                <span class="suffix" id="sufArea">ft²</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="volume">Volume</label>
+              <div class="row">
+                <input id="volume" type="number" min="0" step="1000" value="1500000">
+                <span class="suffix" id="sufVol">ft³</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="height">Average height (for volume check)</label>
+              <div class="row">
+                <input id="height" type="number" min="0" step="0.1" value="30">
+                <span class="suffix" id="sufH">ft</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="panelNatural">
+          <h2>Prescriptive natural vents</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="ventRatio">User-verified vent-to-floor ratio</label>
+              <div class="row">
+                <input id="ventRatio" type="number" min="0" step="0.001" value="0.01">
+                <span class="suffix">:1 (e.g. 1:100 = 0.01)</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="ventSize">Individual vent size</label>
+              <div class="row">
+                <input id="ventSize" type="number" min="0" step="1" value="32">
+                <span class="suffix" id="sufVent">ft²</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="panelMechanical" style="display:none">
+          <h2>Prescriptive mechanical exhaust</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="ach">Air changes per hour (user-verified)</label>
+              <input id="ach" type="number" min="0" step="0.1" value="2">
+            </div>
+            <div class="field">
+              <label for="fanCapacity">Individual fan capacity</label>
+              <div class="row">
+                <input id="fanCapacity" type="number" min="0" step="100" value="10000">
+                <span class="suffix" id="sufFan">cfm</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="makeupVel">Makeup-air velocity assumption</label>
+              <div class="row">
+                <input id="makeupVel" type="number" min="0" step="10" value="200">
+                <span class="suffix" id="sufVel">fpm</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="panelPurge" style="display:none">
+          <h2>Idealized post-fire purge</h2>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="purgeACH">Purge air changes per hour</label>
+              <input id="purgeACH" type="number" min="0" step="0.1" value="6">
+            </div>
+            <div class="field">
+              <label for="startConc">Starting concentration (relative)</label>
+              <input id="startConc" type="number" min="0" step="0.01" value="1">
+              <span class="sub">1 = 100%</span>
+            </div>
+            <div class="field">
+              <label for="targetConc">Target concentration (relative)</label>
+              <input id="targetConc" type="number" min="0" step="0.001" value="0.01">
+              <span class="sub">0.01 = 1%</span>
+            </div>
+            <div class="field">
+              <label for="sourceRate">Continuing contaminant source (optional)</label>
+              <input id="sourceRate" type="number" min="0" step="0.001" value="0">
+              <span class="sub">0 = clean replacement air only</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="sticky">
+        <section class="panel result-panel">
+          <h2>Results</h2>
+          <div id="resultBox" class="result-box">
+            <p>Select workflow and enter parameters.</p>
+          </div>
+          <canvas id="purgeCurve" width="320" height="180" style="width:100%;height:auto;margin-top:0.75rem;border:1px solid var(--line);border-radius:8px"></canvas>
+          <div class="callout warn" style="margin-top:0.75rem">
+            <strong>Limits:</strong> Do not combine prescriptive smoke removal with engineered smoke control. No automatic exception decisions, NFPA 92 design, tenability/ASET claims, or safe-reentry declaration. Basic exponential purge assumes clean replacement air, effective mixing, and no continuing source.
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <section class="print-package panel" id="printPackage">
+      <div id="reportLogoPrint"></div>
+      <div id="printBody"></div>
+    </section>
+
+    <footer class="site-foot no-print">
+      Smoke/Heat Removal & Purge Screener · Fire Toolshed · Screening tool only.
+      Confirm applicability, ratios, capacities, and criteria with project-specific analysis and AHJ.
+      <a href="../">Portal</a>
+    </footer>
+  </div>
+
+  <div class="modal hidden" id="helpModal" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>Help & limits</h2>
+        <button type="button" class="ghost" data-close>Close</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Three distinct workflows</strong> (do not combine with engineered smoke control):</p>
+        <p><strong>1. Prescriptive natural vents:</strong> Required area = floor area × user-verified ratio. Equipment count = ceil(required / vent size).</p>
+        <p><strong>2. Prescriptive mechanical exhaust:</strong> Required cfm = volume × ACH / 60. Makeup-air area from stated velocity. Equipment count rounded up.</p>
+        <p><strong>3. Idealized purge:</strong> Well-mixed exponential decay. C(t) = C0 exp(−ACH × t). Time to target and concentration curve.</p>
+        <p><strong>Acceptance examples:</strong><br>
+        • 1:100 on 50,000 ft² → 500 ft²; 32 ft² vents → 16 units.<br>
+        • 1,500,000 ft³ at 2 ACH → 50,000 cfm.<br>
+        • 6 ACH, 10 min → ~36.8% remaining; 1% takes ~46.05 min.</p>
+        <p><strong>Limits:</strong> No automatic exceptions, NFPA 92, tenability, or safe-reentry. Purge assumes clean air, good mixing, no continuing source unless entered.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/report-logo.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>

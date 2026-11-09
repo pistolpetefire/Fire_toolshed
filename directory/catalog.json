@@ -992,6 +992,30 @@
         "mode": "browser",
         "instructions": null
       }
+    },
+    {
+      "id": "smoke-heat-removal-screener",
+      "name": "Smoke/Heat Removal & Purge Screener",
+      "description": "Preliminary screener with three workflows: prescriptive natural vents, prescriptive mechanical exhaust, and idealized post-fire purge. Not engineered smoke control.",
+      "url": "./smoke-heat-removal-screener/",
+      "task": "Calculate",
+      "disciplines": [
+        "Smoke control & exhaust",
+        "Fire protection engineering"
+      ],
+      "keywords": [
+        "smoke",
+        "heat removal",
+        "vents",
+        "purge",
+        "ACH",
+        "prescriptive"
+      ],
+      "status": "Available",
+      "automation": {
+        "mode": "browser",
+        "instructions": null
+      }
     }
   ]
 }
