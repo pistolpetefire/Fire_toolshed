@@ -19,7 +19,7 @@
       <div>
         <p class="eyebrow">Fire Toolshed</p>
         <h1>Sprinkler System Estimator</h1>
-        <p class="version" id="appVersion">Version 1.7.0-prelim</p>
+        <p class="version" id="appVersion">Version 1.8.0-prelim</p>
         <p class="version" id="codeEdition">Code basis: <strong>NFPA 13-2022</strong> (Florida 9th Edition reference) · UFC 3-600-01 · FM planning</p>
       </div>
       <div class="top-actions no-print">
@@ -197,7 +197,7 @@
             </label>
           </div>
           <p class="hint" id="systemTypeHint" style="margin-top:0.5rem">
-            No dry-pipe criteria for AF Sundown or ESFR/storage-type protection. Highest ESFR demands for ~40 ft ceiling added (K-25.2 @ 60 psi / K-14.0 @ 75 psi, 12 heads). UFC Table 9-3 dry is also N/A for ceiling heights &gt;60–100 ft.
+            No dry-pipe criteria for AF Sundown or ESFR/storage-type protection. UFC Table 9-3 dry is also N/A for ceiling heights &gt;60–100 ft.
           </p>
 
           <div class="field" style="margin-top:1rem">
@@ -383,10 +383,66 @@
           </div>
         </section>
 
+
+        <!-- Hazen-Williams lead-in / riser -->
+        <section class="panel">
+          <h2>Lead-in & riser friction (Hazen-Williams)</h2>
+          <p class="hint">Optional. When enabled, underground and interior main losses are calculated from diameter, length, and C-factor instead of the fixed lump sums. Larger pipe → lower friction. Planning estimate only — not a full hydraulic network.</p>
+          <label class="field" style="margin-bottom:0.65rem">
+            <span style="display:flex;align-items:center;gap:0.5rem;font-weight:600;font-size:0.85rem">
+              <input id="useHazen" type="checkbox" style="width:auto;min-height:auto">
+              Use Hazen-Williams for lead-in and riser
+            </span>
+          </label>
+          <div id="hazenFields" class="hidden">
+            <h3 style="font-size:0.9rem;margin:0.5rem 0">Lead-in / underground main</h3>
+            <div class="field-grid two">
+              <div class="field">
+                <label for="leadDiaIn">Diameter</label>
+                <div class="row"><input id="leadDiaIn" type="number" min="1" step="0.5" value="6"><span class="suffix">in</span></div>
+              </div>
+              <div class="field">
+                <label for="leadLengthFt">Length</label>
+                <div class="row"><input id="leadLengthFt" type="number" min="0" step="10" value="100"><span class="suffix">ft</span></div>
+              </div>
+              <div class="field">
+                <label for="leadC">C-factor</label>
+                <div class="row"><input id="leadC" type="number" min="80" step="10" value="140"></div>
+                <span class="sub">140 typical cement-lined / PVC; 120 unlined; 100 old.</span>
+              </div>
+              <div class="field">
+                <label for="leadFittingsFt">Fittings equivalent</label>
+                <div class="row"><input id="leadFittingsFt" type="number" min="0" step="5" value="20"><span class="suffix">ft</span></div>
+              </div>
+            </div>
+            <h3 style="font-size:0.9rem;margin:0.75rem 0 0.35rem">Riser / interior feed</h3>
+            <div class="field-grid two">
+              <div class="field">
+                <label for="riserDiaIn">Diameter</label>
+                <div class="row"><input id="riserDiaIn" type="number" min="1" step="0.5" value="4"><span class="suffix">in</span></div>
+              </div>
+              <div class="field">
+                <label for="riserLengthFt">Length</label>
+                <div class="row"><input id="riserLengthFt" type="number" min="0" step="5" value="40"><span class="suffix">ft</span></div>
+              </div>
+              <div class="field">
+                <label for="riserC">C-factor</label>
+                <div class="row"><input id="riserC" type="number" min="80" step="10" value="120"></div>
+                <span class="sub">120 typical steel; 140 cement-lined / CPVC.</span>
+              </div>
+              <div class="field">
+                <label for="riserFittingsFt">Fittings equivalent</label>
+                <div class="row"><input id="riserFittingsFt" type="number" min="0" step="5" value="15"><span class="suffix">ft</span></div>
+              </div>
+            </div>
+            <p class="hint" style="margin-top:0.5rem">Friction = 4.52 × Q<sup>1.85</sup> × L / (C<sup>1.85</sup> × d<sup>4.87</sup>). Calculated values replace the underground and interior main rows below when this is on.</p>
+          </div>
+        </section>
+
         <!-- Equipment losses -->
         <section class="panel">
           <h2>Generic equipment / main losses</h2>
-          <p class="hint">Toggle typical assemblies. These are <strong>planning lump sums</strong>, not pipe-by-pipe Hazen-Williams equivalent lengths.</p>
+          <p class="hint">Toggle typical assemblies. When Hazen-Williams is enabled above, the underground and interior main rows show calculated friction (larger diameter → lower loss). Other rows remain planning lump sums.</p>
           <table class="loss-table" id="lossTable">
             <thead>
               <tr>
@@ -655,7 +711,8 @@
           <li><strong>Hose allowance:</strong> Inside/outside hose stream GPM added when checkbox is on.</li>
           <li><strong>K-factor / coverage / remote head flow:</strong> Used to compute remote head required pressure P = (Q/K)², floored by code minimum (often 7 psi).</li>
           <li><strong>Elevation:</strong> Static head = feet × 0.433 psi/ft from pump discharge datum to highest head.</li>
-          <li><strong>Backflow / equipment losses:</strong> Planning lump-sum pressure losses — not pipe-by-pipe HW.</li>
+          <li><strong>Lead-in & riser (Hazen-Williams):</strong> Optional. Calculates friction from diameter, length, C-factor, and fittings equivalent length. Larger diameter lowers loss. Replaces the underground and interior main lump sums when enabled.</li>
+          <li><strong>Backflow / equipment losses:</strong> Planning lump-sum pressure losses for valves and assemblies. Underground and interior mains use Hazen when that option is on.</li>
           <li><strong>Safety margin:</strong> Explicit charette contingency in psi.</li>
         </ul>
 
