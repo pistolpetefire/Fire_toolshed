@@ -1057,6 +1057,27 @@
     };
   }
 
+
+  function hazenImpactNote() {
+    if (!state.useHazen) return "";
+    const hw = hazenLosses();
+    const q = sprinklerDemandGpm();
+    if (q <= 0) return "";
+    // Next larger standard sizes
+    const nextLead = state.leadDiaIn < 6 ? 6 : state.leadDiaIn < 8 ? 8 : state.leadDiaIn < 10 ? 10 : state.leadDiaIn + 2;
+    const nextRiser = state.riserDiaIn < 4 ? 4 : state.riserDiaIn < 6 ? 6 : state.riserDiaIn < 8 ? 8 : state.riserDiaIn + 2;
+    const leadL = num(state.leadLengthFt) + num(state.leadFittingsFt);
+    const riserL = num(state.riserLengthFt) + num(state.riserFittingsFt);
+    const leadNext = hazenWilliamsPsi(q, nextLead, leadL, state.leadC);
+    const riserNext = hazenWilliamsPsi(q, nextRiser, riserL, state.riserC);
+    const current = hw.leadPsi + hw.riserPsi;
+    const next = round1(leadNext + riserNext);
+    const delta = round1(current - next);
+    return `Current lead-in + riser friction: ${current.toFixed(1)} psi. ` +
+           `Next sizes (${nextLead}" lead / ${nextRiser}" riser) would be ~${next.toFixed(1)} psi ` +
+           `(Δ ${delta >= 0 ? "−" : "+"}${Math.abs(delta).toFixed(1)} psi). ` +
+           `This pressure change carries into the pump rating and, with duration, into tank volume.`;
+  }
   function lossItemsTotal() {
     const hw = hazenLosses();
     return state.losses.reduce((sum, row) => {
@@ -1340,6 +1361,11 @@
     if ($("riserC")) $("riserC").value = state.riserC;
     if ($("riserFittingsFt")) $("riserFittingsFt").value = state.riserFittingsFt;
     $("hazenFields")?.classList.toggle("hidden", !state.useHazen);
+    const noteEl = $("hazenImpact");
+    if (noteEl) {
+      noteEl.textContent = hazenImpactNote();
+      noteEl.classList.toggle("hidden", !state.useHazen);
+    }
     if ($("backflowType")) $("backflowType").value = state.backflowType;
     if ($("backflowCustomPsi")) $("backflowCustomPsi").value = state.backflowCustomPsi;
     if ($("safetyMarginPsi")) $("safetyMarginPsi").value = state.safetyMarginPsi;
