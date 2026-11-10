@@ -200,6 +200,67 @@
     });
     toast(`Imported fire flow: ${Math.round(data.flowGpm)} GPM @ 20 psi residual · ${Math.round(data.durationMin || 0)} min. Add elevation + losses for pump pressure.`);
     updateFireFlowHandoffBanner();
+    updateEstimatingRecommendation();
+  }
+
+  const STANDARD_PUMP_GPM = [250, 300, 400, 450, 500, 750, 1000, 1250, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000];
+
+  function nextStandardGpm(flow) {
+    const f = Number(flow) || 0;
+    for (const s of STANDARD_PUMP_GPM) {
+      if (s >= f) return s;
+    }
+    return Math.ceil(f / 500) * 500;
+  }
+
+  function updateEstimatingRecommendation() {
+    const host = $('estimatingRecommendation');
+    if (!host) return;
+    const spr = readSprinklerHandoff();
+    const ff = readFireFlowHandoff();
+    if (!spr && !ff) {
+      host.classList.add('hidden');
+      host.innerHTML = '';
+      return;
+    }
+    host.classList.remove('hidden');
+
+    const sprFlow = spr ? Math.round(Number(spr.flowGpm)) : 0;
+    const sprPsi = spr ? Number(spr.pressurePsi) || 0 : 0;
+    const sprDur = spr ? Math.round(Number(spr.durationMin) || 0) : 0;
+    const ffFlow = ff ? Math.round(Number(ff.flowGpm)) : 0;
+    const ffDur = ff ? Math.round(Number(ff.durationMin) || 0) : 0;
+    const ffGal = ff ? Math.round(Number(ff.totalGallons) || ffFlow * ffDur) : 0;
+
+    // Governing: higher flow drives pump capacity; higher pressure drives rated head
+    const govFlow = Math.max(sprFlow, ffFlow);
+    const govPsi = Math.max(sprPsi, 20); // fire flow residual is 20 psi at hydrant; sprinkler usually higher
+    const govSource = sprFlow >= ffFlow ? 'sprinkler' : 'fire flow';
+
+    // For estimating, size pump so 100% rated meets governing flow
+    // (operating past 100% reduces pressure; 150% is only 65% of rated)
+    const recGpm = nextStandardGpm(govFlow);
+    // Rated pressure should cover the higher pressure need with a small planning margin
+    const recPsi = Math.ceil((govPsi + 5) / 5) * 5;
+
+    // Tank volume from governing flow × its duration (use the demand that produces more gallons)
+    const sprGal = sprFlow * sprDur;
+    const tankGal = Math.max(sprGal, ffGal);
+    const tankSource = sprGal >= ffGal ? 'sprinkler' : 'fire flow';
+    const tankDur = tankSource === 'sprinkler' ? sprDur : ffDur;
+
+    const lines = [];
+    lines.push('<strong>Estimating recommendation</strong> (planning only — verify with full hydraulics and manufacturer curve)');
+    lines.push('<ul style="margin:0.4rem 0 0;padding-left:1.2rem">');
+    if (spr) lines.push(`<li>Sprinkler demand: ${sprFlow.toLocaleString()} gpm @ ${sprPsi.toFixed(0)} psi · ${sprDur} min</li>`);
+    if (ff) lines.push(`<li>Fire flow demand: ${ffFlow.toLocaleString()} gpm @ 20 psi residual · ${ffDur} min · ${ffGal.toLocaleString()} gal</li>`);
+    lines.push(`<li><strong>Governing for pump capacity:</strong> ${govSource} (${govFlow.toLocaleString()} gpm)</li>`);
+    lines.push(`<li><strong>Suggested pump:</strong> ${recGpm.toLocaleString()} gpm @ ${recPsi} psi rated (next standard size ≥ governing flow; pressure covers the higher demand + ~5 psi planning margin)</li>`);
+    lines.push(`<li><strong>Suggested tank volume:</strong> ${tankGal.toLocaleString()} gal from ${tankSource} (${govFlow.toLocaleString()} gpm is not the tank driver if the other demand runs longer). Open Tank Sizer and import the governing demand.</li>`);
+    lines.push('</ul>');
+    lines.push('<p class="tiny" style="margin:0.4rem 0 0">The test-points table below checks a <em>proposed</em> pump against the current system demand. If system demand flow exceeds 150% of rated, or pressure at that flow falls below the required discharge pressure, the proposed pump is undersized.</p>');
+
+    host.innerHTML = lines.join('');
   }
   function updateSprinklerHandoffBanner() {
     const data = readSprinklerHandoff();
@@ -229,6 +290,7 @@
       toast('No sprinkler capture found. Open Sprinkler System Estimator and click “Capture for Pump Sizer”.');
       updateSprinklerHandoffBanner();
     updateFireFlowHandoffBanner();
+    updateEstimatingRecommendation();
       return;
     }
 
@@ -290,6 +352,7 @@
     scheduleSave();
     updateSprinklerHandoffBanner();
     updateFireFlowHandoffBanner();
+    updateEstimatingRecommendation();
     const supplyNote =
       sa && sa.status
         ? ` · supply ${sa.status}${Number.isFinite(Number(sa.availablePsi)) ? ` (avail ${Number(sa.availablePsi).toFixed(1)} psi)` : ''}`
@@ -2070,6 +2133,7 @@ ${(data.demandPoints || []).map((p, i) => `${esc(p.name)}: ${Math.round(p.flow)}
     updateSimplifiedPreview();
     updateSprinklerHandoffBanner();
     updateFireFlowHandoffBanner();
+    updateEstimatingRecommendation();
     if (window.FireToolshedShell) {
       window.FireToolshedShell.mount({ step: 'pump', base: '..' });
     }
