@@ -413,17 +413,18 @@
         btns.push(
           '<a class="wps-btn wps-btn-primary" href="' +
             escapeAttr(joinBase(opts.base, next.path)) +
+            '">Next: Fire Flow →</a>'
+        );
+      }
+    } else if (opts.step === "fireflow") {
+      if (next) {
+        btns.push(
+          '<a class="wps-btn wps-btn-primary" href="' +
+            escapeAttr(joinBase(opts.base, next.path)) +
             '">Next: Sprinkler →</a>'
         );
       }
     } else if (opts.step === "sprinkler") {
-      if (!handoffs.flow) {
-        btns.push(
-          '<a class="wps-btn" href="' +
-            escapeAttr(joinBase(opts.base, "flow-test-report/")) +
-            '">Load Flow Test first</a>'
-        );
-      }
       if (next) {
         btns.push(
           '<a class="wps-btn wps-btn-primary" href="' +
@@ -432,11 +433,18 @@
         );
       }
     } else if (opts.step === "pump") {
-      if (!handoffs.sprinkler) {
+      if (!handoffs.sprinkler && !handoffs.fireflow) {
         btns.push(
           '<a class="wps-btn" href="' +
             escapeAttr(joinBase(opts.base, "sprinkler-system-estimator/")) +
             '">Capture from Sprinkler</a>'
+        );
+      }
+      if (!handoffs.fireflow) {
+        btns.push(
+          '<a class="wps-btn" href="' +
+            escapeAttr(joinBase(opts.base, "fire-flow/")) +
+            '">Capture Fire Flow</a>'
         );
       }
       if (next) {
@@ -473,27 +481,37 @@
 
   function noteForStep(opts, handoffs) {
     if (opts.step === "hub") {
-      return "Set the project name above — it carries through all four tools. Captures stay in this browser until cleared.";
+      return "Set the project name above — it carries through all water tools. Captures stay in this browser until cleared.";
     }
     if (opts.step === "flow") {
       return handoffs.flow
-        ? "Flow test capture ready for Sprinkler Estimator."
-        : "Complete the test, then Capture for Sprinkler (or Capture & Open).";
+        ? "Flow test capture ready. Optional — Fire Flow and Sprinkler can proceed without it."
+        : "Optional. Capture if you have a test; otherwise continue to Fire Flow or Sprinkler.";
+    }
+    if (opts.step === "fireflow") {
+      return handoffs.fireflow
+        ? "Fire flow captured — available to Pump and Tank Sizers."
+        : "Calculate required fire flow, then Capture for Pump & Tank.";
     }
     if (opts.step === "sprinkler") {
-      if (!handoffs.flow) return "Optional: import a Flow Test capture to plot supply vs demand.";
-      if (!handoffs.sprinkler) return "Flow test loaded in chain — set demand, then Capture for Pump.";
-      return "Sprinkler duty captured — continue to Fire Pump Sizer.";
+      if (!handoffs.sprinkler) return "Set sprinkler demand, then Capture for Pump. Flow test is optional.";
+      return "Sprinkler duty captured — continue to Fire Pump Sizer (flow test optional).";
     }
     if (opts.step === "pump") {
-      if (!handoffs.sprinkler) return "Import Sprinkler Demand when ready — or enter duty manually.";
-      if (!handoffs.pump) return "Sprinkler capture available — Import, size pump, then Capture for Tank.";
+      var bits = [];
+      if (handoffs.sprinkler) bits.push("Sprinkler " + handoffs.sprinkler.detail);
+      if (handoffs.fireflow) bits.push("Fire flow " + handoffs.fireflow.detail);
+      if (!bits.length) return "Import Sprinkler and/or Fire Flow when ready — or enter duty manually.";
+      if (!handoffs.pump) return bits.join(" · ") + " available — Import, size pump, then Capture for Tank.";
       return "Pump capture ready for Tank Sizer.";
     }
     if (opts.step === "tank") {
       if (handoffs.pump) return "Pump capture available — Import Upstream / Pump Demand.";
+      if (handoffs.fireflow && handoffs.sprinkler)
+        return "Fire flow and sprinkler captures available — use the larger for tank volume.";
+      if (handoffs.fireflow) return "Fire flow capture available for flow × duration.";
       if (handoffs.sprinkler) return "Sprinkler capture available for flow × duration.";
-      return "Enter flow × duration or import from Pump / Sprinkler.";
+      return "Enter flow × duration or import from Pump / Sprinkler / Fire Flow.";
     }
     return "Each tool works alone; captures link the path when you use them.";
   }
@@ -503,11 +521,11 @@
       '<div class="wps-project" role="group" aria-label="Shared project name">' +
       '<label class="wps-project-label" for="wpsProjectName">Project name</label>' +
       '<input type="text" id="wpsProjectName" class="wps-project-input" autocomplete="organization" ' +
-      'placeholder="Carries across Flow → Sprinkler → Pump → Tank" ' +
+      'placeholder="Carries across Flow → Fire Flow → Sprinkler → Pump → Tank" ' +
       'value="' +
       escapeAttr(projectName || "") +
       '" />' +
-      '<span class="wps-project-hint">Shared on this device for all four water tools and reports</span>' +
+      '<span class="wps-project-hint">Shared on this device for all water tools and reports</span>' +
       "</div>"
     );
   }
@@ -516,9 +534,10 @@
     return (
       '<div class="wps-pills" aria-label="Capture status">' +
       pillHtml("1 Flow", handoffs.flow) +
-      pillHtml("2 Sprinkler", handoffs.sprinkler) +
-      pillHtml("3 Pump", handoffs.pump) +
-      pillHtml("4 Tank", handoffs.tank) +
+      pillHtml("2 Fire Flow", handoffs.fireflow) +
+      pillHtml("3 Sprinkler", handoffs.sprinkler) +
+      pillHtml("4 Pump", handoffs.pump) +
+      pillHtml("5 Tank", handoffs.tank) +
       "</div>" +
       '<div class="wps-actions">' +
       ctaForStep(opts, handoffs) +
