@@ -443,13 +443,13 @@
         <!-- Equipment losses -->
         <section class="panel">
           <h2>Generic equipment / main losses</h2>
-          <p class="hint">Toggle typical assemblies. When Hazen-Williams is enabled above, the underground and interior main rows show calculated friction (larger diameter → lower loss). Other rows remain planning lump sums.</p>
+          <p class="hint">Underground and riser rows take <strong>diameter</strong> (inches). Loss is calculated with Hazen-Williams from the length and C-factor above. Larger diameter → lower loss. Valve and meter rows remain PSI allowances.</p>
           <table class="loss-table" id="lossTable">
             <thead>
               <tr>
                 <th>Use</th>
                 <th>Item</th>
-                <th>Loss (psi)</th>
+                <th>Diameter (in) or Loss (psi)</th>
               </tr>
             </thead>
             <tbody id="lossTableBody"></tbody>
