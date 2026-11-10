@@ -3,7 +3,7 @@
  * Shared chrome for synergy; each tool remains a standalone page.
  *
  * Usage:
- *   FireToolshedShell.mount({ step: 'flow'|'sprinkler'|'pump'|'tank'|'hub', base: '..' });
+ *   FireToolshedShell.mount({ step: 'flow'|'fireflow'|'sprinkler'|'pump'|'tank'|'hub', base: '..' });
  *   // base = relative path from current page to repo root
  */
 (function (global) {
@@ -12,6 +12,7 @@
   var KEYS = {
     flow: "fireToolshed.flowTestHandoff.v1",
     sprinkler: "fireToolshed.sprinklerHandoff.v1",
+    fireflow: "fireToolshed.fireFlowHandoff.v1",
     pump: "fireToolshed.pumpHandoff.v1",
     tank: "fireToolshed.tankHandoff.v1",
     project: "fireToolshed.project.v1",
@@ -33,8 +34,16 @@
       blurb: "Hydrant static / residual / pitot · N^1.85 curve · Class AA–C",
     },
     {
-      id: "sprinkler",
+      id: "fireflow",
       n: 2,
+      short: "Fire Flow",
+      title: "Fire Flow Calculator",
+      path: "fire-flow/",
+      blurb: "Required fire flow (gpm @ 20 psi) + duration · hydrants · feeds pump & tank",
+    },
+    {
+      id: "sprinkler",
+      n: 3,
       short: "Sprinkler",
       title: "Sprinkler System Estimator",
       path: "sprinkler-system-estimator/",
@@ -42,7 +51,7 @@
     },
     {
       id: "pump",
-      n: 3,
+      n: 4,
       short: "Pump",
       title: "Fire Pump Sizer",
       path: "fire-pump-sizer/",
@@ -50,11 +59,11 @@
     },
     {
       id: "tank",
-      n: 4,
+      n: 5,
       short: "Tank",
       title: "Fire Tank Sizer",
       path: "fire-tank-sizer/",
-      blurb: "Flow × duration + safety · prefab catalog · pad plan",
+      blurb: "Flow × duration + safety · multi-tank · prefab catalog · pad plan",
     },
   ];
 
@@ -260,6 +269,14 @@
     return { ready: true, detail: bit, when: fmtWhen(d.capturedAt) };
   }
 
+
+  function fireflowSummary(d) {
+    if (!d || !(Number(d.flowGpm) > 0)) return null;
+    var bit = Math.round(Number(d.flowGpm)).toLocaleString() + " gpm @ 20 psi";
+    if (d.durationMin) bit += " · " + Math.round(Number(d.durationMin)) + " min";
+    if (d.totalGallons) bit += " · " + Math.round(Number(d.totalGallons)).toLocaleString() + " gal";
+    return { ready: true, detail: bit, when: fmtWhen(d.capturedAt) };
+  }
   function pumpSummary(d) {
     if (!d || !(Number(d.flowGpm) > 0)) return null;
     var bit = Math.round(Number(d.flowGpm)) + " gpm × " + Math.round(Number(d.durationMin) || 0) + " min";
@@ -281,6 +298,7 @@
   function handoffState() {
     return {
       flow: flowSummary(readJson(KEYS.flow)),
+      fireflow: fireflowSummary(readJson(KEYS.fireflow)),
       sprinkler: sprinklerSummary(readJson(KEYS.sprinkler)),
       pump: pumpSummary(readJson(KEYS.pump)),
       tank: tankSummary(readJson(KEYS.tank)),
@@ -344,6 +362,7 @@
         // mark prior steps done if their handoff exists
         var ready =
           (s.id === "flow" && handoffs.flow) ||
+          (s.id === "fireflow" && handoffs.fireflow) ||
           (s.id === "sprinkler" && handoffs.sprinkler) ||
           (s.id === "pump" && handoffs.pump) ||
           (s.id === "tank" && handoffs.tank);
