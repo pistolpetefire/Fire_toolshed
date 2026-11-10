@@ -131,6 +131,7 @@
       <section class="card">
         <div class="card-head">
           <h2 class="card-title"><span class="icon" aria-hidden="true">∑</span> System Hydraulic Results + Water Supply</h2>
+          <button type="button" id="btnImportFireFlow" class="btn btn-sm btn-primary" title="Import required fire flow (gpm @ 20 psi + duration) from Fire Flow Calculator">Import Fire Flow</button>
           <button type="button" id="btnImportSprinkler" class="btn btn-sm btn-primary" title="Import flow, pressure, duration, and supply curve from Sprinkler System Estimator">Import Sprinkler Demand</button>
           <button type="button" id="btnSimplified" class="btn btn-sm" title="Override flow and pressure from the simplified hazard calculator below">Use Simplified Demand</button>
           <button type="button" id="btnCaptureTank" class="btn btn-sm" title="Save flow × duration for Fire Tank Sizer">Capture for Tank</button>
@@ -138,10 +139,13 @@
         </div>
         <p class="tiny" style="margin:-0.5rem 0 1rem">
           <strong>Step 3 · Water supply path:</strong> use the shared strip above, or work this page alone.
-          <strong>Import Sprinkler Demand</strong> loads flow, pressure, duration, hydrant test, and available PSI (N<sup>1.85</sup>).
+          <strong>Import Fire Flow</strong> loads required fire flow (gpm @ 20 psi residual + duration). <strong>Import Sprinkler Demand</strong> loads sprinkler flow, pressure, duration, and supply curve. Flow test is optional. Use the governing demand for the pump.
           <strong>Capture for Tank</strong> saves flow × duration for <a href="../fire-tank-sizer/">Fire Tank Sizer</a>.
           <strong>Use Simplified Demand</strong> overwrites from the hazard calculator below.
         </p>
+        <div id="fireflowHandoffBanner" class="status-row hidden" style="margin-bottom:0.5rem">
+          <div id="fireflowHandoffStatus" class="badge" aria-live="polite"></div>
+        </div>
         <div id="sprinklerHandoffBanner" class="status-row hidden" style="margin-bottom:0.85rem">
           <div id="sprinklerHandoffStatus" class="badge" aria-live="polite"></div>
         </div>
