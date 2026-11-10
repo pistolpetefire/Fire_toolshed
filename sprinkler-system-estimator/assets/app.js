@@ -38,17 +38,21 @@
     },
     {
       id: "undergroundMain",
-      label: "Underground / yard main (generic length allowance)",
-      basis: "Lump-sum friction + fittings for short private main; refine with full calc later.",
+      label: "Underground / lead-in main",
+      basis: "Hazen-Williams from diameter + length. Larger diameter lowers loss.",
       defaultPsi: 8,
       defaultOn: true,
+      isPipe: true,
+      diaKey: "leadDiaIn",
     },
     {
       id: "interiorMain",
-      label: "Interior feed main / standpipe feed (generic)",
-      basis: "Preliminary interior main friction allowance.",
+      label: "Riser / interior feed main",
+      basis: "Hazen-Williams from diameter + length. Larger diameter lowers loss.",
       defaultPsi: 6,
       defaultOn: true,
+      isPipe: true,
+      diaKey: "riserDiaIn",
     },
     {
       id: "floorControl",
@@ -1044,7 +1048,7 @@
   }
 
   function hazenLosses() {
-    if (!state.useHazen) return { leadPsi: 0, riserPsi: 0, active: false };
+    // Always calculate so diameter inputs in the table produce a loss
     const q = sprinklerDemandGpm();
     const leadL = num(state.leadLengthFt) + num(state.leadFittingsFt);
     const riserL = num(state.riserLengthFt) + num(state.riserFittingsFt);
@@ -1083,8 +1087,8 @@
     return state.losses.reduce((sum, row) => {
       if (!row.enabled) return sum;
       // When Hazen is on, underground and interior mains use calculated friction
-      if (hw.active && row.id === "undergroundMain") return sum + hw.leadPsi;
-      if (hw.active && row.id === "interiorMain") return sum + hw.riserPsi;
+      if (row.id === "undergroundMain") return sum + hw.leadPsi;
+      if (row.id === "interiorMain") return sum + hw.riserPsi;
       return sum + Math.max(0, num(row.psi));
     }, 0);
   }
@@ -1395,20 +1399,23 @@
         psi: meta.defaultPsi,
       };
       const hw = hazenLosses();
-      const isHwRow = hw.active && (meta.id === "undergroundMain" || meta.id === "interiorMain");
-      const displayPsi = isHwRow
+      const isPipe = !!meta.isPipe;
+      const calcPsi = isPipe
         ? (meta.id === "undergroundMain" ? hw.leadPsi : hw.riserPsi)
         : row.psi;
-      const hwNote = isHwRow ? " · Hazen-Williams (calculated)" : "";
+      const diaVal = isPipe ? (state[meta.diaKey] || "") : "";
       return `
         <tr>
-          <td><input type="checkbox" data-loss-en="${meta.id}" ${row.enabled ? "checked" : ""} aria-label="Include ${escapeHtml(meta.label)}" ${isHwRow ? "disabled" : ""}></td>
+          <td><input type="checkbox" data-loss-en="${meta.id}" ${row.enabled ? "checked" : ""} aria-label="Include ${escapeHtml(meta.label)}"></td>
           <td>
-            <div>${escapeHtml(meta.label)}${hwNote}</div>
+            <div>${escapeHtml(meta.label)}</div>
             <div class="sub" style="font-size:0.7rem;color:var(--muted)">${escapeHtml(meta.basis)}</div>
           </td>
           <td class="num">
-            <input type="number" data-loss-psi="${meta.id}" step="0.5" min="0" value="${displayPsi}" ${row.enabled && !isHwRow ? "" : "disabled"}>
+            ${isPipe
+              ? `<input type="number" data-loss-dia="${meta.diaKey}" step="0.5" min="1" value="${diaVal}" style="width:4.5rem" title="Inside diameter (in)"> <span class="sub">in → ${calcPsi.toFixed(1)} psi</span>`
+              : `<input type="number" data-loss-psi="${meta.id}" step="0.5" min="0" value="${row.psi}" ${row.enabled ? "" : "disabled"}>`
+            }
           </td>
         </tr>
       `;
@@ -2016,7 +2023,15 @@
     if (state.durationAuto !== false) applyDurationFromTable();
     writeForm();
     bind();
-    $("lossTable")?.addEventListener("input", onChange);
+    $("lossTable")?.addEventListener("input", (e) => {
+      const t = e.target;
+      if (t && t.matches("[data-loss-dia]")) {
+        const key = t.getAttribute("data-loss-dia");
+        state[key] = num(t.value, state[key]);
+        state.useHazen = true;
+      }
+      onChange();
+    });
     $("lossTable")?.addEventListener("change", (e) => {
       const t = e.target;
       if (t && t.matches("[data-loss-en]")) {
