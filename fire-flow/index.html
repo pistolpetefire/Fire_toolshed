@@ -5,14 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Determine required fire flow and hydrants for new building design per IBC/IFC Appendix B, UFC 3-600-01, and Florida Building Code / FFPC.">
   <title>Fire Flow Calculator · Fire Toolshed</title>
+  <link rel="stylesheet" href="../shared/water-path-shell.css">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+  <div id="waterPathShell" class="no-print"></div>
 <div class="shell">
   <header>
     <p class="eyebrow">Fire Toolshed · Water supply</p>
     <h1>Fire Flow Calculator</h1>
-    <p class="version">v1.0.0 · New building design</p>
+    <p class="version">v1.1.0 · New building design · water path</p>
     <p class="lead">Determine required fire flow (gpm @ 20 psi) and minimum hydrants for a new building. Select the code basis, construction type, area, and sprinkler protection. Output includes facility-specific method notes and is printable.</p>
   </header>
 
@@ -72,12 +74,14 @@
     <div id="results" class="results" style="display:none"></div>
 
     <div class="actions no-print">
+      <button type="button" id="btnCapture" class="primary">Capture for Pump & Tank</button>
       <button type="button" onclick="window.print()">Print report</button>
       <a href="../">← Back to Toolshed</a>
     </div>
   </section>
 </div>
 <script src="../shared.js"></script>
+<script src="../shared/water-path-shell.js"></script>
 <script src="./app.js"></script>
 </body>
 </html>
