@@ -8,6 +8,7 @@
   const STORAGE_KEY = 'firePumpSizer.v1';
   /** Shared handoff from Sprinkler System Estimator */
   const SPRINKLER_HANDOFF_KEY = 'fireToolshed.sprinklerHandoff.v1';
+  const FIREFLOW_HANDOFF_KEY = 'fireToolshed.fireFlowHandoff.v1';
   /** Shared handoff to Fire Tank Sizer */
   const PUMP_HANDOFF_KEY = 'fireToolshed.pumpHandoff.v1';
   const APP_VERSION = '2.7.2';
@@ -139,6 +140,67 @@
     }
   }
 
+
+  function readFireFlowHandoff() {
+    try {
+      const raw = localStorage.getItem(FIREFLOW_HANDOFF_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (!data || typeof data !== 'object') return null;
+      if (!(Number(data.flowGpm) > 0)) return null;
+      return data;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function updateFireFlowHandoffBanner() {
+    const data = readFireFlowHandoff();
+    const banner = $('fireflowHandoffBanner');
+    const status = $('fireflowHandoffStatus');
+    if (!banner || !status) return;
+    if (!data) {
+      banner.classList.add('hidden');
+      return;
+    }
+    banner.classList.remove('hidden');
+    const when = data.capturedAt ? new Date(data.capturedAt).toLocaleString() : 'recently';
+    status.textContent =
+      `Fire flow capture ready: ${Math.round(data.flowGpm)} GPM @ 20 psi residual · ${Math.round(data.durationMin || 0)} min · ${Math.round(data.totalGallons || 0).toLocaleString()} gal (${when})`;
+    status.className = 'badge badge-info';
+  }
+
+  /** Import fire flow (gpm @ 20 psi + duration) as pump duty planning point. Residual is at hydrant; add elevation/losses as needed. */
+  function importFireFlowDemand() {
+    const data = readFireFlowHandoff();
+    if (!data) {
+      toast('No fire flow capture found. Open Fire Flow Calculator and click “Capture for Pump & Tank”.');
+      updateFireFlowHandoffBanner();
+      return;
+    }
+    if ($('systemFlow')) $('systemFlow').value = Math.round(Number(data.flowGpm));
+    // Fire flow residual is 20 psi at the hydrant. For pump duty, user still adds elevation + losses.
+    // We set a planning residual of 20 psi and note that elevation/losses are additional.
+    if ($('systemPressure')) $('systemPressure').value = '20.0';
+    if ($('systemDuration')) $('systemDuration').value = Math.round(Number(data.durationMin) || 60);
+    if ($('systemDurationBasis')) {
+      $('systemDurationBasis').textContent =
+        'Imported from Fire Flow Calculator (gpm @ 20 psi residual). Add elevation and friction losses for pump discharge pressure.';
+    }
+    ['systemFlow', 'systemPressure', 'systemDuration'].forEach((id) => {
+      const el = $(id);
+      if (!el) return;
+      el.style.transition = 'box-shadow 0.3s, border-color 0.3s';
+      el.style.borderColor = '#1e3a8a';
+      el.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.2)';
+      setTimeout(() => {
+        el.style.boxShadow = '';
+        el.style.borderColor = '';
+      }, 1200);
+    });
+    toast(`Imported fire flow: ${Math.round(data.flowGpm)} GPM @ 20 psi residual · ${Math.round(data.durationMin || 0)} min. Add elevation + losses for pump pressure.`);
+    updateFireFlowHandoffBanner();
+  }
   function updateSprinklerHandoffBanner() {
     const data = readSprinklerHandoff();
     const banner = $('sprinklerHandoffBanner');
@@ -166,6 +228,7 @@
     if (!data) {
       toast('No sprinkler capture found. Open Sprinkler System Estimator and click “Capture for Pump Sizer”.');
       updateSprinklerHandoffBanner();
+    updateFireFlowHandoffBanner();
       return;
     }
 
@@ -226,6 +289,7 @@
     switchTab(0);
     scheduleSave();
     updateSprinklerHandoffBanner();
+    updateFireFlowHandoffBanner();
     const supplyNote =
       sa && sa.status
         ? ` · supply ${sa.status}${Number.isFinite(Number(sa.availablePsi)) ? ` (avail ${Number(sa.availablePsi).toFixed(1)} psi)` : ''}`
@@ -1953,6 +2017,7 @@ ${(data.demandPoints || []).map((p, i) => `${esc(p.name)}: ${Math.round(p.flow)}
     $('hazardSelect')?.addEventListener('change', updateHazardSelection);
     $('btnSimplified')?.addEventListener('click', useSimplifiedDemand);
     $('btnImportSprinkler')?.addEventListener('click', importSprinklerDemand);
+    $('btnImportFireFlow')?.addEventListener('click', importFireFlowDemand);
     $('btnCaptureTank')?.addEventListener('click', () => captureForTankSizer(false));
     $('btnCaptureTankOpen')?.addEventListener('click', () => captureForTankSizer(true));
     $('btnSupply')?.addEventListener('click', () => calculateSupplyCurve(false));
@@ -2004,6 +2069,7 @@ ${(data.demandPoints || []).map((p, i) => `${esc(p.name)}: ${Math.round(p.flow)}
     updateCodeNotes();
     updateSimplifiedPreview();
     updateSprinklerHandoffBanner();
+    updateFireFlowHandoffBanner();
     if (window.FireToolshedShell) {
       window.FireToolshedShell.mount({ step: 'pump', base: '..' });
     }
