@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simple Bulk SDS to HMIS Instructions · Fire Toolshed</title>
+<link rel="stylesheet" href="../directory/style.css">
+<link rel="stylesheet" href="bulk.css">
+<style>
+.step { margin: 2rem 0; padding: 1.5rem; border-left: 4px solid #163b70; background: #f8fafc; }
+.step h2 { margin-top: 0; color: #163b70; }
+.who { display: inline-block; font-weight: bold; padding: 0.2rem 0.6rem; border-radius: 4px; margin-right: 0.5rem; }
+.human { background: #dbeafe; color: #1e40af; }
+.app { background: #dcfce7; color: #166534; }
+.ai { background: #fef3c7; color: #92400e; }
+</style>
+</head>
+<body>
+<header>
+<a class="brand" href="../">FIRE TOOLSHED</a>
+<nav>
+<a href="bulk.html">Open bulk workspace</a>
+<a href="index.html">Assessment / HMIS</a>
+<a href="../video-training/#bulk-sds">Video</a>
+</nav>
+</header>
+<main>
+<section class="hero">
+<span class="eyebrow">SIMPLE INSTRUCTIONS</span>
+<h1>Bulk SDS to HMIS — step by step</h1>
+<p>One workspace per project. Human controls uploads and validation. App keeps the record. AI is used only for classification batches.</p>
+</section>
+
+<div class="step">
+<h2>1. Load the SDS package</h2>
+<p><span class="who human">Human</span> Open the Bulk SDS workspace. Enter project name, jurisdiction, and code basis (IBC, Florida Building Code, or NFPA 400) plus edition. Name the delivery and upload PDFs or a ZIP. You can add more packages later to the same workspace. Export the receipt log and confirm every file is registered.</p>
+<p><span class="who app">App</span> Reads PDFs, records fingerprints, extracts text, and stores everything in this browser. No AI is used.</p>
+</div>
+
+<div class="step">
+<h2>2. Confirm documents and product identities</h2>
+<p><span class="who human">Human</span> Review sources. Confirm product name, manufacturer, revision, and page ranges (especially combined PDFs). Use the “next 25” helper for simple files. Correct bad text if needed.</p>
+<p><span class="who app">App</span> Creates permanent material IDs so later results merge safely. No AI is used.</p>
+</div>
+
+<div class="step">
+<h2>3. AI classification (only AI step)</h2>
+<p><span class="who human">Human</span> Select the next 25 materials (stay at or under 50). Click “Export selected AI batch.” Open the ZIP. It contains PDFs, extracted text, permanent IDs, project basis, and AI-INSTRUCTIONS.txt. Give the package to your approved AI and follow the instructions exactly. Bring the completed JSON back. Use “Preview AI results,” review, and merge. Repeat until every material has a result or an open question.</p>
+<p><span class="who app">App</span> Packages only the selected materials. Merges returned JSON by permanent material ID. Never sends files to an AI itself.</p>
+<p><span class="who ai">AI</span> Classifies hazards against the code basis you entered. Records SDS evidence and database corroboration (PubChem, CAMEO, NIOSH with URL, access date, and evidence). Does not invent quantities.</p>
+</div>
+
+<div class="step">
+<h2>4. Client quantities</h2>
+<p><span class="who human">Human</span> Download the prefilled owner workbook and send it to the client. Client fills maximum expected quantities (storage / closed-use / open-use), locations, and on-site status. Keep the prefilled IDs. Unknowns stay blank; enter zero only when confirmed absent. Load the returned Excel back into the app, review the preview, and apply.</p>
+<p><span class="who app">App</span> Matches rows by permanent ID, updates inventory, and preserves hazard findings. No AI is used.</p>
+</div>
+
+<div class="step">
+<h2>5. MAQ review and assessment export</h2>
+<p><span class="who human">Human</span> Export the assessment JSON or Excel. Import into the main Assessment / HMIS view. Review which materials exceed MAQ (use the companion MAQ & Control Area Calculator for detailed math). Confirm control areas and Group H implications. Health hazards that exceed MAQ are H-4 only.</p>
+<p><span class="who app">App</span> Produces the hazard register with evidence. Flags items that need MAQ review. No AI is used for the final MAQ call.</p>
+</div>
+
+<div class="step">
+<h2>6. HMIS tables and Revit text (final output)</h2>
+<p><span class="who human">Human</span> In the HMIS section, assign materials to rooms or control areas. Review or edit the generated room notes (scope, hazards, occupancy/MAQ, containers, incompatibilities, containment, ventilation, signage, fire protection, egress). Validate the rooms. Export the reviewed HMIS room notes text. Copy the relevant blocks into the corresponding Revit text notes. Reconcile quantities and hazards against the Excel and plans.</p>
+<p><span class="who app">App</span> Builds the HMIS inventory tables and draft/reviewed room-note text ready for Revit. Marks status so nothing issues until validated.</p>
+<p><span class="who ai">AI</span> Optional only for drafting note language from already-validated evidence. The human must confirm every note before export.</p>
+</div>
+
+<section class="panel">
+<h2>Key rules</h2>
+<ul>
+<li>One workspace per project. Upload multiple packages into it.</li>
+<li>100 MiB per PDF; 1 GiB expanded data per ZIP. Split larger deliveries.</li>
+<li>AI batches: 25 recommended, 50 maximum.</li>
+<li>Jurisdiction and adopted code edition must be set before AI classification.</li>
+<li>Human validation is required at every stage. The app and AI do not issue final engineering conclusions.</li>
+<li>Backup workspace JSON and original packages after major steps.</li>
+</ul>
+<a class="button" href="bulk.html">Open the bulk workspace</a>
+<a class="button" href="index.html">Go to Assessment / HMIS</a>
+</section>
+</main>
+<footer><p>Fire Toolshed · Simple Bulk SDS to HMIS instructions · Educational only. Verify against the adopted code and AHJ.</p></footer>
+</body>
+</html>
