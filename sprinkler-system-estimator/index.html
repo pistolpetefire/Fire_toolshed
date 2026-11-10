@@ -19,7 +19,7 @@
       <div>
         <p class="eyebrow">Fire Toolshed</p>
         <h1>Sprinkler System Estimator</h1>
-        <p class="version" id="appVersion">Version 1.8.0-prelim</p>
+        <p class="version" id="appVersion">Version 1.9.0-prelim</p>
         <p class="version" id="codeEdition">Code basis: <strong>NFPA 13-2022</strong> (Florida 9th Edition reference) · UFC 3-600-01 · FM planning</p>
       </div>
       <div class="top-actions no-print">
@@ -123,7 +123,7 @@
               <input type="radio" name="mode" value="criteria">
               <div>
                 <b>Criteria-assisted — density / area planning</b>
-                <small>Seed demand from NFPA 13, UFC 3-600-01, AF Sundown, or FM Global planning presets (wet or dry pipe), then edit.</small>
+                <small>Select the jurisdiction that governs this project. Presets and durations follow that basis.</small>
               </div>
             </label>
           </div>
@@ -147,13 +147,20 @@
 
         <!-- Criteria demand -->
         <section class="panel hidden" id="criteriaDemandPanel">
-          <h2>Criteria framework</h2>
+          <h2>Jurisdiction / code basis</h2>
           <div class="criteria">
             <label>
               <input type="radio" name="framework" value="nfpa13" checked>
               <div>
                 <b>NFPA 13</b>
                 <small>Density-area planning presets for light / ordinary / extra hazard.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="framework" value="florida">
+              <div>
+                <b>Florida (FFPC / NFPA 1)</b>
+                <small>Florida Fire Prevention Code adopts NFPA 1. Uses NFPA 13 density-area presets with Florida-aware notes. Confirm local amendments.</small>
               </div>
             </label>
             <label>
@@ -201,7 +208,7 @@
           </p>
 
           <div class="field" style="margin-top:1rem">
-            <label for="presetSelect">Preset</label>
+            <label for="presetSelect">Governing / worst hazard</label>
             <select id="presetSelect"></select>
           </div>
 
@@ -390,7 +397,7 @@
           <p class="hint">Optional. When enabled, underground and interior main losses are calculated from diameter, length, and C-factor instead of the fixed lump sums. Larger pipe → lower friction. Planning estimate only — not a full hydraulic network.</p>
           <label class="field" style="margin-bottom:0.65rem">
             <span style="display:flex;align-items:center;gap:0.5rem;font-weight:600;font-size:0.85rem">
-              <input id="useHazen" type="checkbox" style="width:auto;min-height:auto">
+              <input id="useHazen" type="checkbox" style="width:auto;min-height:auto" checked>
               Use Hazen-Williams for lead-in and riser
             </span>
           </label>
@@ -435,7 +442,28 @@
                 <div class="row"><input id="riserFittingsFt" type="number" min="0" step="5" value="15"><span class="suffix">ft</span></div>
               </div>
             </div>
-            <p class="hint" style="margin-top:0.5rem">Friction = 4.52 × Q<sup>1.85</sup> × L / (C<sup>1.85</sup> × d<sup>4.87</sup>). Calculated values replace the underground and interior main rows below when this is on.</p>
+            
+            <h3 style="font-size:0.9rem;margin:0.75rem 0 0.35rem">Main at roof / ceiling level</h3>
+            <div class="field-grid two">
+              <div class="field">
+                <label for="roofDiaIn">Diameter</label>
+                <div class="row"><input id="roofDiaIn" type="number" min="1" step="0.5" value="4"><span class="suffix">in</span></div>
+              </div>
+              <div class="field">
+                <label for="roofLengthFt">Length</label>
+                <div class="row"><input id="roofLengthFt" type="number" min="0" step="10" value="80"><span class="suffix">ft</span></div>
+              </div>
+              <div class="field">
+                <label for="roofC">C-factor</label>
+                <div class="row"><input id="roofC" type="number" min="80" step="10" value="120"></div>
+                <span class="sub">120 typical steel; 140 cement-lined / CPVC.</span>
+              </div>
+              <div class="field">
+                <label for="roofFittingsFt">Fittings equivalent</label>
+                <div class="row"><input id="roofFittingsFt" type="number" min="0" step="5" value="20"><span class="suffix">ft</span></div>
+              </div>
+            </div>
+<p class="hint" style="margin-top:0.5rem">Friction = 4.52 × Q<sup>1.85</sup> × L / (C<sup>1.85</sup> × d<sup>4.87</sup>). Calculated values replace the underground and interior main rows below when this is on.</p>
             <p id="hazenImpact" class="hint hidden" style="margin-top:0.35rem;font-weight:600;color:var(--ink,#0f172a)"></p>
           </div>
         </section>
@@ -443,7 +471,7 @@
         <!-- Equipment losses -->
         <section class="panel">
           <h2>Generic equipment / main losses</h2>
-          <p class="hint">Underground and riser rows take <strong>diameter</strong> (inches). Loss is calculated with Hazen-Williams from the length and C-factor above. Larger diameter → lower loss. Valve and meter rows remain PSI allowances.</p>
+          <p class="hint">Lead-in, riser, and roof main losses are calculated from the diameters and lengths above (Hazen-Williams). Larger diameter → lower loss. Valve and meter rows remain PSI allowances. All inputs recalculate immediately.</p>
           <table class="loss-table" id="lossTable">
             <thead>
               <tr>
@@ -588,7 +616,7 @@
       <div id="reportLogoPrint" class="report-logo-print"></div>
       <p class="eyebrow">Fire Toolshed · Preliminary Charette Report</p>
       <h1>Sprinkler System Demand Estimate</h1>
-      <p>Version <span id="printVersion">1.6.2-prelim</span> · Code basis: NFPA 13-2022 · Not a final Hazen-Williams hydraulic calculation</p>
+      <p>Version <span id="printVersion">1.9.0-prelim</span> · Code basis: NFPA 13-2022 · Not a final Hazen-Williams hydraulic calculation</p>
     </section>
     <section class="print-only print-meta">
       <div><b>Project</b> <span id="printProject">—</span></div>
@@ -689,7 +717,9 @@
         <h3>Estimate mode</h3>
         <ul>
           <li><strong>Simple — manual system demand:</strong> Enter total GPM when you already have a planning or hydraulic total.</li>
-          <li><strong>Criteria-assisted:</strong> Seed density, design area, hose, K, and duration from NFPA 13, UFC 3-600-01, AF Sundown, or FM Global presets, then edit.</li>
+          <li><strong>Jurisdiction:</strong> Select NFPA 13, Florida (FFPC), UFC, AF Sundown, or FM Global. This sets the code basis and available hazard presets.</li>
+          <li><strong>Governing hazard:</strong> Pick the worst expected hazard. ESFR 40 ft options are under NFPA 13 and FM (wet only).</li>
+          <li><strong>Criteria-assisted:</strong> Seed density, design area, hose, K, and duration from the selected jurisdiction, then edit. All inputs recalculate immediately.</li>
         </ul>
 
         <h3>Criteria framework</h3>
