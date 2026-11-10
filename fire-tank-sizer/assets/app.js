@@ -10,6 +10,7 @@
   const APP_VERSION = "1.1.1-prelim";
   const STORAGE_KEY = "fireTankSizer.v1";
   const SPRINKLER_HANDOFF_KEY = "fireToolshed.sprinklerHandoff.v1";
+  const FIREFLOW_HANDOFF_KEY = "fireToolshed.fireFlowHandoff.v1";
   const PUMP_HANDOFF_KEY = "fireToolshed.pumpHandoff.v1";
   const TANK_HANDOFF_KEY = "fireToolshed.tankHandoff.v1";
   const GAL_PER_CUFT = 7.48051945;
@@ -96,6 +97,7 @@
     customDiaFt: 0,
     customHtFt: 0,
     useCustom: false,
+    numTanks: 1,
   });
 
   let state = defaultState();
@@ -177,19 +179,39 @@
     const maxH = num(state.maxHeightFt, 999);
     const maxD = num(state.maxDiaFt, 999);
     const need = demand.requiredShellGal;
+    const n = Math.max(1, Math.round(num(state.numTanks, 1)));
     return PREFAB_CATALOG.map((t) => {
       const okH = !(maxH > 0) || t.htFt <= maxH + 1e-9;
       const okD = !(maxD > 0) || t.diaFt <= maxD + 1e-9;
-      const okV = t.computedGal + 1e-6 >= need;
+      const totalGal = t.computedGal * n;
+      const okV = totalGal + 1e-6 >= need;
       return {
         ...t,
+        numTanks: n,
+        totalGal: totalGal,
         ok: okH && okD && okV,
         failH: !okH,
         failD: !okD,
         failV: !okV,
-        spareGal: t.computedGal - need,
+        spareGal: totalGal - need,
       };
     });
+  }
+
+  /** Suggest minimum number of identical tanks when one tank cannot meet volume under site limits */
+  function suggestTankCount(demand) {
+    const maxH = num(state.maxHeightFt, 999) || 999;
+    const maxD = num(state.maxDiaFt, 999) || 999;
+    const need = demand.requiredShellGal;
+    const candidates = PREFAB_CATALOG.filter((t) =>
+      (!(maxH > 0) || t.htFt <= maxH + 1e-9) &&
+      (!(maxD > 0) || t.diaFt <= maxD + 1e-9)
+    );
+    if (!candidates.length) return 1;
+    const largest = candidates.reduce((a, b) => (a.computedGal > b.computedGal ? a : b));
+    if (largest.computedGal <= 0) return 1;
+    const n = Math.ceil(need / largest.computedGal);
+    return Math.min(Math.max(1, n), 6);
   }
 
   function selectedTank(demand) {
@@ -415,6 +437,7 @@
     if (fw) fw.checked = true;
     if ($("flowGpm")) $("flowGpm").value = state.flowGpm;
     if ($("durationMin")) $("durationMin").value = state.durationMin;
+    if ($("numTanks")) $("numTanks").value = state.numTanks || 1;
     if ($("safetyPct"))
       $("safetyPct").value =
         state.safetyPctOverride == null ? "" : state.safetyPctOverride;
@@ -447,8 +470,9 @@
           (calc.tank && calc.tank.id === t.id && !state.useCustom)
             ? "selected "
             : "") + (t.ok ? "pick" : "fail");
+        const n = Math.max(1, Math.round(num(state.numTanks, 1)));
         const note = t.ok
-          ? "+" + round0(t.spareGal).toLocaleString() + " gal spare"
+          ? (n > 1 ? n + "× " : "") + "+" + round0(t.spareGal).toLocaleString() + " gal spare"
           : [
               t.failV ? "volume" : "",
               t.failH ? "height" : "",
@@ -486,10 +510,18 @@
     if ($("metricBase")) $("metricBase").textContent = d.baseGal.toLocaleString();
     if ($("metricRequired"))
       $("metricRequired").textContent = d.requiredShellGal.toLocaleString();
-    if ($("metricTank"))
-      $("metricTank").textContent = calc.tank
-        ? round0(calc.tank.computedGal).toLocaleString()
-        : "—";
+    if ($("metricTank")) {
+      if (calc.tank) {
+        const n = Math.max(1, Math.round(num(state.numTanks, 1)));
+        const total = calc.tank.computedGal * n;
+        $("metricTank").textContent = n > 1
+          ? n + " × " + round0(calc.tank.computedGal).toLocaleString()
+          : round0(calc.tank.computedGal).toLocaleString();
+        $("metricTank").title = n > 1 ? "Total " + total.toLocaleString() + " gal" : "";
+      } else {
+        $("metricTank").textContent = "—";
+      }
+    }
     if ($("metricPad"))
       $("metricPad").textContent = calc.tank ? calc.pad.padDiaFt + "'" : "—";
 
@@ -554,7 +586,14 @@
     set(
       "printTank",
       calc.tank
-        ? `⌀ ${calc.tank.diaFt}' × ${calc.tank.htFt}' H · ${round0(calc.tank.computedGal).toLocaleString()} gal (${calc.tank.style})`
+        ? (() => {
+            const n = Math.max(1, Math.round(num(state.numTanks, 1)));
+            const total = calc.tank.computedGal * n;
+            const each = round0(calc.tank.computedGal).toLocaleString();
+            return n > 1
+              ? `${n} tanks · ⌀ ${calc.tank.diaFt}' × ${calc.tank.htFt}' H · ${each} gal each · ${total.toLocaleString()} gal total (${calc.tank.style})`
+              : `⌀ ${calc.tank.diaFt}' × ${calc.tank.htFt}' H · ${each} gal (${calc.tank.style})`;
+          })()
         : "—"
     );
     set(
@@ -661,6 +700,38 @@
   }
 
   /** Import best available upstream handoff: pump first, then sprinkler. */
+  
+  function importFireFlowHandoff(silent) {
+    try {
+      const raw = localStorage.getItem(FIREFLOW_HANDOFF_KEY);
+      if (!raw) {
+        if (!silent) toast("No fire flow capture found — open Fire Flow Calculator and Capture for Pump & Tank first");
+        return false;
+      }
+      const d = JSON.parse(raw);
+      if (!(num(d.flowGpm) > 0)) {
+        if (!silent) toast("Fire flow handoff missing flow");
+        return false;
+      }
+      state.flowGpm = num(d.flowGpm);
+      if (num(d.durationMin) > 0) state.durationMin = num(d.durationMin);
+      // Auto-suggest tank count for large volumes
+      const baseGal = state.flowGpm * state.durationMin;
+      if (baseGal > 200000) {
+        const demand = computeDemand();
+        state.numTanks = suggestTankCount(demand);
+        toast("Fire flow imported. Suggested " + state.numTanks + " tanks for ~" + Math.round(baseGal).toLocaleString() + " gal base volume.");
+      } else {
+        toast("Fire flow imported: " + state.flowGpm + " gpm × " + state.durationMin + " min");
+      }
+      save();
+      render();
+      return true;
+    } catch (_) {
+      if (!silent) toast("Could not read fire flow handoff");
+      return false;
+    }
+  }
   function importUpstreamDemand(silent) {
     if (importPumpHandoff(true)) {
       if (!silent) {
