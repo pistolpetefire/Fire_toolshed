@@ -98,6 +98,9 @@
     { id: "oh2-dry", name: "Ordinary hazard Group 2 — dry · 0.20/1,950 · K8.0", sys: "dry", density: 0.2, area: 1950, hose: 250, remotePsi: 7, kFactor: 8.0, coverage: 130, note: "OH-2 dry pipe planning: density unchanged, design area +30% (1,500 → 1,950 sf). Confirm adopted NFPA 13." },
     { id: "eh1-dry", name: "Extra hazard Group 1 — dry · 0.30/3,250 · K11.2", sys: "dry", density: 0.3, area: 3250, hose: 500, remotePsi: 7, kFactor: 11.2, coverage: 100, note: "EH-1 dry pipe planning: density unchanged, design area +30% (2,500 → 3,250 sf)." },
     { id: "eh2-dry", name: "Extra hazard Group 2 — dry · 0.40/3,250 · K11.2", sys: "dry", density: 0.4, area: 3250, hose: 500, remotePsi: 7, kFactor: 11.2, coverage: 100, note: "EH-2 dry pipe planning: density unchanged, design area +30% (2,500 → 3,250 sf)." },
+    // ESFR / high-demand storage — 40 ft ceiling planning (wet only)
+    { id: "esfr-k252-40", name: "ESFR — 40 ft ceiling · K-25.2 · 12 @ 60 psi (highest)", sys: "wet", density: 0, area: 0, hose: 250, remotePsi: 60, kFactor: 25.2, coverage: 100, heads: 12, headPsi: 60, duration: 60, note: "ESFR planning — 40 ft roof. 12 most demanding heads at 60 psi, K-25.2. Highest typical demand. Confirm listing and commodity. Wet only." },
+    { id: "esfr-k14-40", name: "ESFR — 40 ft ceiling · K-14.0 · 12 @ 75 psi", sys: "wet", density: 0, area: 0, hose: 250, remotePsi: 75, kFactor: 14.0, coverage: 100, heads: 12, headPsi: 75, duration: 60, note: "ESFR planning — 40 ft roof. 12 heads at 75 psi, K-14.0. Confirm listing. Wet only." },
   ];
 
   /**
@@ -169,6 +172,9 @@
     { id: "ds5-32-dc", name: "FM DS 5-32 style — data center (wet)", sys: "wet", density: 0.3, area: 2500, hose: 250, remotePsi: 7, kFactor: 8, coverage: 130, note: "Data center protection varies (wet/preaction/clean agent). Cite DS 5-32 project path." },
     // ESFR / storage — wet only (no dry-pipe criteria)
     { id: "ds8-9-storage", name: "FM DS 8-9 / ESFR-type storage (wet only)", sys: "wet", density: 0.45, area: 2000, hose: 500, remotePsi: 7, kFactor: 11.2, coverage: 100, note: "Storage / ESFR-type protection is wet-pipe only in this tool. Configuration-specific — replace with governing DS 8-9 / ESFR listing values for commodity, height, and aisle. No dry-pipe storage or ESFR criteria." },
+    { id: "fm-esfr-k252-40", name: "FM DS 8-9 ESFR — 40 ft ceiling · K-25.2 · 12 @ 60 psi (highest)", sys: "wet", density: 0, area: 0, hose: 250, remotePsi: 60, kFactor: 25.2, coverage: 100, heads: 12, headPsi: 60, duration: 90, note: "FM DS 8-9 ESFR planning — 40 ft roof. 12 heads at 60 psi, K-25.2. Highest typical. Confirm DS table for commodity/storage height. Wet only. 90 min duration." },
+    { id: "fm-esfr-k14-40", name: "FM DS 8-9 ESFR — 40 ft ceiling · K-14.0 · 12 @ 75 psi", sys: "wet", density: 0, area: 0, hose: 250, remotePsi: 75, kFactor: 14.0, coverage: 100, heads: 12, headPsi: 75, duration: 90, note: "FM DS 8-9 ESFR planning — 40 ft roof. 12 heads at 75 psi, K-14.0. Confirm DS. Wet only. 90 min." },
+
     // Dry — general hazard only (not storage/ESFR)
     { id: "ds3-26-oh-dry", name: "FM DS 3-26 style — ordinary hazard (dry)", sys: "dry", density: 0.2, area: 3250, hose: 250, remotePsi: 7, kFactor: 8, coverage: 130, note: "Generic OH dry planning: area +30% (2,500 → 3,250 sf). Confirm FM DS dry/preaction rules. Not for ESFR/storage." },
     { id: "ds3-26-eh-dry", name: "FM DS 3-26 style — extra hazard (dry)", sys: "dry", density: 0.3, area: 3250, hose: 500, remotePsi: 7, kFactor: 11.2, coverage: 100, note: "Extra hazard dry planning (+30% area). Confirm DS tables. Not for ESFR/storage." },
