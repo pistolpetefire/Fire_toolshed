@@ -1,0 +1,34 @@
+:root {
+  --blue-900: #234e70;
+  --slate-50: #f4f6f9;
+  --slate-200: #dde4ec;
+  --slate-600: #526578;
+  --slate-800: #193a56;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--slate-50);
+  color: var(--slate-800);
+  line-height: 1.5;
+}
+.shell { max-width: 960px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+header { margin-bottom: 1.5rem; }
+.eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue-900); margin: 0 0 0.25rem; }
+h1 { margin: 0 0 0.25rem; font-size: 1.75rem; letter-spacing: -0.03em; }
+.version, .lead { color: var(--slate-600); font-size: 0.9rem; margin: 0.25rem 0; }
+.card { background: #fff; border: 1px solid var(--slate-200); border-radius: 1rem; padding: 1.25rem 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
+select, input[type="number"] { width: 100%; padding: 0.5rem 0.65rem; border: 1px solid var(--slate-200); border-radius: 0.5rem; font-size: 1rem; }
+.check { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+.calc { background: var(--blue-900); color: #fff; border: 0; padding: 0.75rem 1.5rem; border-radius: 0.6rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem; }
+.calc:hover { filter: brightness(1.1); }
+.results { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--slate-200); }
+.results .big { font-size: 1.75rem; color: var(--blue-900); font-weight: 700; }
+.notes { background: #f8fafc; padding: 0.75rem 1rem; border-radius: 0.5rem; margin: 1rem 0; }
+.cite { font-size: 0.75rem; color: var(--slate-600); margin-top: 1rem; }
+.actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
+.actions button, .actions a { background: #fff; border: 1px solid var(--slate-200); padding: 0.5rem 0.85rem; border-radius: 0.5rem; text-decoration: none; color: inherit; font-size: 0.85rem; cursor: pointer; }
+@media print { .no-print { display: none; } body { background: #fff; } }

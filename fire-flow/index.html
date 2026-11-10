@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Determine required fire flow and hydrants for new building design per IBC/IFC Appendix B, UFC 3-600-01, and Florida Building Code / FFPC.">
+  <title>Fire Flow Calculator · Fire Toolshed</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="shell">
+  <header>
+    <p class="eyebrow">Fire Toolshed · Water supply</p>
+    <h1>Fire Flow Calculator</h1>
+    <p class="version">v1.0.0 · New building design</p>
+    <p class="lead">Determine required fire flow (gpm @ 20 psi) and minimum hydrants for a new building. Select the code basis, construction type, area, and sprinkler protection. Output includes facility-specific method notes and is printable.</p>
+  </header>
+
+  <section class="card">
+    <div class="grid">
+      <div>
+        <label for="basis">Code basis</label>
+        <select id="basis">
+          <option value="ifc">IBC / IFC Appendix B</option>
+          <option value="ufc">UFC 3-600-01 (DoD)</option>
+          <option value="florida">Florida Building Code / FFPC (NFPA 1)</option>
+        </select>
+      </div>
+      <div>
+        <label for="constType">Construction type</label>
+        <select id="constType">
+          <option value="ia">Type IA / IB</option>
+          <option value="iia">Type IIA / IIIA</option>
+          <option value="iva">Type IV / VA</option>
+          <option value="iib">Type IIB / IIIB</option>
+          <option value="vb">Type VB</option>
+        </select>
+      </div>
+      <div>
+        <label for="area">Fire-flow calculation area (ft²)</label>
+        <input id="area" type="number" value="25000" min="0" step="100">
+        <small>Total floor area of all floors (outside walls). For Type IA/IB use the three largest successive floors.</small>
+      </div>
+      <div>
+        <label for="sprinkler">Sprinkler system</label>
+        <select id="sprinkler">
+          <option value="none">None</option>
+          <option value="13">NFPA 13 throughout</option>
+          <option value="13r">NFPA 13R</option>
+          <option value="13d">NFPA 13D / IRC</option>
+        </select>
+      </div>
+    </div>
+    <div class="check">
+      <label><input id="qr" type="checkbox"> Quick-response sprinklers throughout (reduces min further in some codes)</label>
+    </div>
+    <div class="grid" style="margin-top:1rem">
+      <div>
+        <label for="special">UFC special facility (optional)</label>
+        <select id="special">
+          <option value="">Standard building</option>
+          <option value="family1">Family housing – 1 story</option>
+          <option value="family2">Family housing – 2 stories</option>
+          <option value="family3">Family housing – 3+ stories</option>
+          <option value="vehicle">Vehicle parking areas</option>
+          <option value="aircraft">Aircraft parking / refueling</option>
+        </select>
+      </div>
+    </div>
+    <button id="calcBtn" class="calc" type="button">Calculate</button>
+
+    <div id="results" class="results" style="display:none"></div>
+
+    <div class="actions no-print">
+      <button type="button" onclick="window.print()">Print report</button>
+      <a href="../">← Back to Toolshed</a>
+    </div>
+  </section>
+</div>
+<script src="../shared.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
