@@ -13,6 +13,7 @@
 .human { background: #dbeafe; color: #1e40af; }
 .app { background: #dcfce7; color: #166534; }
 .ai { background: #fef3c7; color: #92400e; }
+.client { background: #fce7f3; color: #9d174d; }
 </style>
 </head>
 <body>
@@ -28,7 +29,7 @@
 <section class="hero">
 <span class="eyebrow">SIMPLE INSTRUCTIONS</span>
 <h1>Bulk SDS to HMIS — step by step</h1>
-<p>One workspace per project. Human controls uploads and validation. App keeps the record. AI is used only for classification batches.</p>
+<p>One workspace per project. Human controls uploads and validation. App keeps the record. AI is used only for classification batches. Client quantity confirmation is a separate handoff.</p>
 </section>
 
 <div class="step">
@@ -51,8 +52,10 @@
 </div>
 
 <div class="step">
-<h2>4. Client quantities</h2>
-<p><span class="who human">Human</span> Download the prefilled owner workbook and send it to the client. Client fills maximum expected quantities (storage / closed-use / open-use), locations, and on-site status. Keep the prefilled IDs. Unknowns stay blank; enter zero only when confirmed absent. Load the returned Excel back into the app, review the preview, and apply.</p>
+<h2>4. Separate client quantity handoff</h2>
+<p><span class="who human">Human</span> Download the prefilled owner workbook. Send it to the client as a distinct step.</p>
+<p><span class="who client">Client</span> Fills maximum expected quantities (storage / closed-use / open-use), locations, and on-site status. Keeps the prefilled IDs. Leaves unknowns blank; enters zero only when confirmed absent. Returns the completed workbook.</p>
+<p><span class="who human">Human</span> Load the returned Excel back into the app, review the preview, and apply the import.</p>
 <p><span class="who app">App</span> Matches rows by permanent ID, updates inventory, and preserves hazard findings. No AI is used.</p>
 </div>
 
@@ -76,6 +79,7 @@
 <li>100 MiB per PDF; 1 GiB expanded data per ZIP. Split larger deliveries.</li>
 <li>AI batches: 25 recommended, 50 maximum.</li>
 <li>Jurisdiction and adopted code edition must be set before AI classification.</li>
+<li>Client quantity confirmation is a separate handoff after classification is complete.</li>
 <li>Human validation is required at every stage. The app and AI do not issue final engineering conclusions.</li>
 <li>Backup workspace JSON and original packages after major steps.</li>
 </ul>
