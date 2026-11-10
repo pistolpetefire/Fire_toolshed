@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.6.2-prelim";
+  const APP_VERSION = "1.9.0-prelim";
   const STORAGE_KEY = "sprinklerSystemEstimator.v1";
   /** Shared handoff payload for Fire Pump Sizer (and future tank sizer) */
   const HANDOFF_KEY = "fireToolshed.sprinklerHandoff.v1";
@@ -47,12 +47,21 @@
     },
     {
       id: "interiorMain",
-      label: "Riser / interior feed main",
+      label: "Riser",
       basis: "Hazen-Williams from diameter + length. Larger diameter lowers loss.",
       defaultPsi: 6,
       defaultOn: true,
       isPipe: true,
       diaKey: "riserDiaIn",
+    },
+    {
+      id: "roofMain",
+      label: "Main at roof / ceiling level",
+      basis: "Hazen-Williams from diameter + length. Larger diameter lowers loss.",
+      defaultPsi: 4,
+      defaultOn: true,
+      isPipe: true,
+      diaKey: "roofDiaIn",
     },
     {
       id: "floorControl",
@@ -208,7 +217,7 @@
     autoRemoteFromK: true,
     elevFt: 40,
     // Hazen-Williams for lead-in and riser (optional; overrides lump sums when enabled)
-    useHazen: false,
+    useHazen: true,
     leadDiaIn: 6,
     leadLengthFt: 100,
     leadC: 140,
@@ -217,6 +226,10 @@
     riserLengthFt: 40,
     riserC: 120,
     riserFittingsFt: 15,
+    roofDiaIn: 4,
+    roofLengthFt: 80,
+    roofC: 120,
+    roofFittingsFt: 20,
     backflowType: "reducedPressure",
     backflowCustomPsi: 12,
     safetyMarginPsi: 5,
@@ -277,6 +290,7 @@
     if (state.framework === "ufc") return UFC_TABLE;
     if (state.framework === "afsundown") return AF_SUNDOWN;
     if (state.framework === "fm") return FM_PRESETS;
+    // florida uses NFPA 13 density-area presets (FFPC adopts NFPA 1 / NFPA 13)
     return NFPA13;
   }
 
@@ -406,6 +420,7 @@
   }
 
   function frameworkLabel(fw) {
+    if (fw === "florida") return "Florida (FFPC / NFPA 1)";
     const base =
       fw === "ufc"
         ? "UFC 3-600-01 Table 9-3"
@@ -1054,16 +1069,16 @@
   }
 
   function hazenLosses() {
-    // Always calculate so diameter inputs in the table produce a loss
     const q = sprinklerDemandGpm();
     const leadL = num(state.leadLengthFt) + num(state.leadFittingsFt);
     const riserL = num(state.riserLengthFt) + num(state.riserFittingsFt);
+    const roofL = num(state.roofLengthFt) + num(state.roofFittingsFt);
     return {
-      active: true,
+      active: !!state.useHazen,
       leadPsi: round1(hazenWilliamsPsi(q, state.leadDiaIn, leadL, state.leadC)),
       riserPsi: round1(hazenWilliamsPsi(q, state.riserDiaIn, riserL, state.riserC)),
-      leadL: leadL,
-      riserL: riserL,
+      roofPsi: round1(hazenWilliamsPsi(q, state.roofDiaIn, roofL, state.roofC)),
+      leadL, riserL, roofL,
     };
   }
 
@@ -1083,18 +1098,18 @@
     const current = hw.leadPsi + hw.riserPsi;
     const next = round1(leadNext + riserNext);
     const delta = round1(current - next);
-    return `Current lead-in + riser friction: ${current.toFixed(1)} psi. ` +
-           `Next sizes (${nextLead}" lead / ${nextRiser}" riser) would be ~${next.toFixed(1)} psi ` +
-           `(Δ ${delta >= 0 ? "−" : "+"}${Math.abs(delta).toFixed(1)} psi). ` +
-           `This pressure change carries into the pump rating and, with duration, into tank volume.`;
+    return `Lead-in + riser + roof friction: ${(hw.leadPsi + hw.riserPsi + hw.roofPsi).toFixed(1)} psi. ` +
+           `Next sizes (${nextLead}" lead / ${nextRiser}" riser) would save ~${Math.abs(delta).toFixed(1)} psi on lead+riser. ` +
+           `Diameter changes update pressure demand immediately.`;
   }
   function lossItemsTotal() {
     const hw = hazenLosses();
     return state.losses.reduce((sum, row) => {
       if (!row.enabled) return sum;
       // When Hazen is on, underground and interior mains use calculated friction
-      if (row.id === "undergroundMain") return sum + hw.leadPsi;
-      if (row.id === "interiorMain") return sum + hw.riserPsi;
+      if (state.useHazen && row.id === "undergroundMain") return sum + hw.leadPsi;
+      if (state.useHazen && row.id === "interiorMain") return sum + hw.riserPsi;
+      if (state.useHazen && row.id === "roofMain") return sum + hw.roofPsi;
       return sum + Math.max(0, num(row.psi));
     }, 0);
   }
@@ -1286,6 +1301,10 @@
     state.riserLengthFt = num($("riserLengthFt")?.value, 40);
     state.riserC = num($("riserC")?.value, 120);
     state.riserFittingsFt = num($("riserFittingsFt")?.value, 15);
+    state.roofDiaIn = num($("roofDiaIn")?.value, 4);
+    state.roofLengthFt = num($("roofLengthFt")?.value, 80);
+    state.roofC = num($("roofC")?.value, 120);
+    state.roofFittingsFt = num($("roofFittingsFt")?.value, 20);
     state.backflowType = $("backflowType")?.value || "none";
     state.backflowCustomPsi = num($("backflowCustomPsi")?.value, 0);
     state.safetyMarginPsi = num($("safetyMarginPsi")?.value, 0);
@@ -1370,6 +1389,10 @@
     if ($("riserLengthFt")) $("riserLengthFt").value = state.riserLengthFt;
     if ($("riserC")) $("riserC").value = state.riserC;
     if ($("riserFittingsFt")) $("riserFittingsFt").value = state.riserFittingsFt;
+    if ($("roofDiaIn")) $("roofDiaIn").value = state.roofDiaIn;
+    if ($("roofLengthFt")) $("roofLengthFt").value = state.roofLengthFt;
+    if ($("roofC")) $("roofC").value = state.roofC;
+    if ($("roofFittingsFt")) $("roofFittingsFt").value = state.roofFittingsFt;
     $("hazenFields")?.classList.toggle("hidden", !state.useHazen);
     const noteEl = $("hazenImpact");
     if (noteEl) {
@@ -1407,7 +1430,10 @@
       const hw = hazenLosses();
       const isPipe = !!meta.isPipe;
       const calcPsi = isPipe
-        ? (meta.id === "undergroundMain" ? hw.leadPsi : hw.riserPsi)
+        ? (meta.id === "undergroundMain" ? hw.leadPsi
+          : meta.id === "interiorMain" ? hw.riserPsi
+          : meta.id === "roofMain" ? hw.roofPsi
+          : 0)
         : row.psi;
       const diaVal = isPipe ? (state[meta.diaKey] || "") : "";
       return `
