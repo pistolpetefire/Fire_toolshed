@@ -94,10 +94,6 @@
     { id: "oh2-dry", name: "Ordinary hazard Group 2 — dry · 0.20/1,950 · K8.0", sys: "dry", density: 0.2, area: 1950, hose: 250, remotePsi: 7, kFactor: 8.0, coverage: 130, note: "OH-2 dry pipe planning: density unchanged, design area +30% (1,500 → 1,950 sf). Confirm adopted NFPA 13." },
     { id: "eh1-dry", name: "Extra hazard Group 1 — dry · 0.30/3,250 · K11.2", sys: "dry", density: 0.3, area: 3250, hose: 500, remotePsi: 7, kFactor: 11.2, coverage: 100, note: "EH-1 dry pipe planning: density unchanged, design area +30% (2,500 → 3,250 sf)." },
     { id: "eh2-dry", name: "Extra hazard Group 2 — dry · 0.40/3,250 · K11.2", sys: "dry", density: 0.4, area: 3250, hose: 500, remotePsi: 7, kFactor: 11.2, coverage: 100, note: "EH-2 dry pipe planning: density unchanged, design area +30% (2,500 → 3,250 sf)." },
-    // ESFR — ceiling-only, 12 most demanding sprinklers (4 on each of 3 lines). Wet only.
-    // Highest common demand at ~40 ft ceiling (confirm commodity, storage height, and adopted edition).
-    { id: "esfr-k252-40ft-60psi", name: "ESFR K-25.2 — 40 ft ceiling · 12 @ 60 psi (highest common)", sys: "wet", density: 0, area: 0, hose: 250, remotePsi: 60, kFactor: 25.2, coverage: 100, heads: 12, headPsi: 60, duration: 60, note: "NFPA 13 ESFR ceiling-only planning (wet only). Highest common demand at ~40 ft ceiling: K-25.2 pendent, 12 most demanding sprinklers at 60 psi end pressure (exposed expanded Group A plastics / high-challenge). Q ≈ 25.2×√60 ≈ 195 gpm/head → ~2,340 gpm sprinkler demand + hose. Confirm Table 23.3.1 / adopted edition for commodity and storage height. Not a density-area design." },
-    { id: "esfr-k140-40ft-75psi", name: "ESFR K-14.0 — 40 ft ceiling · 12 @ 75 psi", sys: "wet", density: 0, area: 0, hose: 250, remotePsi: 75, kFactor: 14.0, coverage: 100, heads: 12, headPsi: 75, duration: 60, note: "NFPA 13 ESFR ceiling-only (wet only). K-14.0, 12 sprinklers at 75 psi (common for 40 ft ceiling Class I–IV / cartoned). Q ≈ 14×√75 ≈ 121 gpm/head → ~1,455 gpm + hose. Confirm table for commodity/storage height." },
   ];
 
   /**
@@ -169,9 +165,6 @@
     { id: "ds5-32-dc", name: "FM DS 5-32 style — data center (wet)", sys: "wet", density: 0.3, area: 2500, hose: 250, remotePsi: 7, kFactor: 8, coverage: 130, note: "Data center protection varies (wet/preaction/clean agent). Cite DS 5-32 project path." },
     // ESFR / storage — wet only (no dry-pipe criteria)
     { id: "ds8-9-storage", name: "FM DS 8-9 / ESFR-type storage (wet only)", sys: "wet", density: 0.45, area: 2000, hose: 500, remotePsi: 7, kFactor: 11.2, coverage: 100, note: "Storage / ESFR-type protection is wet-pipe only in this tool. Configuration-specific — replace with governing DS 8-9 / ESFR listing values for commodity, height, and aisle. No dry-pipe storage or ESFR criteria." },
-    // Highest common ESFR demand at 40 ft ceiling (confirm DS 8-9 edition and commodity)
-    { id: "ds8-9-esfr-40ft-k252-60", name: "FM DS 8-9 ESFR — 40 ft ceiling · K-25.2 · 12 @ 60 psi (highest common)", sys: "wet", density: 0, area: 0, hose: 500, remotePsi: 60, kFactor: 25.2, coverage: 100, heads: 12, headPsi: 60, duration: 90, note: "FM Global DS 8-9 style highest common ESFR demand for ~40 ft ceiling (wet only). K-25.2, 12 sprinklers at 60 psi. Q ≈ 25.2×√60 ≈ 195 gpm/head → ~2,340 gpm sprinkler demand + hose. Confirm actual DS 8-9 table for commodity class, storage height, and aisle. Duration 90 min planning default (confirm DS)." },
-    { id: "ds8-9-esfr-40ft-k140-75", name: "FM DS 8-9 ESFR — 40 ft ceiling · K-14.0 · 12 @ 75 psi", sys: "wet", density: 0, area: 0, hose: 500, remotePsi: 75, kFactor: 14.0, coverage: 100, heads: 12, headPsi: 75, duration: 90, note: "FM DS 8-9 style K-14.0 ESFR at 40 ft ceiling: 12 sprinklers at 75 psi (wet only). Q ≈ 14×√75 ≈ 121 gpm/head → ~1,455 gpm + hose. Confirm governing table." },
     // Dry — general hazard only (not storage/ESFR)
     { id: "ds3-26-oh-dry", name: "FM DS 3-26 style — ordinary hazard (dry)", sys: "dry", density: 0.2, area: 3250, hose: 250, remotePsi: 7, kFactor: 8, coverage: 130, note: "Generic OH dry planning: area +30% (2,500 → 3,250 sf). Confirm FM DS dry/preaction rules. Not for ESFR/storage." },
     { id: "ds3-26-eh-dry", name: "FM DS 3-26 style — extra hazard (dry)", sys: "dry", density: 0.3, area: 3250, hose: 500, remotePsi: 7, kFactor: 11.2, coverage: 100, note: "Extra hazard dry planning (+30% area). Confirm DS tables. Not for ESFR/storage." },
@@ -204,6 +197,16 @@
     minResidualFloor: 7,
     autoRemoteFromK: true,
     elevFt: 40,
+    // Hazen-Williams for lead-in and riser (optional; overrides lump sums when enabled)
+    useHazen: false,
+    leadDiaIn: 6,
+    leadLengthFt: 100,
+    leadC: 140,
+    leadFittingsFt: 20,
+    riserDiaIn: 4,
+    riserLengthFt: 40,
+    riserC: 120,
+    riserFittingsFt: 15,
     backflowType: "reducedPressure",
     backflowCustomPsi: 12,
     safetyMarginPsi: 5,
@@ -1029,9 +1032,38 @@
     return BACKFLOW[state.backflowType]?.psi || 0;
   }
 
+
+  /** Hazen-Williams friction loss (psi). Q gpm, d inches, L feet, C coefficient. */
+  function hazenWilliamsPsi(q, d, L, C) {
+    const Q = Math.max(0, num(q));
+    const dia = Math.max(0.1, num(d));
+    const len = Math.max(0, num(L));
+    const c = Math.max(1, num(C, 120));
+    if (Q <= 0 || len <= 0) return 0;
+    return 4.52 * Math.pow(Q, 1.85) * len / (Math.pow(c, 1.85) * Math.pow(dia, 4.87));
+  }
+
+  function hazenLosses() {
+    if (!state.useHazen) return { leadPsi: 0, riserPsi: 0, active: false };
+    const q = sprinklerDemandGpm();
+    const leadL = num(state.leadLengthFt) + num(state.leadFittingsFt);
+    const riserL = num(state.riserLengthFt) + num(state.riserFittingsFt);
+    return {
+      active: true,
+      leadPsi: round1(hazenWilliamsPsi(q, state.leadDiaIn, leadL, state.leadC)),
+      riserPsi: round1(hazenWilliamsPsi(q, state.riserDiaIn, riserL, state.riserC)),
+      leadL: leadL,
+      riserL: riserL,
+    };
+  }
+
   function lossItemsTotal() {
+    const hw = hazenLosses();
     return state.losses.reduce((sum, row) => {
       if (!row.enabled) return sum;
+      // When Hazen is on, underground and interior mains use calculated friction
+      if (hw.active && row.id === "undergroundMain") return sum + hw.leadPsi;
+      if (hw.active && row.id === "interiorMain") return sum + hw.riserPsi;
       return sum + Math.max(0, num(row.psi));
     }, 0);
   }
@@ -1214,6 +1246,15 @@
     state.minResidualFloor = num($("minResidualFloor")?.value, 7);
     state.autoRemoteFromK = !!$("autoRemoteFromK")?.checked;
     state.elevFt = num($("elevFt")?.value, 0);
+    state.useHazen = !!$("useHazen")?.checked;
+    state.leadDiaIn = num($("leadDiaIn")?.value, 6);
+    state.leadLengthFt = num($("leadLengthFt")?.value, 100);
+    state.leadC = num($("leadC")?.value, 140);
+    state.leadFittingsFt = num($("leadFittingsFt")?.value, 20);
+    state.riserDiaIn = num($("riserDiaIn")?.value, 4);
+    state.riserLengthFt = num($("riserLengthFt")?.value, 40);
+    state.riserC = num($("riserC")?.value, 120);
+    state.riserFittingsFt = num($("riserFittingsFt")?.value, 15);
     state.backflowType = $("backflowType")?.value || "none";
     state.backflowCustomPsi = num($("backflowCustomPsi")?.value, 0);
     state.safetyMarginPsi = num($("safetyMarginPsi")?.value, 0);
@@ -1289,6 +1330,16 @@
     if ($("minResidualFloor")) $("minResidualFloor").value = state.minResidualFloor;
     if ($("autoRemoteFromK")) $("autoRemoteFromK").checked = !!state.autoRemoteFromK;
     if ($("elevFt")) $("elevFt").value = state.elevFt;
+    if ($("useHazen")) $("useHazen").checked = !!state.useHazen;
+    if ($("leadDiaIn")) $("leadDiaIn").value = state.leadDiaIn;
+    if ($("leadLengthFt")) $("leadLengthFt").value = state.leadLengthFt;
+    if ($("leadC")) $("leadC").value = state.leadC;
+    if ($("leadFittingsFt")) $("leadFittingsFt").value = state.leadFittingsFt;
+    if ($("riserDiaIn")) $("riserDiaIn").value = state.riserDiaIn;
+    if ($("riserLengthFt")) $("riserLengthFt").value = state.riserLengthFt;
+    if ($("riserC")) $("riserC").value = state.riserC;
+    if ($("riserFittingsFt")) $("riserFittingsFt").value = state.riserFittingsFt;
+    $("hazenFields")?.classList.toggle("hidden", !state.useHazen);
     if ($("backflowType")) $("backflowType").value = state.backflowType;
     if ($("backflowCustomPsi")) $("backflowCustomPsi").value = state.backflowCustomPsi;
     if ($("safetyMarginPsi")) $("safetyMarginPsi").value = state.safetyMarginPsi;
@@ -1317,15 +1368,21 @@
         enabled: meta.defaultOn,
         psi: meta.defaultPsi,
       };
+      const hw = hazenLosses();
+      const isHwRow = hw.active && (meta.id === "undergroundMain" || meta.id === "interiorMain");
+      const displayPsi = isHwRow
+        ? (meta.id === "undergroundMain" ? hw.leadPsi : hw.riserPsi)
+        : row.psi;
+      const hwNote = isHwRow ? " · Hazen-Williams (calculated)" : "";
       return `
         <tr>
-          <td><input type="checkbox" data-loss-en="${meta.id}" ${row.enabled ? "checked" : ""} aria-label="Include ${escapeHtml(meta.label)}"></td>
+          <td><input type="checkbox" data-loss-en="${meta.id}" ${row.enabled ? "checked" : ""} aria-label="Include ${escapeHtml(meta.label)}" ${isHwRow ? "disabled" : ""}></td>
           <td>
-            <div>${escapeHtml(meta.label)}</div>
+            <div>${escapeHtml(meta.label)}${hwNote}</div>
             <div class="sub" style="font-size:0.7rem;color:var(--muted)">${escapeHtml(meta.basis)}</div>
           </td>
           <td class="num">
-            <input type="number" data-loss-psi="${meta.id}" step="0.5" min="0" value="${row.psi}" ${row.enabled ? "" : "disabled"}>
+            <input type="number" data-loss-psi="${meta.id}" step="0.5" min="0" value="${displayPsi}" ${row.enabled && !isHwRow ? "" : "disabled"}>
           </td>
         </tr>
       `;
