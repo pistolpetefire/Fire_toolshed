@@ -7,7 +7,7 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.3.0-prelim";
+  const APP_VERSION = "1.3.1-prelim";
   const STORAGE_KEY = "fireTankSizer.v1";
   const SPRINKLER_HANDOFF_KEY = "fireToolshed.sprinklerHandoff.v1";
   const FIREFLOW_HANDOFF_KEY = "fireToolshed.fireFlowHandoff.v1";
@@ -103,7 +103,9 @@
     sprinklerDuration: 0,
     fireFlowFlow: 0,
     fireFlowDuration: 0,
-    governingSource: "", // "sprinkler" | "fireflow" | ""
+    governingSource: "", // volume source: "sprinkler" | "fireflow"
+    flowSource: "",      // flow source: "sprinkler" | "fireflow"
+    governingVolumeGal: 0, // max of the two volumes; 0 = use flow×duration
   });
 
   let state = defaultState();
@@ -145,7 +147,11 @@
   function calculateDemand() {
     const flow = Math.max(0, num(state.flowGpm));
     const dur = Math.max(0, num(state.durationMin));
-    const baseGal = flow * dur;
+    // When both captures are compared, volume is the greater of the two products,
+    // not necessarily flow × the displayed duration.
+    const baseGal = num(state.governingVolumeGal) > 0
+      ? num(state.governingVolumeGal)
+      : flow * dur;
     const pct = safetyPct();
     const withSafety = baseGal * (1 + pct / 100);
     const unusable = Math.max(0, num(state.unusablePct, 0));
@@ -576,7 +582,11 @@
       $("exportSummary").innerHTML =
         `<div><strong>${round0(calc.tank.computedGal).toLocaleString()} gal</strong> shell · ⌀ ${calc.tank.diaFt}' × ${calc.tank.htFt}' H</div>` +
         `<div style="margin-top:0.35rem"><strong>Pad ⌀ ${calc.pad.padDiaFt}'</strong> · ${calc.pad.beyondFt}' beyond shell · ${calc.pad.thicknessIn}" thick</div>` +
-        `<div style="margin-top:0.35rem;color:var(--muted)">Required shell ≥ ${d.requiredShellGal.toLocaleString()} gal from ${d.flowGpm} gpm × ${d.durationMin} min + safety</div>`;
+        `<div style="margin-top:0.35rem;color:var(--muted)">Required shell ≥ ${d.requiredShellGal.toLocaleString()} gal` +
+      (num(state.governingVolumeGal) > 0
+        ? ` · flow ${d.flowGpm} gpm (${state.flowSource || "demand"}) · volume from ${state.governingSource || "governing"} demand + safety`
+        : ` from ${d.flowGpm} gpm × ${d.durationMin} min + safety`) +
+      `</div>`;
     } else if ($("exportSummary")) {
       $("exportSummary").textContent = "—";
     }
@@ -785,16 +795,21 @@
       return false;
     }
 
-    if (ffGal > sprGal) {
-      state.flowGpm = ffFlow;
-      state.durationMin = ffDur;
-      state.governingSource = "fireflow";
-      if (!silent) toast(`Fire flow governs: ${ffFlow} gpm × ${ffDur} min = ${Math.round(ffGal).toLocaleString()} gal (sprinkler ${Math.round(sprGal).toLocaleString()} gal)`);
-    } else {
-      state.flowGpm = sprFlow;
-      state.durationMin = sprDur;
-      state.governingSource = "sprinkler";
-      if (!silent) toast(`Sprinkler governs: ${sprFlow} gpm × ${sprDur} min = ${Math.round(sprGal).toLocaleString()} gal (fire flow ${Math.round(ffGal).toLocaleString()} gal)`);
+    // Flow rate = the greater gpm (usually sprinkler/suppression)
+    // Tank volume = the greater of the two (flow × duration) products
+    const maxFlow = Math.max(sprFlow, ffFlow);
+    const maxGal = Math.max(sprGal, ffGal);
+    state.flowGpm = maxFlow;
+    state.governingVolumeGal = maxGal;
+    state.flowSource = sprFlow >= ffFlow ? "sprinkler" : "fireflow";
+    state.governingSource = ffGal > sprGal ? "fireflow" : "sprinkler";
+    // Duration field shows the volume-governing duration for reference
+    state.durationMin = state.governingSource === "fireflow" ? ffDur : sprDur;
+    if (!silent) {
+      toast(
+        `Flow: ${maxFlow} gpm (${state.flowSource}). ` +
+        `Tank volume: ${Math.round(maxGal).toLocaleString()} gal (${state.governingSource}).`
+      );
     }
 
     // Suggest tank count for large volumes
