@@ -7,7 +7,7 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.1.1-prelim";
+  const APP_VERSION = "1.3.0-prelim";
   const STORAGE_KEY = "fireTankSizer.v1";
   const SPRINKLER_HANDOFF_KEY = "fireToolshed.sprinklerHandoff.v1";
   const FIREFLOW_HANDOFF_KEY = "fireToolshed.fireFlowHandoff.v1";
@@ -1135,8 +1135,10 @@
       window.FireToolshedShell.mount({ step: "tank", base: ".." });
     }
     load();
-    // Soft import if still on stock defaults
-    if (state.flowGpm === 1250 && state.durationMin === 60) {
+    // Always prefer governing demand when both sprinkler and fire flow captures exist
+    if (applyGoverningDemand(true)) {
+      // governing applied — fire flow or sprinkler, whichever volume is larger
+    } else if (state.flowGpm === 1250 && state.durationMin === 60) {
       if (!importPumpHandoff(true)) importSprinklerHandoff(true);
     }
     writeForm();
