@@ -98,6 +98,12 @@
     customHtFt: 0,
     useCustom: false,
     numTanks: 1,
+    // Captured demands for comparison
+    sprinklerFlow: 0,
+    sprinklerDuration: 0,
+    fireFlowFlow: 0,
+    fireFlowDuration: 0,
+    governingSource: "", // "sprinkler" | "fireflow" | ""
   });
 
   let state = defaultState();
@@ -525,6 +531,22 @@
     if ($("metricPad"))
       $("metricPad").textContent = calc.tank ? calc.pad.padDiaFt + "'" : "—";
 
+    // Show governing comparison if both captures present
+    const cmp = $("governingCompare");
+    if (cmp) {
+      const sGal = state.sprinklerFlow * state.sprinklerDuration;
+      const fGal = state.fireFlowFlow * state.fireFlowDuration;
+      if (sGal > 0 || fGal > 0) {
+        const gov = fGal > sGal ? "Fire flow" : "Sprinkler";
+        cmp.classList.remove("hidden");
+        cmp.innerHTML = `<strong>Tank driver:</strong> ${gov} ` +
+          `(${Math.round(Math.max(sGal, fGal)).toLocaleString()} gal). ` +
+          `Sprinkler: ${state.sprinklerFlow || "—"} gpm × ${state.sprinklerDuration || "—"} min = ${Math.round(sGal).toLocaleString()} gal. ` +
+          `Fire flow: ${state.fireFlowFlow || "—"} gpm × ${state.fireFlowDuration || "—"} min = ${Math.round(fGal).toLocaleString()} gal.`;
+      } else {
+        cmp.classList.add("hidden");
+      }
+    }
     if ($("resultBase"))
       $("resultBase").textContent = `${d.flowGpm} gpm × ${d.durationMin} min = ${d.baseGal.toLocaleString()} gal`;
     if ($("resultSafety"))
@@ -650,8 +672,10 @@
         if (!silent) toast("Sprinkler handoff missing flow");
         return false;
       }
-      state.flowGpm = num(d.flowGpm);
-      if (num(d.durationMin) > 0) state.durationMin = num(d.durationMin);
+      state.sprinklerFlow = num(d.flowGpm);
+      state.sprinklerDuration = num(d.durationMin) || 60;
+      state.flowGpm = state.sprinklerFlow;
+      state.durationMin = state.sprinklerDuration;
       if (d.projectName && !state.projectName) state.projectName = d.projectName;
       if (d.facility && !state.facility) state.facility = d.facility;
       // Map framework labels loosely
@@ -684,8 +708,10 @@
         if (!silent) toast("Pump handoff missing flow");
         return false;
       }
-      state.flowGpm = num(d.flowGpm);
-      if (num(d.durationMin) > 0) state.durationMin = num(d.durationMin);
+      state.sprinklerFlow = num(d.flowGpm);
+      state.sprinklerDuration = num(d.durationMin) || 60;
+      state.flowGpm = state.sprinklerFlow;
+      state.durationMin = state.sprinklerDuration;
       if (d.projectName && !state.projectName) state.projectName = d.projectName;
       if (!silent)
         toast(
@@ -713,12 +739,14 @@
         if (!silent) toast("Fire flow handoff missing flow");
         return false;
       }
-      state.flowGpm = num(d.flowGpm);
-      if (num(d.durationMin) > 0) state.durationMin = num(d.durationMin);
+      state.fireFlowFlow = num(d.flowGpm);
+      state.fireFlowDuration = num(d.durationMin) || 120;
+      state.flowGpm = state.fireFlowFlow;
+      state.durationMin = state.fireFlowDuration;
       // Auto-suggest tank count for large volumes
       const baseGal = state.flowGpm * state.durationMin;
       if (baseGal > 200000) {
-        const demand = computeDemand();
+        const demand = calculateDemand();
         state.numTanks = suggestTankCount(demand);
         toast("Fire flow imported. Suggested " + state.numTanks + " tanks for ~" + Math.round(baseGal).toLocaleString() + " gal base volume.");
       } else {
@@ -732,7 +760,60 @@
       return false;
     }
   }
+
+  /** Load both captures and set flow/duration to the one with greater volume. */
+  function applyGoverningDemand(silent) {
+    let spr = null, ff = null;
+    try { const r = localStorage.getItem(SPRINKLER_HANDOFF_KEY); if (r) spr = JSON.parse(r); } catch (_) {}
+    try { const r = localStorage.getItem(FIREFLOW_HANDOFF_KEY); if (r) ff = JSON.parse(r); } catch (_) {}
+
+    const sprFlow = spr && num(spr.flowGpm) > 0 ? num(spr.flowGpm) : 0;
+    const sprDur = spr && num(spr.durationMin) > 0 ? num(spr.durationMin) : 0;
+    const ffFlow = ff && num(ff.flowGpm) > 0 ? num(ff.flowGpm) : 0;
+    const ffDur = ff && num(ff.durationMin) > 0 ? num(ff.durationMin) : 0;
+
+    state.sprinklerFlow = sprFlow;
+    state.sprinklerDuration = sprDur;
+    state.fireFlowFlow = ffFlow;
+    state.fireFlowDuration = ffDur;
+
+    const sprGal = sprFlow * sprDur;
+    const ffGal = ffFlow * ffDur;
+
+    if (sprGal <= 0 && ffGal <= 0) {
+      if (!silent) toast("No sprinkler or fire flow capture found");
+      return false;
+    }
+
+    if (ffGal > sprGal) {
+      state.flowGpm = ffFlow;
+      state.durationMin = ffDur;
+      state.governingSource = "fireflow";
+      if (!silent) toast(`Fire flow governs: ${ffFlow} gpm × ${ffDur} min = ${Math.round(ffGal).toLocaleString()} gal (sprinkler ${Math.round(sprGal).toLocaleString()} gal)`);
+    } else {
+      state.flowGpm = sprFlow;
+      state.durationMin = sprDur;
+      state.governingSource = "sprinkler";
+      if (!silent) toast(`Sprinkler governs: ${sprFlow} gpm × ${sprDur} min = ${Math.round(sprGal).toLocaleString()} gal (fire flow ${Math.round(ffGal).toLocaleString()} gal)`);
+    }
+
+    // Suggest tank count for large volumes
+    if (Math.max(sprGal, ffGal) > 200000) {
+      const demand = calculateDemand();
+      state.numTanks = suggestTankCount(demand);
+    }
+    return true;
+  }
+
   function importUpstreamDemand(silent) {
+    // Prefer governing comparison when both sprinkler and fire flow exist
+    if (applyGoverningDemand(true)) {
+      if (!silent) {
+        const src = state.governingSource === "fireflow" ? "Fire flow" : "Sprinkler";
+        toast(`${src} governs tank volume — ${state.flowGpm} gpm × ${state.durationMin} min`);
+      }
+      return true;
+    }
     if (importPumpHandoff(true)) {
       if (!silent) {
         // re-toast with preference message
@@ -763,6 +844,26 @@
       const sr = localStorage.getItem(SPRINKLER_HANDOFF_KEY);
       if (sr) spr = JSON.parse(sr);
     } catch (_) { /* ignore */ }
+    let ff = null;
+    try {
+      const fr = localStorage.getItem(FIREFLOW_HANDOFF_KEY);
+      if (fr) ff = JSON.parse(fr);
+    } catch (_) { /* ignore */ }
+    if (ff && num(ff.flowGpm) > 0 && spr && num(spr.flowGpm) > 0) {
+      const sGal = num(spr.flowGpm) * (num(spr.durationMin) || 0);
+      const fGal = num(ff.flowGpm) * (num(ff.durationMin) || 0);
+      const gov = fGal > sGal ? "Fire flow" : "Sprinkler";
+      el.classList.remove("hidden");
+      el.className = "callout info";
+      el.textContent = `Both captures ready — ${gov} governs (${Math.round(Math.max(sGal, fGal)).toLocaleString()} gal). Click Use Governing Demand.`;
+      return;
+    }
+    if (ff && num(ff.flowGpm) > 0) {
+      el.classList.remove("hidden");
+      el.className = "callout info";
+      el.textContent = `Fire flow capture ready: ${Math.round(num(ff.flowGpm))} GPM × ${Math.round(num(ff.durationMin) || 0)} min — use Import Fire Flow or Use Governing Demand.`;
+      return;
+    }
     if (pump && num(pump.flowGpm) > 0) {
       el.classList.remove("hidden");
       el.className = "callout info";
@@ -985,6 +1086,20 @@
     });
     $("btnImportSprinkler")?.addEventListener("click", () => {
       if (importSprinklerHandoff(false)) {
+        writeForm();
+        render();
+        updateHandoffBanner();
+      }
+    });
+    $("btnImportFireFlow")?.addEventListener("click", () => {
+      if (importFireFlowHandoff(false)) {
+        writeForm();
+        render();
+        updateHandoffBanner();
+      }
+    });
+    $("btnImportGoverning")?.addEventListener("click", () => {
+      if (applyGoverningDemand(false)) {
         writeForm();
         render();
         updateHandoffBanner();
