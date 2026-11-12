@@ -137,6 +137,8 @@
       durationHours: out.duration,
       totalGallons: out.totalGallons,
       residualPsi: 20,
+      hydrantCount: out.hydrants,
+      maxPerHydrant: 1250,
       codeBasis: document.getElementById("basis").value,
       capturedAt: new Date().toISOString(),
       notes: out.notes || [],
