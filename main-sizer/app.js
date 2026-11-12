@@ -76,6 +76,13 @@
   }
 
   function size() {
+    const pathMode = localStorage.getItem("fireToolshed.pathMode.v1") || "combined";
+    const modeEl = document.getElementById("pathModeDisplay");
+    if (modeEl) {
+      const labels = { combined: "Combined — pump serves both", separate: "Separate — hydrants on domestic", adequate: "Adequate supply — no pump/tank" };
+      modeEl.textContent = "Path: " + (labels[pathMode] || pathMode);
+    }
+    const pathMode = localStorage.getItem("fireToolshed.pathMode.v1") || "combined";
     const loopType = document.querySelector('input[name="loop"]:checked')?.value || "pump";
     const share = document.querySelector('input[name="share"]:checked')?.value || "shared";
     const loopLen = Number(document.getElementById("loopLen").value) || 400;
@@ -91,6 +98,28 @@
 
     const rows = [];
     const sepRows = [];
+
+    
+    // Adequate supply: no pump/tank, size service line from demand + flow test
+    if (pathMode === "adequate") {
+      const q = Math.max(ffQ, sprQ);
+      if (q > 0) {
+        const lead = sizeFor(q, maxVel);
+        const leadLoss = friction(q, C, lead.id, leadLen);
+        rows.push(`<tr><td>Service line</td><td>${lead.size}" · ${lead.fps.toFixed(1)} fps · ${leadLoss.toFixed(1)} psi / ${leadLen} ft</td></tr>`);
+        rows.push(`<tr><td>Basis</td><td>${q.toLocaleString()} gpm · flow test covers demand · no pump/tank</td></tr>`);
+        if (captures.flow) {
+          rows.push(`<tr><td>Flow test</td><td>${captures.flow.staticPressure || "—"} / ${captures.flow.residualPressure || "—"} psi @ ${captures.flow.flowAtResidual || "—"} gpm</td></tr>`);
+        }
+      }
+      const modeLabel = pathMode === "combined" ? "Combined" : pathMode === "separate" ? "Separate" : "Adequate";
+    rows.unshift(`<tr><td>Path mode</td><td>${modeLabel}</td></tr>`);
+    document.getElementById("resultBody").innerHTML = rows.length
+        ? `<table>${rows.join("")}</table><p class="sub" style="margin-top:0.5rem">Adequate supply mode. Service line sized for demand. Confirm residual at demand exceeds required pressure.</p>`
+        : `<p class="missing">Load captures first.</p>`;
+      document.getElementById("separate").classList.add("hidden");
+      return;
+    }
 
     // Pump size
     if (pumpQ > 0) {
@@ -158,6 +187,8 @@
         : `<p class="missing">Capture fire flow for hydrant sizing.</p>`;
     }
 
+    const modeLabel = pathMode === "combined" ? "Combined" : pathMode === "separate" ? "Separate" : "Adequate";
+    rows.unshift(`<tr><td>Path mode</td><td>${modeLabel}</td></tr>`);
     document.getElementById("resultBody").innerHTML = rows.length
       ? `<table>${rows.join("")}</table><p class="sub" style="margin-top:0.5rem">Velocity and friction use the same Hazen-Williams method as Service Line Sizer. Planning estimate — confirm with hydraulic calc.</p>`
       : `<p class="missing">Load captures first.</p>`;
