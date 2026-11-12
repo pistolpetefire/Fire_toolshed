@@ -171,6 +171,66 @@
   }
 
   /** Import fire flow (gpm @ 20 psi + duration) as pump duty planning point. Residual is at hydrant; add elevation/losses as needed. */
+
+  /** Clear hydrant test fields when no test is available; pump is known to be required. */
+  function clearFlowTest() {
+    if ($('hydrantStatic')) $('hydrantStatic').value = '';
+    if ($('hydrantFlow')) $('hydrantFlow').value = '';
+    if ($('hydrantResidual')) $('hydrantResidual').value = '';
+    if ($('suctionMode')) $('suctionMode').value = 'direct';
+    if ($('suctionMin')) $('suctionMin').value = '';
+    if ($('suctionMax')) $('suctionMax').value = '';
+    const note = $('flowTestNote');
+    if (note) {
+      note.classList.remove('hidden');
+      note.textContent = 'No flow test available. Pump is required. Enter direct suction if known, or proceed with demand-only sizing.';
+    }
+    toast('Flow test cleared. Pump required — size from demand.');
+    if (typeof calculate === 'function') calculate();
+  }
+
+  /** Pump serves both fire flow and sprinkler. Use max flow, max pressure, volume-governing duration. */
+  function pumpServesBoth() {
+    const ff = readFireFlowHandoff();
+    const spr = readSprinklerHandoff();
+    const ffFlow = ff ? Math.round(Number(ff.flowGpm)) : 0;
+    const sprFlow = spr ? Math.round(Number(spr.flowGpm)) : 0;
+    const ffDur = ff ? Math.round(Number(ff.durationMin) || 0) : 0;
+    const sprDur = spr ? Math.round(Number(spr.durationMin) || 0) : 0;
+    const sprPsi = spr ? Number(spr.pressurePsi) || 0 : 0;
+    const ffPsi = 20; // fire flow residual at hydrant
+
+    if (ffFlow <= 0 && sprFlow <= 0) {
+      toast('Capture fire flow and sprinkler first.');
+      return;
+    }
+
+    const maxFlow = Math.max(ffFlow, sprFlow);
+    const maxPsi = Math.max(sprPsi, ffPsi);
+    const ffGal = ffFlow * ffDur;
+    const sprGal = sprFlow * sprDur;
+    const useDur = ffGal >= sprGal ? ffDur : sprDur;
+    const flowSrc = sprFlow >= ffFlow ? 'sprinkler' : 'fire flow';
+    const psiSrc = sprPsi >= ffPsi ? 'sprinkler' : 'fire flow';
+    const volSrc = ffGal >= sprGal ? 'fire flow' : 'sprinkler';
+
+    if ($('systemFlow')) $('systemFlow').value = maxFlow;
+    if ($('systemPressure')) $('systemPressure').value = maxPsi.toFixed(1);
+    if ($('systemDuration')) $('systemDuration').value = useDur || 60;
+
+    const basis = $('systemDurationBasis');
+    if (basis) {
+      basis.textContent =
+        `Pump serves both. Flow ${maxFlow} gpm (${flowSrc}). Pressure ${maxPsi.toFixed(0)} psi (${psiSrc}). ` +
+        `Volume driver: ${volSrc} (${Math.round(Math.max(ffGal, sprGal)).toLocaleString()} gal). ` +
+        `Sprinkler: ${sprFlow} gpm @ ${sprPsi.toFixed(0)} psi × ${sprDur} min. ` +
+        `Fire flow: ${ffFlow} gpm @ ${ffPsi} psi × ${ffDur} min.`;
+    }
+    toast(`Pump serves both: ${maxFlow} gpm @ ${maxPsi.toFixed(0)} psi`);
+    if (typeof calculate === 'function') calculate();
+    if (typeof updateEstimatingRecommendation === 'function') updateEstimatingRecommendation();
+  }
+
   function importFireFlowDemand() {
     const data = readFireFlowHandoff();
     if (!data) {
@@ -262,50 +322,6 @@
 
     host.innerHTML = lines.join('');
   }
-
-  /** Set system demand to the greater of fire flow and sprinkler flow. */
-  function applyGoverningDemand(silent) {
-    const ff = readFireFlowHandoff();
-    const spr = readSprinklerHandoff();
-    const ffFlow = ff ? Math.round(Number(ff.flowGpm)) : 0;
-    const sprFlow = spr ? Math.round(Number(spr.flowGpm)) : 0;
-    const ffDur = ff ? Math.round(Number(ff.durationMin) || 0) : 0;
-    const sprDur = spr ? Math.round(Number(spr.durationMin) || 0) : 0;
-    const sprPsi = spr ? Number(spr.pressurePsi) || 0 : 0;
-
-    if (ffFlow <= 0 && sprFlow <= 0) {
-      if (!silent) toast('No fire flow or sprinkler capture found.');
-      return false;
-    }
-
-    // Flow = the greater gpm
-    const maxFlow = Math.max(ffFlow, sprFlow);
-    const flowSrc = sprFlow >= ffFlow ? 'sprinkler' : 'fire flow';
-    // Pressure: use sprinkler pressure if available (fire flow residual is only 20 psi at hydrant)
-    const usePsi = sprPsi > 0 ? sprPsi : 20;
-    // Duration: the one that produces more gallons (for tank path)
-    const ffGal = ffFlow * ffDur;
-    const sprGal = sprFlow * sprDur;
-    const useDur = ffGal > sprGal ? ffDur : sprDur;
-
-    if ($('systemFlow')) $('systemFlow').value = maxFlow;
-    if ($('systemPressure')) $('systemPressure').value = usePsi.toFixed(1);
-    if ($('systemDuration')) $('systemDuration').value = useDur || 60;
-    if ($('systemDurationBasis')) {
-      $('systemDurationBasis').textContent =
-        `Governing: ${maxFlow} gpm from ${flowSrc}. ` +
-        `Sprinkler ${sprFlow} gpm @ ${sprPsi.toFixed(0)} psi × ${sprDur} min. ` +
-        `Fire flow ${ffFlow} gpm × ${ffDur} min.`;
-    }
-    if (!silent) {
-      toast(`Governing demand: ${maxFlow} gpm (${flowSrc}) · ${usePsi.toFixed(0)} psi · ${useDur} min`);
-    }
-    updateFireFlowHandoffBanner();
-    updateSprinklerHandoffBanner();
-    if (typeof updateEstimatingRecommendation === 'function') updateEstimatingRecommendation();
-    return true;
-  }
-
   function updateSprinklerHandoffBanner() {
     const data = readSprinklerHandoff();
     const banner = $('sprinklerHandoffBanner');
@@ -334,15 +350,6 @@
       toast('No sprinkler capture found. Open Sprinkler System Estimator and click “Capture for Pump Sizer”.');
       updateSprinklerHandoffBanner();
     updateFireFlowHandoffBanner();
-    // Auto-apply governing if both captures exist and current flow is below both
-    const _ff = readFireFlowHandoff();
-    const _spr = readSprinklerHandoff();
-    const _ffQ = _ff ? Number(_ff.flowGpm) : 0;
-    const _sprQ = _spr ? Number(_spr.flowGpm) : 0;
-    const _cur = num('systemFlow');
-    if ((_ffQ > 0 || _sprQ > 0) && _cur < Math.max(_ffQ, _sprQ)) {
-      applyGoverningDemand(true);
-    }
     updateEstimatingRecommendation();
       return;
     }
@@ -405,15 +412,6 @@
     scheduleSave();
     updateSprinklerHandoffBanner();
     updateFireFlowHandoffBanner();
-    // Auto-apply governing if both captures exist and current flow is below both
-    const _ff = readFireFlowHandoff();
-    const _spr = readSprinklerHandoff();
-    const _ffQ = _ff ? Number(_ff.flowGpm) : 0;
-    const _sprQ = _spr ? Number(_spr.flowGpm) : 0;
-    const _cur = num('systemFlow');
-    if ((_ffQ > 0 || _sprQ > 0) && _cur < Math.max(_ffQ, _sprQ)) {
-      applyGoverningDemand(true);
-    }
     updateEstimatingRecommendation();
     const supplyNote =
       sa && sa.status
@@ -2142,7 +2140,6 @@ ${(data.demandPoints || []).map((p, i) => `${esc(p.name)}: ${Math.round(p.flow)}
     $('hazardSelect')?.addEventListener('change', updateHazardSelection);
     $('btnSimplified')?.addEventListener('click', useSimplifiedDemand);
     $('btnImportSprinkler')?.addEventListener('click', importSprinklerDemand);
-    $('btnImportGoverning')?.addEventListener('click', () => applyGoverningDemand(false));
     $('btnImportFireFlow')?.addEventListener('click', importFireFlowDemand);
     $('btnCaptureTank')?.addEventListener('click', () => captureForTankSizer(false));
     $('btnCaptureTankOpen')?.addEventListener('click', () => captureForTankSizer(true));
@@ -2196,15 +2193,6 @@ ${(data.demandPoints || []).map((p, i) => `${esc(p.name)}: ${Math.round(p.flow)}
     updateSimplifiedPreview();
     updateSprinklerHandoffBanner();
     updateFireFlowHandoffBanner();
-    // Auto-apply governing if both captures exist and current flow is below both
-    const _ff = readFireFlowHandoff();
-    const _spr = readSprinklerHandoff();
-    const _ffQ = _ff ? Number(_ff.flowGpm) : 0;
-    const _sprQ = _spr ? Number(_spr.flowGpm) : 0;
-    const _cur = num('systemFlow');
-    if ((_ffQ > 0 || _sprQ > 0) && _cur < Math.max(_ffQ, _sprQ)) {
-      applyGoverningDemand(true);
-    }
     updateEstimatingRecommendation();
     if (window.FireToolshedShell) {
       window.FireToolshedShell.mount({ step: 'pump', base: '..' });
