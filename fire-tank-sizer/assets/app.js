@@ -947,6 +947,7 @@
       framework: state.framework,
       maxHeightFt: state.maxHeightFt,
       maxDiaFt: state.maxDiaFt,
+      numTanks: state.numTanks || 1,
     };
     try {
       localStorage.setItem(TANK_HANDOFF_KEY, JSON.stringify(payload));
