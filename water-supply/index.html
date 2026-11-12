@@ -45,6 +45,24 @@
       Data stays in this browser (<code>localStorage</code>). No account required.
     </p>
 
+    
+    <div class="card" style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;margin:1rem 0">
+      <h2 style="font-size:0.95rem;margin:0 0 0.5rem">Path mode</h2>
+      <p style="font-size:0.82rem;color:#64748b;margin:0 0 0.6rem">Choose how the tools connect. Each tool still works alone.</p>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:0.35rem;padding:0.4rem 0.7rem;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:0.85rem">
+          <input type="radio" name="pathMode" value="combined" checked> Combined (pump serves both)
+        </label>
+        <label style="display:flex;align-items:center;gap:0.35rem;padding:0.4rem 0.7rem;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:0.85rem">
+          <input type="radio" name="pathMode" value="separate"> Separate (hydrants on domestic)
+        </label>
+        <label style="display:flex;align-items:center;gap:0.35rem;padding:0.4rem 0.7rem;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:0.85rem">
+          <input type="radio" name="pathMode" value="adequate"> Adequate supply (no pump/tank)
+        </label>
+      </div>
+      <p id="modeNote" style="font-size:0.8rem;color:#475569;margin:0.6rem 0 0"></p>
+    </div>
+
     <div class="wps-hub-grid" id="hubCards" aria-label="Water path tools"></div>
 
     <div class="hub-points">
@@ -73,6 +91,25 @@
 
       var host = document.getElementById("hubCards");
       if (!host) return;
+      
+    // Path mode
+    var modeNotes = {
+      combined: "Pump and tank serve both fire flow and sprinkler. Loop is on pump distribution.",
+      separate: "Hydrants on domestic/city supply. Sprinkler on its own supply. Two sizing paths.",
+      adequate: "Flow test covers the demand. No pump or tank. Size the service line only."
+    };
+    function setMode(m) {
+      localStorage.setItem("fireToolshed.pathMode.v1", m);
+      document.getElementById("modeNote").textContent = modeNotes[m] || "";
+    }
+    document.querySelectorAll('input[name="pathMode"]').forEach(function(el) {
+      el.addEventListener("change", function() { setMode(el.value); });
+    });
+    var saved = localStorage.getItem("fireToolshed.pathMode.v1") || "combined";
+    var radio = document.querySelector('input[name="pathMode"][value="' + saved + '"]');
+    if (radio) radio.checked = true;
+    setMode(saved);
+
       host.innerHTML = shell.STEPS.map(function (s) {
         return (
           '<a class="wps-hub-card" href="../' +
