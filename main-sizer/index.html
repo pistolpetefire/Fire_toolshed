@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Main Sizer · Fire Toolshed</title>
+  <script src="../shared/water-path-shell.js"></script>
+  <style>
+    :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f8fafc; --card:#fff; --accent:#1e40af; --ok:#15803d; --warn:#b45309; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--ink); margin: 0; padding: 1.25rem; }
+    .wrap { max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 1.4rem; margin: 0.25rem 0; }
+    .sub { color: var(--muted); font-size: 0.82rem; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.15rem; margin: 0.85rem 0; }
+    .card h2 { font-size: 0.95rem; margin: 0 0 0.6rem; }
+    .row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: end; }
+    .field { flex: 1; min-width: 140px; }
+    .field label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 0.2rem; }
+    .field input, .field select { width: 100%; padding: 0.4rem 0.5rem; border: 1px solid var(--line); border-radius: 6px; font-size: 0.9rem; }
+    .opts { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .opts label { display: flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.7rem; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .opts input { width: auto; }
+    .opts label:has(input:checked) { border-color: var(--accent); background: #eff6ff; }
+    .btn { background: var(--accent); color: #fff; border: 0; padding: 0.45rem 0.9rem; border-radius: 6px; cursor: pointer; font-size: 0.82rem; }
+    .btn.secondary { background: #334155; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    td { padding: 0.3rem 0; border-bottom: 1px solid var(--line); }
+    td:first-child { color: var(--muted); }
+    td:last-child { font-weight: 600; text-align: right; }
+    .result { background: #f0fdf4; border-color: #86efac; }
+    .warn { background: #fffbeb; border-color: #fcd34d; }
+    .missing { color: var(--warn); }
+    @media print { .no-print { display: none; } body { background: #fff; padding: 0; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="sub">FIRE TOOLSHED</p>
+    <h1>Main Sizer</h1>
+    <p class="sub">Size the building loop, lead-in, and pump discharge from captured demands. Clarify whether the loop is on the pump or domestic, and whether hydrants share the sprinkler supply.</p>
+
+    <div class="card no-print">
+      <button class="btn" id="btnLoad">Load captures</button>
+      <button class="btn secondary" onclick="window.print()" style="margin-left:0.4rem">Print</button>
+      <span id="loadStatus" class="sub" style="margin-left:0.75rem"></span>
+    </div>
+
+    <div class="card">
+      <h2>Configuration</h2>
+      <p class="sub" style="margin:0 0 0.5rem">Loop around the building</p>
+      <div class="opts" id="loopType">
+        <label><input type="radio" name="loop" value="pump" checked> Pump distribution</label>
+        <label><input type="radio" name="loop" value="domestic"> Domestic water</label>
+      </div>
+      <p class="sub" style="margin:0.75rem 0 0.5rem">Hydrants and sprinkler supply</p>
+      <div class="opts" id="shareType">
+        <label><input type="radio" name="share" value="shared" checked> Hydrants share supply with sprinkler</label>
+        <label><input type="radio" name="share" value="separate"> Hydrants on domestic (separate from sprinkler)</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Sizing inputs</h2>
+      <div class="row">
+        <div class="field"><label>Loop length (ft)</label><input id="loopLen" type="number" value="400" min="0"></div>
+        <div class="field"><label>Lead-in length (ft)</label><input id="leadLen" type="number" value="100" min="0"></div>
+        <div class="field"><label>Max velocity (fps)</label><input id="maxVel" type="number" value="15" min="5" max="20"></div>
+        <div class="field"><label>C-factor</label><input id="cFactor" type="number" value="140" min="80"></div>
+      </div>
+    </div>
+
+    
+    <div class="card">
+      <h2>Manual overrides</h2>
+      <p class="sub">Leave blank to use the calculated size. Enter a value to lock it.</p>
+      <div class="row">
+        <div class="field"><label>Loop size (in)</label><input id="ovLoop" type="number" min="0" step="1" placeholder="auto"></div>
+        <div class="field"><label>Lead-in size (in)</label><input id="ovLead" type="number" min="0" step="1" placeholder="auto"></div>
+        <div class="field"><label>Pump discharge (in)</label><input id="ovDisch" type="number" min="0" step="1" placeholder="auto"></div>
+        <div class="field"><label>Hydrant loop (in)</label><input id="ovHydrant" type="number" min="0" step="1" placeholder="auto"></div>
+      </div>
+    </div>
+
+    <div id="captures" class="card">
+      <h2>Captured demands</h2>
+      <div id="captureBody"><p class="missing">Load captures to see fire flow, sprinkler, pump, and tank.</p></div>
+    </div>
+
+    <div id="results" class="card result">
+      <h2>Recommended sizes</h2>
+      <div id="resultBody"><p class="sub">Set configuration and load captures.</p></div>
+    </div>
+
+    <div id="separate" class="card warn hidden">
+      <h2>Separate hydrant sizing (domestic)</h2>
+      <div id="separateBody"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
