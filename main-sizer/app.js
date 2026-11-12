@@ -172,7 +172,7 @@
   });
 
   if (window.FireToolshedShell) {
-    FireToolshedShell.mount({ step: "tank", base: ".." });
+    FireToolshedShell.mount({ step: "mainsizer", base: ".." });
   }
   loadCaptures();
 })();
