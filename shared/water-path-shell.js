@@ -3,7 +3,7 @@
  * Shared chrome for synergy; each tool remains a standalone page.
  *
  * Usage:
- *   FireToolshedShell.mount({ step: 'flow'|'fireflow'|'sprinkler'|'pump'|'tank'|'hub', base: '..' });
+ *   FireToolshedShell.mount({ step: 'flow'|'fireflow'|'sprinkler'|'pump'|'tank'|'mainsizer'|'hub', base: '..' });
  *   // base = relative path from current page to repo root
  */
 (function (global) {
@@ -64,6 +64,14 @@
       title: "Fire Tank Sizer",
       path: "fire-tank-sizer/",
       blurb: "Flow × duration + safety · multi-tank · prefab catalog · pad plan",
+    },
+    {
+      id: "mainsizer",
+      n: 6,
+      short: "Main",
+      title: "Main Sizer",
+      path: "main-sizer/",
+      blurb: "Loop, lead-in, pump discharge · shared or separate · velocity check",
     },
   ];
 
