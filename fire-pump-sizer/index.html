@@ -16,6 +16,8 @@
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
   <link rel="stylesheet" href="../shared/water-path-shell.css">
   <link rel="stylesheet" href="./assets/styles.css?v=2.1.0">
+  <script src="../shared/verify-tab.js"></script>
+  <script src="./assets/verify-cases.js"></script>
 </head>
 <body>
   <div id="waterPathShell" class="no-print"></div>
@@ -129,7 +131,7 @@
       <section class="card">
         <div class="card-head">
           <h2 class="card-title"><span class="icon" aria-hidden="true">∑</span> System Hydraulic Results + Water Supply</h2>
-          <button type="button" id="btnImportGoverning" class="btn btn-sm btn-primary" title="Use the greater of fire flow and sprinkler demand">Use Governing Demand</button>
+          <button type="button" id="btnPumpServesBoth" class="btn btn-sm btn-primary" title="Pump supplies both fire flow and sprinkler — use max flow and max pressure">Pump Serves Both</button>
           <button type="button" id="btnImportFireFlow" class="btn btn-sm btn-primary" title="Import required fire flow (gpm @ 20 psi + duration) from Fire Flow Calculator">Import Fire Flow</button>
           <button type="button" id="btnImportSprinkler" class="btn btn-sm btn-primary" title="Import flow, pressure, duration, and supply curve from Sprinkler System Estimator">Import Sprinkler Demand</button>
           <button type="button" id="btnSimplified" class="btn btn-sm" title="Override flow and pressure from the simplified hazard calculator below">Use Simplified Demand</button>
@@ -178,6 +180,8 @@
 
       <section class="card">
         <h2 class="card-title"><span class="icon" aria-hidden="true">💧</span> Hydrant Flow Test Results</h2>
+        <button type="button" id="btnClearFlowTest" class="btn btn-sm" style="margin-bottom:0.5rem" title="Blank the test when none is available; pump is known to be required">Clear flow test / No test — pump required</button>
+        <p id="flowTestNote" class="tiny hidden" style="margin:0 0 0.5rem;color:var(--warn,#b45309)"></p>
         <p class="muted">Optional but recommended. Enter the most recent hydrant flow test to estimate available pressure at design flow.</p>
 
         <div class="grid-3 mb-4">
