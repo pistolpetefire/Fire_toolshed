@@ -68,10 +68,10 @@
     {
       id: "mainsizer",
       n: 6,
-      short: "Main",
-      title: "Main Sizer",
+      short: "Loop",
+      title: "Loop / Service Line",
       path: "main-sizer/",
-      blurb: "Loop, lead-in, pump discharge · shared or separate · velocity check",
+      blurb: "Loop and service line sizing · shared or separate · velocity check",
     },
   ];
 
