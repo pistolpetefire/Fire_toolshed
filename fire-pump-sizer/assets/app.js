@@ -186,7 +186,7 @@
       note.textContent = 'No flow test available. Pump is required. Enter direct suction if known, or proceed with demand-only sizing.';
     }
     toast('Flow test cleared. Pump required — size from demand.');
-    if (typeof calculate === 'function') calculate();
+    if (typeof calculateAll === 'function') calculateAll();
   }
 
   /** Pump serves both fire flow and sprinkler. Use max flow, max pressure, volume-governing duration. */
@@ -214,9 +214,9 @@
     const psiSrc = sprPsi >= ffPsi ? 'sprinkler' : 'fire flow';
     const volSrc = ffGal >= sprGal ? 'fire flow' : 'sprinkler';
 
-    if ($('systemFlow')) $('systemFlow').value = maxFlow;
-    if ($('systemPressure')) $('systemPressure').value = maxPsi.toFixed(1);
-    if ($('systemDuration')) $('systemDuration').value = useDur || 60;
+    if ($('systemFlow')) { $('systemFlow').value = maxFlow; $('systemFlow').dispatchEvent(new Event('input', {bubbles:true})); }
+    if ($('systemPressure')) { $('systemPressure').value = maxPsi.toFixed(1); $('systemPressure').dispatchEvent(new Event('input', {bubbles:true})); }
+    if ($('systemDuration')) { $('systemDuration').value = useDur || 60; $('systemDuration').dispatchEvent(new Event('input', {bubbles:true})); }
 
     const basis = $('systemDurationBasis');
     if (basis) {
@@ -227,7 +227,7 @@
         `Fire flow: ${ffFlow} gpm @ ${ffPsi} psi × ${ffDur} min.`;
     }
     toast(`Pump serves both: ${maxFlow} gpm @ ${maxPsi.toFixed(0)} psi`);
-    if (typeof calculate === 'function') calculate();
+    if (typeof calculateAll === 'function') calculateAll();
     if (typeof updateEstimatingRecommendation === 'function') updateEstimatingRecommendation();
   }
 
@@ -2141,6 +2141,8 @@ ${(data.demandPoints || []).map((p, i) => `${esc(p.name)}: ${Math.round(p.flow)}
     $('btnSimplified')?.addEventListener('click', useSimplifiedDemand);
     $('btnImportSprinkler')?.addEventListener('click', importSprinklerDemand);
     $('btnImportFireFlow')?.addEventListener('click', importFireFlowDemand);
+    $('btnPumpServesBoth')?.addEventListener('click', pumpServesBoth);
+    $('btnClearFlowTest')?.addEventListener('click', clearFlowTest);
     $('btnCaptureTank')?.addEventListener('click', () => captureForTankSizer(false));
     $('btnCaptureTankOpen')?.addEventListener('click', () => captureForTankSizer(true));
     $('btnSupply')?.addEventListener('click', () => calculateSupplyCurve(false));
