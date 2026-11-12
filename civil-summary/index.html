@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Civil Utilities Summary · Fire Toolshed</title>
+  <script src="../shared/water-path-shell.js"></script>
+  <style>
+    :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f8fafc; --card:#fff; --accent:#1e40af; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--ink); margin: 0; padding: 1.5rem; }
+    .wrap { max-width: 800px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin: 0.5rem 0; }
+    .sub { color: var(--muted); font-size: 0.85rem; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0; }
+    .card h2 { font-size: 1rem; margin: 0 0 0.5rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    td { padding: 0.35rem 0; border-bottom: 1px solid var(--line); }
+    td:first-child { color: var(--muted); width: 40%; }
+    td:last-child { font-weight: 600; text-align: right; }
+    .missing { color: #b45309; font-weight: 500; }
+    .ok { color: #15803d; }
+    .btn { background: var(--accent); color: #fff; border: 0; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .btn:hover { opacity: 0.9; }
+    @media print { .no-print { display: none; } body { background: #fff; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="sub">FIRE TOOLSHED</p>
+    <h1>Civil Utilities Summary</h1>
+    <p class="sub">Aggregated from the water path captures. For underground utilities planning.</p>
+    <p class="no-print" style="margin:0.75rem 0">
+      <button class="btn" onclick="load()">Refresh</button>
+      <button class="btn" onclick="window.print()" style="margin-left:0.5rem;background:#334155">Print</button>
+    </p>
+    <div id="project" class="card"><h2>Project</h2><div id="projectBody">—</div></div>
+    <div id="fireflow" class="card"><h2>Fire Flow</h2><div id="ffBody">—</div></div>
+    <div id="sprinkler" class="card"><h2>Sprinkler Demand</h2><div id="sprBody">—</div></div>
+    <div id="pump" class="card"><h2>Fire Pump</h2><div id="pumpBody">—</div></div>
+    <div id="tank" class="card"><h2>Fire Water Tank</h2><div id="tankBody">—</div></div>
+    <div class="card">
+      <h2>Civil takeaway</h2>
+      <div id="takeaway">—</div>
+    </div>
+  </div>
+  <script>
+    const KEYS = {
+      project: "fireToolshed.project.v1",
+      fireflow: "fireToolshed.fireFlowHandoff.v1",
+      sprinkler: "fireToolshed.sprinklerHandoff.v1",
+      pump: "fireToolshed.pumpHandoff.v1",
+      tank: "fireToolshed.tankHandoff.v1",
+    };
+    function read(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
+    function row(label, val, ok) {
+      const cls = ok === false ? "missing" : (ok === true ? "ok" : "");
+      return `<tr><td>${label}</td><td class="${cls}">${val}</td></tr>`;
+    }
+    function load() {
+      const proj = read(KEYS.project) || {};
+      const ff = read(KEYS.fireflow);
+      const spr = read(KEYS.sprinkler);
+      const pump = read(KEYS.pump);
+      const tank = read(KEYS.tank);
+
+      document.getElementById("projectBody").innerHTML = `<table>
+        ${row("Project", proj.name || proj.projectName || "—")}
+        ${row("Date", new Date().toLocaleDateString())}
+      </table>`;
+
+      document.getElementById("ffBody").innerHTML = ff ? `<table>
+        ${row("Required fire flow", ff.flowGpm + " gpm @ " + (ff.residualPsi || 20) + " psi", true)}
+        ${row("Duration", ff.durationMin + " min (" + (ff.durationHours || (ff.durationMin/60).toFixed(1)) + " hr)")}
+        ${row("Total volume", (ff.totalGallons || ff.flowGpm * ff.durationMin).toLocaleString() + " gal")}
+        ${row("Hydrants", ff.hydrantCount || "—")}
+        ${row("Max per hydrant", (ff.maxPerHydrant || 1250) + " gpm")}
+        ${row("Code basis", ff.codeBasis || "—")}
+      </table>` : `<p class="missing">Not captured — run Fire Flow Calculator and Capture.</p>`;
+
+      document.getElementById("sprBody").innerHTML = spr ? `<table>
+        ${row("System demand", spr.flowGpm + " gpm @ " + (spr.pressurePsi || "—") + " psi", true)}
+        ${row("Duration", (spr.durationMin || "—") + " min")}
+        ${row("Framework", spr.frameworkLabel || spr.framework || "—")}
+      </table>` : `<p class="missing">Not captured — run Sprinkler Estimator and Capture for Pump.</p>`;
+
+      document.getElementById("pumpBody").innerHTML = pump ? `<table>
+        ${row("Duty flow", pump.flowGpm + " gpm", true)}
+        ${row("Duty pressure", (pump.pressurePsi || "—") + " psi")}
+        ${row("Duration", (pump.durationMin || "—") + " min")}
+        ${row("Rated pump", pump.ratedGPM ? pump.ratedGPM + " gpm" : "—")}
+      </table>` : `<p class="missing">Not captured — size pump and Capture for Tank.</p>`;
+
+      document.getElementById("tankBody").innerHTML = tank ? `<table>
+        ${row("Base volume", (tank.baseGal || "—").toLocaleString() + " gal", true)}
+        ${row("Required shell", (tank.requiredShellGal || "—").toLocaleString() + " gal")}
+        ${row("Selected tank", tank.tank ? tank.tank.gal.toLocaleString() + " gal · ⌀" + tank.tank.diaFt + "' × " + tank.tank.htFt + "'" : "—")}
+        ${row("Tank count", tank.numTanks || 1)}
+      </table>` : `<p class="missing">Not captured — size tank and save handoff.</p>`;
+
+      const bits = [];
+      if (ff) bits.push(`Fire flow ${ff.flowGpm} gpm @ 20 psi for ${ff.durationMin} min`);
+      if (ff && ff.hydrantCount) bits.push(`${ff.hydrantCount} hydrants (max ${ff.maxPerHydrant || 1250} gpm each)`);
+      if (spr) bits.push(`Sprinkler ${spr.flowGpm} gpm @ ${spr.pressurePsi || "—"} psi`);
+      if (pump) bits.push(`Pump ${pump.flowGpm} gpm @ ${pump.pressurePsi || "—"} psi`);
+      if (tank) bits.push(`Tank ${(tank.requiredShellGal || tank.baseGal || 0).toLocaleString()} gal`);
+      document.getElementById("takeaway").innerHTML = bits.length
+        ? `<p>${bits.join(". ")}.</p><p class="sub">Lead-in and underground main sized to carry the governing flow at acceptable velocity. Confirm with hydraulic calc.</p>`
+        : `<p class="missing">No captures yet. Complete the water path first.</p>`;
+    }
+    if (window.FireToolshedShell) FireToolshedShell.mount({ step: "tank", base: ".." });
+    load();
+  </script>
+</body>
+</html>
