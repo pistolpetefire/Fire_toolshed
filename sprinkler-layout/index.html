@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sprinkler Layout · Fire Toolshed</title>
+  <link rel="stylesheet" href="./style.css?v=0.1.0">
+</head>
+<body>
+<div class="shell">
+  <header>
+    <p class="eyebrow">Fire Toolshed</p>
+    <h1>Sprinkler Head Layout</h1>
+    <p class="version">v0.1.0 · Dual Ceiling (Open / Grid)</p>
+    <div class="actions no-print">
+      <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
+      <label>Report logo <select id="logoSelect"></select></label>
+    </div>
+  </header>
+
+  <div id="guide" class="guide hidden">
+    <h2>User Guide</h2>
+    <p>Upload a floor plan PDF and an FX criteria sheet (or define criteria manually). The app supports both <strong>open bay</strong> and <strong>reflected ceiling plan with drop ceiling grid</strong> from the start.</p>
+    <ul>
+      <li><strong>Ceiling Type</strong> — Choose Open Bay or Grid (RCP). Grid mode adds tile size and optional snap-to-center.</li>
+      <li><strong>Floor Plan PDF</strong> — Architectural or reflected ceiling plan.</li>
+      <li><strong>FX Criteria</strong> — Map hatchings/colors to hazard criteria (max area/head, max spacing, density). Upload sheet or enter manually.</li>
+      <li><strong>Scale</strong> — Set or measure scale so dimensions are accurate.</li>
+      <li><strong>Areas</strong> — Select regions (manual for now; auto-hatching detection planned) and assign criteria.</li>
+      <li><strong>Generate</strong> — Places heads, dimensions them, and prepares marked-up output.</li>
+    </ul>
+    <p>Compliant with NFPA 13 spacing rules for the assigned hazard. Always verify with the full standard and AHJ.</p>
+  </div>
+
+  <section class="card">
+    <div class="controls">
+      <div class="field">
+        <label>Ceiling Type</label>
+        <select id="ceilingType">
+          <option value="open">Open Bay</option>
+          <option value="grid">Grid (RCP / Drop Ceiling)</option>
+        </select>
+      </div>
+      <div class="field" id="tileSizeField" style="display:none">
+        <label>Tile Size (ft)</label>
+        <input id="tileSize" type="text" value="2 x 2" placeholder="e.g. 2 x 4">
+      </div>
+      <div class="field">
+        <label>Floor Plan PDF</label>
+        <input id="planPdf" type="file" accept="application/pdf">
+      </div>
+      <div class="field">
+        <label>FX Criteria Sheet (optional)</label>
+        <input id="criteriaPdf" type="file" accept="application/pdf">
+      </div>
+      <div class="field">
+        <label>Scale (ft per unit)</label>
+        <input id="scale" type="number" value="1" step="0.01" min="0.01">
+      </div>
+    </div>
+    <div class="actions-row">
+      <button class="calc" onclick="loadPlan()">Load Plan</button>
+      <button class="calc" onclick="generateLayout()">Generate Layout</button>
+      <button class="calc" onclick="exportPdf()">Export Marked PDF</button>
+    </div>
+    <div id="viewer" class="viewer">
+      <canvas id="planCanvas"></canvas>
+      <div id="overlay" class="overlay"></div>
+    </div>
+    <div id="status" class="status"></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
+<script src="../shared.js?v=0.1.0"></script>
+<script src="./app.js?v=0.1.0"></script>
+<script>ToolshedShared.mountLogoSelect("logoSelect");</script>
+</body>
+</html>
