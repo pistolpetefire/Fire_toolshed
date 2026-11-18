@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Standpipe Calculator · Fire Toolshed</title>
-  <link rel="stylesheet" href="./style.css?v=1.0.8">
+  <link rel="stylesheet" href="./style.css?v=1.0.9">
 </head>
 <body>
 <div class="shell">
   <header>
     <p class="eyebrow">Fire Toolshed</p>
     <h1>Standpipe Calculator</h1>
-    <p class="version">v1.0.8 · NFPA 14-2019</p>
+    <p class="version">v1.0.9 · NFPA 14-2019</p>
     <div class="actions no-print">
       <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
       <label>Report logo <select id="logoSelect"></select></label>
@@ -21,9 +21,10 @@
   <div id="guide" class="guide hidden">
     <h2>User Guide</h2>
     <ul>
-      <li>Select class. Residual required at the top outlet is 100 psi (Class I/III) or 65 psi (Class II).</li>
-      <li>Enter height and estimated friction. The tool calculates the pressure the designer must provide at the base so the top outlet meets the residual.</li>
-      <li>Flow is 500 gpm for the first standpipe plus 250 gpm each additional, capped at 1,000 gpm (sprinklered) or 1,250 gpm (unsprinklered). Class II is 100 gpm.</li>
+      <li>Select class. Residual required at the top outlet is 100 psi (Class I/III) or 65 psi (Class II) per NFPA 14-2019 7.8.</li>
+      <li>Flow per NFPA 14-2019 7.10: 500 gpm first standpipe + 250 gpm each additional (capped), or 100 gpm for Class II.</li>
+      <li>Height is used for elevation (0.433 psi/ft). Friction is calculated with Hazen-Williams from pipe diameter, length, and C-factor (120 wet steel / 100 dry typical).</li>
+      <li>Required pressure at base = residual at top + elevation + friction loss.</li>
     </ul>
   </div>
   <section class="card">
@@ -36,14 +37,18 @@
         <select id="sprink"><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
       <div><label>Height to top outlet (ft)</label><input id="height" type="number" value="60"></div>
-      <div><label>Friction loss to base (psi)</label><input id="fric" type="number" value="15" step="0.1"></div>
+      <div><label>Pipe diameter (in)</label><input id="diam" type="number" value="4" step="0.1" min="2"></div>
+      <div><label>Pipe length (ft)</label><input id="length" type="number" value="100" min="0"></div>
+      <div><label>C-factor</label>
+        <select id="cFactor"><option value="120">120 (wet steel)</option><option value="100">100 (dry)</option><option value="140">140 (cement-lined)</option></select>
+      </div>
     </div>
     <button class="calc" onclick="calc()">Calculate</button>
     <div id="results" class="results" style="display:none"></div>
   </section>
 </div>
-<script src="../shared.js?v=1.0.8"></script>
-<script src="./app.js?v=1.0.8"></script>
+<script src="../shared.js?v=1.0.9"></script>
+<script src="./app.js?v=1.0.9"></script>
 <script>ToolshedShared.mountLogoSelect("logoSelect");</script>
 </body>
 </html>
