@@ -24,9 +24,7 @@ body {
   padding: 1rem 1rem 3rem;
 }
 
-header {
-  margin-bottom: 1rem;
-}
+header { margin-bottom: 1rem; }
 .eyebrow {
   font-size: 0.75rem;
   letter-spacing: 0.08em;
@@ -34,15 +32,8 @@ header {
   color: var(--muted);
   margin: 0 0 0.25rem;
 }
-h1 {
-  margin: 0 0 0.25rem;
-  font-size: 1.6rem;
-}
-.version {
-  margin: 0 0 0.75rem;
-  color: var(--muted);
-  font-size: 0.85rem;
-}
+h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
+.version { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.85rem; }
 
 .actions {
   display: flex;
@@ -118,10 +109,12 @@ button:hover { filter: brightness(1.05); }
   display: block;
   max-width: 100%;
 }
-.overlay {
+.overlay-canvas {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
+  top: 0;
+  left: 0;
+  pointer-events: auto;
+  cursor: crosshair;
 }
 
 .status {
