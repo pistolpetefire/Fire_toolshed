@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Sprinkler Layout · Fire Toolshed</title>
-  <link rel="stylesheet" href="./style.css?v=0.1.0">
+  <link rel="stylesheet" href="./style.css?v=0.2.0">
 </head>
 <body>
 <div class="shell">
   <header>
     <p class="eyebrow">Fire Toolshed</p>
     <h1>Sprinkler Head Layout</h1>
-    <p class="version">v0.1.0 · Dual Ceiling (Open / Grid)</p>
+    <p class="version">v0.2.0 · Dual Ceiling + Polygons</p>
     <div class="actions no-print">
       <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
       <label>Report logo <select id="logoSelect"></select></label>
@@ -20,16 +20,14 @@
 
   <div id="guide" class="guide hidden">
     <h2>User Guide</h2>
-    <p>Upload a floor plan PDF and an FX criteria sheet (or define criteria manually). The app supports both <strong>open bay</strong> and <strong>reflected ceiling plan with drop ceiling grid</strong> from the start.</p>
+    <p>Upload a floor plan PDF. Draw coverage polygons, assign criteria, then generate heads (open bay or grid).</p>
     <ul>
-      <li><strong>Ceiling Type</strong> — Choose Open Bay or Grid (RCP). Grid mode adds tile size and optional snap-to-center.</li>
-      <li><strong>Floor Plan PDF</strong> — Architectural or reflected ceiling plan.</li>
-      <li><strong>FX Criteria</strong> — Map hatchings/colors to hazard criteria (max area/head, max spacing, density). Upload sheet or enter manually.</li>
-      <li><strong>Scale</strong> — Set or measure scale so dimensions are accurate.</li>
-      <li><strong>Areas</strong> — Select regions (manual for now; auto-hatching detection planned) and assign criteria.</li>
-      <li><strong>Generate</strong> — Places heads, dimensions them, and prepares marked-up output.</li>
+      <li><strong>Ceiling Type</strong> — Open Bay or Grid (RCP). Grid adds tile size.</li>
+      <li><strong>Load Plan</strong> — Upload floor plan PDF.</li>
+      <li><strong>Draw Polygon</strong> — Click to add vertices. Double-click or click first point to close.</li>
+      <li><strong>Assign Criteria</strong> — Set max spacing / area per head for the selected polygon.</li>
+      <li><strong>Generate Layout</strong> — Places heads inside polygons and dimensions them.</li>
     </ul>
-    <p>Compliant with NFPA 13 spacing rules for the assigned hazard. Always verify with the full standard and AHJ.</p>
   </div>
 
   <section class="card">
@@ -50,30 +48,33 @@
         <input id="planPdf" type="file" accept="application/pdf">
       </div>
       <div class="field">
-        <label>FX Criteria Sheet (optional)</label>
-        <input id="criteriaPdf" type="file" accept="application/pdf">
+        <label>Scale (ft per pixel unit)</label>
+        <input id="scale" type="number" value="1" step="0.01" min="0.01">
       </div>
       <div class="field">
-        <label>Scale (ft per unit)</label>
-        <input id="scale" type="number" value="1" step="0.01" min="0.01">
+        <label>Max Spacing (ft)</label>
+        <input id="maxSpacing" type="number" value="15" step="0.5" min="6">
       </div>
     </div>
     <div class="actions-row">
       <button class="calc" onclick="loadPlan()">Load Plan</button>
+      <button class="calc" onclick="startPolygon()">Draw Polygon</button>
+      <button class="calc" onclick="finishPolygon()">Finish Polygon</button>
+      <button class="calc" onclick="clearPolygons()">Clear Polygons</button>
       <button class="calc" onclick="generateLayout()">Generate Layout</button>
       <button class="calc" onclick="exportPdf()">Export Marked PDF</button>
     </div>
     <div id="viewer" class="viewer">
       <canvas id="planCanvas"></canvas>
-      <div id="overlay" class="overlay"></div>
+      <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
     </div>
     <div id="status" class="status"></div>
   </section>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
-<script src="../shared.js?v=0.1.0"></script>
-<script src="./app.js?v=0.1.0"></script>
+<script src="../shared.js?v=0.2.0"></script>
+<script src="./app.js?v=0.2.0"></script>
 <script>ToolshedShared.mountLogoSelect("logoSelect");</script>
 </body>
 </html>
