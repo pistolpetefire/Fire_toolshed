@@ -1,11 +1,11 @@
 /* Sprinkler Head Layout – dual ceiling + user polygons
-   Fire Toolshed – v0.2.0
+   Fire Toolshed – v0.2.1
 */
 
 const state = {
   ceilingType: 'open',
   tileSize: '2 x 2',
-  scale: 1,
+  scale: 0.1,
   planDoc: null,
   polygons: [],
   currentPoly: null,
@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ceilingSelect.addEventListener('change', () => {
     state.ceilingType = ceilingSelect.value;
     tileField.style.display = state.ceilingType === 'grid' ? 'block' : 'none';
+    setStatus(state.ceilingType === 'grid' ? 'Grid mode – tile size available.' : 'Open bay mode.');
   });
   ceilingSelect.dispatchEvent(new Event('change'));
 
@@ -112,6 +113,7 @@ function clearPolygons() {
 }
 
 function redrawOverlay() {
+  if (!overlayCtx) return;
   overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
   // Draw finished polygons
@@ -165,7 +167,7 @@ function generateLayout() {
     return;
   }
   const maxSpacing = parseFloat(document.getElementById('maxSpacing').value) || 15;
-  const scale = parseFloat(document.getElementById('scale').value) || 1;
+  const scale = parseFloat(document.getElementById('scale').value) || 0.1;
   const spacingPx = maxSpacing / scale;
 
   state.heads = [];
