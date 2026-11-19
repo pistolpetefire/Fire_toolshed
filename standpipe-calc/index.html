@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Standpipe Calculator · Fire Toolshed</title>
-  <link rel="stylesheet" href="./style.css?v=1.0.10">
+  <link rel="stylesheet" href="./style.css?v=1.0.11">
 </head>
 <body>
 <div class="shell">
   <header>
     <p class="eyebrow">Fire Toolshed</p>
     <h1>Standpipe Calculator</h1>
-    <p class="version">v1.0.10 · NFPA 14-2019</p>
+    <p class="version">v1.0.11 · NFPA 14-2019 Compliant</p>
     <div class="actions no-print">
       <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
       <label>Report logo <select id="logoSelect"></select></label>
@@ -20,17 +20,17 @@
   </header>
   <div id="guide" class="guide hidden">
     <h2>User Guide</h2>
-    <p>This tool calculates the pressure required at the base so the hydraulically most remote outlet meets NFPA 14 residual and flow requirements. Friction uses the Hazen-Williams formula.</p>
+    <p><strong>This calculator complies with NFPA 14-2019.</strong> It determines the pressure required at the base so the hydraulically most remote outlet meets the residual and flow requirements of the standard. Friction uses the Hazen-Williams formula.</p>
     <ul>
       <li><strong>Class</strong> — Select I, II, or III. Class I and III require 100 psi residual at the most remote 2½ in. outlet. Class II requires 65 psi at the most remote 1½ in. outlet (NFPA 14-2019 7.8).</li>
       <li><strong>Number of standpipes</strong> — Total standpipes in the system. Flow is 500 gpm for the first + 250 gpm for each additional, capped at 1,000 gpm (sprinklered) or 1,250 gpm (unsprinklered). Class II is fixed at 100 gpm (7.10).</li>
-      <li><strong>Building sprinklered?</strong> — Yes if the building is sprinklered throughout per NFPA 13. This sets the system flow cap (1,000 gpm vs 1,250 gpm).</li>
-      <li><strong>Height to top outlet (ft)</strong> — Vertical distance from the base (pump or FDC) to the most remote outlet. Used for elevation loss at 0.433 psi per foot. Typical floor-to-floor is 12–14 ft; enter the actual height of the top outlet.</li>
-      <li><strong>Pipe diameter (in)</strong> — Internal diameter of the riser or main being calculated. NFPA 14 minimum is 4 in. for Class I/III standpipes and 6 in. for combined systems. Use the actual size; smaller diameters increase friction sharply.</li>
-      <li><strong>Pipe length (ft)</strong> — Length of the pipe segment (riser or main) from the base to the top outlet. Do not include fittings here unless you convert them to equivalent length and add them. Typical riser is roughly building height plus a little for offsets.</li>
-      <li><strong>C-factor</strong> — Hazen-Williams roughness coefficient. Use 120 for wet steel (most common), 100 for dry systems, or 140 for cement-lined or smooth pipe. Higher C means less friction.</li>
+      <li><strong>Building sprinklered?</strong> — Yes if the building is sprinklered throughout per NFPA 13. This sets the system flow cap (1,000 gpm vs 1,250 gpm) per NFPA 14 7.10.1.</li>
+      <li><strong>Height to top outlet (ft)</strong> — Vertical distance from the base (pump or FDC) to the most remote outlet. Used for elevation loss at 0.433 psi per foot.</li>
+      <li><strong>Pipe diameter (in)</strong> — Internal diameter of the riser or main being calculated. NFPA 14 minimum is 4 in. for Class I/III standpipes and 6 in. for combined systems.</li>
+      <li><strong>Pipe length (ft)</strong> — Length of the pipe segment (riser or main) from the base to the top outlet. Convert fittings to equivalent length and add if desired.</li>
+      <li><strong>C-factor</strong> — Hazen-Williams roughness coefficient. Use 120 for wet steel (most common), 100 for dry systems, or 140 for cement-lined or smooth pipe.</li>
     </ul>
-    <p><strong>Result:</strong> Pressure required at base = residual at top + elevation + friction loss. Provide at least this pressure at the base so the top outlet has the required residual.</p>
+    <p><strong>Result:</strong> Pressure required at base = residual at top (7.8) + elevation + friction loss (Hazen-Williams). Provide at least this pressure at the base so the top outlet has the required residual. All steps are referenced in the on-screen results and the printed report.</p>
   </div>
   <section class="card">
     <div class="grid">
@@ -52,8 +52,8 @@
     <div id="results" class="results" style="display:none"></div>
   </section>
 </div>
-<script src="../shared.js?v=1.0.10"></script>
-<script src="./app.js?v=1.0.10"></script>
+<script src="../shared.js?v=1.0.11"></script>
+<script src="./app.js?v=1.0.11"></script>
 <script>ToolshedShared.mountLogoSelect("logoSelect");</script>
 </body>
 </html>
