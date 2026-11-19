@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Sprinkler Layout · Fire Toolshed</title>
-  <link rel="stylesheet" href="./style.css?v=0.2.0">
+  <link rel="stylesheet" href="./style.css?v=0.2.1">
 </head>
 <body>
 <div class="shell">
   <header>
     <p class="eyebrow">Fire Toolshed</p>
     <h1>Sprinkler Head Layout</h1>
-    <p class="version">v0.2.0 · Dual Ceiling + Polygons</p>
+    <p class="version">v0.2.1 · Dual Ceiling + Polygons</p>
     <div class="actions no-print">
       <button type="button" onclick="ToolshedShared.toggleGuide('guide')">Help / Guide</button>
       <label>Report logo <select id="logoSelect"></select></label>
@@ -20,13 +20,14 @@
 
   <div id="guide" class="guide hidden">
     <h2>User Guide</h2>
-    <p>Upload a floor plan PDF. Draw coverage polygons, assign criteria, then generate heads (open bay or grid).</p>
+    <p>Upload a floor plan PDF. Draw coverage polygons, set spacing, then generate heads (open bay or grid).</p>
     <ul>
-      <li><strong>Ceiling Type</strong> — Open Bay or Grid (RCP). Grid adds tile size.</li>
+      <li><strong>Ceiling Type</strong> — Open Bay or Grid (RCP). Grid adds tile size field.</li>
       <li><strong>Load Plan</strong> — Upload floor plan PDF.</li>
-      <li><strong>Draw Polygon</strong> — Click to add vertices. Double-click or click first point to close.</li>
-      <li><strong>Assign Criteria</strong> — Set max spacing / area per head for the selected polygon.</li>
-      <li><strong>Generate Layout</strong> — Places heads inside polygons and dimensions them.</li>
+      <li><strong>Scale</strong> — Feet represented by one canvas unit after render (tune until dimensions match the drawing).</li>
+      <li><strong>Draw Polygon</strong> — Click to add vertices. Finish Polygon or double-click to close (min 3 points).</li>
+      <li><strong>Max Spacing</strong> — Maximum distance between heads in feet for the layout.</li>
+      <li><strong>Generate Layout</strong> — Places heads only inside the drawn polygons.</li>
     </ul>
   </div>
 
@@ -48,8 +49,8 @@
         <input id="planPdf" type="file" accept="application/pdf">
       </div>
       <div class="field">
-        <label>Scale (ft per pixel unit)</label>
-        <input id="scale" type="number" value="1" step="0.01" min="0.01">
+        <label>Scale (ft per canvas unit)</label>
+        <input id="scale" type="number" value="0.1" step="0.01" min="0.001">
       </div>
       <div class="field">
         <label>Max Spacing (ft)</label>
@@ -73,8 +74,8 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
-<script src="../shared.js?v=0.2.0"></script>
-<script src="./app.js?v=0.2.0"></script>
+<script src="../shared.js?v=0.2.1"></script>
+<script src="./app.js?v=0.2.1"></script>
 <script>ToolshedShared.mountLogoSelect("logoSelect");</script>
 </body>
 </html>
