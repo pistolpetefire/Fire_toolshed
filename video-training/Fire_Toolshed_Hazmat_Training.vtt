@@ -1,0 +1,997 @@
+WEBVTT
+
+1
+00:00:00.272 --> 00:00:03.535
+Welcome to the updated Fire Toolshed hazardous
+materials workflow.
+
+2
+00:00:03.499 --> 00:00:06.777
+We will follow the live user guides from the
+owner's safety data sheets through
+
+3
+00:00:06.777 --> 00:00:10.220
+classification, owner quantities, maximum
+allowable quantity review, and room notes
+
+4
+00:00:10.220 --> 00:00:10.635
+for Revit.
+
+5
+00:00:10.635 --> 00:00:13.510
+These are actual screenshots captured while
+using the published app.
+
+6
+00:00:13.510 --> 00:00:17.149
+The products, quantities, and returned analysis
+are clearly labeled training
+
+7
+00:00:17.149 --> 00:00:17.580
+examples.
+
+8
+00:00:17.580 --> 00:00:20.732
+They demonstrate the controls, not a completed
+engineering assessment.
+
+9
+00:00:21.599 --> 00:00:23.815
+Step one: start in the bulk workspace.
+
+10
+00:00:23.778 --> 00:00:25.754
+Expand Project and code basis.
+
+11
+00:00:25.754 --> 00:00:29.824
+Enter the project name, jurisdiction, reviewer,
+assessment basis, and adopted code
+
+12
+00:00:29.824 --> 00:00:30.221
+edition.
+
+13
+00:00:30.221 --> 00:00:33.764
+Confirm amendments and project requirements
+before exporting an AI batch.
+
+14
+00:00:33.764 --> 00:00:37.435
+Use one workspace for the project, adding later
+deliveries to that same workspace.
+
+15
+00:00:37.435 --> 00:00:40.986
+The edition shown here is a training
+placeholder; a real assessment needs the actual
+
+16
+00:00:40.986 --> 00:00:41.747
+governing edition.
+
+17
+00:00:42.597 --> 00:00:45.887
+Name the delivery so you can recognize its
+building, date, or sender.
+
+18
+00:00:45.851 --> 00:00:48.830
+Select PDFs or ZIP archives and choose the
+owner's files.
+
+19
+00:00:48.830 --> 00:00:50.589
+Combined PDFs are allowed.
+
+20
+00:00:50.589 --> 00:00:52.563
+Keep the tab open while the app reads them.
+
+21
+00:00:52.563 --> 00:00:56.878
+The limits are one hundred mebibytes per PDF and
+one gibibyte of expanded PDF data
+
+22
+00:00:56.878 --> 00:00:57.299
+per ZIP.
+
+23
+00:00:57.299 --> 00:00:58.858
+Split larger deliveries.
+
+24
+00:00:58.858 --> 00:01:02.141
+Pause after current page lets you stop reading
+without losing the registered
+
+25
+00:01:02.141 --> 00:01:02.616
+identities.
+
+26
+00:01:03.458 --> 00:01:05.517
+Step two: account for the documents.
+
+27
+00:01:05.481 --> 00:01:09.427
+Export the receipt log and reconcile every
+delivered file as registered, duplicate,
+
+28
+00:01:09.427 --> 00:01:10.521
+or explicitly excluded.
+
+29
+00:01:10.521 --> 00:01:12.850
+Then use Confirm documents and page ranges.
+
+30
+00:01:12.850 --> 00:01:15.180
+Here, two PDFs still need range review.
+
+31
+00:01:15.180 --> 00:01:19.155
+A filename is not a verified product identity,
+and one PDF may contain several
+
+32
+00:01:19.155 --> 00:01:19.614
+products.
+
+33
+00:01:19.614 --> 00:01:23.710
+Use Find a source and the Show filter to focus
+on failed files, unreadable pages, or
+
+34
+00:01:23.710 --> 00:01:24.636
+unconfirmed ranges.
+
+35
+00:01:25.493 --> 00:01:28.237
+Select Review source, then Open original PDF.
+
+36
+00:01:28.201 --> 00:01:32.130
+Check product name, manufacturer, product
+number, and revision against the actual
+
+37
+00:01:32.130 --> 00:01:32.567
+document.
+
+38
+00:01:32.567 --> 00:01:34.211
+Set the start and end pages.
+
+39
+00:01:34.211 --> 00:01:37.458
+For a combined PDF, add one range for each
+safety data sheet.
+
+40
+00:01:37.458 --> 00:01:39.433
+Assign every page exactly once.
+
+41
+00:01:39.433 --> 00:01:42.074
+Mark cover pages Not an SDS and explain why.
+
+42
+00:01:42.074 --> 00:01:44.378
+Confirm page coverage only after checking it.
+
+43
+00:01:44.378 --> 00:01:48.128
+Keep the permanent material IDs, including when
+linking an existing assessment.
+
+44
+00:01:48.947 --> 00:01:52.289
+Read or correct extracted text is the recovery
+path for poor documents.
+
+45
+00:01:52.253 --> 00:01:56.437
+The app extracts existing PDF text; it does not
+perform optical character recognition
+
+46
+00:01:56.437 --> 00:01:56.782
+itself.
+
+47
+00:01:56.782 --> 00:02:00.790
+Use your chosen OCR tool when necessary, paste
+the readable text, compare it with the
+
+48
+00:02:00.790 --> 00:02:03.242
+original page, check the verification box, and
+save.
+
+49
+00:02:03.242 --> 00:02:06.816
+Straightforward single-sheet documents can be
+reviewed in groups using Review next
+
+50
+00:02:06.816 --> 00:02:08.342
+twenty-five single-SDS suggestions.
+
+51
+00:02:08.342 --> 00:02:11.313
+Combined or uncertain files still need
+individual attention.
+
+52
+00:02:12.159 --> 00:02:14.643
+Step three: classify the confirmed products.
+
+53
+00:02:14.607 --> 00:02:18.449
+In Analyze and review products, click Select
+next twenty-five without results, or
+
+54
+00:02:18.449 --> 00:02:19.777
+select individual materials.
+
+55
+00:02:19.777 --> 00:02:22.436
+Twenty-five is recommended; fifty is the
+maximum.
+
+56
+00:02:22.436 --> 00:02:24.167
+Our small example selects two.
+
+57
+00:02:24.167 --> 00:02:26.195
+Click Export selected AI batch.
+
+58
+00:02:26.195 --> 00:02:31.071
+The ZIP contains original PDFs, extracted text,
+stable IDs, the project basis, and
+
+59
+00:02:31.071 --> 00:02:32.498
+AI-INSTRUCTIONS dot txt.
+
+60
+00:02:32.498 --> 00:02:35.598
+The app does not run a hosted AI model or send
+this package for you.
+
+61
+00:02:36.460 --> 00:02:40.060
+Give that ZIP to your approved AI, together with
+authorized governing code text and
+
+62
+00:02:40.060 --> 00:02:40.537
+amendments.
+
+63
+00:02:40.501 --> 00:02:42.919
+Tell it to follow AI-INSTRUCTIONS dot txt.
+
+64
+00:02:42.919 --> 00:02:46.176
+Those instructions require reading the complete
+sheets, evaluating physical and
+
+65
+00:02:46.176 --> 00:02:49.681
+health hazards, and returning the same JSON
+structure with unchanged IDs and document
+
+66
+00:02:49.681 --> 00:02:50.218
+fingerprints.
+
+67
+00:02:50.218 --> 00:02:53.188
+Safety labels alone do not establish code
+classifications.
+
+68
+00:02:53.188 --> 00:02:55.232
+Missing evidence becomes an open question.
+
+69
+00:02:55.232 --> 00:02:58.567
+Quantities remain unknown, and reviewer
+validation stays with a person.
+
+70
+00:02:59.395 --> 00:03:02.208
+Bring the returned JSON back through Preview AI
+results.
+
+71
+00:03:02.172 --> 00:03:06.009
+Check the returned count, missing batch records,
+and identity and source checks.
+
+72
+00:03:06.009 --> 00:03:09.083
+Fix import errors before choosing Merge checked
+analysis results.
+
+73
+00:03:09.083 --> 00:03:12.479
+This demonstration response deliberately leaves
+the technical classification
+
+74
+00:03:12.479 --> 00:03:12.971
+unresolved.
+
+75
+00:03:12.971 --> 00:03:16.577
+A successful merge means the records were
+accepted; it does not mean the hazards are
+
+76
+00:03:16.577 --> 00:03:17.006
+validated.
+
+77
+00:03:17.006 --> 00:03:19.102
+Existing owner inventory is preserved.
+
+78
+00:03:19.102 --> 00:03:22.627
+Use Analysis batch reconciliation to find
+partial or missing responses before
+
+79
+00:03:22.627 --> 00:03:23.726
+starting the next batch.
+
+80
+00:03:24.578 --> 00:03:28.491
+Open Review product to inspect the identity,
+linked source range, proposed hazards,
+
+81
+00:03:28.491 --> 00:03:30.188
+evidence, and outstanding questions.
+
+82
+00:03:30.152 --> 00:03:34.222
+Check mixture composition, concentration,
+physical state, and conditions of use.
+
+83
+00:03:34.222 --> 00:03:37.921
+Do not assume a pure component classification
+automatically applies to the mixture.
+
+84
+00:03:37.921 --> 00:03:41.368
+Repeat the batch process until every confirmed
+product has results or a clearly
+
+85
+00:03:41.368 --> 00:03:42.371
+recorded open question.
+
+86
+00:03:42.371 --> 00:03:45.942
+For a real project, resolve the classification
+questions before treating this stage
+
+87
+00:03:45.942 --> 00:03:46.458
+as finished.
+
+88
+00:03:47.323 --> 00:03:50.292
+Step four: get quantities from the person who
+knows the site.
+
+89
+00:03:50.256 --> 00:03:51.616
+Download owner workbook.
+
+90
+00:03:51.616 --> 00:03:54.604
+Product identities and permanent IDs are already
+filled in.
+
+91
+00:03:54.604 --> 00:03:56.196
+Send that workbook to the owner.
+
+92
+00:03:56.196 --> 00:03:59.358
+Keep Material IDs and existing Inventory IDs
+unchanged.
+
+93
+00:03:59.358 --> 00:04:01.392
+Use one row per material and location.
+
+94
+00:04:01.392 --> 00:04:05.094
+For another location, copy the row, keep the
+Material ID, and clear the Inventory ID
+
+95
+00:04:05.094 --> 00:04:07.298
+so the app can create a separate inventory
+record.
+
+96
+00:04:08.149 --> 00:04:12.165
+Ask the owner to confirm on-site status,
+building, room, process, and maximum
+
+97
+00:04:12.165 --> 00:04:14.512
+storage, closed-use, and open-use quantities.
+
+98
+00:04:14.476 --> 00:04:18.402
+Use plain numbers with a supported unit, not
+formulas or descriptions such as two
+
+99
+00:04:18.402 --> 00:04:18.693
+drums.
+
+100
+00:04:18.693 --> 00:04:21.664
+Leave unknown values blank; zero means confirmed
+absent.
+
+101
+00:04:21.664 --> 00:04:25.145
+The optional owner total is independent because
+storage and use can overlap.
+
+102
+00:04:25.145 --> 00:04:27.440
+Include who confirmed the information and when.
+
+103
+00:04:27.440 --> 00:04:29.389
+Do not guess control-area boundaries.
+
+104
+00:04:29.389 --> 00:04:32.202
+Record exclusions explicitly rather than
+deleting rows.
+
+105
+00:04:33.055 --> 00:04:35.305
+Select Load returned Excel or CSV.
+
+106
+00:04:35.269 --> 00:04:38.638
+Choose the worksheet, check the column mapping,
+then build the inventory preview.
+
+107
+00:04:38.638 --> 00:04:43.149
+Review additions, updates, locations, unit
+conversions, and unresolved information.
+
+108
+00:04:43.149 --> 00:04:46.856
+Permanent IDs take priority; ambiguous matches
+need manual selection.
+
+109
+00:04:46.856 --> 00:04:50.681
+Here, the cleaning solution's open-use quantity
+remains unknown, while its closed-use
+
+110
+00:04:50.681 --> 00:04:51.896
+quantity is confirmed zero.
+
+111
+00:04:51.896 --> 00:04:55.293
+Check the review confirmation and apply the
+import only after errors are resolved and
+
+112
+00:04:55.293 --> 00:04:56.252
+warnings are understood.
+
+113
+00:04:57.079 --> 00:05:00.266
+Check the saved inventory and import history
+after applying the workbook.
+
+114
+00:05:00.230 --> 00:05:03.615
+Rows omitted from a return are retained;
+omission does not remove stock.
+
+115
+00:05:03.615 --> 00:05:07.330
+Mark products No longer used or Duplicate when
+appropriate and explain the decision.
+
+116
+00:05:07.330 --> 00:05:10.932
+The app converts compatible volume units to
+gallons and mass units to pounds, without
+
+117
+00:05:10.932 --> 00:05:12.543
+inferring a mass-to-volume conversion.
+
+118
+00:05:12.543 --> 00:05:16.207
+Export assessment JSON and Excel, and keep a
+dated checkpoint before continuing to
+
+119
+00:05:16.207 --> 00:05:17.280
+the detailed assessment.
+
+120
+00:05:18.147 --> 00:05:21.904
+Step five: open the exported Excel workbook and
+inspect MAQ Tables.
+
+121
+00:05:21.868 --> 00:05:25.512
+The current workbook applies automatic
+comparisons where classifications match its
+
+122
+00:05:25.512 --> 00:05:26.267
+supported tables.
+
+123
+00:05:26.267 --> 00:05:28.086
+YES flags an exceedance for review.
+
+124
+00:05:28.086 --> 00:05:31.541
+Blank, unresolved, or not-assessed results are
+not passing conclusions.
+
+125
+00:05:31.541 --> 00:05:34.870
+Our sample classifications remain unresolved, so
+they cannot demonstrate an
+
+126
+00:05:34.870 --> 00:05:36.113
+allowable-quantity decision.
+
+127
+00:05:36.113 --> 00:05:39.819
+Confirm the selected edition, table
+applicability, control-area aggregation,
+
+128
+00:05:39.819 --> 00:05:42.306
+adjustments, and any Group H implications
+yourself.
+
+129
+00:05:42.306 --> 00:05:46.184
+Use Material inventory for unique inventory;
+repeated hazard rows are not additional
+
+130
+00:05:46.184 --> 00:05:46.461
+stock.
+
+131
+00:05:47.324 --> 00:05:51.273
+Open Assessment and HMIS, then import the
+assessment JSON if it is not already
+
+132
+00:05:51.273 --> 00:05:51.627
+loaded.
+
+133
+00:05:51.591 --> 00:05:55.584
+Back up any existing record first, because this
+import replaces the open assessment.
+
+134
+00:05:55.584 --> 00:05:59.330
+Review the approved-cabinet setting and project
+sprinkler information, including any
+
+135
+00:05:59.330 --> 00:06:00.311
+per-material override.
+
+136
+00:06:00.311 --> 00:06:03.800
+Set these only when the actual installation and
+applicable criteria support the
+
+137
+00:06:03.800 --> 00:06:04.286
+adjustment.
+
+138
+00:06:04.286 --> 00:06:06.546
+Re-export Excel after changing the flags.
+
+139
+00:06:06.546 --> 00:06:10.399
+A checkbox does not verify the cabinet,
+sprinkler coverage, or entitlement to an
+
+140
+00:06:10.399 --> 00:06:10.833
+increase.
+
+141
+00:06:11.695 --> 00:06:15.651
+In each hazard record, use Add database
+reference to document online corroboration.
+
+142
+00:06:15.615 --> 00:06:19.627
+The AI instructions require opening
+authoritative records such as PubChem, NIOSH, or
+
+143
+00:06:19.627 --> 00:06:21.824
+CAMEO, rather than relying on search snippets.
+
+144
+00:06:21.824 --> 00:06:26.016
+Record the specific URL, access date, identity
+match, supporting or conflicting
+
+145
+00:06:26.016 --> 00:06:27.184
+evidence, and finding.
+
+146
+00:06:27.184 --> 00:06:31.211
+Match CAS number, concentration, form, and
+conditions, and explain mixture
+
+147
+00:06:31.211 --> 00:06:31.973
+applicability.
+
+148
+00:06:31.973 --> 00:06:34.077
+Our reference is intentionally incomplete.
+
+149
+00:06:34.077 --> 00:06:37.537
+Resolve outstanding material information and
+review the evidence before selecting
+
+150
+00:06:37.537 --> 00:06:38.519
+Validate this material.
+
+151
+00:06:39.368 --> 00:06:41.462
+Step six: prepare the room register.
+
+152
+00:06:41.426 --> 00:06:44.639
+Check Inventory assignment and confirm each line
+belongs to the correct room.
+
+153
+00:06:44.639 --> 00:06:47.825
+Imported locations may already create room
+entries, as shown here.
+
+154
+00:06:47.825 --> 00:06:51.525
+Add room when needed, then enter room number,
+name, control-area grouping, and
+
+155
+00:06:51.525 --> 00:06:52.900
+intended Revit sheet or view.
+
+156
+00:06:52.900 --> 00:06:55.023
+Keep the same room record when renaming it.
+
+157
+00:06:55.023 --> 00:06:58.994
+Split actual stock between locations; never copy
+a whole-site quantity into every
+
+158
+00:06:58.994 --> 00:06:59.239
+room.
+
+159
+00:06:59.239 --> 00:07:01.187
+Verify assignments against the plans.
+
+160
+00:07:02.043 --> 00:07:04.874
+Review the generated inventory block and
+complete the room notes.
+
+161
+00:07:04.838 --> 00:07:09.189
+The detailed guide calls for scope, hazards,
+occupancy and MAQ assessment, containers
+
+162
+00:07:09.189 --> 00:07:13.437
+and transfer, incompatibilities, containment,
+ventilation, signage, fire protection
+
+163
+00:07:13.437 --> 00:07:14.614
+and alarms, and egress.
+
+164
+00:07:14.614 --> 00:07:16.519
+Explain not-applicable decisions.
+
+165
+00:07:16.519 --> 00:07:20.494
+Add source revisions, pages, adopted criteria,
+and calculation references.
+
+166
+00:07:20.494 --> 00:07:23.933
+Finish the content, resolve material questions,
+then confirm the room, shared
+
+167
+00:07:23.933 --> 00:07:26.747
+control-area, and building review before
+validating every room.
+
+168
+00:07:26.747 --> 00:07:29.682
+This training draft remains incomplete and is
+not ready for issue.
+
+169
+00:07:30.546 --> 00:07:33.255
+Use Export draft Revit text during coordination.
+
+170
+00:07:33.219 --> 00:07:36.816
+Use Export reviewed Revit text only after every
+current room is complete and
+
+171
+00:07:36.816 --> 00:07:37.289
+validated.
+
+172
+00:07:37.289 --> 00:07:40.919
+Here, the app blocks reviewed export and tells
+us to validate the notes and resolve
+
+173
+00:07:40.919 --> 00:07:41.706
+outstanding items.
+
+174
+00:07:41.706 --> 00:07:44.572
+That is the correct outcome for this unresolved
+training example.
+
+175
+00:07:44.572 --> 00:07:46.962
+Read the blockers and fix the underlying
+records.
+
+176
+00:07:46.962 --> 00:07:50.390
+Do not use a reviewed filename or a reviewer
+name as a substitute for completed
+
+177
+00:07:50.390 --> 00:07:51.215
+engineering review.
+
+178
+00:07:52.063 --> 00:07:54.686
+The Revit handoff is a text file for human
+placement.
+
+179
+00:07:54.650 --> 00:07:58.634
+Open it, identify the correct room and stable
+ID, and copy the appropriate inventory
+
+180
+00:07:58.634 --> 00:07:59.915
+and note blocks into Revit.
+
+181
+00:07:59.915 --> 00:08:02.678
+Choose the view, sheet, text type, and
+placement.
+
+182
+00:08:02.678 --> 00:08:05.492
+Check wrapping, clipping, symbols, and
+references.
+
+183
+00:08:05.492 --> 00:08:09.493
+Reconcile the quantities and units with Excel
+and the current JSON, then verify the
+
+184
+00:08:09.493 --> 00:08:10.506
+exported drawing PDF.
+
+185
+00:08:10.506 --> 00:08:13.658
+The app does not update the model or confirm
+that issued drawings changed.
+
+186
+00:08:14.514 --> 00:08:18.384
+When the owner changes a quantity, first archive
+the current JSON and issued package.
+
+187
+00:08:18.348 --> 00:08:21.864
+Find the affected inventory line and choose
+Record quantities or late change.
+
+188
+00:08:21.864 --> 00:08:24.522
+Here, storage changes from ten to fifteen
+gallons.
+
+189
+00:08:24.522 --> 00:08:28.056
+Review every quantity field and the unit, then
+enter the reason and source notice
+
+190
+00:08:28.056 --> 00:08:29.190
+with its revision or date.
+
+191
+00:08:29.190 --> 00:08:30.706
+Save the quantity record.
+
+192
+00:08:30.706 --> 00:08:34.195
+In this dialog, a unit change is a revision, not
+an automatic conversion.
+
+193
+00:08:35.063 --> 00:08:38.275
+Inspect Quantity change history and verify the
+old and new values.
+
+194
+00:08:38.239 --> 00:08:41.382
+The app keeps a preceding assessment snapshot
+and preserves the narrative.
+
+195
+00:08:41.382 --> 00:08:45.137
+Inventory changes require re-review of all room
+notes, including shared control-area
+
+196
+00:08:45.137 --> 00:08:46.076
+and building effects.
+
+197
+00:08:46.076 --> 00:08:50.151
+Reassess affected limits, safeguards, and
+occupancy conclusions, validate the changed
+
+198
+00:08:50.151 --> 00:08:53.843
+material and current rooms, then export fresh
+JSON, Excel, and reviewed text.
+
+199
+00:08:53.843 --> 00:08:57.839
+Update all affected Revit notes and callouts,
+archive superseded output, and check
+
+200
+00:08:57.839 --> 00:08:58.814
+the new drawing PDF.
+
+201
+00:08:59.676 --> 00:09:01.468
+Back up after each major stage.
+
+202
+00:09:01.432 --> 00:09:05.879
+Complete backup includes original PDFs and
+extracted text; workspace JSON alone does
+
+203
+00:09:05.879 --> 00:09:06.091
+not.
+
+204
+00:09:06.091 --> 00:09:09.493
+The complete backup supports up to five hundred
+megabytes of stored PDFs.
+
+205
+00:09:09.493 --> 00:09:13.608
+For larger projects, retain the original
+packages, workspace JSON, and AI batches
+
+206
+00:09:13.608 --> 00:09:14.065
+together.
+
+207
+00:09:14.065 --> 00:09:16.751
+Browser storage is local to that browser and
+device.
+
+208
+00:09:16.751 --> 00:09:20.281
+Keep the latest Assessment and HMIS JSON after
+room edits or late changes; returning
+
+209
+00:09:20.281 --> 00:09:23.055
+to an older bulk export does not carry those
+newer edits backward.
+
+210
+00:09:23.890 --> 00:09:27.705
+Finish by reconciling every delivered file and
+page, confirmed product, analysis
+
+211
+00:09:27.705 --> 00:09:30.280
+result or open question, and owner inventory
+location.
+
+212
+00:09:30.244 --> 00:09:33.865
+Confirm the engineering conclusions and
+outstanding actions, and retain the sources
+
+213
+00:09:33.865 --> 00:09:34.956
+with the current exports.
+
+214
+00:09:34.956 --> 00:09:38.538
+Use Simple instructions for the sequence,
+Detailed bulk guide for intake and
+
+215
+00:09:38.538 --> 00:09:41.319
+recovery, and the HMIS guide for rooms, changes,
+and Revit.
+
+216
+00:09:41.319 --> 00:09:44.726
+That completes the workflow from the owner's
+package to a recoverable, reviewed
+
+217
+00:09:44.726 --> 00:09:45.415
+project handoff.

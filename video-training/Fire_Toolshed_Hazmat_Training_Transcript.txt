@@ -1,0 +1,84 @@
+FIRE TOOLSHED — UPDATED HAZMAT TRAINING
+Captured 20 November 2026
+
+00:00  The complete hazmat workflow
+Welcome to the updated Fire Toolshed hazardous materials workflow. We will follow the live user guides from the owner's safety data sheets through classification, owner quantities, maximum allowable quantity review, and room notes for Revit. These are actual screenshots captured while using the published app. The products, quantities, and returned analysis are clearly labeled training examples. They demonstrate the controls, not a completed engineering assessment.
+
+00:21  Set the project and code basis
+Step one: start in the bulk workspace. Expand Project and code basis. Enter the project name, jurisdiction, reviewer, assessment basis, and adopted code edition. Confirm amendments and project requirements before exporting an AI batch. Use one workspace for the project, adding later deliveries to that same workspace. The edition shown here is a training placeholder; a real assessment needs the actual governing edition.
+
+00:42  Receive the SDS package
+Name the delivery so you can recognize its building, date, or sender. Select PDFs or ZIP archives and choose the owner's files. Combined PDFs are allowed. Keep the tab open while the app reads them. The limits are one hundred mebibytes per PDF and one gibibyte of expanded PDF data per ZIP. Split larger deliveries. Pause after current page lets you stop reading without losing the registered identities.
+
+01:03  Account for every source
+Step two: account for the documents. Export the receipt log and reconcile every delivered file as registered, duplicate, or explicitly excluded. Then use Confirm documents and page ranges. Here, two PDFs still need range review. A filename is not a verified product identity, and one PDF may contain several products. Use Find a source and the Show filter to focus on failed files, unreadable pages, or unconfirmed ranges.
+
+01:25  Confirm identity and page coverage
+Select Review source, then Open original PDF. Check product name, manufacturer, product number, and revision against the actual document. Set the start and end pages. For a combined PDF, add one range for each safety data sheet. Assign every page exactly once. Mark cover pages Not an SDS and explain why. Confirm page coverage only after checking it. Keep the permanent material IDs, including when linking an existing assessment.
+
+01:48  Handle unreadable text
+Read or correct extracted text is the recovery path for poor documents. The app extracts existing PDF text; it does not perform optical character recognition itself. Use your chosen OCR tool when necessary, paste the readable text, compare it with the original page, check the verification box, and save. Straightforward single-sheet documents can be reviewed in groups using Review next twenty-five single-SDS suggestions. Combined or uncertain files still need individual attention.
+
+02:11  Export a controlled AI batch
+Step three: classify the confirmed products. In Analyze and review products, click Select next twenty-five without results, or select individual materials. Twenty-five is recommended; fifty is the maximum. Our small example selects two. Click Export selected AI batch. The ZIP contains original PDFs, extracted text, stable IDs, the project basis, and AI-INSTRUCTIONS dot txt. The app does not run a hosted AI model or send this package for you.
+
+02:36  Tell the AI how to work
+Give that ZIP to your approved AI, together with authorized governing code text and amendments. Tell it to follow AI-INSTRUCTIONS dot txt. Those instructions require reading the complete sheets, evaluating physical and health hazards, and returning the same JSON structure with unchanged IDs and document fingerprints. Safety labels alone do not establish code classifications. Missing evidence becomes an open question. Quantities remain unknown, and reviewer validation stays with a person.
+
+02:59  Preview and merge returned JSON
+Bring the returned JSON back through Preview AI results. Check the returned count, missing batch records, and identity and source checks. Fix import errors before choosing Merge checked analysis results. This demonstration response deliberately leaves the technical classification unresolved. A successful merge means the records were accepted; it does not mean the hazards are validated. Existing owner inventory is preserved. Use Analysis batch reconciliation to find partial or missing responses before starting the next batch.
+
+03:24  Review the proposed classifications
+Open Review product to inspect the identity, linked source range, proposed hazards, evidence, and outstanding questions. Check mixture composition, concentration, physical state, and conditions of use. Do not assume a pure component classification automatically applies to the mixture. Repeat the batch process until every confirmed product has results or a clearly recorded open question. For a real project, resolve the classification questions before treating this stage as finished.
+
+03:47  Request the owner quantities
+Step four: get quantities from the person who knows the site. Download owner workbook. Product identities and permanent IDs are already filled in. Send that workbook to the owner. Keep Material IDs and existing Inventory IDs unchanged. Use one row per material and location. For another location, copy the row, keep the Material ID, and clear the Inventory ID so the app can create a separate inventory record.
+
+04:07  Complete the owner workbook
+Ask the owner to confirm on-site status, building, room, process, and maximum storage, closed-use, and open-use quantities. Use plain numbers with a supported unit, not formulas or descriptions such as two drums. Leave unknown values blank; zero means confirmed absent. The optional owner total is independent because storage and use can overlap. Include who confirmed the information and when. Do not guess control-area boundaries. Record exclusions explicitly rather than deleting rows.
+
+04:32  Preview the returned workbook
+Select Load returned Excel or CSV. Choose the worksheet, check the column mapping, then build the inventory preview. Review additions, updates, locations, unit conversions, and unresolved information. Permanent IDs take priority; ambiguous matches need manual selection. Here, the cleaning solution's open-use quantity remains unknown, while its closed-use quantity is confirmed zero. Check the review confirmation and apply the import only after errors are resolved and warnings are understood.
+
+04:56  Reconcile the saved inventory
+Check the saved inventory and import history after applying the workbook. Rows omitted from a return are retained; omission does not remove stock. Mark products No longer used or Duplicate when appropriate and explain the decision. The app converts compatible volume units to gallons and mass units to pounds, without inferring a mass-to-volume conversion. Export assessment JSON and Excel, and keep a dated checkpoint before continuing to the detailed assessment.
+
+05:17  Review the MAQ workbook
+Step five: open the exported Excel workbook and inspect MAQ Tables. The current workbook applies automatic comparisons where classifications match its supported tables. YES flags an exceedance for review. Blank, unresolved, or not-assessed results are not passing conclusions. Our sample classifications remain unresolved, so they cannot demonstrate an allowable-quantity decision. Confirm the selected edition, table applicability, control-area aggregation, adjustments, and any Group H implications yourself. Use Material inventory for unique inventory; repeated hazard rows are not additional stock.
+
+05:47  Verify safeguards and export again
+Open Assessment and HMIS, then import the assessment JSON if it is not already loaded. Back up any existing record first, because this import replaces the open assessment. Review the approved-cabinet setting and project sprinkler information, including any per-material override. Set these only when the actual installation and applicable criteria support the adjustment. Re-export Excel after changing the flags. A checkbox does not verify the cabinet, sprinkler coverage, or entitlement to an increase.
+
+06:11  Record online corroboration
+In each hazard record, use Add database reference to document online corroboration. The AI instructions require opening authoritative records such as PubChem, NIOSH, or CAMEO, rather than relying on search snippets. Record the specific URL, access date, identity match, supporting or conflicting evidence, and finding. Match CAS number, concentration, form, and conditions, and explain mixture applicability. Our reference is intentionally incomplete. Resolve outstanding material information and review the evidence before selecting Validate this material.
+
+06:39  Assign inventory to rooms
+Step six: prepare the room register. Check Inventory assignment and confirm each line belongs to the correct room. Imported locations may already create room entries, as shown here. Add room when needed, then enter room number, name, control-area grouping, and intended Revit sheet or view. Keep the same room record when renaming it. Split actual stock between locations; never copy a whole-site quantity into every room. Verify assignments against the plans.
+
+07:01  Complete and validate room notes
+Review the generated inventory block and complete the room notes. The detailed guide calls for scope, hazards, occupancy and MAQ assessment, containers and transfer, incompatibilities, containment, ventilation, signage, fire protection and alarms, and egress. Explain not-applicable decisions. Add source revisions, pages, adopted criteria, and calculation references. Finish the content, resolve material questions, then confirm the room, shared control-area, and building review before validating every room. This training draft remains incomplete and is not ready for issue.
+
+07:30  Use draft and reviewed exports
+Use Export draft Revit text during coordination. Use Export reviewed Revit text only after every current room is complete and validated. Here, the app blocks reviewed export and tells us to validate the notes and resolve outstanding items. That is the correct outcome for this unresolved training example. Read the blockers and fix the underlying records. Do not use a reviewed filename or a reviewer name as a substitute for completed engineering review.
+
+07:51  Place and check the Revit notes
+The Revit handoff is a text file for human placement. Open it, identify the correct room and stable ID, and copy the appropriate inventory and note blocks into Revit. Choose the view, sheet, text type, and placement. Check wrapping, clipping, symbols, and references. Reconcile the quantities and units with Excel and the current JSON, then verify the exported drawing PDF. The app does not update the model or confirm that issued drawings changed.
+
+08:14  Record a late quantity notice
+When the owner changes a quantity, first archive the current JSON and issued package. Find the affected inventory line and choose Record quantities or late change. Here, storage changes from ten to fifteen gallons. Review every quantity field and the unit, then enter the reason and source notice with its revision or date. Save the quantity record. In this dialog, a unit change is a revision, not an automatic conversion.
+
+08:34  Recheck before reissuing
+Inspect Quantity change history and verify the old and new values. The app keeps a preceding assessment snapshot and preserves the narrative. Inventory changes require re-review of all room notes, including shared control-area and building effects. Reassess affected limits, safeguards, and occupancy conclusions, validate the changed material and current rooms, then export fresh JSON, Excel, and reviewed text. Update all affected Revit notes and callouts, archive superseded output, and check the new drawing PDF.
+
+08:59  Back up and close the loop
+Back up after each major stage. Complete backup includes original PDFs and extracted text; workspace JSON alone does not. The complete backup supports up to five hundred megabytes of stored PDFs. For larger projects, retain the original packages, workspace JSON, and AI batches together. Browser storage is local to that browser and device. Keep the latest Assessment and HMIS JSON after room edits or late changes; returning to an older bulk export does not carry those newer edits backward.
+
+09:23  Check that the process is complete
+Finish by reconciling every delivered file and page, confirmed product, analysis result or open question, and owner inventory location. Confirm the engineering conclusions and outstanding actions, and retain the sources with the current exports. Use Simple instructions for the sequence, Detailed bulk guide for intake and recovery, and the HMIS guide for rooms, changes, and Revit. That completes the workflow from the owner's package to a recoverable, reviewed project handoff.
+
+Guides consulted:
+https://pistolpetefire.github.io/Fire_toolshed/hazardous-materials/simple-instructions.html
+https://pistolpetefire.github.io/Fire_toolshed/hazardous-materials/bulk-guide.html
+https://pistolpetefire.github.io/Fire_toolshed/hazardous-materials/how-to.html
+
+Demonstration note: Simplified training PDFs, illustrative owner quantities and deliberately unresolved sample JSON were used in the live app. No completed engineering classification or final reviewed room export is represented.
