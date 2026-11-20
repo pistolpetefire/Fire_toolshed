@@ -5,7 +5,7 @@
     {
       "id": "hazardous-materials",
       "name": "Hazardous Materials Assessor",
-      "description": "Assess SDS hazards under IBC Chapter 3 or NFPA 400. Export Excel, prepare HMIS room notes for Revit, and track late quantity changes for re-review.",
+      "description": "SDS to HMIS workflow. Bulk upload, AI classification batches, owner quantity handoff, MAQ exceedance review, and Revit room notes.",
       "url": "./hazardous-materials/",
       "task": "Review",
       "disciplines": [
@@ -20,14 +20,16 @@
         "NFPA 400",
         "IBC",
         "Revit",
-        "room notes",
-        "quantity changes"
+        "MAQ",
+        "bulk",
+        "hazmat"
       ],
       "status": "Supervised pilot",
       "automation": {
         "mode": "executable workflow",
         "instructions": "./automation/HAZARDOUS-MATERIALS.md"
-      }
+      },
+      "featured": true
     },
     {
       "id": "ai-review",
@@ -170,24 +172,34 @@
     },
     {
       "id": "water-supply",
-      "name": "Water Supply Workflow",
-      "description": "Follow the water-supply review from flow testing through preliminary sprinkler demand, pump and tank sizing.",
+      "name": "Combined Water Supply Path",
+      "description": "Chain flow test → fire flow → sprinkler demand → pump → tank → service line. Tools share captures and work alone. Combined, separate, or adequate-supply modes.",
       "url": "./water-supply/",
       "task": "Calculate",
       "disciplines": [
         "Water supply, pumps & tanks"
       ],
-      "keywords": [],
+      "keywords": [
+        "water",
+        "flow test",
+        "pump",
+        "tank",
+        "sprinkler",
+        "combined",
+        "path",
+        "hydrant"
+      ],
       "status": "Available",
       "automation": {
         "mode": "browser",
         "instructions": null
-      }
+      },
+      "featured": true
     },
     {
       "id": "flow-test-request",
       "name": "Flow Test Request",
-      "description": "Stock hydrant flow test request (suppression or fire flow). NFPA 291 procedures for 2\u00bd\u2033 outlets only \u2014 base building number, location, hydrant selection reasons, jurisdiction ask.",
+      "description": "Stock hydrant flow test request (suppression or fire flow). NFPA 291 procedures for 2½″ outlets only — base building number, location, hydrant selection reasons, jurisdiction ask.",
       "url": "./flow-test-request/",
       "task": "Collect field information",
       "disciplines": [
@@ -267,7 +279,7 @@
     {
       "id": "fire-tank-sizer",
       "name": "Fire Tank Sizer",
-      "description": "Flow \u00d7 duration + NFPA/UFC/FM safety, US-typical prefab steel sizes, max H/\u2300 limits, concrete pad, plan diagram.",
+      "description": "Flow × duration + NFPA/UFC/FM safety, US-typical prefab steel sizes, max H/⌀ limits, concrete pad, plan diagram.",
       "url": "./fire-tank-sizer/",
       "task": "Calculate",
       "disciplines": [
@@ -335,7 +347,7 @@
     {
       "id": "velocity-suction",
       "name": "Velocity / Suction Check",
-      "description": "v = 0.4085Q/d\u00b2. Checks pump suction velocity \u2264 15 ft/s at 150% flow.",
+      "description": "v = 0.4085Q/d². Checks pump suction velocity ≤ 15 ft/s at 150% flow.",
       "url": "./velocity-suction/",
       "task": "Calculate",
       "disciplines": [
@@ -375,7 +387,7 @@
     {
       "id": "branch-hand-calc",
       "name": "Branch-Line Hand Calc",
-      "description": "Node-by-node Q = K\u221aP, Hazen-Williams, elevation. NFPA 13-2022.",
+      "description": "Node-by-node Q = K√P, Hazen-Williams, elevation. NFPA 13-2022.",
       "url": "./branch-hand-calc/",
       "task": "Calculate",
       "disciplines": [
@@ -391,7 +403,7 @@
     {
       "id": "junction-balancer",
       "name": "Junction Balancer",
-      "description": "Equivalent-K and 0.5 psi balance check at hydraulic junction points. Q2 = Q1\u00b7\u221a(P2/P1).",
+      "description": "Equivalent-K and 0.5 psi balance check at hydraulic junction points. Q2 = Q1·√(P2/P1).",
       "url": "./junction-balancer/",
       "task": "Calculate",
       "disciplines": [
@@ -407,7 +419,7 @@
     {
       "id": "hardy-cross",
       "name": "Hardy Cross Loop Solver",
-      "description": "Two-path split, \u0394Q correction, convergence. NFPA 13-2022 hydraulics.",
+      "description": "Two-path split, ΔQ correction, convergence. NFPA 13-2022 hydraulics.",
       "url": "./hardy-cross/",
       "task": "Calculate",
       "disciplines": [
@@ -439,7 +451,7 @@
     {
       "id": "dry-sprinkler-delivery",
       "name": "Dry Sprinkler Water Delivery",
-      "description": "Dry / double-interlock delivery time \u00b7 wet rejected \u00b7 10\u201312\u2033 mains \u00b7 PDF multi-page fixture import \u00b7 HW + valves. Preliminary \u2014 not a listed method.",
+      "description": "Dry / double-interlock delivery time · wet rejected · 10–12″ mains · PDF multi-page fixture import · HW + valves. Preliminary — not a listed method.",
       "url": "./dry-sprinkler-delivery/",
       "task": "Calculate",
       "disciplines": [
@@ -487,7 +499,7 @@
     {
       "id": "seismic-brace",
       "name": "Seismic Brace Load",
-      "description": "Wp, Fpw = Cp\u00d7Wp, 40/80 ft spacing. NFPA 13-2022 Ch. 18. Verify tables.",
+      "description": "Wp, Fpw = Cp×Wp, 40/80 ft spacing. NFPA 13-2022 Ch. 18. Verify tables.",
       "url": "./seismic-brace/",
       "task": "Calculate",
       "disciplines": [
@@ -503,7 +515,7 @@
     {
       "id": "fa-power-extenders",
       "name": "FA Power Extenders",
-      "description": "NAC horn/strobe + speaker taps (25/70 V), voltage drop, booster / remote-amp warrant. NFPA 72 / UFC. Preliminary \u2014 not a listed calc.",
+      "description": "NAC horn/strobe + speaker taps (25/70 V), voltage drop, booster / remote-amp warrant. NFPA 72 / UFC. Preliminary — not a listed calc.",
       "url": "./fa-power-extenders/",
       "task": "Calculate",
       "disciplines": [
@@ -524,7 +536,7 @@
     {
       "id": "occupant-egress",
       "name": "Occupant Load & Egress Capacity",
-      "description": "IBC-style occupant load factors, means of egress width capacity, minimum exits (Table 1006.3.3) and loss-of-one-exit (1005.5), travel / common path / dead-end checks \u2014 life-safety basis of design.",
+      "description": "IBC-style occupant load factors, means of egress width capacity, minimum exits (Table 1006.3.3) and loss-of-one-exit (1005.5), travel / common path / dead-end checks — life-safety basis of design.",
       "url": "./occupant-egress/",
       "task": "Calculate",
       "disciplines": [
@@ -577,7 +589,7 @@
     {
       "id": "rset-tool",
       "name": "Transparent RSET Tool",
-      "description": "Educational Required Safe Egress Time calculator \u2014 full plain-language guide plus technical chapters; Detection + Notification + Pre-movement + Movement with assumptions log and session export.",
+      "description": "Educational Required Safe Egress Time calculator — full plain-language guide plus technical chapters; Detection + Notification + Pre-movement + Movement with assumptions log and session export.",
       "url": "./rset-tool/",
       "task": "Calculate",
       "disciplines": [
@@ -609,7 +621,7 @@
     {
       "id": "atrium-smoke-exhaust",
       "name": "Atrium Smoke Exhaust",
-      "description": "Hub: IBC/NFPA 101, suitability, NFPA 92 algebraic, systems/SI, links to native zone & multi-cell field engines \u2014 all browser-only.",
+      "description": "Hub: IBC/NFPA 101, suitability, NFPA 92 algebraic, systems/SI, links to native zone & multi-cell field engines — all browser-only.",
       "url": "./atrium-smoke-exhaust/",
       "task": "Calculate",
       "disciplines": [
@@ -641,7 +653,7 @@
     {
       "id": "atrium-field-model",
       "name": "Atrium Field Model",
-      "description": "Self-contained multi-cell column model for atrium-height filling sensitivity. Not FDS/LES \u2014 fully in-browser.",
+      "description": "Self-contained multi-cell column model for atrium-height filling sensitivity. Not FDS/LES — fully in-browser.",
       "url": "./atrium-field-model/",
       "task": "Calculate",
       "disciplines": [
@@ -705,7 +717,7 @@
     {
       "id": "ibc-ifc-hazard",
       "name": "IBC / IFC Hazard Impacts",
-      "description": "H occupancy + material hazards \u2192 construction & mitigations from IBC 414/415/315 and IFC Ch. 50+, with drivers and high-cost flags (2015\u20132024).",
+      "description": "H occupancy + material hazards → construction & mitigations from IBC 414/415/315 and IFC Ch. 50+, with drivers and high-cost flags (2015–2024).",
       "url": "./ibc-ifc-hazard/",
       "task": "Calculate",
       "disciplines": [
@@ -721,7 +733,7 @@
     {
       "id": "maq-control-area",
       "name": "MAQ & Control Area Calculator",
-      "description": "Storage / use-closed / use-open vs. MAQ per control area (IFC Tables 5003.1.1(1)/(2), sprinkler and cabinet increases, Table 5003.8.3.2 story % and count) \u2192 Group H needed or not. 2021/2024, Florida Building Code 9th Edition label.",
+      "description": "Storage / use-closed / use-open vs. MAQ per control area (IFC Tables 5003.1.1(1)/(2), sprinkler and cabinet increases, Table 5003.8.3.2 story % and count) → Group H needed or not. 2021/2024, Florida Building Code 9th Edition label.",
       "url": "./maq-control-area/",
       "task": "Calculate",
       "disciplines": [
@@ -737,7 +749,7 @@
     {
       "id": "deflagration-vent",
       "name": "Deflagration Vent Sizing",
-      "description": "NFPA 68-2023 room and process vent sizing (L\u00d7W\u00d7H, KSt/Pmax dust, Su gas, Pred) with IBC/IFC explosion-control context.",
+      "description": "NFPA 68-2023 room and process vent sizing (L×W×H, KSt/Pmax dust, Su gas, Pred) with IBC/IFC explosion-control context.",
       "url": "./deflagration-vent/",
       "task": "Calculate",
       "disciplines": [
@@ -753,7 +765,7 @@
     {
       "id": "concrete-fire-rating",
       "name": "Concrete Fire Rating Thickness",
-      "description": "Minimum concrete / CMU thickness for 1\u20134 hour fire ratings by material makeup (siliceous, carbonate, lightweight, masonry aggregates) \u2014 IBC / ACI 216.1 calculated method.",
+      "description": "Minimum concrete / CMU thickness for 1–4 hour fire ratings by material makeup (siliceous, carbonate, lightweight, masonry aggregates) — IBC / ACI 216.1 calculated method.",
       "url": "./concrete-fire-rating/",
       "task": "Calculate",
       "disciplines": [
@@ -801,7 +813,7 @@
     {
       "id": "study-buddy",
       "name": "Study Buddy",
-      "description": "Class-by-class study apps \u2014 start with OCCC Human Anatomy & Physiology (BIO 1314 / BIO 1414): diagrams, flashcards, quizzes, atlas.",
+      "description": "Class-by-class study apps — start with OCCC Human Anatomy & Physiology (BIO 1314 / BIO 1414): diagrams, flashcards, quizzes, atlas.",
       "url": "./study-buddy/",
       "task": "Learn",
       "disciplines": [
@@ -817,7 +829,7 @@
     {
       "id": "games",
       "name": "Games",
-      "description": "Team arcade breaks in the browser \u2014 Punch-Out!!, Frogger, and Ms. Pac Maze fan remakes (touch + keyboard).",
+      "description": "Team arcade breaks in the browser — Punch-Out!!, Frogger, and Ms. Pac Maze fan remakes (touch + keyboard).",
       "url": "./games/",
       "task": "Learn",
       "disciplines": [

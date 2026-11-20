@@ -16,3 +16,10 @@ header{border-bottom:3px solid var(--gold)}.brand,h1,h2,h3{color:var(--navy)}.ca
 .card-report{border-top-color:#7c3aed}
 .card-learn{border-top-color:#db2777}
 .quick-links{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 8px}.quick-links a{background:#eef2f6;padding:6px 12px;border-radius:6px;text-decoration:none;font-size:.9rem;font-weight:600;color:var(--navy)}.quick-links a:hover{background:#d9ad32}
+
+/* Featured workflows */
+.featured-section{margin:8px 0 32px;padding:20px;background:#fff;border:2px solid var(--navy);border-radius:14px}
+.featured-section h2{margin:0 0 4px;font-size:1.3rem}
+.featured-grid{margin-top:12px}
+.featured-card{border-width:2px;box-shadow:0 2px 8px rgba(22,59,112,.08)}
+.featured-card .badge{font-weight:700}
