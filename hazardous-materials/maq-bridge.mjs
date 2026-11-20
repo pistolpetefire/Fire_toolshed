@@ -55,11 +55,12 @@ function cellMAQ(cell, sprinklered, cabinet, storyPct = 100) {
   return {kind: "num", limit, text: String(Math.round(limit * 1000) / 1000)};
 }
 
-export function evaluateGroup(key, storage, closed, open, project) {
+export function evaluateGroup(key, storage, closed, open, project, opts = {}) {
   const m = MATERIALS.find(x => x.key === key);
   if (!m) return {matched: false, exceeded: false, storageMAQ: "Not matched", closedMAQ: "Not matched", openMAQ: "Not matched", exceededFlag: "Not assessed", hGroup: ""};
-  const sprinklered = /yes|sprinkler/i.test(project.sprinkler || "");
-  const cabinet = false;
+  const projectSprinklered = /yes|sprinkler/i.test(project.sprinkler || "");
+  const sprinklered = opts.sprinkler !== undefined && opts.sprinkler !== null ? !!opts.sprinkler : projectSprinklered;
+  const cabinet = !!opts.cabinet;
   const storyPct = 100;
   const sMAQ = cellMAQ(m.storage, sprinklered, cabinet, storyPct);
   const cMAQ = cellMAQ(m.closed, sprinklered, cabinet, storyPct);
@@ -75,6 +76,8 @@ export function evaluateGroup(key, storage, closed, open, project) {
     closedMAQ: cMAQ.text,
     openMAQ: oMAQ.text,
     exceededFlag: exceeded ? "YES" : "NO",
-    hGroup: exceeded ? (m.hazard === "health" ? "H-4" : "See table") : ""
+    hGroup: exceeded ? (m.hazard === "health" ? "H-4" : "See table") : "",
+    usedCabinet: cabinet,
+    usedSprinkler: sprinklered
   };
 }
