@@ -7,9 +7,9 @@
   <meta name="description" content="Preliminary fire water tank sizer — flow × duration + NFPA/UFC/FM safety, prefab steel sizes, concrete pad plan view.">
   <title>Fire Tank Sizer · Fire Toolshed</title>
   <link rel="stylesheet" href="../shared/water-path-shell.css">
-  <link rel="stylesheet" href="./assets/styles.css">
-  <script src="../shared/verify-tab.js?v=1.3.2"></script>
-  <script src="./assets/verify-cases.js?v=1.3.2"></script>
+  <link rel="stylesheet" href="./assets/styles.css?v=1.4.0">
+  <script src="../shared/verify-tab.js?v=1.4.0"></script>
+  <script src="./assets/verify-cases.js?v=1.4.0"></script>
 </head>
 <body>
   <div id="waterPathShell" class="no-print"></div>
@@ -19,7 +19,7 @@
       <div>
         <p class="eyebrow">Fire Toolshed</p>
         <h1>Fire Tank Sizer</h1>
-        <p class="version" id="appVersion">Version 1.3.2-prelim</p>
+        <p class="version" id="appVersion">Version 1.4.0-prelim</p>
         <p class="version" id="codeEdition">Code basis: <strong>NFPA 22-2023</strong> (water tanks) · NFPA 13 / UFC / FM demand durations</p>
       </div>
       <div class="top-actions no-print">
@@ -106,8 +106,83 @@
         </section>
 
         <section class="panel">
+          <h2>NFPA 1 required fire flow</h2>
+          <p class="hint">Sprinklered throughout: 25% of the table flow, not below 1,000 gpm (600 gpm with quick-response throughout), and not above 2,000 gpm. Duration is not above 2 hours. The tank uses the greater of this fire flow and the sprinkler demand, not the sum. <strong>AHJ may modify.</strong></p>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="nfpaEdition">NFPA 1 edition (labels)</label>
+              <select id="nfpaEdition">
+                <option value="2021" selected>2021 — §18.4.5.3 and §18.4.5.4</option>
+                <option value="2024">2024 — §18.4.4 (renumbered)</option>
+              </select>
+              <span class="sub">Labels only. 2024 subsection numbers are not stated.</span>
+            </div>
+            <div class="field">
+              <label for="nfpaGroup">Construction type</label>
+              <select id="nfpaGroup">
+                <option value="I">Type I (443) / I (332) / II (222)</option>
+                <option value="IIA">Type II (111) / III (211)</option>
+                <option value="IV">Type IV (2HH) / V (111)</option>
+                <option value="IIB" selected>Type II (000) / III (200)</option>
+                <option value="VB">Type V (000)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="nfpaArea">Fire-flow calculation area</label>
+              <div class="row">
+                <input id="nfpaArea" type="number" min="0" step="100" placeholder="ft²">
+                <span class="suffix">ft²</span>
+              </div>
+              <span class="sub">Lookup uses the toolshed area bands. Leave blank if you type a table flow.</span>
+            </div>
+            <div class="field">
+              <label for="nfpaSprinkler">Sprinklers</label>
+              <select id="nfpaSprinkler">
+                <option value="none">Not sprinklered throughout</option>
+                <option value="13">Sprinklered throughout</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="nfpaTableGpm">Table flow override</label>
+              <div class="row">
+                <input id="nfpaTableGpm" type="number" min="0" step="50" placeholder="blank = lookup">
+                <span class="suffix">gpm</span>
+              </div>
+              <span class="sub">User entry from the adopted table. Not a built-in code value.</span>
+            </div>
+            <div class="field">
+              <label for="nfpaTableHours">Table duration override</label>
+              <div class="row">
+                <input id="nfpaTableHours" type="number" min="0" step="0.5" placeholder="hours">
+                <span class="suffix">h</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="nfpaSprGpm">Sprinkler demand</label>
+              <div class="row">
+                <input id="nfpaSprGpm" type="number" min="0" step="10" placeholder="optional">
+                <span class="suffix">gpm</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="nfpaSprMin">Sprinkler duration</label>
+              <div class="row">
+                <input id="nfpaSprMin" type="number" min="0" step="5" placeholder="optional">
+                <span class="suffix">min</span>
+              </div>
+            </div>
+          </div>
+          <label class="field" style="margin:0.65rem 0;display:flex;align-items:center;gap:0.5rem;font-weight:600">
+            <input id="nfpaQr" type="checkbox" style="width:auto;min-height:auto">
+            Quick-response sprinklers throughout (600 gpm minimum)
+          </label>
+          <button type="button" id="btnApplyNfpa1" class="primary">Apply to tank demand</button>
+          <div id="nfpa1Result" class="callout info" style="margin-top:0.75rem">Enter an area, or a table flow and duration, then Apply to tank demand.</div>
+        </section>
+
+        <section class="panel">
           <h2>Demand (from system / pump)</h2>
-          <p class="hint">Tank volume is driven by the <strong>greater</strong> of sprinkler demand × duration vs fire flow × duration. Use Governing Demand to compare both captures.</p>
+          <p class="hint">Tank volume is the <strong>greater</strong> of sprinkler demand × duration and fire flow × duration. The two demands are not added. Use Governing Demand to compare both captures. <strong>AHJ may modify</strong> an NFPA 1 fire flow.</p>
           <div id="governingCompare" class="callout info hidden" style="margin:0.5rem 0"></div>
           <div class="field-grid two">
             <div class="field">
@@ -285,6 +360,24 @@
               <tbody id="catalogBody"></tbody>
             </table>
           </div>
+          <div id="fieldErectedPanel" class="hidden" style="margin-top:1.25rem">
+            <h2>Field-erected AWWA D100 screening list</h2>
+            <p class="hint" id="fieldErectedNote"></p>
+            <div class="table-wrap">
+              <table class="catalog">
+                <thead>
+                  <tr>
+                    <th>Nominal gal</th>
+                    <th class="num">⌀ ft</th>
+                    <th class="num">H ft</th>
+                    <th class="num">Calculated gal</th>
+                    <th>Site limits</th>
+                  </tr>
+                </thead>
+                <tbody id="fieldErectedBody"></tbody>
+              </table>
+            </div>
+          </div>
         </section>
       </div>
     </div>
@@ -298,7 +391,7 @@
     <section class="print-only panel">
       <div id="reportLogoPrint" class="report-logo-print"></div>
       <h2>Fire water tank — preliminary sizing report</h2>
-      <p>Version <span id="printVersion">1.3.2-prelim</span> · Code basis: NFPA 22-2023 · Not a sealed NFPA 22 design</p>
+      <p>Version <span id="printVersion">1.4.0-prelim</span> · Code basis: NFPA 22-2023 · Not a sealed NFPA 22 design</p>
       <p><b>Project</b> <span id="printProject">—</span> · <b>Site</b> <span id="printFacility">—</span></p>
       <p><b>By</b> <span id="printBy">—</span> · <b>Date</b> <span id="printDate">—</span></p>
       <p><b>Demand</b> <span id="printDemand">—</span></p>
@@ -322,12 +415,24 @@
           <p><a href="../main-sizer/" style="font-weight:600">Main Sizer →</a> · <a href="../civil-summary/" style="font-weight:600">Civil Summary →</a></p>
           <p><strong>Path:</strong> Flow Test → Fire Flow Calculator → Sprinkler Estimator → Fire Pump Sizer → <b>Tank Sizer</b>. Import Fire Flow for large site volumes.</p>
 
+          <h3>NFPA 1 required fire flow</h3>
+          <ul>
+            <li><strong>Edition:</strong> 2021 cites §18.4.5.3 (reduction, floors, and the 2,000 gpm / 2 hour cap) and §18.4.5.4 (greater of fire flow and sprinkler demand). 2024 cites §18.4.4 for the same rules. The edition does not change the math, and this tool does not invent 2024 subsection numbers.</li>
+            <li><strong>Construction and area:</strong> Lookup uses the toolshed area bands (the same bands as the Hydrant Loop Sizer). Type II (000) is the IIB group. Type V (000) is VB.</li>
+            <li><strong>Sprinklered throughout:</strong> Flow = the smaller of 2,000 gpm and the larger of 25% of the table flow and the floor. The floor is 1,000 gpm, or 600 gpm when quick-response sprinklers are used throughout. Duration = the smaller of the table duration and 2 hours. The result is labeled <strong>AHJ may modify</strong>.</li>
+            <li><strong>Table flow and duration overrides:</strong> Type the adopted table's numbers when you do not want the lookup. Leave them blank to use the lookup. Do not type a guessed code value.</li>
+            <li><strong>Sprinkler demand:</strong> The supply rate is the greater gpm. The tank volume is the greater of the two volumes. The demands are not added.</li>
+            <li><strong>Apply to tank demand</strong> writes that supply into the flow and duration used for the tank. It does not add the tank's safety percent until the demand section does.</li>
+          </ul>
+
           <h3>Demand inputs</h3>
           <ul>
-            <li><strong>System / pump flow (GPM):</strong> Usually total fire water demand from the Sprinkler Estimator (or pump duty flow).</li>
-            <li><strong>Duration (min):</strong> Water-supply duration from code/framework (UFC Table 9-4, NFPA 13, FM, project). Imported with sprinkler capture when available.</li>
-            <li><strong>Import Upstream Demand:</strong> Prefers Fire Pump Sizer capture (flow × duration), else Sprinkler Estimator handoff.</li>
+            <li><strong>System / pump flow (GPM):</strong> The greater of sprinkler demand and fire flow when both are known. Not the sum.</li>
+            <li><strong>Duration (min):</strong> Duration of the demand that needs more gallons. Imported with a capture when available.</li>
+            <li><strong>Use Governing Demand:</strong> Compares a saved sprinkler capture and a saved fire-flow capture and keeps the greater rate and the greater volume.</li>
+            <li><strong>Import Upstream Demand:</strong> Prefers that comparison, else Fire Pump Sizer capture, else Sprinkler Estimator.</li>
             <li><strong>Import Pump Demand:</strong> Loads Capture for Tank from Fire Pump Sizer.</li>
+            <li><strong>Import Fire Flow:</strong> Loads the Fire Flow Calculator capture. The reduction is applied in that calculator, not a second time here.</li>
             <li><strong>Import Sprinkler:</strong> Loads Capture for Pump Sizer (flow + duration + project fields).</li>
           </ul>
 
@@ -348,11 +453,13 @@
             <li><strong>Pad thickness:</strong> Used only for approximate concrete volume (cu yd). Structural design by others.</li>
           </ul>
 
-          <h3>Prefab catalog &amp; custom</h3>
+          <h3>Prefab catalog, field-erected screening, and custom</h3>
           <ul>
-            <li>Rows are typical US bolted/reservoir/standpipe-style steel fire tanks (planning nominals).</li>
+            <li>Prefab rows are planning nominals for bolted / reservoir / standpipe-style steel tanks. They are not a manufacturer's catalog. Confirm with the manufacturer.</li>
             <li>Green/white rows meet volume + max H + max ⌀. Click to select.</li>
-            <li><strong>Custom diameter &amp; height:</strong> Override catalog with project-specific geometry; capacity from cylinder volume.</li>
+            <li><strong>Field-erected list:</strong> When no prefab row fits, the page lists practical diameters and heights for a field-erected welded steel tank. Nominal gallons are the calculated cylinder volume, rounded up to the next 1,000. The list is labeled AWWA D100 because that is the usual standard for this kind of tank. It is a screening list to confirm with the tank manufacturer, not a product catalog. A row may exceed the entered height or diameter; the status column says so.</li>
+            <li><strong>Custom diameter &amp; height:</strong> Override both lists with project geometry. Capacity is the cylinder volume.</li>
+            <li><strong>Report logo:</strong> Benham, MeadHunt JV, AI&amp;P + Benham (a Haskell Company), Haskell by state, or an uploaded image. The choice is shared across Toolshed report tools.</li>
           </ul>
 
           <h3>Outputs</h3>
@@ -385,7 +492,9 @@
   </div>
 
   <script src="../shared/water-path-shell.js?v=6"></script>
-  <script src="../shared/report-logo.js"></script>
-  <script src="./assets/app.js?v=1.3.2"></script>
+  <script src="../shared/report-logo.js?v=1.4.0"></script>
+  <script src="../shared/nfpa1-fire-flow.js?v=1.2.0"></script>
+  <script src="./assets/tank-options.js?v=1.4.0"></script>
+  <script src="./assets/app.js?v=1.4.0"></script>
 <aside class="noprint" style="padding:12px 20px;text-align:center;font:14px system-ui"><a href="../peer-review/" target="_blank" rel="noopener">Use this result in a Peer Review Case ↗</a></aside><aside class="noprint" style="text-align:center;padding:12px"><a href="../water-supply-review/">Open the related technical review →</a></aside></body>
 </html>

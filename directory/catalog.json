@@ -279,7 +279,7 @@
     {
       "id": "fire-tank-sizer",
       "name": "Fire Tank Sizer",
-      "description": "Flow × duration + NFPA/UFC/FM safety, US-typical prefab steel sizes, max H/⌀ limits, concrete pad, plan diagram.",
+      "description": "Flow × duration + NFPA/UFC/FM safety, NFPA 1 fire-flow reduction, prefab steel sizes, and a field-erected AWWA D100 screening list when no prefab fits. Concrete pad and plan diagram.",
       "url": "./fire-tank-sizer/",
       "task": "Calculate",
       "disciplines": [
@@ -299,7 +299,7 @@
     {
       "id": "hydrant-loop-sizer",
       "name": "Hydrant Loop Sizer",
-      "description": "Hydrant-only supply: NFPA 291 available flow, ring hydraulics with hydrant arms, velocity, single-break case, loop schematic. US or metric.",
+      "description": "Hydrant flow test or a fire pump and tank: NFPA 291 or a pump curve, NFPA 24 Hazen-Williams, supply main, riser lead-ins with backflow loss, velocity, and a one-segment-out case. US or metric.",
       "url": "./hydrant-loop-sizer/",
       "task": "Calculate",
       "disciplines": [
@@ -363,7 +363,7 @@
     {
       "id": "fire-flow",
       "name": "Fire Flow Calculator",
-      "description": "Required fire flow (gpm @ 20 psi) and minimum hydrants for new building design. IBC/IFC Appendix B, UFC 3-600-01, Florida FFPC / NFPA 1. Construction type, area, sprinkler reductions, UFC specials, printable report with citations.",
+      "description": "Required fire flow at 20 psi. NFPA 1 sprinkler reduction: 75% of table flow, 1,000 gpm floor (600 gpm quick-response), cap 2,000 gpm for 2 hours. AHJ may modify. Supply is the greater of fire flow and sprinkler demand. Also IFC Appendix B and UFC 3-600-01.",
       "url": "./fire-flow/",
       "task": "Calculate",
       "disciplines": [

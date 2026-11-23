@@ -362,7 +362,7 @@ const stateUrl = (o, extra = '') => `/hydrant-loop-sizer/?state=${encodeURICompo
 test('page: shows version, SEA numbers, supply-limited result, the DI nominal-to-ID table with the DN note, and the schematic', async () => {
   const html = await page('/hydrant-loop-sizer/?example=sea')
   const t = text(html)
-  assert.match(html, /id="appVersion">Version 1\.0\.3</)
+  assert.match(html, /id="appVersion">Version 1\.1\.0</)
   assert.match(html, /id="mQr">3,520 gpm</)
   assert.match(t, /DOES NOT PASS\. No size passes: the water supply cannot deliver 5,000 gpm at 20\.0 psi \(available 3,520 gpm\)/)
   assert.match(t, /Hydrant-only supply/i)
@@ -587,4 +587,136 @@ test('units: summary, warnings and items carry the display units (metric text ha
   assert.match(all, /DN150 pipe/)
   const us = E.evaluate(SEA)
   assert.match(us.summary, /5,000 gpm at 20\.0 psi \(available 3,520 gpm\)\. Smallest size under the velocity limit: 10 in\./)
+})
+
+// Pump + tank. Inside diameters are the tool's ductile-iron actual IDs (12 in. = 12.52, 10 in. = 10.46), not nominal.
+// The pump curve is piecewise linear on the entered points. This sample uses the NFPA 20 limits: churn 140% and 150% flow at 65%.
+const PUMP = {
+  nfpa24: '2022', ratedQ: 2500, ratedP: 115, churnP: 161, p150: 74.75, suction: 0, pumpElev: 0,
+  supplyLen: 360, supplySize: 12, loopLen: 2321, loopSize: 12, placement: 'far', material: 'di', maxVel: 10, fittingPct: 0,
+  risers: [{ q: 2602, pReq: 106.4, len: 150, size: 10, bfp: 0, elev: 0 }],
+}
+const NOMINAL = { c: 140, rating: 150, ids: { 6: 6, 8: 8, 10: 10, 12: 12, 16: 16 } }
+
+test('engine v1.1.0: pump sample uses actual IDs; normal passes and the full-loop break fails', () => {
+  const Q = 2602, C = 140, d12 = 12.52, d10 = 10.46
+  const supply = hw(Q, C, d12) * 360
+  const split = hw(Q / 2, C, d12) * (2321 / 2)
+  const openPath = hw(Q, C, d12) * 2321
+  const half = hw(Q, C, d12) * (2321 / 2)
+  const lead = hw(Q, C, d10) * 150
+  const vel = 0.4085 * Q / d12 ** 2
+  near(vel, 6.781, 0.001) // 6.8 ft/s is this diameter, not a nominal 12 in. (7.38 ft/s)
+  const avail = 115 - (115 - 74.75) * ((Q - 2500) / (3750 - 2500))
+  near(avail, 111.7156, 1e-4)
+  const r = E.evaluatePump(PUMP)
+  assert.equal(r.ok, true)
+  assert.equal(r.supplyMain.id, 12.52); assert.equal(r.normal.risers[0].id, 10.46)
+  near(r.supplyMain.loss, supply, 1e-9); near(r.supplyMain.vel, vel, 1e-9)
+  near(r.normal.loopLossGovern, split, 1e-6)
+  near(r.broken.loopLossGovern, openPath, 1e-9); assert.equal(r.broken.pathLen, 2321)
+  near(r.half.loopLossGovern, half, 1e-9); assert.equal(r.half.governs, false)
+  near(r.normal.risers[0].loss, lead, 1e-9)
+  near(r.normal.required, 106.4 + supply + split + lead, 1e-6)
+  near(r.broken.required, 106.4 + supply + openPath + lead, 1e-6)
+  near(r.curve.available, avail, 1e-6); near(r.normal.margin, avail - r.normal.required, 1e-9)
+  assert.equal(r.normal.pass, true); assert.equal(r.broken.pass, false); assert.equal(r.pass, false)
+  assert.match(r.summary, /Normal operation PASSES/); assert.match(r.summary, /Loop break FAILS/)
+  // Nominal IDs reproduce the 2.0 psi and 1.8 psi figures and miss 6.8 ft/s. They are not what this tool uses.
+  const nom = E.evaluatePump({ ...PUMP, material: 'custom', custom: NOMINAL })
+  near(nom.supplyMain.loss, 2.013, 0.001); near(nom.supplyMain.vel, 7.381, 0.001)
+  near(nom.normal.loopLossGovern, 1.800, 0.001); near(nom.broken.loopLossGovern, 12.977, 0.001)
+  near(nom.normal.risers[0].loss, 2.038, 0.001)
+  assert.equal(nom.normal.pass, false) // 111.7 psi available is under the nominal-ID required discharge
+  assert.ok(Math.abs(r.supplyMain.loss - 2.0) > 0.2)
+  assert.ok(Math.abs(r.normal.loopLossGovern - 1.8) > 0.2)
+  assert.ok(Math.abs(r.broken.loopLossGovern - 12.7) > 1)
+  assert.ok(Math.abs(r.normal.risers[0].loss - 1.4) > 0.2)
+})
+
+test('engine v1.1.0: pump curve is the entered straight line; limits, suction, backflow and elevation are not assumed', () => {
+  near(E.pumpNetAt(0, 2500, 115, 161, 74.75), 161, 1e-9)
+  near(E.pumpNetAt(2500, 2500, 115, 161, 74.75), 115, 1e-9)
+  near(E.pumpNetAt(3750, 2500, 115, 161, 74.75), 74.75, 1e-9)
+  near(E.pumpNetAt(1000, 2500, 115, 161, 74.75), 161 + (115 - 161) * (1000 / 2500), 1e-9)
+  near(E.pumpNetAt(2602, 2500, 115, 161, 100), 115 + (100 - 115) * ((2602 - 2500) / 1250), 1e-9)
+  assert.equal(Number.isFinite(E.pumpNetAt(3751, 2500, 115, 161, 74.75)), false)
+  assert.equal(E.evaluatePump({ ...PUMP, churnP: 162 }).ok, false)
+  assert.equal(E.evaluatePump({ ...PUMP, p150: 74 }).ok, false)
+  assert.equal(E.evaluatePump({ ...PUMP, risers: [{ ...PUMP.risers[0], q: 4000 }] }).ok, false)
+  for (const k of ['ratedQ', 'ratedP', 'churnP', 'p150', 'suction', 'supplyLen', 'loopLen']) assert.equal(E.evaluatePump({ ...PUMP, [k]: null }).ok, false, k)
+  assert.equal(E.evaluatePump({ ...PUMP, risers: [] }).ok, false)
+  assert.equal(E.evaluatePump({ ...PUMP, risers: [{ ...PUMP.risers[0], bfp: null }] }).ok, false)
+  const base = E.evaluatePump(PUMP)
+  const bfp = E.evaluatePump({ ...PUMP, risers: [{ ...PUMP.risers[0], bfp: 6 }] })
+  near(bfp.normal.required, base.normal.required + 6, 1e-9)
+  near(bfp.broken.required, base.broken.required + 6, 1e-9)
+  const elev = E.evaluatePump({ ...PUMP, risers: [{ ...PUMP.risers[0], elev: 10 }] })
+  near(elev.normal.required, base.normal.required + 0.433 * 10, 1e-9)
+  const suc = E.evaluatePump({ ...PUMP, suction: 5 })
+  near(suc.curve.available, base.curve.available + 5, 1e-9)
+  near(suc.normal.margin, base.normal.margin + 5, 1e-9)
+  assert.equal(suc.supplyMain.loss, base.supplyMain.loss) // suction does not change friction
+  const low = E.evaluatePump({ ...PUMP, risers: [{ ...PUMP.risers[0], q: 1000, pReq: 80 }] })
+  near(low.curve.net, 161 + (115 - 161) * (1000 / 2500), 1e-6)
+  const u = E.unitSet('metric', 'lpm', 'kpa')
+  const m = E.evaluatePump(PUMP, u)
+  assert.match(m.summary, /PASSES/); assert.match(m.summary, /FAILS/); assert.match(m.summary, /kPa/)
+  assert.doesNotMatch(m.summary, /gpm|psi|ft\/s/)
+  assert.match(m.criteria.map((c) => c.value).join(' '), /L\/min/)
+  assert.ok(m.criteria.some((c) => /NFPA 24 \(2022\) s11\.1/.test(c.cite)))
+  assert.ok(m.criteria.some((c) => c.cite === 'NFPA 20 s6.2'))
+  assert.ok(m.criteria.some((c) => c.cite === 'NFPA 1 Chapter 18'))
+  const y2019 = E.evaluatePump({ ...PUMP, nfpa24: '2019' })
+  assert.ok(y2019.criteria.some((c) => /2019/.test(c.cite) && c.flag === 'U'))
+  assert.ok(!/s18\.4\.5\.3\.2|inferred number/.test(JSON.stringify(y2019.criteria)))
+})
+
+test('engine v1.1.0: riser demands use the ring solver; one segment out on an even loop is the remaining half', () => {
+  const net = E.buildNetwork({ loopLen: 4000, sources: 1, nHyd: 4, placement: 'even' })
+  const qh = 500
+  const a = E.solveNetwork(net, qh, (q) => E.hwRate(q, 140, 12.52), -1, 1)
+  const demand = net.nodes.map((nd) => nd.hyd.length * qh)
+  const b = E.solveDemands(net, demand, (q) => E.hwRate(q, 140, 12.52), -1, 1)
+  for (let i = 0; i < a.flows.length; i++) near(b.flows[i], a.flows[i], 1e-6)
+  for (let i = 0; i < a.drop.length; i++) near(b.drop[i], a.drop[i], 1e-6)
+  const even = E.evaluatePump({ ...PUMP, placement: 'even' })
+  near(even.normal.loopLossGovern, hw(2602 / 2, 140, 12.52) * (2321 / 2), 1e-6)
+  near(even.broken.loopLossGovern, hw(2602, 140, 12.52) * (2321 / 2), 1e-6)
+  near(even.broken.pathLen, 1160.5, 1e-6)
+  assert.equal(even.half, null); assert.equal(even.broken.pass, false)
+  const two = E.evaluatePump({
+    ...PUMP, placement: 'even',
+    risers: [{ q: 1000, pReq: 80, len: 40, size: 6, bfp: 4, elev: 0 }, { q: 800, pReq: 70, len: 80, size: 8, bfp: 2, elev: 0 }],
+  })
+  const delivered = Object.values(two.network.intact.srcFlow).reduce((x, y) => x + y, 0)
+  near(delivered, 1800, 1e-4)
+  assert.equal(two.normal.risers.length, 2)
+  near(two.normal.risers[0].bfp, 4, 1e-9); near(two.normal.risers[1].bfp, 2, 1e-9)
+  near(two.supplyMain.loss, hw(1800, 140, 12.52) * 360, 1e-9)
+  assert.ok(two.broken.required >= two.normal.required - 1e-6)
+})
+
+test('page v1.1.0: pump example shows actual inside diameters, PASS on normal operation, FAIL on the loop break, and keeps the shared logo list', async () => {
+  const html = await page('/hydrant-loop-sizer/?example=pump')
+  const t = text(html)
+  assert.match(html, /id="appVersion">Version 1\.1\.0</)
+  assert.match(html, /id="pumpAvailable">111\.7 psi</)
+  assert.match(html, /id="pumpReqNormal">111\.1</)
+  assert.match(html, /id="pumpNormalResult">PASS</)
+  assert.match(html, /id="pumpBreakResult">FAIL</)
+  assert.match(html, /id="pumpIdLead">10\.46</)
+  assert.match(t, /12\.52/)
+  assert.match(t, /DOES NOT PASS\. Normal operation PASSES/)
+  assert.match(t, /Loop break FAILS/)
+  const pr = text(html.slice(html.indexOf('id="printReport"')))
+  assert.match(pr, /Normal operation PASSES/); assert.match(pr, /Loop break FAILS/); assert.match(pr, /12\.52/); assert.match(pr, /backflow/i)
+  assert.match(t, /backflow/i)
+  assert.match(t, /NFPA 24 \(2022\)/)
+  assert.match(t, /150% of rated flow/)
+  assert.match(html, /value="aip"/); assert.match(html, /value="benham"/); assert.match(html, /value="haskell"/); assert.match(html, /value="upload"/)
+  assert.match(html, /class="panel mode-test hidden"/)
+  assert.doesNotMatch(html, /class="panel mode-pump hidden"/)
+  const help = html.slice(html.indexOf('id="helpModal"'), html.indexOf('id="printReport"'))
+  assert.match(help, /backflow/i); assert.match(help, /2019 or 2022/); assert.match(help, /Fire pump and tank/)
 })

@@ -29,6 +29,22 @@ select, input[type="number"] { width: 100%; padding: 0.5rem 0.65rem; border: 1px
 .results .big { font-size: 1.75rem; color: var(--blue-900); font-weight: 700; }
 .notes { background: #f8fafc; padding: 0.75rem 1rem; border-radius: 0.5rem; margin: 1rem 0; }
 .cite { font-size: 0.75rem; color: var(--slate-600); margin-top: 1rem; }
+.muted { color: var(--slate-600); font-weight: 500; }
+.ahj { display: inline-block; margin-left: 0.35rem; padding: 0.1rem 0.45rem; border-radius: 999px; background: #ffedd5; color: #9a3412; font-size: 0.85rem; font-weight: 700; }
+small { display: block; color: var(--slate-600); font-size: 0.75rem; margin-top: 0.3rem; }
 .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
 .actions button, .actions a { background: #fff; border: 1px solid var(--slate-200); padding: 0.5rem 0.85rem; border-radius: 0.5rem; text-decoration: none; color: inherit; font-size: 0.85rem; cursor: pointer; }
-@media print { .no-print { display: none; } body { background: #fff; } }
+button.ghost { background: #fff; color: var(--slate-800); margin-left: 0.5rem; }
+.hidden { display: none !important; }
+.modal { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-start; justify-content: center; padding: 1.5rem 1rem; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.45); }
+.modal-card { position: relative; background: #fff; max-width: 720px; width: 100%; max-height: calc(100dvh - 3rem); overflow: auto; border-radius: 1rem; padding: 1rem 1.15rem 1.25rem; }
+.modal-head { display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
+.modal-head h2 { margin: 0; font-size: 1.15rem; }
+.modal-body h3 { margin: 1rem 0 0.35rem; font-size: 1rem; }
+.modal-body ul { margin: 0.2rem 0 0; padding-left: 1.15rem; }
+.modal-body li { margin: 0.3rem 0; }
+@media print {
+  .no-print, .modal { display: none !important; }
+  body { background: #fff; }
+}

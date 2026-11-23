@@ -25,9 +25,10 @@ Details: [STUDY-BUDDY.md](./STUDY-BUDDY.md)
 
 0. **[Flow Test Request](./flow-test-request/)** — Stock request form (suppression or fire flow), NFPA 291 procedures for 2½″ outlets only, base/city fields, hydrant selection reasons, jurisdiction ask.
 1. **[Flow Test Report](./flow-test-report/)** — Hydrant static/residual/pitot GPM, N^1.85 supply curve, fire flow @ 20 psi. Capture for Sprinkler Estimator (no system demand).
-2. **[Sprinkler System Estimator](./sprinkler-system-estimator/)** — Prelim demand, pressure stack, duration (NFPA 13 / UFC / FM), plus an ESFR storage comparison of NFPA 13 and FM. Overlay flow-test curve; capture duty for pump sizer.
-3. **[Fire Pump Sizer](./fire-pump-sizer/)** — Import sprinkler flow/pressure/duration; NFPA 20 / UFC preliminary pump, driver, room.
-4. **[Fire Tank Sizer](./fire-tank-sizer/)** — Tank volume ≈ system/pump flow × duration + NFPA/UFC/FM safety; prefab steel catalog; max height/diameter; concrete pad plan.
+2. **[Fire Flow Calculator](./fire-flow/)** — Required fire flow at 20 psi. NFPA 1 sprinkler reduction (25% of table flow, 1,000 gpm floor, 600 gpm with quick-response, 2,000 gpm and 2 hour cap). AHJ may modify. Supply is the greater of fire flow and sprinkler demand, not the sum. Also IFC Appendix B and UFC 3-600-01.
+3. **[Sprinkler System Estimator](./sprinkler-system-estimator/)** — Prelim demand, pressure stack, duration (NFPA 13 / UFC / FM), plus an ESFR storage comparison of NFPA 13 and FM. Overlay flow-test curve; capture duty for pump sizer.
+4. **[Fire Pump Sizer](./fire-pump-sizer/)** — Import sprinkler flow/pressure/duration; NFPA 20 / UFC preliminary pump, driver, room.
+5. **[Fire Tank Sizer](./fire-tank-sizer/)** — Tank volume ≈ system/pump flow × duration + NFPA/UFC/FM safety. Can apply the NFPA 1 fire flow above. Prefab steel catalog, and a field-erected AWWA D100 screening list when no prefab fits. Max height/diameter. Concrete pad plan.
 
 ## Atrium smoke path
 
@@ -47,7 +48,7 @@ Phase 1 screens the job and stops at the AHJ kickoff. Phase 2 is [FDS and Smokev
 
 | Tool | Path |
 |------|------|
-| [Hydrant Loop Sizer](./hydrant-loop-sizer/) | Hydrant-only private loop: NFPA 291 available flow (0.54), ring hydraulics (Hazen-Williams, NFPA 24 §11.1) with hydrant arms, velocity, single-break case, loop schematic; Florida / IBC-IFC / DoD bases; US or metric |
+| [Hydrant Loop Sizer](./hydrant-loop-sizer/) | Hydrant flow test or a fire pump and tank: NFPA 291 available flow (0.54) or a pump curve, ring hydraulics (Hazen-Williams, NFPA 24 §11.1) with hydrant arms or riser lead-ins and backflow loss, velocity, single-break case, loop schematic; Florida / IBC-IFC / DoD bases; US or metric |
 | [Occupant Load & Egress Capacity](./occupant-egress/) | IBC / NFPA 101 paths — load factors, egress width capacity, IBC minimum exits and loss-of-one-exit, travel checks |
 | [FA Power Extenders](./fa-power-extenders/) | NAC horn/strobe + speaker taps (25/70 V), voltage drop, booster / remote-amp warrant (NFPA 72 / UFC) |
 | [Transparent RSET Tool](./rset-tool/) | Educational RSET = Detection + Notification + Pre-movement + Movement; guides + assumptions log (React app; build with `npm run build` in `rset-tool/`) |

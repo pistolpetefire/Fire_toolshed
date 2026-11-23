@@ -128,15 +128,19 @@ test('page: Hydrant Loop Sizer Submittal mode - OFF keeps all four elements, ON 
   } finally { await s.close() }
 })
 
-test('version: Hydrant Loop Sizer version matches the engine and the catalog uses the current card', () => {
+test('version: Hydrant Loop Sizer matches the engine, keeps Submittal mode, records the pump source, and the catalog uses the current card', () => {
   const html = readFileSync(join(ROOT, 'hydrant-loop-sizer/index.html'), 'utf8')
   const v = E.VERSION
   const esc = v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   assert.match(html, new RegExp(`id="appVersion">Version ${esc}<`))
   assert.match(html, new RegExp(`id="footVersion">${esc}<`))
+  assert.match(html, new RegExp(`hls-engine\\.js\\?v=${esc}`))
+  assert.match(html, new RegExp(`app\\.js\\?v=${esc}`))
+  assert.match(html, new RegExp(`styles\\.css\\?v=${esc}`))
   const rd = readFileSync(join(ROOT, 'hydrant-loop-sizer/README.md'), 'utf8')
   assert.match(rd, new RegExp(`Version ${esc}\\.`))
   assert.match(rd, /\*\*1\.0\.3\.\*\*[^\n]*Submittal mode[^\n]*inferred/)
+  assert.match(rd, new RegExp(`\\*\\*${esc}\\.\\*\\*[^\n]*Fire pump and tank`))
   const portal = readFileSync(join(ROOT, 'index.html'), 'utf8')
   const start = portal.indexOf('id="tool-hydrant-loop-sizer"')
   assert.ok(start >= 0, 'catalog card tool-hydrant-loop-sizer')
@@ -144,5 +148,6 @@ test('version: Hydrant Loop Sizer version matches the engine and the catalog use
   assert.match(card, /Hydrant Loop Sizer/)
   assert.match(card, /badge-calculate/)
   assert.match(card, /href="\.\/hydrant-loop-sizer\/"/)
+  assert.match(card, /fire pump and tank/)
   assert.doesNotMatch(portal, /id="card-hydrant-loop"/)
 })

@@ -36,7 +36,7 @@ const APPS = {
 function appVersionOf(a) {
   const html = readFileSync(join(ROOT, a, 'index.html'), 'utf8')
   const js = existsSync(join(ROOT, a, 'assets/app.js')) ? readFileSync(join(ROOT, a, 'assets/app.js'), 'utf8') : ''
-  const m = (js || html).match(/APP_VERSION\s*=\s*['"]([^'"]+)['"]/)
+  const m = (js + '\n' + html).match(/APP_VERSION\s*=\s*['"]([^'"]+)['"]/)
   assert.ok(m, `${a}: APP_VERSION`)
   return { v: m[1], html, js }
 }
