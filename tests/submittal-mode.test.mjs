@@ -128,11 +128,21 @@ test('page: Hydrant Loop Sizer Submittal mode - OFF keeps all four elements, ON 
   } finally { await s.close() }
 })
 
-test('version: Hydrant Loop Sizer is 1.0.3 everywhere and the changelog describes Submittal mode and the cite change', () => {
+test('version: Hydrant Loop Sizer version matches the engine and the catalog uses the current card', () => {
   const html = readFileSync(join(ROOT, 'hydrant-loop-sizer/index.html'), 'utf8')
-  assert.match(html, /id="appVersion">Version 1\.0\.3</); assert.match(html, /id="footVersion">1\.0\.3</)
-  assert.equal(E.VERSION, '1.0.3')
+  const v = E.VERSION
+  const esc = v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  assert.match(html, new RegExp(`id="appVersion">Version ${esc}<`))
+  assert.match(html, new RegExp(`id="footVersion">${esc}<`))
   const rd = readFileSync(join(ROOT, 'hydrant-loop-sizer/README.md'), 'utf8')
-  assert.match(rd, /Version 1\.0\.3\./); assert.match(rd, /\*\*1\.0\.3\.\*\*[^\n]*Submittal mode[^\n]*inferred/)
-  assert.match(readFileSync(join(ROOT, 'index.html'), 'utf8'), /card-hydrant-loop[\s\S]{0,900}Live · v1\.0\.3/)
+  assert.match(rd, new RegExp(`Version ${esc}\\.`))
+  assert.match(rd, /\*\*1\.0\.3\.\*\*[^\n]*Submittal mode[^\n]*inferred/)
+  const portal = readFileSync(join(ROOT, 'index.html'), 'utf8')
+  const start = portal.indexOf('id="tool-hydrant-loop-sizer"')
+  assert.ok(start >= 0, 'catalog card tool-hydrant-loop-sizer')
+  const card = portal.slice(start, portal.indexOf('</article>', start))
+  assert.match(card, /Hydrant Loop Sizer/)
+  assert.match(card, /badge-calculate/)
+  assert.match(card, /href="\.\/hydrant-loop-sizer\/"/)
+  assert.doesNotMatch(portal, /id="card-hydrant-loop"/)
 })

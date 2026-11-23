@@ -1,4 +1,5 @@
 # Flow Test Report changelog
 
+- **2.4.3.** The saved-report HTML string had an unescaped quote, so the whole page script failed to parse. Results stayed on the em dash (including 3,520 gpm for the SEA ATCT test) and the shared report-logo list never attached. The quote is escaped. The Verification tab is loaded from `shared/verify-tab.js` and `assets/verify-cases.js` (`?v=2.4.3`); it was not on the page, so the status was blank. Logo options still come from `shared/report-logo.js` (AI&P + Benham, Benham, MeadHunt JV, Haskell, upload). Help is unchanged. No calculation change. No service worker.
 - **2.4.2.** Report logo list gains a built-in option **AI&P + Benham (a Haskell Company)** (AI&P Alberti Ozzo & Partners + Benham). It is added once in the shared `shared/report-logo.js` (source key `aip`, image `shared/logos/aip-benham.png`), so it shows in this tool's Report logo list and preview and in the printout header. The default logo (Benham) and a saved choice (`fireToolshed.reportLogo.v1`) are unchanged. No layout changes.
 - Previous version: 2.4.1.

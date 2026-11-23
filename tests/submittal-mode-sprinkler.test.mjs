@@ -1,5 +1,5 @@
-// Submittal mode for the Sprinkler System Estimator 1.6.2-prelim (shared/submittal-mode.js): OFF prints the blank sign-off block (current behavior),
-// ON leaves it out of the printout and keeps everything else.
+// Submittal mode for the Sprinkler System Estimator (shared/submittal-mode.js): OFF prints the blank sign-off block,
+// ON leaves it out of the printout and keeps everything else. Version is read from the app, not pinned to 1.6.2-prelim.
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs'
@@ -39,10 +39,13 @@ test('page: Sprinkler System Estimator Submittal mode - OFF prints the blank sig
   } finally { await s.close() }
 })
 
-test('version: Sprinkler System Estimator is 1.10.0-prelim and its changelog still describes Submittal mode', () => {
-  const html = readFileSync(join(ROOT, 'sprinkler-system-estimator/index.html'), 'utf8')
-  assert.match(html, /1\.10\.0-prelim/)
-  assert.match(readFileSync(join(ROOT, 'sprinkler-system-estimator/assets/app.js'), 'utf8'), /APP_VERSION\s*=\s*"1\.10\.0-prelim"/)
-  assert.match(readFileSync(join(ROOT, 'sprinkler-system-estimator/CHANGELOG.md'), 'utf8'), /\*\*1\.6\.2-prelim\.\*\*[^\n]*Submittal mode/)
-  assert.match(readFileSync(join(ROOT, 'sprinkler-system-estimator/CHANGELOG.md'), 'utf8'), /\*\*1\.10\.0-prelim\.\*\*[^\n]*Storage/)
+test('version: Sprinkler System Estimator matches APP_VERSION and its changelog still describes Submittal mode', () => {
+  const js = readFileSync(join(ROOT, 'sprinkler-system-estimator/assets/app.js'), 'utf8')
+  const v = (js.match(/APP_VERSION\s*=\s*"([^"]+)"/) || [])[1]
+  assert.ok(v, 'APP_VERSION')
+  const esc = v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  assert.match(readFileSync(join(ROOT, 'sprinkler-system-estimator/index.html'), 'utf8'), new RegExp(esc))
+  const log = readFileSync(join(ROOT, 'sprinkler-system-estimator/CHANGELOG.md'), 'utf8')
+  assert.match(log, /\*\*1\.6\.2-prelim\.\*\*[^\n]*Submittal mode/)
+  assert.match(log, new RegExp(`\\*\\*${esc}\\.\\*\\*`))
 })

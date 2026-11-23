@@ -1,0 +1,3 @@
+# Optional Python deps for regenerating committed hand-calc files.
+# The node suite skips Hydrant Loop Sizer regeneration when scipy is missing.
+scipy>=1.11

@@ -643,6 +643,8 @@ footer a { color: var(--teal); font-weight: 700; }
       text-align: left;
     }
   </style>
+  <script src="../shared/verify-tab.js?v=2.4.3"></script>
+  <script src="./assets/verify-cases.js?v=2.4.3"></script>
 </head>
 <body>
   <div id="waterPathShell" class="no-print"></div>
@@ -652,7 +654,7 @@ footer a { color: var(--teal); font-weight: 700; }
       <div>
         <p class="eyebrow">Fire Toolshed</p>
         <h1>Flow Test Report</h1>
-        <p class="version" id="appVersion">Version 2.4.2</p>
+        <p class="version" id="appVersion">Version 2.4.3</p>
         <p class="version" id="codeEdition">Code basis: <strong>NFPA 291-2022</strong> (recommended practice, not code-referenced) · hydrant flow testing</p>
         <p class="print-edition" id="printCodeEdition">Code basis: NFPA 291-2022 (recommended practice, not code-referenced)</p>
         <p class="hint" style="margin-top:0.5rem;max-width:36rem">
@@ -1096,7 +1098,7 @@ footer a { color: var(--teal); font-weight: 700; }
 
     <footer class="print-omit">
       <p>
-        <strong>Version <span id="footerVersion">2.4.2</span></strong>
+        <strong>Version <span id="footerVersion">2.4.3</span></strong>
         · Hydrant flow test (NFPA 291) · Not a substitute for stamped hydraulics or AHJ approval.
         <a href="../">Portal</a> ·
         <a href="../sprinkler-system-estimator/">Sprinkler Estimator</a> ·
@@ -1195,7 +1197,7 @@ footer a { color: var(--teal); font-weight: 700; }
 (function () {
   "use strict";
 
-  var APP_VERSION = "2.4.2";
+  var APP_VERSION = "2.4.3";
   var SUPPLY_EXPONENT = 1.85;
   /** NFPA 291 available-flow exponent: Q_R = Q_F x ((Ps - Pr_rating) / (Ps - Pr))^0.54 */
   var CAPACITY_EXPONENT = 0.54;
@@ -3222,7 +3224,7 @@ footer a { color: var(--teal); font-weight: 700; }
       tableRows +
       "</tbody></table>" +
       "<p class='muted'>Preliminary field documentation only. Not a substitute for stamped hydraulics or AHJ approval. System demand is calculated in the Sprinkler System Estimator.</p>" +
-      "<aside class="noprint" style="text-align:center;padding:12px"><a href="../water-supply-review/">Open the related technical review →</a></aside></body></html>";
+      "<aside class='noprint' style='text-align:center;padding:12px'><a href='../water-supply-review/'>Open the related technical review →</a></aside></body></html>";
     downloadFile(name + "_flow-test-report.html", html);
     // Also save JSON project snapshot
     downloadFile(

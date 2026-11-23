@@ -7,7 +7,7 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.3.1-prelim";
+  const APP_VERSION = "1.3.2-prelim";
   const STORAGE_KEY = "fireTankSizer.v1";
   const SPRINKLER_HANDOFF_KEY = "fireToolshed.sprinklerHandoff.v1";
   const FIREFLOW_HANDOFF_KEY = "fireToolshed.fireFlowHandoff.v1";
