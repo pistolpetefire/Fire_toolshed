@@ -7,54 +7,24 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.3.1-prelim";
+  const APP_VERSION = "1.4.0-prelim";
   const STORAGE_KEY = "fireTankSizer.v1";
   const SPRINKLER_HANDOFF_KEY = "fireToolshed.sprinklerHandoff.v1";
   const FIREFLOW_HANDOFF_KEY = "fireToolshed.fireFlowHandoff.v1";
   const PUMP_HANDOFF_KEY = "fireToolshed.pumpHandoff.v1";
   const TANK_HANDOFF_KEY = "fireToolshed.tankHandoff.v1";
-  const GAL_PER_CUFT = 7.48051945;
+  const GAL_PER_CUFT = window.TankOptions ? window.TankOptions.GAL_PER_CUFT : 7.48051945;
 
   /**
    * Representative US prefab / bolted / corrugated steel fire-protection tank sizes.
-   * Dimensions approximate industry-typical product lines (Pioneer-style, bolted ring,
-   * welded ground storage). Confirm with manufacturer for project use.
+   * Dimensions approximate industry-typical product lines. Confirm with the manufacturer.
    * diaFt / htFt = shell outside diameter / shell height (ft).
+   * The list is built in tank-options.js so tests and the page share one catalog.
    */
-  const PREFAB_CATALOG = buildPrefabCatalog();
-
-  function buildPrefabCatalog() {
-    // Common diameters (ft) used by bolted/corrugated steel fire tanks
-    const dias = [11, 13.5, 15.5, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48];
-    // Typical total heights (ft) — low profile through taller standpipe-style
-    const heights = [8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32];
-    const list = [];
-    let id = 0;
-    dias.forEach((d) => {
-      heights.forEach((h) => {
-        const gal = Math.round(cylGallons(d, h) / 500) * 500; // nominal round
-        if (gal < 4000 || gal > 400000) return;
-        // Prefer squat reservoir (d >= h*0.6) or moderate standpipe for fire suction tanks
-        const aspect = d / h;
-        let style = "bolted-steel";
-        if (aspect >= 1.2) style = "bolted-reservoir";
-        else if (aspect < 0.75) style = "standpipe-style";
-        list.push({
-          id: "pf-" + ++id,
-          nominalGal: gal,
-          diaFt: d,
-          htFt: h,
-          style: style,
-          computedGal: Math.round(cylGallons(d, h)),
-        });
-      });
-    });
-    // Sort by nominal capacity then height
-    list.sort((a, b) => a.nominalGal - b.nominalGal || a.htFt - b.htFt);
-    return list;
-  }
+  const PREFAB_CATALOG = window.TankOptions ? window.TankOptions.buildPrefabCatalog() : [];
 
   function cylGallons(diaFt, htFt) {
+    if (window.TankOptions) return window.TankOptions.cylGallons(diaFt, htFt);
     const r = Math.max(0, diaFt) / 2;
     return Math.PI * r * r * Math.max(0, htFt) * GAL_PER_CUFT;
   }
@@ -106,6 +76,19 @@
     governingSource: "", // volume source: "sprinkler" | "fireflow"
     flowSource: "",      // flow source: "sprinkler" | "fireflow"
     governingVolumeGal: 0, // max of the two volumes; 0 = use flow×duration
+    nfpaEdition: "2021",
+    nfpaGroup: "IIB",
+    nfpaArea: "",
+    nfpaSprinkler: "none",
+    nfpaQr: false,
+    nfpaTableGpm: "",
+    nfpaTableHours: "",
+    nfpaSprGpm: "",
+    nfpaSprMin: "",
+    nfpa1Note: "",
+    useField: false,
+    fieldDiaFt: 0,
+    fieldHtFt: 0,
   });
 
   let state = defaultState();
@@ -226,6 +209,23 @@
     return Math.min(Math.max(1, n), 6);
   }
 
+  function fieldTank(diaFt, htFt) {
+    const d = num(diaFt);
+    const h = num(htFt);
+    const gal = Math.round(cylGallons(d, h));
+    return {
+      id: "field-" + d + "x" + h,
+      nominalGal: Math.ceil(gal / 1000) * 1000,
+      computedGal: gal,
+      diaFt: d,
+      htFt: h,
+      style: "AWWA D100 field-erected welded steel (screening)",
+      ok: true,
+      field: true,
+      screening: true,
+    };
+  }
+
   function selectedTank(demand) {
     if (state.useCustom && num(state.customDiaFt) > 0 && num(state.customHtFt) > 0) {
       const d = num(state.customDiaFt);
@@ -241,6 +241,9 @@
         ok: true,
         custom: true,
       };
+    }
+    if (state.useField && num(state.fieldDiaFt) > 0 && num(state.fieldHtFt) > 0) {
+      return fieldTank(state.fieldDiaFt, state.fieldHtFt);
     }
     const list = filterCatalog(demand);
     let pick = list.find((t) => t.id === state.selectedId && t.ok);
@@ -263,12 +266,16 @@
         constraintNote += "Shell capacity below required. ";
     }
     const okCount = catalog.filter((t) => t.ok).length;
+    const fieldOptions = okCount === 0 && window.TankOptions
+      ? window.TankOptions.fieldErectedScreening(demand.requiredShellGal, maxH, maxD)
+      : [];
     return {
       demand,
       catalog,
       tank,
       pad,
       okCount,
+      fieldOptions,
       constraintNote: constraintNote.trim(),
       meetsConstraints:
         !!tank &&
@@ -435,6 +442,15 @@
     state.useCustom = !!$("useCustom")?.checked;
     state.customDiaFt = num($("customDiaFt")?.value, 0);
     state.customHtFt = num($("customHtFt")?.value, 0);
+    if ($("nfpaEdition")) state.nfpaEdition = $("nfpaEdition").value || "2021";
+    if ($("nfpaGroup")) state.nfpaGroup = $("nfpaGroup").value || "IIB";
+    if ($("nfpaArea")) state.nfpaArea = $("nfpaArea").value;
+    if ($("nfpaSprinkler")) state.nfpaSprinkler = $("nfpaSprinkler").value || "none";
+    if ($("nfpaQr")) state.nfpaQr = !!$("nfpaQr").checked;
+    if ($("nfpaTableGpm")) state.nfpaTableGpm = $("nfpaTableGpm").value;
+    if ($("nfpaTableHours")) state.nfpaTableHours = $("nfpaTableHours").value;
+    if ($("nfpaSprGpm")) state.nfpaSprGpm = $("nfpaSprGpm").value;
+    if ($("nfpaSprMin")) state.nfpaSprMin = $("nfpaSprMin").value;
   }
 
   function writeForm() {
@@ -462,6 +478,15 @@
     if ($("customDiaFt")) $("customDiaFt").value = state.customDiaFt || "";
     if ($("customHtFt")) $("customHtFt").value = state.customHtFt || "";
     $("customFields")?.classList.toggle("hidden", !state.useCustom);
+    if ($("nfpaEdition")) $("nfpaEdition").value = state.nfpaEdition || "2021";
+    if ($("nfpaGroup")) $("nfpaGroup").value = state.nfpaGroup || "IIB";
+    if ($("nfpaArea")) $("nfpaArea").value = state.nfpaArea || "";
+    if ($("nfpaSprinkler")) $("nfpaSprinkler").value = state.nfpaSprinkler || "none";
+    if ($("nfpaQr")) $("nfpaQr").checked = !!state.nfpaQr;
+    if ($("nfpaTableGpm")) $("nfpaTableGpm").value = state.nfpaTableGpm || "";
+    if ($("nfpaTableHours")) $("nfpaTableHours").value = state.nfpaTableHours || "";
+    if ($("nfpaSprGpm")) $("nfpaSprGpm").value = state.nfpaSprGpm || "";
+    if ($("nfpaSprMin")) $("nfpaSprMin").value = state.nfpaSprMin || "";
   }
 
   function renderCatalog(calc) {
@@ -509,6 +534,48 @@
       tr.addEventListener("click", () => {
         state.selectedId = tr.getAttribute("data-tank-id");
         state.useCustom = false;
+        state.useField = false;
+        writeForm();
+        render();
+      });
+    });
+  }
+
+  function renderFieldErected(calc) {
+    const panel = $("fieldErectedPanel");
+    const tbody = $("fieldErectedBody");
+    const note = $("fieldErectedNote");
+    const rows = (calc && calc.fieldOptions) || [];
+    if (panel) panel.classList.toggle("hidden", rows.length === 0);
+    if (note) {
+      note.textContent = rows.length && window.TankOptions
+        ? window.TankOptions.FIELD_LABEL
+        : "";
+    }
+    if (!tbody) return;
+    tbody.innerHTML = rows.map((t) => {
+      const limits = [
+        t.exceedsHeight ? "exceeds max height" : "",
+        t.exceedsDiameter ? "exceeds max diameter" : "",
+      ].filter(Boolean).join("; ") || "within entered limits";
+      const selected = state.useField && num(state.fieldDiaFt) === t.diaFt && num(state.fieldHtFt) === t.htFt;
+      return (
+        `<tr class="pick${selected ? " selected" : ""}" data-dia="${t.diaFt}" data-ht="${t.htFt}">` +
+        `<td>${round0(t.nominalGal).toLocaleString()}</td>` +
+        `<td class="num">${t.diaFt}</td>` +
+        `<td class="num">${t.htFt}</td>` +
+        `<td class="num">${round0(t.computedGal).toLocaleString()}</td>` +
+        `<td>${escapeHtml(limits)}</td>` +
+        `</tr>`
+      );
+    }).join("");
+    tbody.querySelectorAll("tr.pick").forEach((tr) => {
+      tr.addEventListener("click", () => {
+        state.useField = true;
+        state.useCustom = false;
+        state.selectedId = "";
+        state.fieldDiaFt = num(tr.getAttribute("data-dia"));
+        state.fieldHtFt = num(tr.getAttribute("data-ht"));
         writeForm();
         render();
       });
@@ -553,21 +620,31 @@
         cmp.classList.add("hidden");
       }
     }
-    if ($("resultBase"))
-      $("resultBase").textContent = `${d.flowGpm} gpm × ${d.durationMin} min = ${d.baseGal.toLocaleString()} gal`;
+    if ($("resultBase")) {
+      const product = d.flowGpm * d.durationMin;
+      $("resultBase").textContent = num(state.governingVolumeGal) > 0 && Math.abs(d.baseGal - product) > 1
+        ? `Supply rate ${d.flowGpm} gpm (greater of the two demands, not the sum). Tank volume ${d.baseGal.toLocaleString()} gal (greater of the two volumes).`
+        : `${d.flowGpm} gpm × ${d.durationMin} min = ${d.baseGal.toLocaleString()} gal`;
+    }
     if ($("resultSafety"))
       $("resultSafety").textContent = `+${d.safetyPct}% (${d.safetyGal.toLocaleString()} gal) → ${d.withSafetyGal.toLocaleString()} gal usable target`;
     if ($("resultUnusable"))
       $("resultUnusable").textContent = `${d.unusablePct}% unusable allowance → shell ≥ ${d.requiredShellGal.toLocaleString()} gal`;
     if ($("resultFramework")) $("resultFramework").textContent = d.frameworkLabel;
-    if ($("resultNote")) $("resultNote").textContent = d.safetyNote;
+    if ($("resultNote")) {
+      $("resultNote").textContent = d.safetyNote + (state.nfpa1Note ? " " + state.nfpa1Note : "");
+    }
 
     const callout = $("selectCallout");
     if (callout) {
-      if (!calc.tank) {
+      if (!calc.tank && calc.fieldOptions && calc.fieldOptions.length) {
         callout.className = "callout warn";
         callout.textContent =
-          "No prefab option meets volume + max height/diameter. Loosen constraints or use custom dimensions.";
+          "No prefabricated tank in the planning catalog meets this volume within the height and diameter limits. Field-erected AWWA D100 screening sizes are listed below. Confirm diameter, height, and capacity with the tank manufacturer. This is not a manufacturer's catalog. AHJ may modify.";
+      } else if (!calc.tank) {
+        callout.className = "callout warn";
+        callout.textContent =
+          "No prefab option meets volume + max height/diameter. Loosen constraints, use custom dimensions, or review the field-erected screening list.";
       } else if (!calc.meetsConstraints) {
         callout.className = "callout warn";
         callout.textContent = calc.constraintNote || "Selection fails a site constraint.";
@@ -592,6 +669,7 @@
     }
 
     renderCatalog(calc);
+    renderFieldErected(calc);
 
     const svg = renderPlanSVG(calc);
     const host = $("planHost");
@@ -641,6 +719,7 @@
     set("printNotes", state.notes || "—");
     set("printVersion", APP_VERSION);
     updateReportLogoPrint();
+    updateNfpaPreview();
 
     save();
   }
@@ -795,20 +874,37 @@
       return false;
     }
 
-    // Flow rate = the greater gpm (usually sprinkler/suppression)
-    // Tank volume = the greater of the two (flow × duration) products
-    const maxFlow = Math.max(sprFlow, ffFlow);
-    const maxGal = Math.max(sprGal, ffGal);
-    state.flowGpm = maxFlow;
-    state.governingVolumeGal = maxGal;
-    state.flowSource = sprFlow >= ffFlow ? "sprinkler" : "fireflow";
-    state.governingSource = ffGal > sprGal ? "fireflow" : "sprinkler";
-    // Duration field shows the volume-governing duration for reference
-    state.durationMin = state.governingSource === "fireflow" ? ffDur : sprDur;
+    // NFPA 1 §18.4.5.4 / 2024 §18.4.4: the greater of the two demands, never the sum.
+    const supply = window.Nfpa1FireFlow
+      ? window.Nfpa1FireFlow.greaterOfSupply(ffFlow, ffDur, sprFlow, sprDur)
+      : null;
+    const patch = supply && window.TankOptions
+      ? window.TankOptions.demandFromSupply(supply)
+      : null;
+    if (patch) {
+      state.flowGpm = patch.flowGpm;
+      state.durationMin = patch.durationMin;
+      state.governingVolumeGal = patch.governingVolumeGal;
+      state.flowSource = patch.flowSource;
+      state.governingSource = patch.governingSource;
+      state.sprinklerFlow = patch.sprinklerFlow;
+      state.sprinklerDuration = patch.sprinklerDuration;
+      state.fireFlowFlow = patch.fireFlowFlow;
+      state.fireFlowDuration = patch.fireFlowDuration;
+    } else {
+      const maxFlow = Math.max(sprFlow, ffFlow);
+      const maxGal = Math.max(sprGal, ffGal);
+      state.flowGpm = maxFlow;
+      state.governingVolumeGal = maxGal;
+      state.flowSource = sprFlow >= ffFlow ? "sprinkler" : "fireflow";
+      state.governingSource = ffGal > sprGal ? "fireflow" : "sprinkler";
+      state.durationMin = state.governingSource === "fireflow" ? ffDur : sprDur;
+    }
     if (!silent) {
+      const sum = Math.round(sprFlow + ffFlow);
       toast(
-        `Flow: ${maxFlow} gpm (${state.flowSource}). ` +
-        `Tank volume: ${Math.round(maxGal).toLocaleString()} gal (${state.governingSource}).`
+        `Supply ${state.flowGpm} gpm (greater of the two demands, not the sum ${sum}). ` +
+        `Tank volume ${Math.round(state.governingVolumeGal).toLocaleString()} gal (${state.governingSource}).`
       );
     }
 
@@ -965,6 +1061,70 @@
     render();
   }
 
+  function nfpaInputFromState() {
+    return {
+      basis: "nfpa1",
+      edition: state.nfpaEdition || "2021",
+      group: state.nfpaGroup || "IIB",
+      area: num(state.nfpaArea, 0),
+      sprinkler: state.nfpaSprinkler || "none",
+      quickResponse: !!state.nfpaQr,
+      tableGpm: num(state.nfpaTableGpm, 0),
+      tableHours: num(state.nfpaTableHours, 0),
+      sprinklerDemandGpm: num(state.nfpaSprGpm, 0),
+      sprinklerDemandMin: num(state.nfpaSprMin, 0),
+    };
+  }
+
+  function updateNfpaPreview() {
+    const host = $("nfpa1Result");
+    if (!host || !window.Nfpa1FireFlow) return;
+    const input = nfpaInputFromState();
+    const touched = input.area > 0 || input.tableGpm > 0 || input.sprinklerDemandGpm > 0 || (input.sprinkler && input.sprinkler !== "none");
+    if (!touched) {
+      host.textContent = "Enter an area, or a table flow and duration, then Apply to tank demand. A sprinklered result is labeled AHJ may modify.";
+      return;
+    }
+    const result = window.Nfpa1FireFlow.requiredFireFlow(input);
+    if (!result.ok) {
+      host.textContent = result.error || "";
+      return;
+    }
+    const supply = result.supply || {};
+    const ahj = result.ahjMayModify ? " AHJ may modify." : "";
+    let text = `Table ${result.tableGpm.toLocaleString()} gpm` +
+      (result.tableHours ? ` for ${result.tableHours} h` : "") +
+      ` → fire flow ${result.gpm.toLocaleString()} gpm at 20 psi for ${result.hours} h` +
+      ` (${result.gallons.toLocaleString()} gal).` + ahj;
+    if ((supply.sprinklerGpm || 0) > 0) {
+      text += ` Supply ${Math.round(supply.supplyGpm).toLocaleString()} gpm and ${Math.round(supply.supplyGal).toLocaleString()} gal` +
+        ` (greater of the two demands, not the sum ${Math.round(supply.sumGpm).toLocaleString()} gpm / ${Math.round(supply.sumGal).toLocaleString()} gal).`;
+    }
+    host.textContent = text;
+  }
+
+  function applyNfpaFireFlow(silent) {
+    if (!window.Nfpa1FireFlow || !window.TankOptions) {
+      if (!silent) toast("Fire-flow engine did not load");
+      return false;
+    }
+    const result = window.Nfpa1FireFlow.requiredFireFlow(nfpaInputFromState());
+    if (!result.ok) {
+      if (!silent) toast(result.error || "Enter an area or a table flow");
+      return false;
+    }
+    const patch = window.TankOptions.demandFromSupply(result.supply);
+    Object.assign(state, patch);
+    state.nfpa1Note = (result.ahjMayModify ? "AHJ may modify. " : "") + (result.cite || "");
+    if (!silent) {
+      toast(
+        `NFPA 1 fire flow ${result.gpm.toLocaleString()} gpm × ${Math.round(result.hours * 60)} min` +
+        (result.ahjMayModify ? " · AHJ may modify" : "")
+      );
+    }
+    return true;
+  }
+
   function openHelp() {
     const m = $("helpModal");
     if (!m) return;
@@ -1083,6 +1243,7 @@
     });
     $("useCustom")?.addEventListener("change", () => {
       readForm();
+      if (state.useCustom) state.useField = false;
       writeForm();
       render();
     });
@@ -1119,6 +1280,13 @@
         writeForm();
         render();
         updateHandoffBanner();
+      }
+    });
+    $("btnApplyNfpa1")?.addEventListener("click", () => {
+      readForm();
+      if (applyNfpaFireFlow(false)) {
+        writeForm();
+        render();
       }
     });
     $("btnCapture")?.addEventListener("click", captureTankResult);
