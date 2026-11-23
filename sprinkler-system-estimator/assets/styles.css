@@ -563,6 +563,22 @@ h1 {
 
 .print-only { display: none; }
 
+.storage-compare {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.35rem;
+  font-size: 0.88rem;
+}
+.storage-compare th,
+.storage-compare td {
+  border: 1px solid var(--line);
+  padding: 0.45rem 0.55rem;
+  vertical-align: top;
+  text-align: left;
+}
+.storage-compare th { background: #f8fafc; }
+#storagePermission .callout + .callout { margin-top: 0.4rem; }
+
 .print-header {
   border-bottom: 2px solid var(--blue);
   padding-bottom: 0.75rem;

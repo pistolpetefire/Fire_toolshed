@@ -32,6 +32,8 @@
       material: "di", custom: { c: 140, rating: 150, ids: { 6: 6, 8: 8, 10: 10, 12: 12, 16: 16 } },
       maxVel: 10, breakMode: "50", surge: 0, fittingPct: 0, hydLoss: 0, arms: [], displaySize: "auto",
       ffGroup: "I", ffArea: null, ffSprinkler: "none", hydBand: "500",
+      source: "test", nfpa24: "2022", ratedQ: null, ratedP: null, churnP: null, p150: null, suction: null, pumpElev: 0,
+      supplyLen: null, supplySize: 12, loopSize: 12, nRisers: null, risers: [],
       projectName: "", address: "", preparedBy: "", reportDate: "",
       units: { sys: "us", flowU: "lpm", pressU: "kpa" },
     };
@@ -40,10 +42,10 @@
   var lastRes = null, lastFF = null, lastSuggest = null;
   var siteMapAttach = null, photoAttach = [], photoIdSeq = 1, pdfJsLoading = null;
 
-  var NUM = { ps: 1, pr: 1, qf: 1, testElev: 1, connElev: 1, hydElev: 1, minResidual: 1, qreq: 1, qh: 1, loopLen: 1, maxVel: 1, surge: 1, hydLoss: 1, ffArea: 1 };
-  var KIND = Object.assign({}, E.FIELD_KINDS, { ffArea: "area" });
-  var PLAIN_NUM = { nHyd: 1, fittingPct: 1, dropMin: 1 };
-  var SEL = ["basis", "edition", "ffGroup", "ffSprinkler", "hydBand", "sources", "placement", "material", "breakMode"];
+  var NUM = { ps: 1, pr: 1, qf: 1, testElev: 1, connElev: 1, hydElev: 1, minResidual: 1, qreq: 1, qh: 1, loopLen: 1, maxVel: 1, surge: 1, hydLoss: 1, ffArea: 1, ratedQ: 1, ratedP: 1, churnP: 1, p150: 1, suction: 1, pumpElev: 1, supplyLen: 1 };
+  var KIND = Object.assign({}, E.FIELD_KINDS, { ffArea: "area", ratedQ: "flow", ratedP: "press", churnP: "press", p150: "press", suction: "press", pumpElev: "elev", supplyLen: "len" });
+  var PLAIN_NUM = { nHyd: 1, fittingPct: 1, dropMin: 1, nRisers: 1 };
+  var SEL = ["basis", "edition", "ffGroup", "ffSprinkler", "hydBand", "sources", "placement", "material", "breakMode", "source", "nfpa24", "supplySize", "loopSize"];
   var TXT = ["projectName", "address", "preparedBy", "reportDate"];
 
   function U() { return E.unitSet(st.units.sys, st.units.flowU, st.units.pressU); }
@@ -57,6 +59,8 @@
     var m = $("material"); m.innerHTML = Object.keys(E.MATERIALS).map(function (k) { return '<option value="' + k + '">' + esc(E.MATERIALS[k].name) + "</option>"; }).join("");
     $("ffGroup").innerHTML = E.GROUPS.map(function (g) { return '<option value="' + g.key + '">' + esc(g.label) + "</option>"; }).join("");
     $("armAllSize").innerHTML = SIZES.map(function (s) { return '<option value="' + s.nom + '"' + (s.nom === 6 ? " selected" : "") + ">" + s.nom + " in. (DN" + s.dn + ")</option>"; }).join("");
+    var sizeOpts = SIZES.map(function (s) { return '<option value="' + s.nom + '">' + s.nom + " in. (DN" + s.dn + ")</option>"; }).join("");
+    $("supplySize").innerHTML = sizeOpts; $("loopSize").innerHTML = sizeOpts;
     $("customIds").innerHTML = SIZES.map(function (s) { return '<label>ID ' + s.nom + ' in. <span class="u" data-kind="dia"></span><input id="customId' + s.nom + '" type="number" step="any"></label>'; }).join("");
   }
   function fillBasisSelects() {
@@ -80,6 +84,8 @@
     SIZES.forEach(function (s) { $("customId" + s.nom).value = numStr(E.toDisp(u, "dia", st.custom.ids[s.nom])); });
     writeUnitLabels();
     writeArms();
+    writeRisers();
+    syncMode();
   }
   function writeUnitLabels() {
     var u = U();
@@ -93,6 +99,40 @@
     while (st.arms.length < n) st.arms.push({ size: 6, len: 0, sizeSet: false });
     st.arms.length = n;
   }
+  function sizeOptions(selected) {
+    return SIZES.map(function (s) { return '<option value="' + s.nom + '"' + (+selected === s.nom ? " selected" : "") + ">" + s.nom + " in. (DN" + s.dn + ")</option>"; }).join("");
+  }
+  function syncMode() {
+    var pump = st.source === "pump";
+    Array.prototype.forEach.call(document.querySelectorAll(".mode-test"), function (el) { el.classList.toggle("hidden", pump); });
+    Array.prototype.forEach.call(document.querySelectorAll(".mode-pump"), function (el) { el.classList.toggle("hidden", !pump); });
+  }
+  function ensureRisers() {
+    var n = Math.max(0, Math.min(8, Math.round(st.nRisers || 0)));
+    if (!st.risers) st.risers = [];
+    while (st.risers.length < n) st.risers.push({ q: null, pReq: null, len: null, size: 10, bfp: null, elev: 0 });
+    st.risers.length = n;
+  }
+  function writeRisers() {
+    ensureRisers(); var u = U();
+    function numCell(i, key, kind, val) {
+      var shown = val == null || !isFinite(val) ? "" : numStr(E.toDisp(u, kind, val));
+      return '<input data-riser="' + i + '" data-rk="' + key + '" type="number" step="any" value="' + shown + '">';
+    }
+    $("risersBody").innerHTML = st.risers.map(function (r, i) {
+      return "<tr><td>R" + (i + 1) + "</td><td>" + numCell(i, "q", "flow", r.q) + "</td><td>" + numCell(i, "pReq", "press", r.pReq) + "</td><td><select data-riser=\"" + i + "\" data-rk=\"size\">" + sizeOptions(r.size || 10) + "</select></td><td>" + numCell(i, "len", "len", r.len) + "</td><td>" + numCell(i, "bfp", "press", r.bfp) + "</td><td>" + numCell(i, "elev", "elev", r.elev) + "</td></tr>";
+    }).join("") || '<tr><td colspan="7">Enter the number of risers.</td></tr>';
+  }
+  function onRiserEdit(e) {
+    var t = e.target, i = t.getAttribute("data-riser"), k = t.getAttribute("data-rk");
+    if (i == null || !k || !st.risers[+i]) return;
+    if (k === "size") st.risers[+i].size = +t.value;
+    else {
+      var v = parseFloat(t.value), kind = { q: "flow", pReq: "press", len: "len", bfp: "press", elev: "elev" }[k];
+      st.risers[+i][k] = isFinite(v) ? E.toUS(U(), kind, v) : null;
+    }
+    save(); render();
+  }
   function writeArms() {
     ensureArms(); var u = U();
     $("armsBody").innerHTML = st.arms.map(function (a, i) {
@@ -105,11 +145,11 @@
       $(k).addEventListener("input", function () { var v = parseFloat($(k).value); st[k] = isFinite(v) ? E.toUS(U(), KIND[k], v) : null; save(); render(); });
     });
     Object.keys(PLAIN_NUM).forEach(function (k) {
-      $(k).addEventListener("input", function () { var v = parseFloat($(k).value); st[k] = isFinite(v) ? v : null; if (k === "nHyd") writeArms(); save(); render(); });
+      $(k).addEventListener("input", function () { var v = parseFloat($(k).value); st[k] = isFinite(v) ? v : null; if (k === "nHyd") writeArms(); if (k === "nRisers") writeRisers(); save(); render(); });
     });
     SEL.forEach(function (k) {
       $(k).addEventListener("change", function () {
-        var v = $(k).value; st[k] = (k === "sources") ? +v : v;
+        var v = $(k).value; st[k] = (k === "sources" || k === "supplySize" || k === "loopSize") ? +v : v;
         if (k === "basis") { st.breakMode = v === "dod" ? "50" : "100"; st.edition = EDITIONS[v][0][0]; st.ffSprinkler = "none"; fillBasisSelects(); $("edition").value = st.edition; $("breakMode").value = st.breakMode; }
         if (k === "material") writeUnitLabels();
         save(); render();
@@ -142,6 +182,9 @@
     });
     $("btnExSea").addEventListener("click", function () { load(EXAMPLES.sea); });
     $("btnExSpec").addEventListener("click", function () { load(EXAMPLES.spec); });
+    $("btnExPump").addEventListener("click", function () { load(EXAMPLES.pump); });
+    $("risersBody").addEventListener("input", onRiserEdit);
+    $("risersBody").addEventListener("change", onRiserEdit);
     $("btnHelp").addEventListener("click", function () { $("helpModal").classList.remove("hidden"); });
     $("btnHelpClose").addEventListener("click", function () { $("helpModal").classList.add("hidden"); });
     $("btnReset").addEventListener("click", function () { var u = st.units; st = blank(); st.units = u; siteMapAttach = null; photoAttach = []; lastFF = lastSuggest = null; writeForm(); renderAttachmentUi(); save(); render(); });
@@ -171,12 +214,16 @@
   var EXAMPLES = {
     sea: { projectName: "SEA ATCT hydrant test (illustrative loop)", basis: "dod", edition: "c6", ps: 68.3, pr: 61.2, qf: 1250, qreq: 5000, nHyd: 4, qh: 1250, loopLen: 2000, sources: 1, placement: "far", material: "di", breakMode: "50", maxVel: 10 },
     spec: { projectName: "Spec 5.1 illustrative loop", basis: "dod", edition: "c6", ps: 68.3, pr: 61.2, qf: 1250, qreq: 2500, nHyd: 2, qh: 1250, loopLen: 2000, sources: 1, placement: "far", material: "custom", custom: { c: 140, rating: 150, ids: { 6: 6, 8: 8, 10: 10, 12: 12, 16: 16 } }, breakMode: "50", maxVel: 10 },
+    // Churn and the 150% point are the NFPA 20 s6.2 limits (140% and 65% of 115 psi), not a certified curve.
+    pump: { projectName: "Pump and tank sample", source: "pump", nfpa24: "2022", ratedQ: 2500, ratedP: 115, churnP: 161, p150: 74.75, suction: 0, pumpElev: 0, supplyLen: 360, supplySize: 12, loopLen: 2321, loopSize: 12, placement: "far", material: "di", maxVel: 10, fittingPct: 0, nRisers: 1, risers: [{ q: 2602, pReq: 106.4, len: 150, size: 10, bfp: 0, elev: 0 }] },
   };
   function load(obj) {
     var u = st.units; st = Object.assign(blank(), obj || {}); if (!(obj && obj.units)) st.units = u;
     if (!st.custom || !st.custom.ids) st.custom = blank().custom;
+    if (st.source !== "pump") st.source = "test";
     st.arms = (st.arms || []).map(function (a) { return { size: a.size || 6, len: a.len || 0, sizeSet: a.sizeSet === true }; });
-    ensureArms(); writeForm(); save(); render(); return lastRes;
+    st.risers = (st.risers || []).map(function (r) { return { q: r.q, pReq: r.pReq, len: r.len, size: r.size || 10, bfp: r.bfp, elev: r.elev || 0 }; });
+    ensureArms(); ensureRisers(); writeForm(); save(); render(); return lastRes;
   }
   function setUnits(sys, flowU, pressU) { st.units = { sys: sys, flowU: flowU || "lpm", pressU: pressU || "kpa" }; writeForm(); save(); render(); }
 
@@ -187,7 +234,22 @@
     if (!(st.nHyd >= 1)) m.push("hydrants flowing"); if (!(st.qh > 0)) m.push("flow per hydrant"); if (!(st.loopLen > 0)) m.push("loop length");
     return m;
   }
-  function missingForPrint() { var m = missingFields(); if (!(st.qreq > 0)) m.push("required fire flow"); return m; }
+  function missingPump() {
+    var m = [];
+    if (!(st.ratedQ > 0)) m.push("rated flow"); if (!(st.ratedP > 0)) m.push("rated pressure");
+    if (st.churnP == null || !isFinite(st.churnP)) m.push("churn pressure");
+    if (st.p150 == null || !isFinite(st.p150)) m.push("pressure at 150% flow");
+    if (st.suction == null || !isFinite(st.suction)) m.push("tank low-water suction");
+    if (!(st.supplyLen > 0)) m.push("supply main length"); if (!(st.loopLen > 0)) m.push("loop length");
+    if (!(st.nRisers >= 1)) m.push("risers");
+    (st.risers || []).forEach(function (r, i) {
+      var n = "riser " + (i + 1) + " ";
+      if (!(r.q > 0)) m.push(n + "demand"); if (r.pReq == null || !isFinite(r.pReq)) m.push(n + "base pressure");
+      if (r.len == null || !isFinite(r.len)) m.push(n + "lead-in length"); if (r.bfp == null || !isFinite(r.bfp)) m.push(n + "backflow loss");
+    });
+    return m;
+  }
+  function missingForPrint() { if (st.source === "pump") return missingPump(); var m = missingFields(); if (!(st.qreq > 0)) m.push("required fire flow"); return m; }
   function evalInput() {
     var o = JSON.parse(JSON.stringify(st));
     if (!(o.qreq > 0)) o.qreq = o.nHyd * o.qh;
@@ -333,10 +395,116 @@
   }
 
   // ---------- render ----------
+  function pumpInput() {
+    return {
+      nfpa24: st.nfpa24, ratedQ: st.ratedQ, ratedP: st.ratedP, churnP: st.churnP, p150: st.p150, suction: st.suction, pumpElev: st.pumpElev || 0,
+      supplyLen: st.supplyLen, supplySize: st.supplySize, loopLen: st.loopLen, loopSize: st.loopSize, placement: st.placement,
+      material: st.material, custom: st.custom, maxVel: st.maxVel, fittingPct: st.fittingPct || 0, surge: st.surge || 0,
+      risers: (st.risers || []).map(function (r) { return { q: r.q, pReq: r.pReq, len: r.len, size: r.size, bfp: r.bfp, elev: r.elev || 0 }; }),
+    };
+  }
+  function pumpResultsHtml(res, u, ids) {
+    var c = res.curve, s = res.supplyMain, n = res.normal, b = res.broken;
+    function tag(ok) { return ok ? '<span class="pass-t">PASS</span>' : '<span class="fail-t">FAIL</span>'; }
+    function margin(v) { return v >= -1e-6 ? "margin " + E.fmtU(u, "press", v) : "short " + E.fmtU(u, "press", -v); }
+    var h = '<section class="panel rep"><h2>Pump discharge</h2>';
+    h += '<dl class="kv"><dt>Curve</dt><dd>Straight line: churn ' + E.fmtU(u, "press", c.churnP) + " at 0, rated " + E.fmtU(u, "flow", c.ratedQ) + " at " + E.fmtU(u, "press", c.ratedP) + ", 150% flow " + E.fmtU(u, "flow", c.q150) + " at " + E.fmtU(u, "press", c.p150) + ".</dd>";
+    h += "<dt>Net pressure at demand</dt><dd" + (ids ? ' id="pumpNet"' : "") + ">" + E.fmtU(u, "press", c.net) + "</dd>";
+    h += "<dt>Tank low-water suction</dt><dd>" + E.fmtU(u, "press", c.suction) + "</dd>";
+    h += "<dt>Pump available at demand</dt><dd" + (ids ? ' id="pumpAvailable"' : "") + ">" + E.fmtU(u, "press", c.available) + "</dd></dl>";
+    h += "<p>Inside diameters used: supply " + E.fmt(u, "dia", s.id) + " " + E.label(u, "dia") + " (" + s.nom + " in. nominal), loop " + E.fmt(u, "dia", res.loopPipe.id) + " " + E.label(u, "dia") + " (" + res.loopPipe.nom + " in. nominal), C = " + s.c + ". Hazen-Williams p = 4.52 Q^1.85 / (C^1.85 d^4.87) with those actual inside diameters.</p>";
+    h += '<div class="tablewrap"><table class="data"><thead><tr><th class="l">Case</th><th>Required discharge (' + E.label(u, "press") + ")</th><th>Available (" + E.label(u, "press") + ")</th><th>Margin (" + E.label(u, "press") + ')</th><th class="l">Result</th></tr></thead><tbody>';
+    h += '<tr><td class="l">Normal operation</td><td' + (ids ? ' id="pumpReqNormal"' : "") + ">" + E.fmt(u, "press", n.required) + "</td><td>" + E.fmt(u, "press", n.available) + "</td><td" + (ids ? ' id="pumpMarginNormal"' : "") + ">" + E.fmt(u, "press", n.margin) + "</td><td class=\"l\" " + (ids ? 'id="pumpNormalResult"' : "") + ">" + (n.pass ? "PASS" : "FAIL") + "</td></tr>";
+    h += '<tr><td class="l">Loop break</td><td' + (ids ? ' id="pumpReqBreak"' : "") + ">" + E.fmt(u, "press", b.required) + "</td><td>" + E.fmt(u, "press", b.available) + "</td><td" + (ids ? ' id="pumpMarginBreak"' : "") + ">" + E.fmt(u, "press", b.margin) + "</td><td class=\"l\" " + (ids ? 'id="pumpBreakResult"' : "") + ">" + (b.pass ? "PASS" : "FAIL") + "</td></tr>";
+    h += "</tbody></table></div>";
+    h += "<p>Normal operation " + tag(n.pass) + ". Required discharge " + E.fmtU(u, "press", n.required) + ", available " + E.fmtU(u, "press", n.available) + ", " + margin(n.margin) + ".</p>";
+    h += "<p>Loop break " + tag(b.pass) + ". Required discharge " + E.fmtU(u, "press", b.required) + ", available " + E.fmtU(u, "press", b.available) + ", " + margin(b.margin) + ". " + esc(b.label) + (b.pathLen ? " (" + E.fmtU(u, "len", b.pathLen) + ")" : "") + ".</p>";
+    if (res.half) h += "<p>If only one of the two half-loops is out and the other half stays in service (" + E.fmtU(u, "len", res.half.pathLen) + "), loop loss is " + E.fmtU(u, "press", res.half.loopLossGovern) + " and required discharge is " + E.fmtU(u, "press", res.half.required) + " (" + (res.half.pass ? "would PASS" : "would FAIL") + "). That reading does not govern. The PASS/FAIL above uses the full-loop open path, the same far-point convention as the hydrant check.</p>";
+    h += "</section>";
+    h += '<section class="panel rep"><h2>Supply main, loop and lead-ins</h2>';
+    h += '<dl class="kv"><dt>Supply main</dt><dd' + (ids ? ' id="pumpSupplyLoss"' : "") + ">" + E.fmtU(u, "len", s.len) + " of " + s.nom + " in. (ID " + E.fmtU(u, "dia", s.id) + "), loss " + E.fmtU(u, "press", s.loss) + " at " + E.fmtU(u, "vel", s.vel) + "</dd>";
+    h += "<dt>Loop, flow split both ways</dt><dd" + (ids ? ' id="pumpLoopLoss"' : "") + ">" + E.fmtU(u, "len", res.loopPipe.len) + " of " + res.loopPipe.nom + " in. (ID " + E.fmtU(u, "dia", res.loopPipe.id) + "), loss " + E.fmtU(u, "press", n.loopLossGovern) + " at " + E.fmtU(u, "vel", n.loopVel) + "</dd>";
+    h += "<dt>Loop, one segment out</dt><dd" + (ids ? ' id="pumpLoopBreak"' : "") + ">loss " + E.fmtU(u, "press", b.loopLossGovern) + " at " + E.fmtU(u, "vel", b.loopVel) + (b.pathLen ? ", path " + E.fmtU(u, "len", b.pathLen) : "") + "</dd></dl>";
+    h += '<div class="tablewrap"><table class="data"><thead><tr><th class="l">Riser</th><th>Demand (' + E.label(u, "flow") + ")</th><th>Lead-in</th><th>ID (" + E.label(u, "dia") + ")</th><th>Lead-in loss (" + E.label(u, "press") + ")</th><th>Velocity (" + E.label(u, "vel") + ")</th><th>Backflow (" + E.label(u, "press") + ")</th><th>Required (" + E.label(u, "press") + ")</th></tr></thead><tbody>";
+    n.risers.forEach(function (r, i) {
+      h += "<tr><td class=\"l\">R" + (i + 1) + "</td><td>" + E.fmt(u, "flow", r.q) + "</td><td>" + r.size + " in. × " + E.fmtU(u, "len", r.len) + "</td><td" + (ids && i === 0 ? ' id="pumpIdLead"' : "") + ">" + E.fmt(u, "dia", r.id) + "</td><td" + (ids && i === 0 ? ' id="pumpLeadLoss"' : "") + ">" + E.fmt(u, "press", r.loss) + "</td><td>" + E.fmt(u, "vel", r.vel) + "</td><td>" + E.fmt(u, "press", r.bfp) + "</td><td>" + E.fmt(u, "press", r.required) + "</td></tr>";
+    });
+    h += "</tbody></table></div>";
+    h += "<p" + (ids ? ' id="pumpIdSupply"' : "") + ">Supply inside diameter " + E.fmt(u, "dia", s.id) + " " + E.label(u, "dia") + ". Loop inside diameter " + E.fmt(u, "dia", res.loopPipe.id) + " " + E.label(u, "dia") + ".</p>";
+    h += E.pumpDiagramSvg(res, u);
+    h += "</section>";
+    h += '<section class="panel rep"><h2>Pressure at churn</h2><dl class="kv"><dt>Churn plus entered suction</dt><dd>' + E.fmtU(u, "press", res.pressure.maxDischarge) + "</dd><dt>Plus surge allowance</dt><dd>" + E.fmtU(u, "press", res.pressure.total) + "</dd><dt>Pipe rating</dt><dd>" + E.fmtU(u, "press", res.pressure.rating) + " (" + esc(res.material.class) + ')</dd><dt>Check</dt><dd class="' + (res.pressure.ok ? "pass-t" : "fail-t") + '">' + (res.pressure.ok ? "PASS" : "FAIL") + "</dd><dt>NFPA 24 minimum rating</dt><dd>" + E.fmtU(u, "press", 150) + " (NFPA 24 s10.1.2)</dd></dl>";
+    h += "<h3>Pipe dimensions</h3>" + tableIds(res, u, ids) + "</section>";
+    h += '<section class="panel rep"><h2>Criteria used</h2>' + tableCriteria(res, subOn(ids)) + (subOn(ids) ? "" : "<h3>Items to confirm</h3>" + listItems(res)) + "</section>";
+    return h;
+  }
+  function pumpInputsHtml(res, u) {
+    var i = res.input;
+    function row(k, v) { return "<dt>" + k + "</dt><dd>" + v + "</dd>"; }
+    var riserTxt = res.normal.risers.map(function (r, n) { return "R" + (n + 1) + " " + E.fmtU(u, "flow", r.q) + " at " + E.fmtU(u, "press", r.pReq) + ", lead-in " + r.size + " in. × " + E.fmtU(u, "len", r.len) + ", backflow " + E.fmtU(u, "press", r.bfp); }).join("; ");
+    return '<dl class="kv">' + row("Code basis", "NFPA 24 (" + esc(i.nfpa24) + ") Hazen-Williams, NFPA 20 s6.2 pump curve, NFPA 1 Chapter 18") +
+      row("Rated / churn / 150% pressure", E.fmtU(u, "flow", i.ratedQ) + " at " + E.fmtU(u, "press", i.ratedP) + " / churn " + E.fmtU(u, "press", i.churnP) + " / " + E.fmtU(u, "press", i.p150) + " at " + E.fmtU(u, "flow", res.curve.q150)) +
+      row("Tank low-water suction", E.fmtU(u, "press", i.suction)) +
+      row("Supply main", E.fmtU(u, "len", i.supplyLen) + " of " + i.supplySize + " in., ID " + E.fmtU(u, "dia", res.supplyMain.id)) +
+      row("Loop", E.fmtU(u, "len", i.loopLen) + " of " + i.loopSize + " in., ID " + E.fmtU(u, "dia", res.loopPipe.id) + ", demand " + (i.placement === "even" ? "spaced around the loop" : "at the farthest point")) +
+      row("Pipe", esc(res.material.name) + ", C = " + res.material.c) +
+      row("Risers", esc(riserTxt)) +
+      row("Velocity limit", E.fmtU(u, "vel", i.maxVel)) +
+      row("Fittings / surge", (i.fittingPct || 0) + "% / " + E.fmtU(u, "press", i.surge || 0)) + "</dl>";
+  }
+  function pumpPrintHtml(res, u, miss) {
+    var h = '<div class="rep"><div id="reportLogoPrint" class="report-logo-print">' + logoHeader() + '</div><h1 class="rtitle">Hydrant Loop Sizer</h1>' +
+      '<p><strong>Project</strong> ' + esc(st.projectName || "—") + " · <strong>Site</strong> " + esc(st.address || "—") + " · <strong>By</strong> " + esc(st.preparedBy || "—") + " · <strong>Date</strong> " + esc(st.reportDate || "—") + " · Version " + E.VERSION + "</p>" +
+      "<p><strong>Scope:</strong> fire pump and tank feeding a private loop. The supply main runs from the pump to the loop. Each sprinkler riser has a lead-in and a backflow preventer because the hydrants share the loop. NFPA 1 Chapter 18 fire flow for those hydrants is not this demand.</p>";
+    if (miss.length || !res) return h + '<p class="fail-t">Enter before printing: ' + esc(miss.join(", ")) + ".</p></div>";
+    h += '<section class="panel"><h2>Inputs</h2>' + pumpInputsHtml(res, u) + "</section>";
+    h += '<section class="panel"><h2>Result</h2><p class="' + (res.pass ? "pass-t" : "fail-t") + '"><strong>' + (res.pass ? "PASS" : "DOES NOT PASS") + ".</strong> " + esc(res.summary) + "</p></section>";
+    h += pumpResultsHtml(res, u, false);
+    if (!subOn(false)) h += '<section class="panel"><h2>Validation</h2><table class="valid-block" style="width:100%;border-collapse:collapse"><tr><td style="width:50%">Prepared by: <br><br>Name: <br>Initials: <br>Date: </td><td>Checked by (QC): <br><br>Name: <br>Initials: <br>Date: </td></tr></table></section>';
+    return h + "</div>";
+  }
+  function renderPump() {
+    var u = U(), miss = missingPump();
+    $("codeEdition").innerHTML = "Code basis: <strong>NFPA 24 (" + esc(st.nfpa24) + ")</strong> Hazen-Williams · NFPA 20 s6.2 · NFPA 1 Chapter 18";
+    $("lblQr").textContent = "Pump available at demand";
+    var banner = $("banner"), warnBox = $("warnings"), results = $("results");
+    if (miss.length) {
+      lastRes = null;
+      ["mQr", "mDemand", "mDropPct", "mSmallest", "mWork"].forEach(function (id) { $(id).textContent = "—"; });
+      $("mDropNote").textContent = "Pump and tank";
+      banner.hidden = false; banner.className = "banner info"; banner.textContent = "Enter: " + miss.join(", ") + ".";
+      warnBox.innerHTML = ""; results.innerHTML = "";
+      $("printReport").innerHTML = pumpPrintHtml(null, u, miss);
+      renderPrintAttachments(); updateLogoScreen(); return;
+    }
+    var res = E.evaluatePump(pumpInput(), u); lastRes = res;
+    if (!res.ok) {
+      banner.hidden = false; banner.className = "banner fail"; banner.textContent = res.errors.join(" ");
+      warnBox.innerHTML = ""; results.innerHTML = "";
+      ["mQr", "mDemand", "mDropPct", "mSmallest", "mWork"].forEach(function (id) { $(id).textContent = "—"; });
+      $("printReport").innerHTML = pumpPrintHtml(null, u, miss.concat(res.errors));
+      renderPrintAttachments(); return;
+    }
+    $("mQr").textContent = E.fmtU(u, "press", res.curve.available);
+    $("mDemand").textContent = E.fmtU(u, "flow", res.q);
+    $("mDropPct").textContent = res.normal.pass ? "PASS" : "FAIL";
+    $("mDropNote").textContent = "Normal margin " + E.fmtU(u, "press", res.normal.margin);
+    $("mSmallest").textContent = (res.broken.pass ? "PASS" : "FAIL") + " loop break";
+    $("mWork").textContent = E.fmtU(u, "press", res.normal.required);
+    banner.hidden = false; banner.className = "banner " + (res.pass ? "pass" : "fail");
+    banner.textContent = (res.pass ? "PASS. " : "DOES NOT PASS. ") + res.summary;
+    warnBox.innerHTML = res.warnings.map(function (w) { return '<div class="warn ' + (w.level === "fail" ? "fail" : "") + '">' + esc(w.text) + "</div>"; }).join("");
+    results.innerHTML = '<div id="logoScreen" class="report-logo-screen">' + logoHeader() + "</div>" + pumpResultsHtml(res, u, true);
+    $("printReport").innerHTML = pumpPrintHtml(res, u, []);
+    renderPrintAttachments();
+  }
   function render() {
-    var u = U(), miss = missingFields(), res = null;
-    $("codeEdition").innerHTML = "Code basis: <strong>" + esc(BASIS_NAME[st.basis]) + "</strong>, " + esc(editionName(st)) + " · NFPA 24 · NFPA 291";
+    var u = U(), miss, res = null;
+    syncMode();
     writeUnitLabels();
+    if (st.source === "pump") { renderPump(); return; }
+    miss = missingFields();
+    $("codeEdition").innerHTML = "Code basis: <strong>" + esc(BASIS_NAME[st.basis]) + "</strong>, " + esc(editionName(st)) + " · NFPA 24 · NFPA 291";
     $("lblQr").textContent = "Available flow at 20 psi".replace("20 psi", E.fmtU(u, "press", 20));
     var banner = $("banner"), warnBox = $("warnings"), results = $("results");
     if (miss.length) {

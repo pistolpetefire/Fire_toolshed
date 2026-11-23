@@ -231,7 +231,7 @@
     {
       "id": "sprinkler-system-estimator",
       "name": "Sprinkler System Estimator",
-      "description": "Prelim demand + pressure stack + duration (NFPA 13 / UFC / FM). Overlay flow-test supply curve; capture duty for Fire Pump Sizer.",
+      "description": "Prelim demand + pressure stack + duration (NFPA 13 / UFC / FM), including an ESFR storage comparison of NFPA 13 and FM. Overlay flow-test supply curve; capture duty for Fire Pump Sizer.",
       "url": "./sprinkler-system-estimator/",
       "task": "Calculate",
       "disciplines": [
@@ -299,7 +299,7 @@
     {
       "id": "hydrant-loop-sizer",
       "name": "Hydrant Loop Sizer",
-      "description": "Hydrant-only supply: NFPA 291 available flow, ring hydraulics with hydrant arms, velocity, single-break case, loop schematic. US or metric.",
+      "description": "Hydrant flow test or a fire pump and tank: NFPA 291 or a pump curve, NFPA 24 Hazen-Williams, supply main, riser lead-ins with backflow loss, velocity, and a one-segment-out case. US or metric.",
       "url": "./hydrant-loop-sizer/",
       "task": "Calculate",
       "disciplines": [
