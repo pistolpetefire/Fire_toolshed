@@ -39,9 +39,10 @@ test('page: Sprinkler System Estimator Submittal mode - OFF prints the blank sig
   } finally { await s.close() }
 })
 
-test('version: Sprinkler System Estimator is 1.6.2-prelim and its changelog describes Submittal mode', () => {
+test('version: Sprinkler System Estimator is 1.10.0-prelim and its changelog still describes Submittal mode', () => {
   const html = readFileSync(join(ROOT, 'sprinkler-system-estimator/index.html'), 'utf8')
-  assert.match(html, /1\.6\.2-prelim/)
-  assert.match(readFileSync(join(ROOT, 'sprinkler-system-estimator/assets/app.js'), 'utf8'), /APP_VERSION\s*=\s*"1\.6\.2-prelim"/)
+  assert.match(html, /1\.10\.0-prelim/)
+  assert.match(readFileSync(join(ROOT, 'sprinkler-system-estimator/assets/app.js'), 'utf8'), /APP_VERSION\s*=\s*"1\.10\.0-prelim"/)
   assert.match(readFileSync(join(ROOT, 'sprinkler-system-estimator/CHANGELOG.md'), 'utf8'), /\*\*1\.6\.2-prelim\.\*\*[^\n]*Submittal mode/)
+  assert.match(readFileSync(join(ROOT, 'sprinkler-system-estimator/CHANGELOG.md'), 'utf8'), /\*\*1\.10\.0-prelim\.\*\*[^\n]*Storage/)
 })

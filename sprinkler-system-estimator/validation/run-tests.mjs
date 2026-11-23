@@ -3,6 +3,7 @@
  */
 import fs from "fs";
 import path from "path";
+import vm from "node:vm";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -30,7 +31,7 @@ function warn(msg) {
 const verJs = (APP_JS.match(/APP_VERSION\s*=\s*"([^"]+)"/) || [])[1];
 const verHtml = (HTML.match(/id="appVersion"[^>]*>([^<]+)/) || [])[1];
 ok("APP_VERSION present", !!verJs, verJs);
-ok("Version is 1.6.x", /1\.6\.\d+-prelim/.test(verJs || ""), verJs);
+ok("Version is 1.10.0-prelim", verJs === "1.10.0-prelim", verJs);
 if (verHtml && verJs && !String(verHtml).includes(verJs)) {
   warn(`HTML static version "${verHtml}" differs from JS APP_VERSION "${verJs}" (ok if JS overwrites at runtime)`);
 }
@@ -402,11 +403,36 @@ ok("HTML has readme modal", HTML.includes('id="readmeModal"'));
 ok("HTML has capture button", HTML.includes('id="btnCaptureDemand"'));
 ok("HTML has clean report button", HTML.includes('id="btnCleanReport"'));
 
+// Storage module — only the brief's rows, and the owner's sample arithmetic.
+const storageSandbox = { Math, Number, String, Object, Array, parseFloat, isFinite };
+storageSandbox.globalThis = storageSandbox;
+vm.runInNewContext(
+  fs.readFileSync(path.join(root, "assets/storage.js"), "utf8"),
+  storageSandbox,
+  { filename: "storage.js" }
+);
+const Storage = storageSandbox.FireToolshedStorage;
+const sampleEv = Storage.evaluate(Storage.sampleInput());
+ok("Storage sample NFPA 12 x 25.2 x sqrt(25) = 1512", sampleEv.nfpa.sprinklerGpm === 1512, String(sampleEv.nfpa.rawGpm));
+ok("Storage sample FM rounds 1912.5 to 1913", sampleEv.fm.sprinklerGpm === 1913 && Math.abs(sampleEv.fm.rawGpm - 1912.5) < 0.05, String(sampleEv.fm.rawGpm));
+ok("Storage sample hose 250 gpm and 60 min", sampleEv.nfpa.hoseGpm === 250 && sampleEv.nfpa.durationMin === 60 && sampleEv.fm.hoseGpm === 250 && sampleEv.fm.durationMin === 60);
+const k14 = Storage.kFactorFlag({ edition: "2022", commodity: "Class IV", storageFt: 35, ceilingFt: 40, kFactor: 14 });
+const k224 = Storage.kFactorFlag({ edition: "2022", commodity: "Class IV", storageFt: 35, ceilingFt: 40, kFactor: 22.4 });
+const k168 = Storage.kFactorFlag({ edition: "2022", commodity: "Class IV", storageFt: 35, ceilingFt: 40, kFactor: 16.8 });
+ok("Storage K-14 and K-22.4 not permitted at the sample row", k14.permitted === false && k224.permitted === false);
+ok("Storage K-16.8 permitted at 52 psi", k168.permitted === true && k168.pressurePsi === 52);
+const towerEv = Storage.evaluate(Storage.fillFromRows(Storage.applyCase("tower-85-shielded", Storage.blankInput())));
+ok("Storage tower 12 x 25.2 x sqrt(50) rounds to 2138", towerEv.fm.sprinklerGpm === 2138 && Math.abs(towerEv.fm.rawGpm - 2138.3) < 0.05, String(towerEv.fm.rawGpm));
+ok("Storage keeps only the brief's rows", Storage.NFPA_2022_ROWS.length === 4 && Storage.FM_ROWS.length === 2);
+ok("Restored ESFR planning presets remain", /id: "esfr-k252-40"/.test(APP_JS) && /headPsi: 60/.test(APP_JS) && /id: "esfr-k14-40"/.test(APP_JS) && /headPsi: 75/.test(APP_JS));
+ok("HTML has storage mode", HTML.includes('value="storage"') && HTML.includes('id="storageDemandPanel"'));
+ok("Estimator verify tab stays removed", !HTML.includes("verify-tab.js"));
+
 // Live server
 try {
   const live = await fetch("http://127.0.0.1:4180/sprinkler-system-estimator/assets/app.js");
   const txt = await live.text();
-  ok("Live JS 1.6.x", /1\.6\.\d+-prelim/.test(txt));
+  ok("Live JS 1.10.0-prelim", /1\.10\.0-prelim/.test(txt));
   ok("Live no af-sundown-dry", !txt.includes("af-sundown-dry"));
   ok("Live no storage-dry", !txt.includes("ds8-9-storage-dry"));
   ok("Live has handoff", txt.includes("fireToolshed.sprinklerHandoff.v1"));

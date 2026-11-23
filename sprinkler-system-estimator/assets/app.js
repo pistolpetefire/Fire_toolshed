@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "1.9.0-prelim";
+  const APP_VERSION = "1.10.0-prelim";
   const STORAGE_KEY = "sprinklerSystemEstimator.v1";
   /** Shared handoff payload for Fire Pump Sizer (and future tank sizer) */
   const HANDOFF_KEY = "fireToolshed.sprinklerHandoff.v1";
@@ -107,7 +107,9 @@
     { id: "oh2-dry", name: "Ordinary hazard Group 2 — dry · 0.20/1,950 · K8.0", sys: "dry", density: 0.2, area: 1950, hose: 250, remotePsi: 7, kFactor: 8.0, coverage: 130, note: "OH-2 dry pipe planning: density unchanged, design area +30% (1,500 → 1,950 sf). Confirm adopted NFPA 13." },
     { id: "eh1-dry", name: "Extra hazard Group 1 — dry · 0.30/3,250 · K11.2", sys: "dry", density: 0.3, area: 3250, hose: 500, remotePsi: 7, kFactor: 11.2, coverage: 100, note: "EH-1 dry pipe planning: density unchanged, design area +30% (2,500 → 3,250 sf)." },
     { id: "eh2-dry", name: "Extra hazard Group 2 — dry · 0.40/3,250 · K11.2", sys: "dry", density: 0.4, area: 3250, hose: 500, remotePsi: 7, kFactor: 11.2, coverage: 100, note: "EH-2 dry pipe planning: density unchanged, design area +30% (2,500 → 3,250 sf)." },
-    // ESFR / high-demand storage — 40 ft ceiling planning (wet only)
+    // ESFR / high-demand storage — 40 ft ceiling planning (wet only).
+    // Keep these. They were restored as highest-typical planning presets (K-25.2 @ 60 psi, K-14.0 @ 75 psi).
+    // The Storage mode table cells are separate and do not replace this list.
     { id: "esfr-k252-40", name: "ESFR — 40 ft ceiling · K-25.2 · 12 @ 60 psi (highest)", sys: "wet", density: 0, area: 0, hose: 250, remotePsi: 60, kFactor: 25.2, coverage: 100, heads: 12, headPsi: 60, duration: 60, note: "ESFR planning — 40 ft roof. 12 most demanding heads at 60 psi, K-25.2. Highest typical demand. Confirm listing and commodity. Wet only." },
     { id: "esfr-k14-40", name: "ESFR — 40 ft ceiling · K-14.0 · 12 @ 75 psi", sys: "wet", density: 0, area: 0, hose: 250, remotePsi: 75, kFactor: 14.0, coverage: 100, heads: 12, headPsi: 75, duration: 60, note: "ESFR planning — 40 ft roof. 12 heads at 75 psi, K-14.0. Confirm listing. Wet only." },
   ];
@@ -196,7 +198,7 @@
     date: new Date().toISOString().slice(0, 10),
     facility: "",
     notes: "",
-    mode: "simple", // simple | criteria
+    mode: "simple", // simple | criteria | storage
     framework: "nfpa13", // nfpa13 | ufc | afsundown | fm
     systemType: "wet", // wet | dry — filters criteria presets
     presetId: "oh2",
@@ -256,6 +258,37 @@
       source: "none",
       capturedAt: "",
     },
+    storage: window.FireToolshedStorage
+      ? window.FireToolshedStorage.sampleInput()
+      : {
+          edition: "2022",
+          editionLabel: "",
+          fmRevision: "",
+          caseId: "class-iv-35-40",
+          commodity: "Class IV",
+          storageFt: 35,
+          ceilingFt: 40,
+          kFactor: 25.2,
+          orientation: "pendent",
+          response: "",
+          fireCase: "",
+          nfpaHeads: 12,
+          nfpaPsi: 25,
+          nfpaHeadsSource: "builtin",
+          nfpaPsiSource: "builtin",
+          fmHeads: 12,
+          fmPsi: 40,
+          fmHeadsSource: "builtin",
+          fmPsiSource: "builtin",
+          nfpaHose: 250,
+          nfpaDuration: 60,
+          fmHose: 250,
+          fmDuration: 60,
+          hoseSource: "builtin",
+          govern: "greater",
+          ds326Table2: "",
+          ds326Section: "",
+        },
   });
 
   let state = defaultState();
@@ -1114,7 +1147,15 @@
     }, 0);
   }
 
+  function storageResult() {
+    return state._storageEval || null;
+  }
+
   function sprinklerDemandGpm() {
+    if (state.mode === "storage") {
+      const t = storageResult() && storageResult().governing && storageResult().governing.totalGpm;
+      return t == null ? 0 : t;
+    }
     if (state.mode === "simple") {
       return Math.max(0, num(state.manualDemandGpm));
     }
@@ -1124,6 +1165,10 @@
   }
 
   function sprinklerOnlyGpm() {
+    if (state.mode === "storage") {
+      const t = storageResult() && storageResult().governing && storageResult().governing.sprinklerGpm;
+      return t == null ? 0 : t;
+    }
     if (state.mode === "simple") {
       // In simple mode, hose is assumed included in manual total unless user notes otherwise
       return Math.max(0, num(state.manualDemandGpm));
@@ -1132,7 +1177,18 @@
   }
 
   function calculate() {
-    const kCalc = state.autoRemoteFromK ? applyRemoteFromK() : computeRemoteFromK();
+    const kCalc = state.mode === "storage"
+      ? {
+          ok: num(state.remotePsi) > 0 && num(state.kFactor) > 0,
+          qHead: num(state.remoteHeadGpm),
+          K: num(state.kFactor),
+          pFromK: num(state.remotePsi),
+          pRemote: num(state.remotePsi),
+          floor: num(state.minResidualFloor, 7),
+          floored: false,
+          note: state.basisNotes.remote || "ESFR end-head pressure from the storage comparison.",
+        }
+      : state.autoRemoteFromK ? applyRemoteFromK() : computeRemoteFromK();
 
     const elev = elevLossPsi();
     const backflow = backflowLossPsi();
@@ -1190,7 +1246,11 @@
     return {
       flowGpm: round0(flowGpm),
       sprinklerOnlyGpm: round0(sprinklerOnlyGpm()),
-      hoseGpm: state.mode === "simple" ? 0 : state.includeHose ? round0(num(state.hoseGpm)) : 0,
+      hoseGpm: state.mode === "simple"
+        ? 0
+        : state.mode === "storage"
+          ? round0((storageResult() && storageResult().governing && storageResult().governing.hoseGpm) || 0)
+          : state.includeHose ? round0(num(state.hoseGpm)) : 0,
       pressurePsi: round1(pressurePsi),
       elevPsi: round1(elev),
       backflowPsi: round1(backflow),
@@ -1202,12 +1262,21 @@
       tankGalPrelim: tankGalPrelim,
       breakdown,
       kCalc: kCalc,
-      frameworkLabel: frameworkLabel(state.framework),
-      modeLabel: state.mode === "simple" ? "Simple (manual demand)" : "Criteria-assisted estimate",
+      frameworkLabel: state.mode === "storage"
+        ? "NFPA 13-2022 Table 23.3.1 · FM Data Sheet 8-9 · wet pipe only"
+        : frameworkLabel(state.framework),
+      modeLabel: state.mode === "simple"
+        ? "Simple (manual demand)"
+        : state.mode === "storage"
+          ? "Storage / ESFR comparison"
+          : "Criteria-assisted estimate",
       designHeads: num(state.designHeads),
       designHeadPsi: num(state.designHeadPsi, 7),
       systemTypeLabel: systemTypeLabel(state.systemType),
-      presetName: getPreset()?.name || "—",
+      presetName: state.mode === "storage"
+        ? storageCaseLabel(state.storage && state.storage.caseId)
+        : (getPreset()?.name || "—"),
+      storageEval: storageResult(),
     };
   }
 
@@ -1231,6 +1300,7 @@
       });
       state.flowTest = { ...defaultState().flowTest, ...(parsed.flowTest || {}) };
       state.basisNotes = { ...defaultState().basisNotes, ...(parsed.basisNotes || {}) };
+      state.storage = { ...defaultState().storage, ...(parsed.storage || {}) };
     } catch (_) { /* ignore */ }
   }
 
@@ -1253,6 +1323,99 @@
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+
+  function storageCaseLabel(caseId) {
+    const cases = (window.FireToolshedStorage && window.FireToolshedStorage.CASES) || [];
+    const found = cases.find((c) => c.id === caseId);
+    return found ? found.label : "Storage / ESFR";
+  }
+
+  function fieldValue(id) {
+    const el = $(id);
+    return el ? el.value : "";
+  }
+
+  function readStorageFields() {
+    const prev = state.storage || {};
+    const s = { ...prev };
+    s.edition = fieldValue("storageEdition") || s.edition || "2022";
+    s.editionLabel = fieldValue("storageEditionLabel");
+    s.fmRevision = fieldValue("storageFmRevision");
+    s.caseId = fieldValue("storageCase") || s.caseId || "class-iv-35-40";
+    s.commodity = fieldValue("storageCommodity");
+    s.storageFt = fieldValue("storageHeightFt");
+    s.ceilingFt = fieldValue("storageCeilingFt");
+    s.orientation = fieldValue("storageOrientation");
+    s.response = fieldValue("storageResponse");
+    s.fireCase = fieldValue("storageFireCase");
+    s.ds326Table2 = fieldValue("storageDs326Table2");
+    s.ds326Section = fieldValue("storageDs326Section");
+    const kSelect = $("storageKSelect");
+    if (document.activeElement && document.activeElement.id === "storageKSelect" && kSelect && kSelect.value !== "other") {
+      s.kFactor = kSelect.value;
+    } else if ($("storageK")) {
+      s.kFactor = $("storageK").value;
+    }
+    const govern = document.querySelector('input[name="storageGovern"]:checked');
+    s.govern = govern ? govern.value : (s.govern || "greater");
+
+    const track = (id, key, sourceKey) => {
+      if (!$(id)) return;
+      const next = $(id).value;
+      if (document.activeElement && document.activeElement.id === id && String(next) !== String(prev[key] == null ? "" : prev[key])) {
+        s[sourceKey] = "user";
+      }
+      s[key] = next;
+    };
+    track("storageNfpaHeads", "nfpaHeads", "nfpaHeadsSource");
+    track("storageNfpaPsi", "nfpaPsi", "nfpaPsiSource");
+    track("storageFmHeads", "fmHeads", "fmHeadsSource");
+    track("storageFmPsi", "fmPsi", "fmPsiSource");
+    const hoseTouched =
+      document.activeElement &&
+      ["storageNfpaHose", "storageNfpaDuration", "storageFmHose", "storageFmDuration"].indexOf(document.activeElement.id) >= 0;
+    if (hoseTouched) s.hoseSource = "user";
+    s.nfpaHose = fieldValue("storageNfpaHose");
+    s.nfpaDuration = fieldValue("storageNfpaDuration");
+    s.fmHose = fieldValue("storageFmHose");
+    s.fmDuration = fieldValue("storageFmDuration");
+    state.storage = s;
+  }
+
+  function applyStorageMode() {
+    const S = window.FireToolshedStorage;
+    if (!S || !state.storage) {
+      state._storageEval = null;
+      return;
+    }
+    const ev = S.evaluate(state.storage);
+    state._storageEval = ev;
+    if (state.mode !== "storage") return;
+    state.systemType = "wet";
+    const g = ev.governing;
+    if (!g) {
+      state.designHeads = 0;
+      state.basisNotes.demand = "Storage / ESFR comparison has no governing demand yet. Enter heads and pressure, or choose a K-factor the built-in row permits.";
+      return;
+    }
+    state.designHeads = g.heads || 0;
+    state.designHeadPsi = g.psi || 0;
+    state.kFactor = g.kFactor || state.kFactor;
+    state.hoseGpm = g.hoseGpm || 0;
+    state.includeHose = true;
+    const pEnd = Math.max(0, num(g.psi));
+    const K = Math.max(0, num(g.kFactor));
+    state.remoteHeadGpm = K > 0 ? round1(K * Math.sqrt(pEnd)) : 0;
+    state.remotePsi = pEnd;
+    if (state.durationAuto !== false) {
+      state.durationMin = g.durationMin || 0;
+      state.basisNotes.duration = g.durationBasis;
+    }
+    state.basisNotes.demand = g.demandBasis;
+    state.basisNotes.remote =
+      "ESFR end-head pressure " + pEnd + " psi from the " + g.label +
+      " column. Remote head flow is K × √P for that end pressure. Not a full remote-area proof.";
   }
 
   function readForm() {
@@ -1336,6 +1499,10 @@
         psi: psi ? num(psi.value, 0) : 0,
       };
     });
+
+    if ($("storageEdition")) readStorageFields();
+    if (state.mode === "storage") applyStorageMode();
+    else state._storageEval = window.FireToolshedStorage ? window.FireToolshedStorage.evaluate(state.storage || {}) : null;
   }
 
   function writeForm() {
@@ -1414,8 +1581,44 @@
     if ($("ftFlow")) $("ftFlow").value = state.flowTest.flowGpm || "";
     if ($("ftMinResidual")) $("ftMinResidual").value = state.flowTest.minResidualPsi || 20;
 
+    const s = state.storage || {};
+    const setS = (id, v) => {
+      if ($(id)) $(id).value = v == null ? "" : v;
+    };
+    setS("storageEdition", s.edition || "2022");
+    setS("storageEditionLabel", s.editionLabel || "");
+    setS("storageFmRevision", s.fmRevision || "");
+    setS("storageCase", s.caseId || "class-iv-35-40");
+    setS("storageCommodity", s.commodity || "");
+    setS("storageHeightFt", s.storageFt == null ? "" : s.storageFt);
+    setS("storageCeilingFt", s.ceilingFt == null ? "" : s.ceilingFt);
+    setS("storageK", s.kFactor == null ? "" : s.kFactor);
+    setS("storageOrientation", s.orientation || "");
+    setS("storageResponse", s.response || "");
+    setS("storageFireCase", s.fireCase || "");
+    setS("storageNfpaHeads", s.nfpaHeads == null ? "" : s.nfpaHeads);
+    setS("storageNfpaPsi", s.nfpaPsi == null ? "" : s.nfpaPsi);
+    setS("storageFmHeads", s.fmHeads == null ? "" : s.fmHeads);
+    setS("storageFmPsi", s.fmPsi == null ? "" : s.fmPsi);
+    setS("storageNfpaHose", s.nfpaHose == null ? "" : s.nfpaHose);
+    setS("storageNfpaDuration", s.nfpaDuration == null ? "" : s.nfpaDuration);
+    setS("storageFmHose", s.fmHose == null ? "" : s.fmHose);
+    setS("storageFmDuration", s.fmDuration == null ? "" : s.fmDuration);
+    setS("storageDs326Table2", s.ds326Table2 || "");
+    setS("storageDs326Section", s.ds326Section || "");
+    if ($("storageKSelect")) {
+      const n = parseFloat(s.kFactor);
+      const known = [25.2, 16.8, 14, 22.4];
+      const hit = known.find((k) => Number.isFinite(n) && Math.abs(n - k) < 0.051);
+      $("storageKSelect").value = hit != null ? String(hit) : "other";
+    }
+    const gov = document.querySelector(`input[name="storageGovern"][value="${s.govern || "greater"}"]`);
+    if (gov) gov.checked = true;
+    $("storageEditionLabelWrap")?.classList.toggle("hidden", (s.edition || "2022") !== "custom");
+
     renderLossTable();
     updateModeVisibility();
+    renderStorageCompare();
   }
 
   function renderLossTable() {
@@ -1455,10 +1658,73 @@
   }
 
   function updateModeVisibility() {
-    const simple = state.mode === "simple";
-    $("simpleDemandPanel")?.classList.toggle("hidden", !simple);
-    $("criteriaDemandPanel")?.classList.toggle("hidden", simple);
+    $("simpleDemandPanel")?.classList.toggle("hidden", state.mode !== "simple");
+    $("criteriaDemandPanel")?.classList.toggle("hidden", state.mode !== "criteria");
+    $("storageDemandPanel")?.classList.toggle("hidden", state.mode !== "storage");
     $("backflowCustomWrap")?.classList.toggle("hidden", state.backflowType !== "custom");
+  }
+
+  function renderStorageCompare() {
+    const host = $("storageCompare");
+    const perm = $("storagePermission");
+    const ev = state._storageEval;
+    if (!ev) {
+      if (host) host.innerHTML = "";
+      if (perm) perm.innerHTML = "";
+      return;
+    }
+    if (perm) {
+      const notes = ev.permissionNotes || [];
+      if (!notes.length) {
+        const flag = ev.nfpa && ev.nfpa.flagMessage ? ev.nfpa.flagMessage : "";
+        perm.innerHTML = flag
+          ? `<div class="callout warn">${escapeHtml(flag)}</div>`
+          : "";
+      } else {
+        perm.innerHTML = notes.map((n) => {
+          const cls = n.permitted ? "ok" : "bad";
+          const psi = n.pressurePsi != null ? ` Built-in pressure ${n.pressurePsi} psi.` : " No design pressure is stored.";
+          const heads = n.heads != null ? ` Built-in heads ${n.heads}.` : "";
+          return `<div class="callout ${cls}" style="margin-top:0.4rem"><strong>K-${n.kFactor}:</strong> ${escapeHtml(n.note)}${heads}${n.permitted ? psi : " No design pressure is stored."} <span class="sub">${escapeHtml(n.citation)}</span></div>`;
+        }).join("");
+      }
+    }
+    const cell = (side) => {
+      if (!side) return "—";
+      if (side.blocked) {
+        const arith = side.arithmeticGpm != null
+          ? ` Arithmetic only: ${window.FireToolshedStorage.format1(side.arithmeticGpm)} gpm. Not used as system demand.`
+          : "";
+        return `<strong>Not permitted.</strong>${escapeHtml(arith)}<br><span class="sub">${escapeHtml(side.flagMessage || "")}</span>`;
+      }
+      if (side.sprinklerGpm == null) {
+        return `No sprinkler demand yet.<br><span class="sub">${escapeHtml(side.flagMessage || "Enter heads and pressure.")}</span>`;
+      }
+      const S = window.FireToolshedStorage;
+      const differ = side.differsFromBuiltin
+        ? `<br><span class="sub">Entered ${side.psi} psi differs from the built-in figure ${side.builtinPsi} psi. Confirm against your copy.</span>`
+        : "";
+      return `<strong>${S.formatInt(side.sprinklerGpm)} gpm</strong>` +
+        `<br><span class="sub">${S.formatInt(side.heads)} × ${side.kFactor} × √${side.psi} = ${S.format1(side.rawGpm)} gpm, shown as ${S.formatInt(side.sprinklerGpm)} gpm</span>` +
+        `<br><span class="sub">Hose ${S.formatInt(side.hoseGpm)} gpm · ${S.formatInt(side.durationMin)} min · total ${S.formatInt(side.totalGpm)} gpm</span>` +
+        differ +
+        `<br><span class="sub">${escapeHtml(side.citation || "")}</span>`;
+    };
+    if (host) {
+      const g = ev.governing;
+      const governLine = g
+        ? `<div class="callout info" style="margin-bottom:0.6rem">Pressure stack uses the <strong>${escapeHtml(g.label)}</strong> column: ${window.FireToolshedStorage.formatInt(g.totalGpm)} gpm at ${g.psi} psi end-head pressure, ${g.durationMin} min. ${escapeHtml(ev.fmRevisionText || "")}</div>`
+        : `<div class="callout warn" style="margin-bottom:0.6rem">No column is feeding the pressure stack. ${escapeHtml(ev.fmRevisionText || "")}</div>`;
+      const ds = ev.ds326 || {};
+      host.innerHTML = governLine +
+        `<table class="storage-compare"><thead><tr><th>Item</th><th>NFPA</th><th>FM</th></tr></thead><tbody>` +
+        `<tr><td>Sprinkler demand</td><td>${cell(ev.nfpa)}</td><td>${cell(ev.fm)}</td></tr>` +
+        `<tr><td>Hose and duration</td><td>${escapeHtml(ev.hoseCitation || "")}</td><td>Same sample until you replace it from Data Sheet 3-26 Table 2.</td></tr>` +
+        `<tr><td>${escapeHtml(ds.citation || "FM Data Sheet 3-26")}</td><td colspan="2">${escapeHtml(ds.note || "")}` +
+        `<br>Table 2: ${escapeHtml(ds.table2 || "not entered")}` +
+        `<br>Section 2.3.1.14: ${escapeHtml(ds.section || "not entered")}</td></tr>` +
+        `</tbody></table>`;
+    }
   }
 
   function render() {
@@ -1629,6 +1895,7 @@
 
     renderSupplyAnalysis(calc);
     updateReportLogoPrint();
+    renderStorageCompare();
 
     save();
   }
@@ -1676,20 +1943,54 @@
     }
   }
 
-  function onChange() {
+  function onChange(e) {
+    if (e && e.target && e.target.getAttribute && e.target.getAttribute("data-storage-driver") === "1") {
+      onStorageDriverChange(e);
+      return;
+    }
     const prevFramework = state.framework;
     const prevSystemType = state.systemType;
     const prevMode = state.mode;
     readForm();
     updateSystemTypeUi();
     // Re-read after wet-only force may have flipped system type
-    if (isWetOnlyFramework()) state.systemType = "wet";
-    if (state.framework !== prevFramework || state.systemType !== prevSystemType) {
+    if (isWetOnlyFramework() || state.mode === "storage") state.systemType = "wet";
+    if (state.mode !== "storage" && (state.framework !== prevFramework || state.systemType !== prevSystemType)) {
       pickDefaultPreset();
     }
     if (state.mode !== prevMode) {
       updateModeVisibility();
     }
+    render();
+  }
+
+  function onStorageDriverChange(e) {
+    const prevFramework = state.framework;
+    const prevSystemType = state.systemType;
+    const prevMode = state.mode;
+    readForm();
+    const S = window.FireToolshedStorage;
+    if (S && state.storage) {
+      let st = state.storage;
+      if (e && e.target && e.target.id === "storageCase") {
+        st = S.applyCase(st.caseId, st);
+        st.hoseSource = "builtin";
+      }
+      st.nfpaPsiSource = "builtin";
+      st.nfpaHeadsSource = "builtin";
+      st.fmPsiSource = "builtin";
+      st.fmHeadsSource = "builtin";
+      state.storage = S.fillFromRows(st);
+      if (state.mode === "storage") applyStorageMode();
+      else state._storageEval = S.evaluate(state.storage);
+    }
+    updateSystemTypeUi();
+    if (isWetOnlyFramework() || state.mode === "storage") state.systemType = "wet";
+    if (state.mode !== "storage" && (state.framework !== prevFramework || state.systemType !== prevSystemType)) {
+      pickDefaultPreset();
+    }
+    if (state.mode !== prevMode) updateModeVisibility();
+    writeForm();
     render();
   }
 
@@ -2073,6 +2374,7 @@
       }
       onChange();
     });
+    readForm();
     if ($("appVersion")) $("appVersion").textContent = "Version " + APP_VERSION;
     if (window.FireToolshedLogo) {
       window.FireToolshedLogo.bindControls({
