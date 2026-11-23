@@ -128,11 +128,15 @@ test('page: Hydrant Loop Sizer Submittal mode - OFF keeps all four elements, ON 
   } finally { await s.close() }
 })
 
-test('version: Hydrant Loop Sizer is 1.0.3 everywhere and the changelog describes Submittal mode and the cite change', () => {
+test('version: Hydrant Loop Sizer is 1.1.0 everywhere and the changelog keeps Submittal mode and records the pump mode', () => {
   const html = readFileSync(join(ROOT, 'hydrant-loop-sizer/index.html'), 'utf8')
-  assert.match(html, /id="appVersion">Version 1\.0\.3</); assert.match(html, /id="footVersion">1\.0\.3</)
-  assert.equal(E.VERSION, '1.0.3')
+  assert.match(html, /id="appVersion">Version 1\.1\.0</); assert.match(html, /id="footVersion">1\.1\.0</)
+  assert.match(html, /hls-engine\.js\?v=1\.1\.0/); assert.match(html, /app\.js\?v=1\.1\.0/); assert.match(html, /styles\.css\?v=1\.1\.0/)
+  assert.equal(E.VERSION, '1.1.0')
   const rd = readFileSync(join(ROOT, 'hydrant-loop-sizer/README.md'), 'utf8')
-  assert.match(rd, /Version 1\.0\.3\./); assert.match(rd, /\*\*1\.0\.3\.\*\*[^\n]*Submittal mode[^\n]*inferred/)
-  assert.match(readFileSync(join(ROOT, 'index.html'), 'utf8'), /card-hydrant-loop[\s\S]{0,900}Live · v1\.0\.3/)
+  assert.match(rd, /Version 1\.1\.0\./)
+  assert.match(rd, /\*\*1\.0\.3\.\*\*[^\n]*Submittal mode[^\n]*inferred/)
+  assert.match(rd, /\*\*1\.1\.0\.\*\*[^\n]*Fire pump and tank/)
+  const portal = readFileSync(join(ROOT, 'index.html'), 'utf8')
+  assert.match(portal, /id="tool-hydrant-loop-sizer"[\s\S]{0,700}fire pump and tank/)
 })
