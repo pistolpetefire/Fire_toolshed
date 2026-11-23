@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#1d4e89">
-  <meta name="description" content="Size a private hydrant loop: NFPA 291 available flow, ring hydraulics with hydrant arms, velocity, single-break and pressure-class checks for Florida, IBC/IFC and DoD (UFC) bases.">
+  <meta name="description" content="Size a private hydrant loop from a flow test, or check a fire pump and tank feeding the loop: NFPA 24 Hazen-Williams, supply main, riser lead-ins with backflow loss, and a one-segment-out case.">
   <title>Hydrant Loop Sizer · Fire Toolshed</title>
-  <link rel="stylesheet" href="./assets/styles.css">
+  <link rel="stylesheet" href="./assets/styles.css?v=1.1.0">
   <script src="../shared/verify-tab.js"></script>
-  <script src="./assets/verify-cases.js"></script>
+  <script src="./assets/verify-cases.js?v=1.1.0"></script>
   <script src="../shared/report-logo.js"></script>
   <script src="../shared/submittal-mode.js"></script>
 </head>
@@ -18,9 +18,9 @@
     <div>
       <p class="eyebrow">Fire Toolshed · Water supply</p>
       <h1>Hydrant Loop Sizer</h1>
-      <p class="version" id="appVersion">Version 1.0.3</p>
+      <p class="version" id="appVersion">Version 1.1.0</p>
       <p class="version" id="codeEdition">Code basis: —</p>
-      <p class="lead">Sizes a private hydrant loop (6, 8, 10, 12, 16 in.) from a flow test: NFPA 291 available flow, ring hydraulics with hydrant arms, velocity, single-break case and pressure class. <strong>Hydrant-only supply</strong>: if the main also feeds sprinklers or standpipes, size that separately.</p>
+      <p class="lead">Sizes a private hydrant loop (6, 8, 10, 12, 16 in.) from a flow test, or checks a fire pump and tank that feeds the same loop. Flow test: NFPA 291 available flow, ring hydraulics, hydrant arms, velocity, single-break case and pressure class. Pump and tank: pump curve (churn, rated, and 150% flow), tank low-water suction, a supply main, and a lead-in with a backflow-preventer loss at each sprinkler riser. Friction loss is Hazen-Williams with the actual inside diameter (NFPA 24, 2019 or 2022). <strong>Flow-test mode is hydrant-only supply.</strong> Pump mode checks the entered riser demand because the hydrants share the loop.</p>
     </div>
     <div class="top-actions">
       <button type="button" id="btnHelp" class="ghost">Help / Guide</button>
@@ -79,6 +79,14 @@
       </section>
 
       <section class="panel">
+        <h2>Supply</h2>
+        <div class="fields">
+          <label>Source<select id="source"><option value="test">Hydrant flow test (NFPA 291)</option><option value="pump">Fire pump and tank</option></select></label>
+        </div>
+        <p class="hint">Flow test sizes a hydrant-only loop. Pump and tank checks the discharge pressure a fire pump needs at the sprinkler risers, including the supply main, the loop, each lead-in, and the backflow preventer on that lead-in.</p>
+      </section>
+
+      <section class="panel mode-test">
         <h2>Code basis</h2>
         <div class="fields two">
           <label>Basis<select id="basis">
@@ -92,7 +100,7 @@
         <p class="hint" id="basisNote"></p>
       </section>
 
-      <section class="panel">
+      <section class="panel mode-test">
         <h2>Flow test (NFPA 291)</h2>
         <div class="fields three">
           <label>Static pressure <span class="u" data-kind="press"></span><input id="ps" type="number" step="any" inputmode="decimal"></label>
@@ -108,7 +116,31 @@
         <p class="hint" id="dropHint">A flow test whose pressure drop is under the warning threshold gives an unreliable extrapolation. This tool defaults to 10% (its spec); the Flow Test Report app uses 25%. Enter 25 to match it, or leave the default of 10.</p>
       </section>
 
-      <section class="panel">
+      <section class="panel mode-pump hidden">
+        <h2>Fire pump and tank</h2>
+        <div class="fields three">
+          <label>NFPA 24 edition<select id="nfpa24"><option value="2022">2022</option><option value="2019">2019</option></select></label>
+          <label>Rated flow <span class="u" data-kind="flow"></span><input id="ratedQ" type="number" step="any" inputmode="decimal"></label>
+          <label>Rated pressure <span class="u" data-kind="press"></span><input id="ratedP" type="number" step="any" inputmode="decimal"></label>
+          <label>Churn (shutoff) pressure <span class="u" data-kind="press"></span><input id="churnP" type="number" step="any" inputmode="decimal"></label>
+          <label>Pressure at 150% flow <span class="u" data-kind="press"></span><input id="p150" type="number" step="any" inputmode="decimal"></label>
+          <label>Tank low-water suction <span class="u" data-kind="press"></span><input id="suction" type="number" step="any" inputmode="decimal"></label>
+          <label>Pump elevation <span class="u" data-kind="elev"></span><input id="pumpElev" type="number" step="any" inputmode="decimal"></label>
+        </div>
+        <p class="hint">Net pressure is a straight line from churn at 0 gpm, through the rated point, to the pressure you enter at 150% of rated flow. Churn cannot be over 140% of rated pressure, and the 150% point cannot be under 65% of rated pressure (NFPA 20 s6.2). Nothing is filled in for you: enter the certified points, or enter the 140% and 65% limits if you are checking the minimum curve. Tank low-water suction is added to the net pressure. Suction may be zero or negative.</p>
+      </section>
+
+      <section class="panel mode-pump hidden">
+        <h2>Supply main (pump to the loop)</h2>
+        <div class="fields three">
+          <label>Length <span class="u" data-kind="len"></span><input id="supplyLen" type="number" step="any" inputmode="decimal"></label>
+          <label>Size<select id="supplySize"></select></label>
+          <label>Loop size<select id="loopSize"></select></label>
+        </div>
+        <p class="hint">The supply main carries the full riser demand from the pump discharge to one connection on the loop. It stays in service in the loop-break case. Loop length is entered with the loop below. Hazen-Williams uses the actual inside diameter for the selected pipe, not the nominal size.</p>
+      </section>
+
+      <section class="panel mode-test">
         <h2>Required fire flow and hydrants</h2>
         <div class="fields three">
           <label>Required fire flow <span class="u" data-kind="flow"></span><input id="qreq" type="number" step="any" inputmode="decimal"></label>
@@ -139,14 +171,14 @@
         <h2>Loop</h2>
         <div class="fields three">
           <label>Loop length (ring) <span class="u" data-kind="len"></span><input id="loopLen" type="number" step="any" inputmode="decimal"></label>
-          <label>Supply connections<select id="sources"><option value="1">1 connection</option><option value="2">2 connections (opposite points)</option></select></label>
+          <label class="mode-test">Supply connections<select id="sources"><option value="1">1 connection</option><option value="2">2 connections (opposite points)</option></select></label>
           <label>Hydrant placement<select id="placement"><option value="far">Worst case: all at the farthest point</option><option value="even">Evenly spaced around the loop</option></select></label>
           <label>Pipe<select id="material"></select></label>
           <label>Velocity limit <span class="u" data-kind="vel"></span><input id="maxVel" type="number" step="any" inputmode="decimal"></label>
-          <label>Single-break check<select id="breakMode"><option value="50">50% of fire flow, one segment out</option><option value="100">100% of fire flow, one segment out</option><option value="0">Not checked</option></select></label>
+          <label class="mode-test">Single-break check<select id="breakMode"><option value="50">50% of fire flow, one segment out</option><option value="100">100% of fire flow, one segment out</option><option value="0">Not checked</option></select></label>
           <label>Surge allowance <span class="u" data-kind="press"></span><input id="surge" type="number" step="any" inputmode="decimal"></label>
           <label>Fittings and valves (% of length)<input id="fittingPct" type="number" step="any" inputmode="decimal"></label>
-          <label>Hydrant loss <span class="u" data-kind="press"></span><input id="hydLoss" type="number" step="any" inputmode="decimal"></label>
+          <label class="mode-test">Hydrant loss <span class="u" data-kind="press"></span><input id="hydLoss" type="number" step="any" inputmode="decimal"></label>
         </div>
         <div id="customBox" class="hidden">
           <div class="fields three">
@@ -158,7 +190,16 @@
         <p class="hint">Hazen-Williams uses the actual internal diameter. Hydrant and fitting minor losses are not modeled unless entered above.</p>
       </section>
 
-      <section class="panel">
+      <section class="panel mode-pump hidden">
+        <h2>Sprinkler risers</h2>
+        <p class="hint">One lead-in from the loop to each riser. Every sprinkler riser on this project has a backflow preventer, because the hydrants share the loop. Enter that preventer's pressure loss on the lead-in (zero only when the data says zero). The riser requirement is the pressure needed at the base, after the lead-in and the preventer.</p>
+        <div class="fields three">
+          <label>Risers<input id="nRisers" type="number" min="1" max="8" step="1" inputmode="numeric"></label>
+        </div>
+        <div class="tablewrap"><table class="data"><thead><tr><th>Riser</th><th>Demand <span class="u" data-kind="flow"></span></th><th>Base pressure <span class="u" data-kind="press"></span></th><th>Lead-in size</th><th>Lead-in length <span class="u" data-kind="len"></span></th><th>Backflow loss <span class="u" data-kind="press"></span></th><th>Riser elevation <span class="u" data-kind="elev"></span></th></tr></thead><tbody id="risersBody"></tbody></table></div>
+      </section>
+
+      <section class="panel mode-test">
         <h2>Hydrant arms (laterals)</h2>
         <p class="hint">Each hydrant has its own arm. Size defaults to 6 in. (NFPA 24 minimum) and length is optional (blank or 0 means no arm friction is added). An arm left at the default size, or with no length, is marked "assumed, confirm" in the printout. Arm friction and arm velocity go into each hydrant's residual check.</p>
         <div class="fields three">
@@ -195,24 +236,25 @@
     <div class="col">
       <section class="panel">
         <h2>Examples</h2>
-        <p><button type="button" id="btnExSea">SEA ATCT test, 4 hydrants at 1,250 gpm</button> <button type="button" id="btnExSpec">Spec 5.1 loop, 2 hydrants at 1,250 gpm</button></p>
-        <p class="hint">Loop length, hydrant count and pipe in the SEA example are illustrative: the flow test (68.3 / 61.2 psi at 1,250 gpm) is the only given data.</p>
+        <p><button type="button" id="btnExSea">SEA ATCT test, 4 hydrants at 1,250 gpm</button> <button type="button" id="btnExSpec">Spec 5.1 loop, 2 hydrants at 1,250 gpm</button> <button type="button" id="btnExPump">Pump and tank, 2,500 gpm at 115 psi</button></p>
+        <p class="hint">Loop length, hydrant count and pipe in the SEA example are illustrative: the flow test (68.3 / 61.2 psi at 1,250 gpm) is the only given data. The pump example is a 2,500 gpm pump at 115 psi with suction at 0, a 360 ft supply main, a 2,321 ft loop, and 2,602 gpm at a riser that needs 106.4 psi through 150 ft of lead-in. Churn and the 150% point are entered at the NFPA 20 limits (140% and 65%). Backflow loss is 0 for that check.</p>
       </section>
       <div id="results"></div>
     </div>
   </div>
 
-  <footer class="foot"><span>Hydrant Loop Sizer · <span id="footVersion">1.0.3</span> · local browser app</span></footer>
+  <footer class="foot"><span>Hydrant Loop Sizer · <span id="footVersion">1.1.0</span> · local browser app</span></footer>
 </div>
 
 <div id="helpModal" class="modal hidden no-print" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
   <div class="modal-card">
     <h2 id="helpTitle">How this tool works</h2>
     <ol>
-      <li>Enter the flow test (static, residual, flow). The tool prints the NFPA 291 available flow at the minimum residual and builds the supply curve.</li>
-      <li>Enter the required fire flow and the hydrants flowing, or use the table lookup and hydrant suggestion for the chosen code basis.</li>
-      <li>Enter the loop length, connections, pipe and the arm of each hydrant. The tool checks 6, 8, 10, 12 and 16 in. pipe for velocity, residual pressure at every hydrant (arm friction included), a single-break case and the pressure class.</li>
-      <li>Items marked "confirm with AHJ/edition" were not verified in the code text. They are listed on the report.</li>
+      <li>Choose the supply. <strong>Hydrant flow test</strong> uses static, residual and flow. The tool prints the NFPA 291 available flow at the minimum residual and builds the supply curve. <strong>Fire pump and tank</strong> uses the pump curve instead of a flow test.</li>
+      <li>Flow test: enter the required fire flow and the hydrants flowing, or use the table lookup and hydrant suggestion for the chosen code basis. Pump and tank: enter rated flow and pressure, churn (not over 140% of rated pressure), the pressure at 150% of rated flow (not under 65% of rated pressure), and the tank low-water suction pressure.</li>
+      <li>Flow test: enter the loop length, connections, pipe and the arm of each hydrant. The tool checks 6, 8, 10, 12 and 16 in. pipe for velocity, residual pressure at every hydrant (arm friction included), a single-break case and the pressure class.</li>
+      <li>Pump and tank: enter the supply main from the pump to the loop, the loop size and length, and each riser. Every sprinkler riser has its own lead-in and a backflow-preventer loss, because the hydrants share the loop. Friction loss is Hazen-Williams with the actual inside diameter. Pick NFPA 24 2019 or 2022; both editions use the same formula here. The report gives normal operation and a loop-break case (one loop segment out, demand not reduced): required pump discharge, pressure available at the demand, PASS or FAIL, and the margin.</li>
+      <li>The pump curve is a straight line between the three points you enter. It is not extended past 150% of rated flow. Confirm it against the certified factory curve. Items marked "confirm with AHJ/edition" were not verified in the code text. They are listed on the report.</li>
     </ol>
     <p><button type="button" id="btnHelpClose" class="primary">Close</button></p>
   </div>
@@ -221,7 +263,7 @@
 <div id="printReport" class="print-report" aria-hidden="true"></div>
 <div id="printAttachments" class="print-attachments-root" aria-hidden="true"></div>
 <div id="toast" class="toast no-print" hidden></div>
-<script src="./assets/hls-engine.js"></script>
-<script src="./assets/app.js"></script>
+<script src="./assets/hls-engine.js?v=1.1.0"></script>
+<script src="./assets/app.js?v=1.1.0"></script>
 </body>
 </html>

@@ -1,9 +1,12 @@
 /**
  * Hydrant Loop Sizer engine. Browser: window.HLSEngine. Node: module.exports. No DOM access.
- * Hydrant-only supply (not sprinkler or standpipe supply). All engine math is in US customary units (in, ft, gpm, psi);
- * the unit helpers convert display values (US or metric) to and from US so both systems run the same math.
+ * Two supply modes. Flow test: hydrant-only supply from one NFPA 291 test. Pump and tank: a fire pump curve plus tank
+ * low-water suction, a supply main from the pump to the loop, and a lead-in with a backflow-preventer loss at each riser.
+ * All engine math is in US customary units (in, ft, gpm, psi); the unit helpers convert display values to and from US.
  * Basis: NFPA 291 available flow Q_R = Q_F ((Ps - Pmin)/(Ps - Pr))^0.54; supply curve P(Q) = Ps - (Ps - Pr)(Q/Q_F)^1.85;
  * NFPA 24 s11.1 Hazen-Williams p = 4.52 Q^1.85 / (C^1.85 d^4.87) with the actual internal diameter; v = 0.4085 Q / d^2.
+ * Pump net pressure is piecewise linear on the entered churn, rated, and 150% points (NFPA 20 s6.2 limits: churn not over
+ * 140% of rated pressure, 150% flow at not less than 65% of rated pressure). Discharge available = net + tank suction.
  * Flags: P = primary text read, S = secondary source, U = unverified, confirm with AHJ/edition (see spec).
  */
 (function (root, factory) {
@@ -13,7 +16,7 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
-  var VERSION = "1.0.3";
+  var VERSION = "1.1.0";
   var PSI_PER_FT = 0.433; // spec 4.1
   var HW_EXP = 1.85;
   var CURVE_EXP = 1.85; // supply curve exponent (spec 4.1)
@@ -111,6 +114,16 @@
   function velocity(q, id) { return 0.4085 * q / (id * id); } // ft/s, gpm, in.
   function availableFlow(ps, pr, qf, pmin) { return qf * Math.pow((ps - pmin) / (ps - pr), NFPA291_EXP); }
   function supplyPressure(ps, pr, qf, q) { return ps - (ps - pr) * Math.pow(q / qf, CURVE_EXP); }
+
+  // Piecewise-linear net pump pressure (psi) on (0, churn), (ratedQ, ratedP), (1.5 ratedQ, p150).
+  // NaN above 150% of rated flow: that point is outside the entered curve. Suction is not included.
+  function pumpNetAt(q, ratedQ, ratedP, churnP, p150) {
+    if (!(q >= 0) || !(ratedQ > 0) || !isFinite(ratedP) || !isFinite(churnP) || !isFinite(p150)) return NaN;
+    var q150 = 1.5 * ratedQ;
+    if (q <= ratedQ) return churnP + (ratedP - churnP) * (q / ratedQ);
+    if (q <= q150 + 1e-9) return ratedP + (p150 - ratedP) * ((q - ratedQ) / (q150 - ratedQ));
+    return NaN;
+  }
 
   // ---------- code tables ----------
   // IFC 2024 Table B105.1(2) (Arizona UpCodes viewer, flag S; NFPA 1 Table 18.4.5.2.1 carries the same numbers, flag S/U). Upper bounds of each
@@ -256,6 +269,56 @@
       }
       drop[a] = 0;
       srcFlow[a] = (srcFlow[a] || 0) + q0 + nodes[a].hyd.length * qh; // hydrants on the connection itself draw straight from it
+      srcFlow[b] = (srcFlow[b] || 0) + (D - q0);
+    });
+    return { flows: flows, losses: losses, drop: drop, srcFlow: srcFlow };
+  }
+  // Same loop closure as solveNetwork, but each node carries its own gpm (riser demands are not equal).
+  // demandAt[i] is gpm taken off node i. A demand on a source node is drawn at the source and is not pushed into the ring.
+  function solveDemands(net, demandAt, rate, brk, fitMult) {
+    var nodes = net.nodes, segs = net.segs, n = nodes.length;
+    var srcIdx = []; nodes.forEach(function (nd, i) { if (nd.type === "S") srcIdx.push(i); });
+    var flows = new Array(n).fill(0), losses = new Array(n).fill(0), drop = new Array(n).fill(null), srcFlow = {};
+    srcIdx.forEach(function (a, k) {
+      var b = srcIdx[(k + 1) % srcIdx.length];
+      var list = [];
+      var j = a; do { list.push(j); j = (j + 1) % n; } while (j !== b);
+      if (srcIdx.length === 1) { list = []; for (var t = 0; t < n; t++) list.push((a + t) % n); }
+      var m = list.length;
+      var d = [0];
+      for (var q = 1; q < m; q++) d.push(demandAt[list[q]] || 0);
+      var cum = [0]; for (q = 1; q < m; q++) cum.push(cum[q - 1] + d[q]);
+      var D = cum[m - 1];
+      var jb = -1; list.forEach(function (sg, idx) { if (sg === brk) jb = idx; });
+      function flowAt(q0, idx) { return q0 - cum[idx]; }
+      function lossAt(f, idx) { var len = segs[list[idx]].len * fitMult; return f === 0 ? 0 : Math.sign(f) * rate(Math.abs(f)) * len; }
+      var q0;
+      if (jb >= 0) q0 = cum[jb];
+      else if (!(D > 0)) q0 = 0;
+      else {
+        var lo = -D - 1, hi = 2 * D + 1, it;
+        for (it = 0; it < 300; it++) {
+          var mid = (lo + hi) / 2, g = 0;
+          for (var x = 0; x < m; x++) g += lossAt(flowAt(mid, x), x);
+          if (g > 0) hi = mid; else lo = mid;
+        }
+        q0 = (lo + hi) / 2;
+      }
+      var f = [], l = [];
+      for (var x2 = 0; x2 < m; x2++) {
+        var fx = jb >= 0 && x2 === jb ? 0 : flowAt(q0, x2);
+        if (Math.abs(fx) < 1e-7) fx = 0;
+        f.push(fx); l.push(lossAt(fx, x2));
+        flows[list[x2]] = fx; losses[list[x2]] = l[x2];
+      }
+      for (var y = 1; y < m; y++) {
+        var dr;
+        if (jb < 0 || y <= jb) { dr = 0; for (var z = 0; z < y; z++) dr += l[z]; }
+        else { dr = 0; for (var w = y; w < m; w++) dr -= l[w]; }
+        drop[list[y]] = dr;
+      }
+      drop[a] = 0;
+      srcFlow[a] = (srcFlow[a] || 0) + q0 + (demandAt[a] || 0);
       srcFlow[b] = (srcFlow[b] || 0) + (D - q0);
     });
     return { flows: flows, losses: losses, drop: drop, srcFlow: srcFlow };
@@ -622,12 +685,257 @@
     return out.join("");
   }
 
+  // ---------- pump + tank source ----------
+  // One fire pump and tank, one supply main into the loop, one lead-in and backflow loss per sprinkler riser.
+  // Loop break follows the same rule as the hydrant check: "far" uses an open path of length L (conservative);
+  // "even" takes each real loop segment out in turn and keeps the worst. The far case also reports the shorter
+  // half-ring (one of the two pipes closed) so that reading is visible and does not govern.
+  function pumpDefaults() {
+    return {
+      nfpa24: "2022", ratedQ: null, ratedP: null, churnP: null, p150: null, suction: null, pumpElev: 0,
+      supplyLen: null, supplySize: 12, loopLen: null, loopSize: 12, placement: "far",
+      material: "di", custom: null, maxVel: 10, fittingPct: 0, surge: 0, risers: [],
+    };
+  }
+  function sizeNom(v, fallback) {
+    return SIZES.some(function (s) { return s.nom === +v; }) ? +v : fallback;
+  }
+  function blankNum(v) { return v === null || v === undefined || v === "" || (typeof v === "number" && !isFinite(v)); }
+  function evaluatePump(raw, uset) {
+    var u = uset || unitSet("us");
+    var FU = function (k, v) { return fmtU(u, k, v); };
+    var SL = function (nom) { var z = SIZES.find(function (x) { return x.nom === nom; }); return u.sys === "metric" && z ? "DN" + z.dn : nom + " in."; };
+    var src = raw || {};
+    var inp = Object.assign(pumpDefaults(), src);
+    inp.nfpa24 = src.nfpa24 === "2019" ? "2019" : "2022";
+    inp.placement = src.placement === "even" ? "even" : "far";
+    inp.supplySize = sizeNom(src.supplySize, 12);
+    inp.loopSize = sizeNom(src.loopSize, 12);
+    inp.material = src.material || "di";
+    inp.custom = src.custom || null;
+    ["pumpElev", "maxVel", "fittingPct", "surge"].forEach(function (k) { inp[k] = num(inp[k], pumpDefaults()[k]); });
+    ["ratedQ", "ratedP", "churnP", "p150", "suction", "supplyLen", "loopLen"].forEach(function (k) { if (blankNum(src[k])) inp[k] = NaN; else inp[k] = +src[k]; });
+    inp.risers = (src.risers || []).map(function (r) {
+      r = r || {};
+      return {
+        q: blankNum(r.q) ? NaN : +r.q,
+        pReq: blankNum(r.pReq) ? NaN : +r.pReq,
+        len: blankNum(r.len) ? NaN : +r.len,
+        size: sizeNom(r.size, 10),
+        bfp: blankNum(r.bfp) ? NaN : +r.bfp,
+        elev: blankNum(r.elev) ? 0 : +r.elev,
+      };
+    });
+    var errors = [], warnings = [], items = [];
+    var mat = material(inp);
+    if (!(inp.ratedQ > 0)) errors.push("Enter the pump rated flow.");
+    if (!(inp.ratedP > 0)) errors.push("Enter the pump rated pressure.");
+    if (!isFinite(inp.churnP)) errors.push("Enter the churn (shutoff) pressure.");
+    if (!isFinite(inp.p150)) errors.push("Enter the pressure at 150% of rated flow.");
+    if (!isFinite(inp.suction)) errors.push("Enter the tank low-water suction pressure.");
+    if (!(inp.supplyLen > 0)) errors.push("Enter the supply main length.");
+    if (!(inp.loopLen > 0)) errors.push("Enter the loop length.");
+    if (!inp.risers.length) errors.push("Enter at least one riser.");
+    inp.risers.forEach(function (r, i) {
+      var n = "Riser " + (i + 1) + ": ";
+      if (!(r.q > 0)) errors.push(n + "enter the demand flow.");
+      if (!isFinite(r.pReq)) errors.push(n + "enter the pressure required at the riser base.");
+      if (!(r.len >= 0) || !isFinite(r.len)) errors.push(n + "enter the lead-in length.");
+      if (!isFinite(r.bfp) || r.bfp < 0) errors.push(n + "enter the backflow preventer loss (zero or more).");
+    });
+    if (inp.ratedP > 0 && isFinite(inp.churnP)) {
+      if (inp.churnP + 1e-6 < inp.ratedP) errors.push("Churn pressure must be at least the rated pressure.");
+      if (inp.churnP > 1.4 * inp.ratedP + 1e-6) errors.push("Churn pressure is over 140% of rated pressure (NFPA 20 s6.2).");
+    }
+    if (inp.ratedP > 0 && isFinite(inp.p150) && inp.p150 + 1e-6 < 0.65 * inp.ratedP) errors.push("Pressure at 150% of rated flow is under 65% of rated pressure (NFPA 20 s6.2).");
+    var res = { version: VERSION, mode: "pump", input: inp, material: mat, errors: errors, warnings: warnings, items: items, ok: false };
+    if (errors.length) return res;
+
+    var Q = 0; inp.risers.forEach(function (r) { Q += r.q; });
+    var q150 = 1.5 * inp.ratedQ;
+    var netP = pumpNetAt(Q, inp.ratedQ, inp.ratedP, inp.churnP, inp.p150);
+    if (!isFinite(netP)) {
+      errors.push("Demand " + FU("flow", Q) + " is over 150% of rated flow (" + FU("flow", q150) + "). The pump curve is not extended past that point.");
+      res.errors = errors; return res;
+    }
+    var available = netP + inp.suction;
+    var fit = 1 + (inp.fittingPct || 0) / 100;
+    var idS = mat.ids[inp.supplySize], idL = mat.ids[inp.loopSize];
+    var supplyLoss = hwLoss(Q, inp.supplyLen * fit, mat.c, idS);
+    var supplyVel = velocity(Q, idS);
+    var net = buildNetwork({ loopLen: inp.loopLen, sources: 1, nHyd: inp.risers.length, placement: inp.placement });
+    var demandAt = net.nodes.map(function () { return 0; });
+    var riserNode = [];
+    net.nodes.forEach(function (nd, ni) {
+      nd.hyd.forEach(function (h) { riserNode[h] = ni; demandAt[ni] += inp.risers[h].q; });
+    });
+    var rate = function (q) { return hwRate(q, mat.c, idL); };
+    var intact = solveDemands(net, demandAt, rate, -1, fit);
+    function worstSegment() {
+      var worst = null;
+      net.segs.forEach(function (sg, si) {
+        if (!(sg.len > 1e-9)) return;
+        var sol = solveDemands(net, demandAt, rate, si, fit);
+        var req = 0, vel = supplyVel;
+        net.segs.forEach(function (g, k) { if (Math.abs(sol.flows[k]) > 0 && velocity(Math.abs(sol.flows[k]), idL) > vel) vel = velocity(Math.abs(sol.flows[k]), idL); });
+        inp.risers.forEach(function (r, i) {
+          var need = r.pReq + hwLoss(r.q, r.len * fit, mat.c, mat.ids[r.size]) + r.bfp + PSI_PER_FT * (r.elev - inp.pumpElev) + supplyLoss + (sol.drop[riserNode[i]] || 0);
+          if (need > req) req = need;
+        });
+        var row = { seg: si, required: req, vel: vel, drop: sol.drop, flows: sol.flows, losses: sol.losses };
+        if (!worst || req > worst.required + 1e-9 || (Math.abs(req - worst.required) <= 1e-9 && vel > worst.vel)) worst = row;
+      });
+      return worst;
+    }
+    var segmentBreak = worstSegment();
+    var openLoss = hwLoss(Q, inp.loopLen * fit, mat.c, idL);
+    var openVel = velocity(Q, idL);
+    var halfLen = inp.loopLen / 2;
+    var halfLoss = hwLoss(Q, halfLen * fit, mat.c, idL);
+    var governFar = inp.placement !== "even";
+    function leadRows(loopDrop) {
+      return inp.risers.map(function (r, i) {
+        var id = mat.ids[r.size];
+        var loss = hwLoss(r.q, r.len * fit, mat.c, id);
+        var elev = PSI_PER_FT * (r.elev - inp.pumpElev);
+        var loopLoss = loopDrop == null ? 0 : (typeof loopDrop === "number" ? loopDrop : (loopDrop[riserNode[i]] || 0));
+        return { i: i, q: r.q, pReq: r.pReq, len: r.len, size: r.size, id: id, bfp: r.bfp, elev: elev, loss: loss, vel: velocity(r.q, id), loopLoss: loopLoss, supplyLoss: supplyLoss, required: r.pReq + loss + r.bfp + elev + supplyLoss + loopLoss };
+      });
+    }
+    function pack(loopLossOrDrop, loopVel, pathLen, label, flows) {
+      var rows = leadRows(loopLossOrDrop);
+      var required = rows.reduce(function (m, r) { return Math.max(m, r.required); }, 0);
+      var margin = available - required;
+      var velOk = supplyVel <= inp.maxVel + 1e-9 && loopVel <= inp.maxVel + 1e-9 && rows.every(function (r) { return r.vel <= inp.maxVel + 1e-9; });
+      var pressureOk = margin >= -1e-6;
+      return { label: label, pathLen: pathLen, loopVel: loopVel, required: required, available: available, margin: margin, velOk: velOk, pressureOk: pressureOk, pass: pressureOk && velOk, risers: rows, flows: flows || null };
+    }
+    var intactLossAt = intact.drop;
+    var normal = pack(intactLossAt, (function () {
+      var v = 0; intact.flows.forEach(function (f) { var x = velocity(Math.abs(f), idL); if (x > v) v = x; }); return v;
+    })(), null, "Normal operation, loop intact", intact.flows);
+    normal.loopLossGovern = normal.risers.reduce(function (m, r) { return Math.max(m, r.loopLoss); }, 0);
+    var broken, half = null;
+    if (governFar) {
+      broken = pack(openLoss, openVel, inp.loopLen, "One segment out, open path equal to the full loop", null);
+      broken.loopLossGovern = openLoss;
+      half = pack(halfLoss, velocity(Q, idL), halfLen, "One of the two half-loops out, the other half in service", null);
+      half.loopLossGovern = halfLoss;
+      half.governs = false;
+    } else {
+      broken = pack(segmentBreak.drop, segmentBreak.vel, null, "One loop segment out (worst remaining path)", segmentBreak.flows);
+      broken.loopLossGovern = broken.risers.reduce(function (m, r) { return Math.max(m, r.loopLoss); }, 0);
+      broken.seg = segmentBreak.seg;
+      broken.pathLen = net.segs.reduce(function (s, sg, i) { return Math.abs(segmentBreak.flows[i]) > 1e-6 ? s + sg.len : s; }, 0);
+    }
+    broken.governs = true;
+    var maxDischarge = inp.churnP + inp.suction;
+    var pressure = { maxDischarge: maxDischarge, rating: mat.rating, surge: inp.surge, total: maxDischarge + (inp.surge || 0), ok: maxDischarge + (inp.surge || 0) <= mat.rating + 1e-9, nfpa24Min: 150 };
+    if (!pressure.ok) warnings.push({ id: "class", level: "fail", text: "Churn plus the entered suction (" + FU("press", pressure.total) + " with surge) exceeds the " + FU("press", mat.rating) + " pressure rating of the selected pipe." });
+    if (supplyVel > inp.maxVel + 1e-9) warnings.push({ id: "supplyVel", level: "fail", text: "Supply main velocity is " + FU("vel", supplyVel) + " at " + FU("flow", Q) + " (limit " + FU("vel", inp.maxVel) + ")." });
+    if (normal.loopVel > inp.maxVel + 1e-9) warnings.push({ id: "loopVel", level: "fail", text: "Loop velocity in normal operation is " + FU("vel", normal.loopVel) + " (limit " + FU("vel", inp.maxVel) + ")." });
+    if (broken.loopVel > inp.maxVel + 1e-9) warnings.push({ id: "breakVel", level: "fail", text: "Loop velocity with one segment out is " + FU("vel", broken.loopVel) + " (limit " + FU("vel", inp.maxVel) + ")." });
+    normal.risers.forEach(function (r) {
+      if (r.vel > inp.maxVel + 1e-9) warnings.push({ id: "leadVel", level: "fail", text: "Lead-in velocity at riser " + (r.i + 1) + " is " + FU("vel", r.vel) + " (limit " + FU("vel", inp.maxVel) + ")." });
+    });
+    if (Math.abs(inp.churnP - 1.4 * inp.ratedP) <= 0.05 || Math.abs(inp.p150 - 0.65 * inp.ratedP) <= 0.05) warnings.push({ id: "limitCurve", level: "warn", text: "The pump curve uses a point at the NFPA 20 s6.2 limit (churn up to 140% of rated pressure, 150% flow at not less than 65% of rated pressure). A certified curve can lie above this straight line. Confirm with the factory curve." });
+    var atLimit150 = Math.abs(inp.p150 - 0.65 * inp.ratedP) <= 1e-6 * Math.max(1, inp.ratedP);
+    var atLimitChurn = Math.abs(inp.churnP - 1.4 * inp.ratedP) <= 1e-6 * Math.max(1, inp.ratedP);
+    function caseWords(c, name) {
+      var marginWord = c.margin >= -1e-6 ? "margin " + FU("press", c.margin) : "short " + FU("press", -c.margin);
+      return name + " " + (c.pass ? "PASSES" : "FAILS") + " (required discharge " + FU("press", c.required) + ", pump available " + FU("press", c.available) + ", " + marginWord + (c.velOk ? "" : "; velocity over the limit") + ")";
+    }
+    res.ok = true;
+    res.q = Q;
+    res.supplyMain = { len: inp.supplyLen, nom: inp.supplySize, id: idS, flow: Q, loss: supplyLoss, vel: supplyVel, c: mat.c };
+    res.loopPipe = { len: inp.loopLen, nom: inp.loopSize, id: idL, c: mat.c };
+    res.curve = {
+      method: "piecewise-linear",
+      ratedQ: inp.ratedQ, ratedP: inp.ratedP, churnP: inp.churnP, p150: inp.p150, q150: q150,
+      atLimitChurn: atLimitChurn, atLimit150: atLimit150,
+      net: netP, suction: inp.suction, available: available,
+      points: [{ name: "Churn", q: 0, p: inp.churnP }, { name: "Rated", q: inp.ratedQ, p: inp.ratedP }, { name: "150% flow", q: q150, p: inp.p150 }, { name: "Demand", q: Q, p: netP }],
+    };
+    res.normal = normal;
+    res.broken = broken;
+    res.half = half;
+    res.pressure = pressure;
+    res.diameters = { supply: idS, loop: idL, supplyNom: inp.supplySize, loopNom: inp.loopSize };
+    res.network = { net: net, intact: intact, riserNode: riserNode };
+    res.pass = normal.pass && broken.pass && pressure.ok;
+    res.summary = caseWords(normal, "Normal operation") + ". Loop break " + caseWords(broken, "").replace(/^ /, "") + ".";
+    res.criteria = pumpCriteria(inp, mat, res, u);
+    res.items = pumpItems(inp, mat, res, u);
+    return res;
+  }
+  function pumpCriteria(inp, mat, res, u) {
+    var rows = [];
+    function R(item, value, cite, flag) { rows.push({ item: item, value: value, cite: cite, flag: flag }); }
+    var ed = inp.nfpa24 === "2019" ? "NFPA 24 (2019); confirm the section number for that edition on NFPA LiNK" : "NFPA 24 (2022) s11.1";
+    R("Friction loss", "Hazen-Williams with the actual internal diameter. The formula used for the 2019 and 2022 editions is the same: p = 4.52 Q^1.85 / (C^1.85 d^4.87).", ed, inp.nfpa24 === "2019" ? "U" : "P");
+    R("Inside diameters", mat.short + ", C = " + mat.c + ". Supply " + inp.supplySize + " in. ID " + mat.ids[inp.supplySize].toFixed(2) + " in. Loop " + inp.loopSize + " in. ID " + mat.ids[inp.loopSize].toFixed(2) + " in. Lead-in IDs are in the riser table.", "NFPA 24 s11.1", "P");
+    R("Pump curve", "Straight line from churn (0 gpm, " + fmtU(u, "press", inp.churnP) + ") to rated (" + fmtU(u, "flow", inp.ratedQ) + " at " + fmtU(u, "press", inp.ratedP) + "), then to 150% flow (" + fmtU(u, "flow", 1.5 * inp.ratedQ) + " at " + fmtU(u, "press", inp.p150) + "). Not extended past 150%.", "NFPA 20 s6.2", "P");
+    R("Churn and 150% limits", "Churn not over 140% of rated pressure; pressure at 150% flow not under 65% of rated pressure. Entered churn is " + (100 * inp.churnP / inp.ratedP).toFixed(1) + "% and the 150% point is " + (100 * inp.p150 / inp.ratedP).toFixed(1) + "% of rated pressure.", "NFPA 20 s6.2", "P");
+    R("Suction", "Tank low-water suction " + fmtU(u, "press", inp.suction) + " is added to the net pump pressure. Available discharge at the demand is " + fmtU(u, "press", res.curve.available) + ".", "NFPA 20 s6.2", "P");
+    R("Supply main", fmtU(u, "len", inp.supplyLen) + " of " + inp.supplySize + " in. from the pump discharge to the loop, carrying the full demand.", "NFPA 24 s11.1", "P");
+    R("Riser lead-in and backflow", "Each sprinkler riser has its own lead-in and an entered backflow-preventer loss. On this project every riser has a backflow preventer because the hydrants share the loop.", "NFPA 24", "U");
+    R("Loop break", inp.placement === "even" ? "Each loop segment is taken out in turn; the worst remaining path governs. Demand stays at 100%." : "Demand at the far point: one segment out is modeled as an open path equal to the full loop length (same convention as the hydrant check). The shorter half-ring is reported and does not govern.", inp.placement === "even" ? "NFPA 24" : "NFPA 24", "U");
+    R("Fire flow context", "The loop is a private fire service main that also supplies hydrants. This check is the entered riser demand, not a Chapter 18 fire-flow lookup.", "NFPA 1 Chapter 18", "P");
+    R("Pipe pressure rating", "Not less than 150 psi. Churn plus the entered suction is checked against the selected pipe rating.", "NFPA 24 s10.1.2", "P");
+    return rows;
+  }
+  function pumpItems(inp, mat, res, u) {
+    var it = [];
+    function I(text, flag) { it.push({ text: text, flag: flag || "U" }); }
+    I("Hazen-Williams C = " + mat.c + " and the internal diameters of " + mat.short + " are manufacturer-dependent. This run uses the actual IDs in the pipe table (supply and loop " + inp.supplySize + " in. = " + mat.ids[inp.supplySize].toFixed(2) + " in.). Confirm with the pipe maker.");
+    I("NFPA 24 edition selected: " + inp.nfpa24 + ". Friction loss uses the Hazen-Williams formula this tool already applies. Confirm the section number for that edition on NFPA LiNK.");
+    I("Pump net pressure is the straight line through the entered churn, rated, and 150% points, not a factory certified curve. Confirm the certified curve covers " + fmtU(u, "flow", res.q) + ".");
+    I("Tank low-water suction is " + fmtU(u, "press", inp.suction) + ". A full tank can be a higher suction and a higher churn discharge than churn plus this suction. Confirm the maximum suction.");
+    I("Each riser lead-in includes the entered backflow-preventer loss. Every sprinkler riser on this project has a backflow preventer because the hydrants share the loop. Confirm each loss with the preventer data (a listed loss of zero is only as good as that data).");
+    if (inp.placement !== "even") I("The governing loop-break path is the full loop length with one segment out (the hydrant far-point convention). Closing only one of the two half-loops leaves a shorter path; that loss is shown and does not govern.");
+    else I("The governing loop break removes each real segment in turn and keeps the worst path. Demand is not reduced.");
+    I("NFPA 1 Chapter 18 fire flow for the hydrants on this loop is not calculated here. The demand is the entered riser flow.");
+    if (!(inp.fittingPct > 0)) I("Fitting and valve equivalent length is not added unless a percent of length is entered (now 0).");
+    I("Elevation head uses 0.433 psi per ft from the pump to each riser. Pipe elevation changes along the supply main and the loop are not modeled.");
+    return it;
+  }
+  function pumpDiagramSvg(res, u) {
+    if (!res || !res.ok || res.mode !== "pump") return "";
+    var W = 780, H = 168;
+    var y = 78;
+    function f(x) { return x.toFixed(1); }
+    var pts = [70, 250, 470, 680];
+    var names = ["Pump", "Loop", "Lead-in", "Riser"];
+    var s = res.supplyMain, n0 = res.normal.risers[0], b = res.broken;
+    var notes = [
+      fmt(u, "len", s.len) + " " + u.kinds.len.label + " · " + fmt(u, "flow", s.flow) + " " + u.kinds.flow.label,
+      "loss " + fmt(u, "press", s.loss) + " " + u.kinds.press.label + " · " + fmt(u, "vel", s.vel) + " " + u.kinds.vel.label,
+    ];
+    var loopNote = ["loop " + fmt(u, "press", res.normal.loopLossGovern) + " " + u.kinds.press.label + " split", "break " + fmt(u, "press", b.loopLossGovern) + " " + u.kinds.press.label];
+    var leadNote = n0 ? [fmt(u, "len", n0.len) + " " + u.kinds.len.label + " · loss " + fmt(u, "press", n0.loss) + " " + u.kinds.press.label, "backflow " + fmt(u, "press", n0.bfp) + " " + u.kinds.press.label] : ["", ""];
+    var body = ['<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="#fff"/>'];
+    body.push('<text x="14" y="22" font-size="13" font-weight="700" fill="#1d4e89">Pump, supply main, loop, lead-in</text>');
+    body.push('<line x1="' + pts[0] + '" y1="' + y + '" x2="' + pts[3] + '" y2="' + y + '" stroke="#1d4e89" stroke-width="6"/>');
+    names.forEach(function (name, i) {
+      body.push('<rect x="' + (pts[i] - 28) + '" y="' + (y - 16) + '" width="56" height="32" fill="#0f172a"/>');
+      body.push('<text x="' + pts[i] + '" y="' + (y + 5) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">' + name + "</text>");
+    });
+    function cap(x, lines, dy) {
+      body.push('<text x="' + x + '" y="' + (y + dy) + '" text-anchor="middle" font-size="11" fill="#0f172a"><tspan x="' + x + '">' + esc(lines[0]) + '</tspan><tspan x="' + x + '" dy="14">' + esc(lines[1]) + "</tspan></text>");
+    }
+    cap((pts[0] + pts[1]) / 2, notes, 36);
+    cap((pts[1] + pts[2]) / 2, loopNote, 36);
+    cap((pts[2] + pts[3]) / 2, leadNote, 36);
+    body.push('<text x="14" y="' + (H - 12) + '" font-size="10" fill="#475569">Not to scale. Loop loss is the friction from the supply connection to the governing riser. Break loss is the governing one-segment-out case.</text>');
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Pump and tank supply schematic" class="hls-diagram" font-family="Arial,Helvetica,sans-serif">' + body.join("") + "</svg>";
+  }
+
   return {
     VERSION: VERSION, PSI_PER_FT: PSI_PER_FT, SIZES: SIZES, MATERIALS: MATERIALS, GROUPS: GROUPS, FF_ROWS: FF_ROWS, C102: C102, US_OD: US_OD, ISO_OD_MM: ISO_OD_MM,
     CONV: CONV, FIELD_KINDS: FIELD_KINDS, defaults: defaults, unitSet: unitSet, toDisp: toDisp, toUS: toUS, label: label, fmt: fmt, fmtU: fmtU, fmtNum: fmtNum,
     displayInputs: displayInputs, convertInputs: convertInputs, material: material,
-    hwLoss: hwLoss, hwRate: hwRate, velocity: velocity, availableFlow: availableFlow, supplyPressure: supplyPressure,
+    hwLoss: hwLoss, hwRate: hwRate, velocity: velocity, availableFlow: availableFlow, supplyPressure: supplyPressure, pumpNetAt: pumpNetAt,
     tableFlow: tableFlow, durationFor: durationFor, requiredFireFlow: requiredFireFlow, hydrantsFor: hydrantsFor,
-    buildNetwork: buildNetwork, solveNetwork: solveNetwork, evaluate: evaluate, diagramSvg: diagramSvg, criteriaFor: criteriaFor, itemsToConfirm: itemsToConfirm,
+    buildNetwork: buildNetwork, solveNetwork: solveNetwork, solveDemands: solveDemands, evaluate: evaluate, evaluatePump: evaluatePump, diagramSvg: diagramSvg, pumpDiagramSvg: pumpDiagramSvg, criteriaFor: criteriaFor, itemsToConfirm: itemsToConfirm,
   };
 });
