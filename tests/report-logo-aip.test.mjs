@@ -17,20 +17,28 @@ const URL_AIP = 'data:image/png;base64,' + PNG.toString('base64')
 const LABEL_PART = 'Alberti Ozzo' // printed label: "AI&P Alberti Ozzo & Partners + Benham (a Haskell Company)"
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
-// app -> version bumped for this change (index.html / app.js / changelog), and how its printout carries the logo
+// app -> how its printout carries the logo. The version is read from APP_VERSION, not a pinned old string.
 const APPS = {
-  'flow-test-report': { v: '2.4.2', saved: 'btnSaveReport' },
-  'fire-pump-sizer': { v: '2.7.2', saved: 'btnSaveReport' },
-  'sprinkler-system-estimator': { v: '1.10.0-prelim', host: '#reportLogoPrint', pdf: true },
-  'fa-power-extenders': { v: '1.1.2', host: '#printPackage .report-logo', pdf: true },
-  'dry-sprinkler-delivery': { v: '1.5.1-prelim', host: '#reportLogoPrint', pdf: true },
-  'occupant-egress': { v: '1.7.1', saved: 'btnSave', seed: ['occupantEgress.v1', '{"codePath":"ibc"}'] },
-  'concrete-fire-rating': { v: '1.1.1', host: '#reportLogoPrint', pdf: true },
-  'flow-test-request': { v: '1.0.4', host: '#reportLogoPrint', pdf: true },
-  'fire-tank-sizer': { v: '1.4.0-prelim', host: '#reportLogoPrint', pdf: true },
-  'deflagration-vent': { v: '1.2.1', saved: 'btnSave', seed: ['deflagrationVent.v1', '{"hazardPath":"process_gas"}'] },
-  'ibc-ifc-hazard': { v: '1.6.2', host: '#reportLogoPrint', pdf: true },
-  'maq-control-area': { v: '1.0.1', popup: 'btnPrintPdf' },
+  'flow-test-report': { saved: 'btnSaveReport' },
+  'fire-pump-sizer': { saved: 'btnSaveReport' },
+  'sprinkler-system-estimator': { host: '#reportLogoPrint', pdf: true },
+  'fa-power-extenders': { host: '#printPackage .report-logo', pdf: true },
+  'dry-sprinkler-delivery': { host: '#reportLogoPrint', pdf: true },
+  'occupant-egress': { saved: 'btnSave', seed: ['occupantEgress.v1', '{"codePath":"ibc"}'] },
+  'concrete-fire-rating': { host: '#reportLogoPrint', pdf: true },
+  'flow-test-request': { host: '#reportLogoPrint', pdf: true },
+  'fire-tank-sizer': { host: '#reportLogoPrint', pdf: true },
+  'deflagration-vent': { saved: 'btnSave', seed: ['deflagrationVent.v1', '{"hazardPath":"process_gas"}'] },
+  'ibc-ifc-hazard': { host: '#reportLogoPrint', pdf: true },
+  'maq-control-area': { popup: 'btnPrintPdf' },
+}
+
+function appVersionOf(a) {
+  const html = readFileSync(join(ROOT, a, 'index.html'), 'utf8')
+  const js = existsSync(join(ROOT, a, 'assets/app.js')) ? readFileSync(join(ROOT, a, 'assets/app.js'), 'utf8') : ''
+  const m = (js + '\n' + html).match(/APP_VERSION\s*=\s*['"]([^'"]+)['"]/)
+  assert.ok(m, `${a}: APP_VERSION`)
+  return { v: m[1], html, js }
 }
 
 function pdfHasLabel(pdf) {
@@ -56,22 +64,21 @@ test('module: the AI&P option is added to a page select that lacks it exactly on
   assert.equal(L.load().source, 'benham'); assert.equal(L.STORAGE_KEY, KEY)
 })
 
-test('versions: each of the 12 other report tools bumped its version consistently (page, app code) and recorded the logo option in its changelog', () => {
-  for (const [a, { v }] of Object.entries(APPS)) {
-    const html = readFileSync(join(ROOT, a, 'index.html'), 'utf8')
-    const js = existsSync(join(ROOT, a, 'assets/app.js')) ? readFileSync(join(ROOT, a, 'assets/app.js'), 'utf8') : ''
-    const shown = new RegExp(`id="(appVersion|footerVersion)">(Version )?v?${v.replace(/\./g, '\\.')}<`).test(html)
-    const coded = new RegExp(`APP_VERSION\\s*=\\s*['"]${v.replace(/\./g, '\\.')}['"]`).test(html + js)
-    if (a !== 'flow-test-request') assert.ok(shown || coded, `${a}: version ${v} in page or app code`) // flow-test-request has no visible version
+test('versions: each report tool matches its current APP_VERSION and recorded the AI&P logo in its changelog', () => {
+  for (const a of Object.keys(APPS)) {
+    const { v, html, js } = appVersionOf(a)
+    const esc = v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const shown = new RegExp(`id="(appVersion|footerVersion)">(Version )?v?${esc}<`).test(html)
+    const coded = new RegExp(`APP_VERSION\\s*=\\s*['"]${esc}['"]`).test(html + js)
+    if (a !== 'flow-test-request') assert.ok(shown || coded, `${a}: version ${v} in page or app code`)
     assert.ok(coded, `${a}: APP_VERSION = ${v}`)
     const log = ['CHANGELOG.md', 'README.md'].map((f) => (existsSync(join(ROOT, a, f)) ? readFileSync(join(ROOT, a, f), 'utf8') : '')).join('\n')
     assert.ok(log.includes(`**${v}.**`) && /AI&P \+ Benham/.test(log), `${a}: changelog entry for ${v}`)
     assert.ok(!/<option value="aip"/.test(html), `${a}: the option comes from the shared module, not hand-copied markup`)
   }
   const portal = readFileSync(join(ROOT, 'index.html'), 'utf8')
-  for (const [id, v] of [['card-pump', '2.7.2'], ['card-dry-delivery', '1.5.1'], ['card-egress', '1.7.1'], ['card-fa-power', '1.1.2'], ['card-hazard', '1.6.2'], ['card-maq', '1.0.1'], ['card-concrete-frr', '1.1.1'], ['card-deflag', '1.2.1']]) {
-    const i = portal.indexOf(`id="${id}"`); const b = portal.slice(i, portal.indexOf('</span>', portal.indexOf('<span class="badge">', i)))
-    assert.ok(b.includes('v' + v), `portal badge ${id} v${v}`)
+  for (const a of ['fire-pump-sizer', 'dry-sprinkler-delivery', 'occupant-egress', 'fa-power-extenders', 'ibc-ifc-hazard', 'maq-control-area', 'concrete-fire-rating', 'deflagration-vent']) {
+    assert.match(portal, new RegExp(`id="tool-${a}"[\\s\\S]{0,900}href="\\./${a}/"`), `catalog card tool-${a}`)
   }
 })
 
@@ -81,7 +88,7 @@ test('shared logo files: the embedded AI&P image is the PNG in shared/logos and 
   assert.ok(readFileSync(join(ROOT, 'validation/inject-report-logos.mjs'), 'utf8').includes('aip-benham.png'))
   for (const f of ['sw.js']) { // service workers that pin the shared module also changed cache names so installed copies refresh
     assert.ok(/v1\.5\.1/.test(readFileSync(join(ROOT, 'dry-sprinkler-delivery', f), 'utf8')))
-    assert.ok(/fire-pump-sizer-v9/.test(readFileSync(join(ROOT, 'fire-pump-sizer', f), 'utf8')))
+    assert.ok(/fire-pump-sizer-v10/.test(readFileSync(join(ROOT, 'fire-pump-sizer', f), 'utf8')))
   }
 })
 

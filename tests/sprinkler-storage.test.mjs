@@ -145,9 +145,11 @@ test('storage tower: 85 ft quick-response K-25.2 shielded fire is 12 heads at 50
 test('storage page: past fixes stay in place, and the sample comparison shows on the estimator', async () => {
   const html = readFileSync(join(ROOT, 'sprinkler-system-estimator/index.html'), 'utf8')
   const app = readFileSync(join(ROOT, 'sprinkler-system-estimator/assets/app.js'), 'utf8')
-  assert.equal((app.match(/APP_VERSION\s*=\s*"([^"]+)"/) || [])[1], '1.10.0-prelim')
-  assert.match(html, /assets\/app\.js\?v=1\.10\.0/)
-  assert.match(html, /assets\/storage\.js\?v=1\.10\.0/)
+  const ver = (app.match(/APP_VERSION\s*=\s*"([^"]+)"/) || [])[1]
+  assert.ok(ver, 'APP_VERSION')
+  const cache = ver.replace(/-prelim$/, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  assert.match(html, new RegExp(`assets/app\\.js\\?v=${cache}`))
+  assert.match(html, new RegExp(`assets/storage\\.js\\?v=${cache}`))
   assert.match(html, /water-path-shell\.js\?v=7/)
   assert.doesNotMatch(html, /verify-tab\.js/)
   assert.doesNotMatch(html + app, /kctestprep|KC Test Prep/i)
@@ -162,7 +164,7 @@ test('storage page: past fixes stay in place, and the sample comparison shows on
   try {
     await withChrome(async (b) => {
       const p = await b.page(`${s.base}/sprinkler-system-estimator/`, 2500)
-      assert.match(await p.eval(`document.getElementById('appVersion').textContent`), /1\.10\.0-prelim/)
+      assert.ok((await p.eval(`document.getElementById('appVersion').textContent`)).includes(ver), ver)
       assert.match(await p.eval(`document.getElementById('codeEdition').textContent`), /^Code basis: NFPA 13-2022/)
       const logos = await p.eval(`[...document.getElementById('reportLogoSource').options].map(o => o.value).join(',')`)
       assert.match(logos, /benham/)

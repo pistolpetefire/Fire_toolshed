@@ -3,7 +3,8 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import { readFileSync } from 'node:fs'
-import { serve, dumpDom, text, verifyStatus } from './helpers.mjs'
+import { serve, dumpDom, text, verifyStatus, ROOT } from './helpers.mjs'
+import { join } from 'node:path'
 const require = createRequire(import.meta.url)
 const R = require('../fire-pump-sizer/assets/pump-rules.js')
 const near = (a, b, tol = 0.05) => assert.ok(Math.abs(a - b) <= tol, `${a} vs ${b}`)
@@ -56,7 +57,7 @@ test('pump page: shows NFPA 20-2022 and the Verification tab passes 50/50 (duty 
   try {
     const page = await dumpDom(`${s.base}/fire-pump-sizer/`, 8000)
     assert.match(text(page), /NFPA 20-2022/)
-    assert.match(page, /id="appVersion">v2\.7\.2</)
+    assert.match(page, /id="appVersion">v2\.7\.3</)
     // Retry kept: with the service worker no longer registered during verification (v2.7.1), headless Chrome still leaves one
     // hidden verification frame blank in about 2 of 20 runs (one case); a rerun is clean. Up to 4 attempts, each logged.
     let st = ''
@@ -185,4 +186,34 @@ test('pump v2.7.1: main page registers the service worker; verification frames a
     assert.match(framed, /<p id="frameSw">skipped<\/p>/)
     console.log('  main: registered; ?ftverify=1, ?ftverifyrun=1, iframe: skipped')
   } finally { await s.close() }
+})
+
+test('pump v2.7.3: verification scripts load in the head, before the app', () => {
+  const html = readFileSync(join(ROOT, 'fire-pump-sizer/index.html'), 'utf8')
+  const head = html.slice(0, html.indexOf('</head>'))
+  assert.match(head, /shared\/verify-tab\.js\?v=2\.7\.3/)
+  assert.match(head, /assets\/verify-cases\.js\?v=2\.7\.3/)
+  assert.ok(html.indexOf('verify-tab.js') < html.indexOf('assets/app.js'), 'tab script before app.js')
+  assert.ok(html.indexOf('verify-cases.js') < html.indexOf('assets/app.js'), 'cases before app.js')
+})
+
+test('pump v2.7.3: version, app.js query, and service-worker cache move together', () => {
+  const html = readFileSync(join(ROOT, 'fire-pump-sizer/index.html'), 'utf8')
+  const js = readFileSync(join(ROOT, 'fire-pump-sizer/assets/app.js'), 'utf8')
+  const sw = readFileSync(join(ROOT, 'fire-pump-sizer/sw.js'), 'utf8')
+  const rd = readFileSync(join(ROOT, 'fire-pump-sizer/README.md'), 'utf8')
+  assert.match(js, /APP_VERSION = '2\.7\.3'/)
+  assert.match(js, /SW_CACHE = 'fire-pump-sizer-v10'/)
+  assert.match(html, /id="appVersion">v2\.7\.3</)
+  assert.match(html, /assets\/app\.js\?v=2\.7\.3/)
+  assert.match(sw, /const CACHE = 'fire-pump-sizer-v10'/)
+  assert.match(sw, /app\.js\?v=2\.7\.3/)
+  assert.match(rd, /\*\*2\.7\.3\.\*\*[^\n]*Verification/)
+  assert.match(rd, /AI&P \+ Benham/)
+})
+
+test('pump v2.7.3: the case file still defines 50 checks (a blank status was the missing script)', () => {
+  const cases = readFileSync(join(ROOT, 'fire-pump-sizer/assets/verify-cases.js'), 'utf8')
+  assert.equal((cases.match(/"label":/g) || []).length, 50)
+  assert.match(cases, /window\.FT_VERIFY_CASES/)
 })

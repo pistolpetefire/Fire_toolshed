@@ -59,7 +59,7 @@ test('app: SEA ATCT screen shows 3520 gpm and the result row is labeled NFPA 291
     const html = await dom(`${s.base}/flow-test-report/`)
     assert.equal(el(html, 'mFireFlow20').trim(), '3520 gpm')
     assert.ok(text(html).includes(`Avail. flow @ 20 psi (${LABEL})`), 'result table row label')
-    assert.match(text(html), /Version 2\.4\.2/)
+    assert.match(text(html), /Version 2\.4\.3/)
   } finally { await s.close() }
 })
 
@@ -98,4 +98,44 @@ test('source: capacity uses 0.54 and the old 1/exponent form and N^ label are go
   assert.ok(src.includes('" psi (" + CAPACITY_LABEL + ")</td><td>"'), 'saved report row carries the label')
   const gen = readFileSync(join(ROOT, 'flow-test-report/assets/verify-cases.js'), 'utf8')
   assert.match(gen, /"id": "sea-atct"[\s\S]*?"ref": 3520\.0/)
+})
+
+test('source: the page script parses, so the saved-report link cannot leave results on the em dash', () => {
+  const src = readFileSync(join(ROOT, 'flow-test-report/index.html'), 'utf8')
+  const start = src.indexOf('<script>\n(function () {')
+  const end = src.indexOf('</script>', start)
+  assert.ok(start > 0 && end > start, 'inline app script')
+  const body = src.slice(start + '<script>\n'.length, end)
+  assert.doesNotThrow(() => new Function(body), 'inline script is valid JavaScript')
+  assert.match(body, /class='noprint' style='text-align:center;padding:12px'><a href='..\/water-supply-review\/'>/)
+  assert.doesNotMatch(body, /<aside class="noprint"/)
+})
+
+test('source: version 2.4.3 is on the page and in the changelog; AI&P is not copied into the select', () => {
+  const src = readFileSync(join(ROOT, 'flow-test-report/index.html'), 'utf8')
+  assert.match(src, /APP_VERSION = "2\.4\.3"/)
+  assert.match(src, /id="appVersion">Version 2\.4\.3</)
+  assert.match(src, /id="footerVersion">2\.4\.3</)
+  assert.doesNotMatch(src, /<option value="aip"/)
+  const log = readFileSync(join(ROOT, 'flow-test-report/CHANGELOG.md'), 'utf8')
+  assert.match(log, /\*\*2\.4\.3\.\*\*/)
+  assert.match(log, /AI&P \+ Benham/)
+  const head = src.slice(0, src.indexOf('</head>'))
+  assert.match(head, /shared\/verify-tab\.js\?v=2\.4\.3/)
+  assert.match(head, /assets\/verify-cases\.js\?v=2\.4\.3/)
+  assert.equal((readFileSync(join(ROOT, 'flow-test-report/assets/verify-cases.js'), 'utf8').match(/"label":/g) || []).length, 13)
+})
+
+test('app: shared logo list includes AI&P and a seeded flow test fills the inputs', async () => {
+  const s = await serveWith(SEA)
+  try {
+    const html = await dom(`${s.base}/flow-test-report/`)
+    const opts = [...html.matchAll(/<option value="([^"]+)"/g)].map((m) => m[1])
+    for (const id of ['benham', 'aip', 'haskell', 'upload']) assert.ok(opts.includes(id), id)
+    const shown = text(html)
+    assert.match(shown, /68\.3 psi/)
+    assert.match(shown, /61\.2 psi/)
+    assert.match(shown, /1250 gpm/)
+    assert.equal(el(html, 'mFireFlow20').trim(), '3520 gpm')
+  } finally { await s.close() }
 })

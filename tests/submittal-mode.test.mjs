@@ -128,15 +128,26 @@ test('page: Hydrant Loop Sizer Submittal mode - OFF keeps all four elements, ON 
   } finally { await s.close() }
 })
 
-test('version: Hydrant Loop Sizer is 1.1.0 everywhere and the changelog keeps Submittal mode and records the pump mode', () => {
+test('version: Hydrant Loop Sizer matches the engine, keeps Submittal mode, records the pump source, and the catalog uses the current card', () => {
   const html = readFileSync(join(ROOT, 'hydrant-loop-sizer/index.html'), 'utf8')
-  assert.match(html, /id="appVersion">Version 1\.1\.0</); assert.match(html, /id="footVersion">1\.1\.0</)
-  assert.match(html, /hls-engine\.js\?v=1\.1\.0/); assert.match(html, /app\.js\?v=1\.1\.0/); assert.match(html, /styles\.css\?v=1\.1\.0/)
-  assert.equal(E.VERSION, '1.1.0')
+  const v = E.VERSION
+  const esc = v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  assert.match(html, new RegExp(`id="appVersion">Version ${esc}<`))
+  assert.match(html, new RegExp(`id="footVersion">${esc}<`))
+  assert.match(html, new RegExp(`hls-engine\\.js\\?v=${esc}`))
+  assert.match(html, new RegExp(`app\\.js\\?v=${esc}`))
+  assert.match(html, new RegExp(`styles\\.css\\?v=${esc}`))
   const rd = readFileSync(join(ROOT, 'hydrant-loop-sizer/README.md'), 'utf8')
-  assert.match(rd, /Version 1\.1\.0\./)
+  assert.match(rd, new RegExp(`Version ${esc}\\.`))
   assert.match(rd, /\*\*1\.0\.3\.\*\*[^\n]*Submittal mode[^\n]*inferred/)
-  assert.match(rd, /\*\*1\.1\.0\.\*\*[^\n]*Fire pump and tank/)
+  assert.match(rd, new RegExp(`\\*\\*${esc}\\.\\*\\*[^\n]*Fire pump and tank`))
   const portal = readFileSync(join(ROOT, 'index.html'), 'utf8')
-  assert.match(portal, /id="tool-hydrant-loop-sizer"[\s\S]{0,700}fire pump and tank/)
+  const start = portal.indexOf('id="tool-hydrant-loop-sizer"')
+  assert.ok(start >= 0, 'catalog card tool-hydrant-loop-sizer')
+  const card = portal.slice(start, portal.indexOf('</article>', start))
+  assert.match(card, /Hydrant Loop Sizer/)
+  assert.match(card, /badge-calculate/)
+  assert.match(card, /href="\.\/hydrant-loop-sizer\/"/)
+  assert.match(card, /fire pump and tank/)
+  assert.doesNotMatch(portal, /id="card-hydrant-loop"/)
 })

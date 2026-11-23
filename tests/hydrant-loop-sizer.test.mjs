@@ -564,7 +564,13 @@ test('page: Verification tab runs and every check passes, including metric, two 
   } finally { await s.close() }
 })
 
-test('verify: regenerating the Python hand-calc output reproduces the committed verify-cases.js byte for byte', () => {
+test('verify: regenerating the Python hand-calc output reproduces the committed verify-cases.js byte for byte', (t) => {
+  try {
+    execFileSync('python3', ['-c', 'import scipy'], { stdio: 'ignore' })
+  } catch {
+    t.skip('scipy is not installed (pip install -r tests/requirements.txt); regeneration is skipped')
+    return
+  }
   const p = join(ROOT, 'hydrant-loop-sizer/assets/verify-cases.js')
   const before = readFileSync(p, 'utf8')
   python('validation/verify/hydrant_loop_sizer.py')

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { ROOT, serve } from './helpers.mjs'
+import { ROOT, serve, dumpDom, text, verifyStatus } from './helpers.mjs'
 import { withChrome } from './cdp.mjs'
 
 const require = createRequire(import.meta.url)
@@ -64,6 +64,10 @@ test('a shell the prefab catalog can cover still selects the same tank, and the 
   assert.match(page, /nfpa1-fire-flow\.js\?v=1\.2\.0/)
   assert.match(page, /Code basis: NFPA 22-2023 · Not a sealed NFPA 22 design/)
   assert.doesNotMatch(page, /<option value="aip"/)
+  assert.match(page, /shared\/verify-tab\.js\?v=1\.4\.0/)
+  assert.match(page, /assets\/verify-cases\.js\?v=1\.4\.0/)
+  const head = page.slice(0, page.indexOf('</head>'))
+  assert.ok(head.includes('verify-tab.js') && head.includes('verify-cases.js'), 'verify scripts are in the head')
   console.log('  default shell still selects 30 ft × 16 ft, 84,603 gal; field list only when prefab count is 0')
 })
 
@@ -155,5 +159,26 @@ test('page: 240,000 gal shows the screening list, Help and logos stay, and Apply
       assert.match(preview, /240,000 gal/)
       await p.close()
     })
+  } finally { await s.close() }
+})
+
+test('tank v1.4.0: the 8 Python checks are unchanged (75000 / 82895 / 84603 gal still the default case)', () => {
+  const cases = readFileSync(join(ROOT, 'fire-tank-sizer/assets/verify-cases.js'), 'utf8')
+  assert.equal((cases.match(/"label":/g) || []).length, 8)
+  assert.match(cases, /"ref": 75000\.0/)
+  assert.match(cases, /"ref": 82895\.0/)
+  assert.match(cases, /"ref": 84603\.0/)
+  const log = readFileSync(join(ROOT, 'fire-tank-sizer/CHANGELOG.md'), 'utf8')
+  assert.match(log, /\*\*1\.4\.0-prelim\.\*\*/)
+  assert.match(log, /AI&P \+ Benham/)
+  assert.match(log, /Verification tab/)
+})
+
+test('tank v1.4.0: the Verification tab runs and passes 8 of 8', async () => {
+  const s = await serve()
+  try {
+    const st = text(verifyStatus(await dumpDom(`${s.base}/fire-tank-sizer/?ftverifyrun=1`, 60000))).trim()
+    console.log('  ' + st)
+    assert.match(st, /^8 of 8 checks pass/)
   } finally { await s.close() }
 })

@@ -117,4 +117,5 @@ fire-pump-sizer/
 
 ## Changelog
 
+- **2.7.3.** The Verification tab is wired again. `shared/verify-tab.js` and `assets/verify-cases.js` load in the page head, before the app script, so `?ftverifyrun=1` can run the 50 checks. They were missing, which left the status blank in headless runs. Service worker cache is `fire-pump-sizer-v10`. Report logo options stay the shared list (AI&P + Benham, Benham, MeadHunt JV, Haskell, upload). Help is unchanged. No calculation change.
 - **2.7.2.** Report logo list gains a built-in option **AI&P + Benham (a Haskell Company)** (AI&P Alberti Ozzo & Partners + Benham). It is added once in the shared `shared/report-logo.js` (source key `aip`, image `shared/logos/aip-benham.png`), so it shows in this tool's Report logo list and preview and in the printout header. The default logo (Benham) and a saved choice (`fireToolshed.reportLogo.v1`) are unchanged. No layout changes.
