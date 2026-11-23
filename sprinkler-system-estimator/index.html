@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#1e3a8a">
   <meta name="description" content="Preliminary sprinkler system demand and pressure estimator for charette / concept design. Not a final Hazen-Williams hydraulic calculation.">
   <title>Sprinkler System Estimator · Fire Toolshed</title>
-  <link rel="stylesheet" href="../shared/water-path-shell.css">
-  <link rel="stylesheet" href="./assets/styles.css">
+  <link rel="stylesheet" href="../shared/water-path-shell.css?v=7">
+  <link rel="stylesheet" href="./assets/styles.css?v=1.10.0">
 </head>
 <body>
   <div id="waterPathShell" class="no-print"></div>
@@ -17,7 +17,7 @@
       <div>
         <p class="eyebrow">Fire Toolshed</p>
         <h1>Sprinkler System Estimator</h1>
-        <p class="version" id="appVersion">Version 1.9.0-prelim</p>
+        <p class="version" id="appVersion">Version 1.10.0-prelim</p>
         <p class="version" id="codeEdition">Code basis: <strong>NFPA 13-2022</strong> (Florida 9th Edition reference) · UFC 3-600-01 · FM planning</p>
       </div>
       <div class="top-actions no-print">
@@ -122,6 +122,13 @@
               <div>
                 <b>Criteria-assisted — density / area planning</b>
                 <small>Select the jurisdiction that governs this project. Presets and durations follow that basis.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="mode" value="storage">
+              <div>
+                <b>Storage / ESFR — NFPA and FM side by side</b>
+                <small>Heads × K × √P for the built-in rows below, plus hose and duration. Other arrangements are typed in. Wet pipe only.</small>
               </div>
             </label>
           </div>
@@ -239,6 +246,189 @@
               </label>
             </div>
           </div>
+        </section>
+
+        <!-- Storage / ESFR comparison -->
+        <section class="panel hidden" id="storageDemandPanel">
+          <h2>Storage / ESFR demand</h2>
+          <p class="hint">
+            Sprinkler demand = number of heads × K × √P. Hose is added after the sprinkler demand is rounded to the nearest gpm.
+            Built-in cells are only the figures named for this module. Each one is labeled and editable. Anything else stays blank until you type it.
+            This mode is wet pipe only. The older criteria presets (K-25.2 at 60 psi and K-14.0 at 75 psi) are unchanged planning presets and are not these table cells.
+          </p>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="storageEdition">NFPA edition</label>
+              <select id="storageEdition" data-storage-driver="1">
+                <option value="2022" selected>NFPA 13-2022</option>
+                <option value="custom">Other edition (user-entered values)</option>
+              </select>
+              <span class="sub">Built-in ESFR rows are NFPA 13-2022 Table 23.3.1 only. Another edition does not reuse those cells.</span>
+            </div>
+            <div class="field" id="storageEditionLabelWrap">
+              <label for="storageEditionLabel">Edition you are using</label>
+              <input id="storageEditionLabel" type="text" data-storage-driver="1" placeholder="Type the edition if it is not 2022" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="storageFmRevision">FM revision</label>
+              <input id="storageFmRevision" type="text" placeholder="Type the revision printed on DS 8-9 and DS 3-26" autocomplete="off">
+              <span class="sub">Required from your copy. This tool does not assume a revision.</span>
+            </div>
+            <div class="field">
+              <label for="storageCase">Built-in arrangement</label>
+              <select id="storageCase" data-storage-driver="1">
+                <option value="class-iv-35-40" selected>Class IV, 35 ft storage, 40 ft ceiling (sample)</option>
+                <option value="tower-85-shielded">Tower, 85 ft, quick-response K-25.2, shielded fire</option>
+                <option value="custom">User-entered arrangement</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="storageCommodity">Commodity</label>
+              <input id="storageCommodity" type="text" data-storage-driver="1" value="Class IV" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="storageHeightFt">Storage height</label>
+              <div class="row">
+                <input id="storageHeightFt" type="number" data-storage-driver="1" min="0" step="1" value="35">
+                <span class="suffix">ft</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="storageCeilingFt">Ceiling height</label>
+              <div class="row">
+                <input id="storageCeilingFt" type="number" data-storage-driver="1" min="0" step="1" value="40">
+                <span class="suffix">ft</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="storageKSelect">K-factor</label>
+              <select id="storageKSelect" data-storage-driver="1">
+                <option value="25.2" selected>K-25.2</option>
+                <option value="16.8">K-16.8</option>
+                <option value="14">K-14</option>
+                <option value="22.4">K-22.4</option>
+                <option value="other">Other (type it)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="storageK">K-factor used</label>
+              <div class="row">
+                <input id="storageK" type="number" data-storage-driver="1" min="0" step="0.1" value="25.2">
+                <span class="suffix">K</span>
+              </div>
+              <span class="sub">Editable. The list above only jumps to K-factors the brief mentions.</span>
+            </div>
+            <div class="field">
+              <label for="storageOrientation">Orientation</label>
+              <input id="storageOrientation" type="text" data-storage-driver="1" value="pendent" autocomplete="off">
+              <span class="sub">The Class IV K-25.2 sample is pendent. The brief does not state orientation for the other K-factors.</span>
+            </div>
+            <div class="field">
+              <label for="storageResponse">Response type</label>
+              <input id="storageResponse" type="text" data-storage-driver="1" placeholder="quick-response for the 85 ft tower case" autocomplete="off">
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="storageFireCase">FM fire case</label>
+              <input id="storageFireCase" type="text" data-storage-driver="1" placeholder="shielded for the 85 ft tower case" autocomplete="off">
+            </div>
+          </div>
+
+          <div id="storagePermission" style="margin-top:0.85rem"></div>
+
+          <h2 style="margin-top:1.1rem;font-size:1rem">Design cells (editable)</h2>
+          <p class="hint">Changing commodity, height, ceiling, K-factor, edition, or arrangement refills these from a built-in row, or clears them when no row matches. After that, what you type is kept.</p>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="storageNfpaHeads">NFPA heads</label>
+              <input id="storageNfpaHeads" type="number" min="0" step="1" value="12">
+              <span class="sub" id="storageNfpaHeadsHint">NFPA 13-2022 Table 23.3.1</span>
+            </div>
+            <div class="field">
+              <label for="storageNfpaPsi">NFPA end pressure</label>
+              <div class="row">
+                <input id="storageNfpaPsi" type="number" min="0" step="1" value="25">
+                <span class="suffix">psi</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="storageFmHeads">FM heads</label>
+              <input id="storageFmHeads" type="number" min="0" step="1" value="12">
+              <span class="sub" id="storageFmHeadsHint">FM Data Sheet 8-9, Tables 8 and 14</span>
+            </div>
+            <div class="field">
+              <label for="storageFmPsi">FM end pressure</label>
+              <div class="row">
+                <input id="storageFmPsi" type="number" min="0" step="1" value="40">
+                <span class="suffix">psi</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="storageNfpaHose">NFPA hose allowance</label>
+              <div class="row">
+                <input id="storageNfpaHose" type="number" min="0" step="50" value="250">
+                <span class="suffix">gpm</span>
+              </div>
+              <span class="sub">NFPA 13-2022 Table 20.15.2.6 — sample figure, editable.</span>
+            </div>
+            <div class="field">
+              <label for="storageNfpaDuration">NFPA duration</label>
+              <div class="row">
+                <input id="storageNfpaDuration" type="number" min="0" step="5" value="60">
+                <span class="suffix">min</span>
+              </div>
+              <span class="sub">NFPA 13-2022 Table 20.15.2.6 — sample figure, editable.</span>
+            </div>
+            <div class="field">
+              <label for="storageFmHose">FM hose allowance</label>
+              <div class="row">
+                <input id="storageFmHose" type="number" min="0" step="50" value="250">
+                <span class="suffix">gpm</span>
+              </div>
+              <span class="sub">Starts as the NFPA Table 20.15.2.6 sample so the comparison can add 250 gpm. Replace it from FM Data Sheet 3-26 Table 2 if your revision differs.</span>
+            </div>
+            <div class="field">
+              <label for="storageFmDuration">FM duration</label>
+              <div class="row">
+                <input id="storageFmDuration" type="number" min="0" step="5" value="60">
+                <span class="suffix">min</span>
+              </div>
+              <span class="sub">Starts as the NFPA Table 20.15.2.6 sample (60 min). Replace it from FM Data Sheet 3-26 Table 2 if your revision differs.</span>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="storageDs326Table2">FM Data Sheet 3-26 Table 2</label>
+              <textarea id="storageDs326Table2" rows="2" placeholder="Enter the Table 2 figure from your revision. Nothing is stored here until you type it."></textarea>
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="storageDs326Section">FM Data Sheet 3-26 section 2.3.1.14</label>
+              <textarea id="storageDs326Section" rows="2" placeholder="Enter the section 2.3.1.14 figure or note from your revision."></textarea>
+            </div>
+          </div>
+
+          <h2 style="margin-top:1.1rem;font-size:1rem">Demand used for the pressure stack</h2>
+          <div class="criteria" style="margin-top:0.5rem">
+            <label>
+              <input type="radio" name="storageGovern" value="greater" checked>
+              <div>
+                <b>Greater of NFPA and FM</b>
+                <small>The higher total (sprinkler demand plus hose) feeds the pressure stack and the pump handoff.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="storageGovern" value="nfpa">
+              <div>
+                <b>NFPA column</b>
+                <small>Use the NFPA total even when FM is higher.</small>
+              </div>
+            </label>
+            <label>
+              <input type="radio" name="storageGovern" value="fm">
+              <div>
+                <b>FM column</b>
+                <small>Use the FM total even when NFPA is higher.</small>
+              </div>
+            </label>
+          </div>
+          <div id="storageCompare" style="margin-top:0.85rem"></div>
         </section>
 
         <!-- Duration -->
@@ -614,7 +804,7 @@
       <div id="reportLogoPrint" class="report-logo-print"></div>
       <p class="eyebrow">Fire Toolshed · Preliminary Charette Report</p>
       <h1>Sprinkler System Demand Estimate</h1>
-      <p>Version <span id="printVersion">1.9.0-prelim</span> · Code basis: NFPA 13-2022 · Not a final Hazen-Williams hydraulic calculation</p>
+      <p>Version <span id="printVersion">1.10.0-prelim</span> · Code basis: NFPA 13-2022 · Not a final Hazen-Williams hydraulic calculation</p>
     </section>
     <section class="print-only print-meta">
       <div><b>Project</b> <span id="printProject">—</span></div>
@@ -716,7 +906,8 @@
         <ul>
           <li><strong>Simple — manual system demand:</strong> Enter total GPM when you already have a planning or hydraulic total.</li>
           <li><strong>Jurisdiction:</strong> Select NFPA 13, Florida (FFPC), UFC, AF Sundown, or FM Global. This sets the code basis and available hazard presets.</li>
-          <li><strong>Governing hazard:</strong> Pick the worst expected hazard. ESFR 40 ft options are under NFPA 13 and FM (wet only).</li>
+          <li><strong>Governing hazard:</strong> Pick the worst expected hazard. ESFR 40 ft planning presets (K-25.2 at 60 psi and K-14.0 at 75 psi) stay under NFPA 13 and FM. They are highest-typical planning presets, wet only, and they are not the storage-module table cells.</li>
+          <li><strong>Storage / ESFR:</strong> Third estimate mode. Compares NFPA 13 and FM for the built-in rows only: Class IV, 35 ft storage, 40 ft ceiling (K-25.2 pendent, and the K-14 / K-16.8 / K-22.4 notes at that ceiling), and the 85 ft tower, quick-response K-25.2, shielded-fire case. Demand is heads × K × √P, then hose and duration. Other arrangements are typed in. Pick the NFPA edition. Type the FM revision. Data Sheet 3-26 Table 2 and section 2.3.1.14 stay blank until you enter them.</li>
           <li><strong>Criteria-assisted:</strong> Seed density, design area, hose, K, and duration from the selected jurisdiction, then edit. All inputs recalculate immediately.</li>
         </ul>
 
@@ -725,7 +916,7 @@
           <li><strong>NFPA 13:</strong> Density-area light / ordinary / extra. Dry uses +30% design area (typical dry/double-interlock rule).</li>
           <li><strong>UFC 3-600-01:</strong> Full Table 9-3 density/area/K by hazard, wet/dry, ceiling height. Hose from Table 9-4. High bay (&gt;60–100 ft) uses 12 sprinklers @ 7 psi, K25.2 (wet only).</li>
           <li><strong>AF Sundown:</strong> Fixed wet criteria 0.20 gpm/sf over 5,000 sf, K8.0, 130 sf/head. No dry path.</li>
-          <li><strong>FM Global:</strong> Planning placeholders — cite the actual DS. Storage/ESFR wet only.</li>
+          <li><strong>FM Global:</strong> Planning placeholders — cite the actual DS. Storage/ESFR wet only. In Storage mode, cite FM Data Sheet 8-9 Tables 8 and 14 and Data Sheet 3-26 Table 2 and section 2.3.1.14, and type the revision you are using.</li>
         </ul>
 
         <h3>System type</h3>
@@ -774,15 +965,17 @@
         <ul>
           <li>No node-by-node Hazen-Williams analysis or remote-area proof.</li>
           <li>Presets are starting points — cite adopted edition, tables, and AHJ direction.</li>
+          <li>Storage mode stores only the ESFR rows named in the tool: Class IV at 35 ft storage and a 40 ft ceiling, and the 85 ft quick-response K-25.2 shielded tower case, plus the 250 gpm / 60 min hose sample. It does not fill the rest of NFPA 13 Table 23.3.1, FM Data Sheet 8-9, or FM Data Sheet 3-26.</li>
           <li>Sloped-ceiling +30% area (UFC when slope &gt; 2:12) is not auto-applied; increase design area manually if required.</li>
         </ul>
       </div>
     </div>
   </div>
 
-  <script src="../shared/water-path-shell.js?v=6"></script>
-  <script src="../shared/report-logo.js"></script>
-  <script src="../shared/submittal-mode.js"></script>
-  <script src="./assets/app.js"></script>
+  <script src="../shared/water-path-shell.js?v=7"></script>
+  <script src="../shared/report-logo.js?v=1.10.0"></script>
+  <script src="../shared/submittal-mode.js?v=1.10.0"></script>
+  <script src="./assets/storage.js?v=1.10.0"></script>
+  <script src="./assets/app.js?v=1.10.0"></script>
 <aside class="noprint" style="padding:12px 20px;text-align:center;font:14px system-ui"><a href="../peer-review/" target="_blank" rel="noopener">Use this result in a Peer Review Case ↗</a></aside><aside class="noprint" style="text-align:center;padding:12px"><a href="../sprinkler-review/">Open the related technical review →</a></aside></body>
 </html>

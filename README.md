@@ -25,7 +25,7 @@ Details: [STUDY-BUDDY.md](./STUDY-BUDDY.md)
 
 0. **[Flow Test Request](./flow-test-request/)** — Stock request form (suppression or fire flow), NFPA 291 procedures for 2½″ outlets only, base/city fields, hydrant selection reasons, jurisdiction ask.
 1. **[Flow Test Report](./flow-test-report/)** — Hydrant static/residual/pitot GPM, N^1.85 supply curve, fire flow @ 20 psi. Capture for Sprinkler Estimator (no system demand).
-2. **[Sprinkler System Estimator](./sprinkler-system-estimator/)** — Prelim demand, pressure stack, duration (NFPA 13 / UFC / FM). Overlay flow-test curve; capture duty for pump sizer.
+2. **[Sprinkler System Estimator](./sprinkler-system-estimator/)** — Prelim demand, pressure stack, duration (NFPA 13 / UFC / FM), plus an ESFR storage comparison of NFPA 13 and FM. Overlay flow-test curve; capture duty for pump sizer.
 3. **[Fire Pump Sizer](./fire-pump-sizer/)** — Import sprinkler flow/pressure/duration; NFPA 20 / UFC preliminary pump, driver, room.
 4. **[Fire Tank Sizer](./fire-tank-sizer/)** — Tank volume ≈ system/pump flow × duration + NFPA/UFC/FM safety; prefab steel catalog; max height/diameter; concrete pad plan.
 

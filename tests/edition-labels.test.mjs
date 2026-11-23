@@ -52,7 +52,8 @@ test('editions: Dry Sprinkler offers NFPA 13-2022 alongside 2025; IBC/IFC Hazard
 
 test('editions: sample results unchanged (Verification tabs + regression harnesses pass)', async () => {
   const s = await serve()
-  const expect = { 'dry-sprinkler-delivery': 11, 'sprinkler-system-estimator': 12, 'fa-power-extenders': 8, 'fire-tank-sizer': 8, 'flow-test-report': 13, 'ibc-ifc-hazard': 17 }
+  // The estimator's hand-calc verify tab was removed on purpose and is not part of this count.
+  const expect = { 'dry-sprinkler-delivery': 11, 'fa-power-extenders': 8, 'fire-tank-sizer': 8, 'flow-test-report': 13, 'ibc-ifc-hazard': 17 }
   try {
     for (const [app, n] of Object.entries(expect)) {
       const st = text(verifyStatus(await dumpDom(`${s.base}/${app}/?ftverifyrun=1`, 60000))).trim()

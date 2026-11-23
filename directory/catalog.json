@@ -231,7 +231,7 @@
     {
       "id": "sprinkler-system-estimator",
       "name": "Sprinkler System Estimator",
-      "description": "Prelim demand + pressure stack + duration (NFPA 13 / UFC / FM). Overlay flow-test supply curve; capture duty for Fire Pump Sizer.",
+      "description": "Prelim demand + pressure stack + duration (NFPA 13 / UFC / FM), including an ESFR storage comparison of NFPA 13 and FM. Overlay flow-test supply curve; capture duty for Fire Pump Sizer.",
       "url": "./sprinkler-system-estimator/",
       "task": "Calculate",
       "disciplines": [
