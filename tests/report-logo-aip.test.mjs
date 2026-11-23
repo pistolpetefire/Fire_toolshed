@@ -27,7 +27,7 @@ const APPS = {
   'occupant-egress': { v: '1.7.1', saved: 'btnSave', seed: ['occupantEgress.v1', '{"codePath":"ibc"}'] },
   'concrete-fire-rating': { v: '1.1.1', host: '#reportLogoPrint', pdf: true },
   'flow-test-request': { v: '1.0.4', host: '#reportLogoPrint', pdf: true },
-  'fire-tank-sizer': { v: '1.1.1-prelim', host: '#reportLogoPrint', pdf: true },
+  'fire-tank-sizer': { v: '1.4.0-prelim', host: '#reportLogoPrint', pdf: true },
   'deflagration-vent': { v: '1.2.1', saved: 'btnSave', seed: ['deflagrationVent.v1', '{"hazardPath":"process_gas"}'] },
   'ibc-ifc-hazard': { v: '1.6.2', host: '#reportLogoPrint', pdf: true },
   'maq-control-area': { v: '1.0.1', popup: 'btnPrintPdf' },

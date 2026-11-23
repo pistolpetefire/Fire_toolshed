@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Determine required fire flow and hydrants for new building design per IBC/IFC Appendix B, UFC 3-600-01, and Florida Building Code / FFPC.">
+  <meta name="description" content="Required fire flow at 20 psi. NFPA 1 sprinkler reduction, floors, 2,000 gpm / 2 hour cap, and the greater of fire flow and sprinkler demand.">
   <title>Fire Flow Calculator · Fire Toolshed</title>
   <link rel="stylesheet" href="../shared/water-path-shell.css">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=1.2.0">
 </head>
 <body>
   <div id="waterPathShell" class="no-print"></div>
@@ -14,8 +14,8 @@
   <header>
     <p class="eyebrow">Fire Toolshed · Water supply</p>
     <h1>Fire Flow Calculator</h1>
-    <p class="version">v1.1.0 · New building design · water path</p>
-    <p class="lead">Determine required fire flow (gpm @ 20 psi) and minimum hydrants for a new building. Select the code basis, construction type, area, and sprinkler protection. Output includes facility-specific method notes and is printable.</p>
+    <p class="version" id="appVersion">v1.2.0</p>
+    <p class="lead">Required fire flow (gpm at 20 psi residual) and duration. Sprinklered buildings on the NFPA 1 basis use 25% of the table flow, not below 1,000 gpm (600 gpm with quick-response sprinklers throughout), and not above 2,000 gpm for 2 hours. The supply is the greater of that fire flow and the sprinkler demand, not the sum. <strong>AHJ may modify.</strong></p>
   </header>
 
   <section class="card">
@@ -23,38 +23,66 @@
       <div>
         <label for="basis">Code basis</label>
         <select id="basis">
+          <option value="florida">NFPA 1 / Florida FFPC</option>
           <option value="ifc">IBC / IFC Appendix B</option>
           <option value="ufc">UFC 3-600-01 (DoD)</option>
-          <option value="florida">Florida Building Code / FFPC (NFPA 1)</option>
         </select>
+      </div>
+      <div>
+        <label for="edition">NFPA 1 edition (labels)</label>
+        <select id="edition">
+          <option value="2021" selected>2021 — §18.4.5.3 and §18.4.5.4</option>
+          <option value="2024">2024 — §18.4.4 (renumbered)</option>
+        </select>
+        <small>The edition changes the section label. The reduction, floors, cap, and greater-of rule are the same. 2024 subsection numbers are not stated.</small>
       </div>
       <div>
         <label for="constType">Construction type</label>
         <select id="constType">
-          <option value="ia">Type IA / IB</option>
-          <option value="iia">Type IIA / IIIA</option>
-          <option value="iva">Type IV / VA</option>
-          <option value="iib">Type IIB / IIIB</option>
-          <option value="vb">Type VB</option>
+          <option value="I">Type I (443) / I (332) / II (222) — IBC IA, IB</option>
+          <option value="IIA">Type II (111) / III (211) — IBC IIA, IIIA</option>
+          <option value="IV">Type IV (2HH) / V (111) — IBC IV, VA</option>
+          <option value="IIB" selected>Type II (000) / III (200) — IBC IIB, IIIB</option>
+          <option value="VB">Type V (000) — IBC VB</option>
         </select>
       </div>
       <div>
         <label for="area">Fire-flow calculation area (ft²)</label>
         <input id="area" type="number" value="25000" min="0" step="100">
-        <small>Total floor area of all floors (outside walls). For Type IA/IB use the three largest successive floors.</small>
+        <small>Lookup uses the toolshed area bands (the same bands as the Hydrant Loop Sizer). It is not a fresh reading of the code table.</small>
       </div>
       <div>
         <label for="sprinkler">Sprinkler system</label>
         <select id="sprinkler">
           <option value="none">None</option>
-          <option value="13">NFPA 13 throughout</option>
-          <option value="13r">NFPA 13R</option>
-          <option value="13d">NFPA 13D / IRC</option>
+          <option value="13">Sprinklered throughout (NFPA 13)</option>
+          <option value="13r">NFPA 13R (IFC minimum 1,500 gpm; NFPA 1 uses the 1,000 gpm floor)</option>
+          <option value="13d">NFPA 13D / IRC (IFC 50% reduction only)</option>
         </select>
+      </div>
+      <div>
+        <label for="tableGpm">Table flow override (gpm)</label>
+        <input id="tableGpm" type="number" min="0" step="50" placeholder="blank = lookup">
+        <small>User entry replaces the lookup. Use the adopted table. This box does not contain a code value.</small>
+      </div>
+      <div>
+        <label for="tableHours">Table duration override (hours)</label>
+        <input id="tableHours" type="number" min="0" step="0.5" placeholder="blank = lookup">
+        <small>Required with a table-flow override. Sprinklered NFPA 1 duration will not exceed 2 hours.</small>
+      </div>
+      <div>
+        <label for="sprDemandGpm">Sprinkler demand (gpm)</label>
+        <input id="sprDemandGpm" type="number" min="0" step="10" placeholder="optional">
+        <small>Compared with fire flow. The supply is the greater rate, not the sum.</small>
+      </div>
+      <div>
+        <label for="sprDemandMin">Sprinkler duration (min)</label>
+        <input id="sprDemandMin" type="number" min="0" step="5" placeholder="optional">
+        <small>Used for the sprinkler volume. Storage is the greater volume, not the sum.</small>
       </div>
     </div>
     <div class="check">
-      <label><input id="qr" type="checkbox"> Quick-response sprinklers throughout (reduces min further in some codes)</label>
+      <label><input id="qr" type="checkbox"> Quick-response sprinklers throughout (NFPA 1 minimum 600 gpm instead of 1,000 gpm)</label>
     </div>
     <div class="grid" style="margin-top:1rem">
       <div>
@@ -68,9 +96,26 @@
           <option value="aircraft">Aircraft parking / refueling</option>
         </select>
       </div>
+      <div>
+        <label for="reportLogoSource">Report logo</label>
+        <select id="reportLogoSource">
+          <option value="benham">Benham</option>
+          <option value="meadhunt">MeadHunt JV</option>
+          <option value="haskell">Haskell (by state)</option>
+          <option value="upload">Upload image…</option>
+        </select>
+        <small>Shared Toolshed list: Benham, MeadHunt JV, AI&amp;P + Benham, Haskell (by state), or an uploaded image. The AI&amp;P option is added by the shared logo module.</small>
+        <div id="reportLogoFileWrap" class="hidden" style="margin-top:0.5rem">
+          <label for="reportLogoFile">Choose logo image</label>
+          <input id="reportLogoFile" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp,image/*">
+        </div>
+        <div id="reportLogoPreview" style="margin-top:0.5rem;min-height:2rem"></div>
+      </div>
     </div>
     <button id="calcBtn" class="calc" type="button">Calculate</button>
+    <button id="btnHelp" class="calc ghost" type="button">Help</button>
 
+    <div id="reportLogoPrint"></div>
     <div id="results" class="results" style="display:none"></div>
 
     <div class="actions no-print">
@@ -80,8 +125,47 @@
     </div>
   </section>
 </div>
+
+<div id="helpModal" class="modal hidden" aria-hidden="true" role="dialog" aria-labelledby="helpTitle">
+  <div class="modal-backdrop" id="helpBackdrop"></div>
+  <div class="modal-card" role="document">
+    <div class="modal-head">
+      <h2 id="helpTitle">Fire Flow Calculator — Help</h2>
+      <button type="button" id="helpClose" class="ghost">Close</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>Purpose:</strong> Preliminary required fire flow at 20 psi residual, plus duration, for a new building. Not a sealed design. <strong>AHJ may modify.</strong></p>
+      <h3>Code basis and edition</h3>
+      <ul>
+        <li><strong>NFPA 1 / Florida FFPC:</strong> Sprinklered throughout: 25% of the table flow, not less than 1,000 gpm, not more than 2,000 gpm, duration not more than 2 hours. Quick-response sprinklers throughout lower the minimum to 600 gpm.</li>
+        <li><strong>Edition:</strong> 2021 labels the rules NFPA 1 §18.4.5.3 (reduction, floors, cap) and §18.4.5.4 (greater of fire flow and sprinkler demand). 2024 labels the same rules §18.4.4. The math does not change. This tool does not invent 2024 subsection numbers.</li>
+        <li><strong>IBC / IFC Appendix B:</strong> Keeps this calculator's IFC reduction (25% with a 1,000 gpm floor, 1,500 gpm for NFPA 13R, 50% and 500 gpm for NFPA 13D). The NFPA 1 2,000 gpm / 2 hour cap is not applied on the IFC basis. Duration follows the reduced flow.</li>
+        <li><strong>UFC 3-600-01:</strong> A standard sprinklered building uses the NFPA 1 reduction. The listed family-housing, vehicle, and aircraft values are fixed and are not reduced again. DFPE may modify.</li>
+      </ul>
+      <h3>Inputs</h3>
+      <ul>
+        <li><strong>Construction type:</strong> NFPA 1 types grouped the same way as the IBC types in the toolshed area bands. Type II (000) is in the IIB group. Type V (000) is VB.</li>
+        <li><strong>Area:</strong> Fire-flow calculation area in square feet. The lookup is the toolshed copy of the area bands, not a new transcription from the code book.</li>
+        <li><strong>Table flow and table duration overrides:</strong> Type the adopted table's flow and duration when you do not want the lookup. Leave both blank to use the lookup. Do not type a guessed table value.</li>
+        <li><strong>Sprinkler system and quick-response:</strong> "Sprinklered throughout" turns on the NFPA 1 reduction. Quick-response throughout changes only the NFPA 1 floor, from 1,000 gpm to 600 gpm. It does not change the IFC path.</li>
+        <li><strong>Sprinkler demand and duration:</strong> Optional. The required supply rate is the greater of fire-flow gpm and sprinkler-demand gpm. The storage volume is the greater of the two volumes. The two demands are not added.</li>
+        <li><strong>Report logo:</strong> Benham, MeadHunt JV, AI&amp;P + Benham (a Haskell Company), Haskell by state, or an uploaded image. The choice is shared with the other Toolshed report tools.</li>
+      </ul>
+      <h3>Result</h3>
+      <ul>
+        <li>Fire flow is reported at 20 psi residual. Gallons are flow × duration × 60, before the tank sizer's safety and unusable allowances.</li>
+        <li>A sprinklered NFPA 1 result is labeled <strong>AHJ may modify</strong>.</li>
+        <li>The hydrant count is this app's older planning estimate. It is not IFC Table C102.1 and not an NFPA 1 hydrant-credit table.</li>
+        <li><strong>Capture for Pump &amp; Tank</strong> stores the supply rate and the governing volume for the Fire Tank Sizer.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 <script src="../shared.js"></script>
 <script src="../shared/water-path-shell.js?v=6"></script>
-<script src="./app.js"></script>
+<script src="../shared/report-logo.js?v=1.2.0"></script>
+<script src="../shared/nfpa1-fire-flow.js?v=1.2.0"></script>
+<script src="./app.js?v=1.2.0"></script>
 </body>
 </html>
