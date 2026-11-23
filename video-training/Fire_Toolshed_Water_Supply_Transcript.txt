@@ -1,0 +1,111 @@
+FIRE TOOLSHED — WATER SUPPLY TRAINING
+Revised: pronunciation corrections, narration and visuals slowed 5%, speech-aligned pointer highlights.
+Pitot spoken PEE TOE; PSI spoken as individual letters P. S. I.
+
+00:00  START | Flow test through tank sizing
+This walkthrough follows the live Fire Toolshed apps from hydrant testing through fire flow, sprinkler demand, pump selection, and tank sizing. We will use a warehouse example and explain the project options. Each app's Help or Guide provides a field reference.
+
+00:14  START | Choose the project supply arrangement
+Start at the hub. Combined means the pump serves hydrants and sprinklers. Separate keeps hydrants on city supply and sizes sprinklers independently. Adequate supply skips the pump and tank when verified supply meets the actual demands. Completing these apps does not establish a tank requirement.
+
+00:31  START | Name the project and check captures
+Enter the shared project name. The top strip shows captured values and timestamps. Captures stay in this browser and device. Navigation alone does not replace another app's inputs: use its import action. Also check the project identification fields inside each report.
+
+00:47  1 · FLOW TEST | Identify the test and its purpose
+In Flow Test Report, enter project, address, test date and time, preparer, and witness. Choose suppression supply for a design supply curve, or hydrant rating for available capacity. Choose Benham, MeadHunt, AI and P, Haskell by state, or an uploaded report logo.
+
+01:04  1 · FLOW TEST | Record hydrant layout and gauges
+Identify the residual hydrant, select the number of separate flow hydrants, and enter their identifiers. Layout notes describe positions and flow direction. Zero represents the less preferred single-hydrant test. Enter both gauge calibration dates and optional equipment identifiers for traceability.
+
+01:21  1 · FLOW TEST | Enter simultaneous test readings
+Static is no-flow pressure. Residual is pressure while the recorded total discharge is flowing. We use seventy-two psi static and forty-eight psi residual at twelve hundred fifty-six gallons per minute. Twenty psi is the capacity reference, not the required sprinkler pressure.
+
+01:38  1 · FLOW TEST | Calculate flow from pitot measurements
+For pitot-derived flow, enter pressure and outlet diameter. Select actual outlet geometry or a documented custom coefficient. Multi-outlet mode measures each open outlet. Additional open butts is a rough multiplier. Monster Pitot fixes the coefficient at point nine and rounds the result.
+
+01:57  1 · FLOW TEST | Finish the field record
+Calculate GPM from pitot writes flow into the test. Check only procedure steps actually performed. Record main size, weather, operators, previous and next test dates, ordinary-demand confirmation, and unusual conditions. Optional maps and captioned photos become report attachments.
+
+02:15  1 · FLOW TEST | Review the curve and capture supply
+Review pressure drop, missing records, and the curve. This example estimates nineteen hundred seven gallons per minute at twenty psi. A favorable numeric result does not clear documentation warnings. Capture saves the supply; Capture and Open also navigates. Continue through Fire Flow for the full path.
+
+02:33  2 · FIRE FLOW | Set basis, construction, and area
+In Fire Flow, select NFPA One or Florida, I F C Appendix B, or U F C. Select edition label, construction group, and fire-flow calculation area. Verify that area and the Toolshed lookup against the project's adopted table and amendments.
+
+02:48  2 · FIRE FLOW | Choose reductions and project exceptions
+Select the actual sprinkler system. Quick-response throughout affects the NFPA One minimum. Paired table-flow and duration overrides require adopted-table values. UFC special-facility choices cover housing, vehicle parking, and aircraft. These criteria paths apply different reductions and limits; do not interchange them.
+
+03:08  2 · FIRE FLOW | Calculate and save the fire-flow demand
+Our twenty-five-thousand-square-foot, Type Two B, sprinklered example returns one thousand gallons per minute for two hours: one hundred twenty thousand gallons. Optional sprinkler flow and duration support comparison. Click Capture for Pump and Tank and acknowledge the confirmation.
+
+03:23  3 · SPRINKLER | Choose how demand is established
+Complete building, preparer, date, and assumptions in Sprinkler Estimator. Simple mode accepts a known total flow; document included hose demand. Criteria-assisted develops flow from hazard criteria. Storage and E S F R compares the specific NFPA and FM arrangements listed in the app.
+
+03:41  3 · SPRINKLER | Set jurisdiction and system type
+In criteria-assisted mode, select NFPA Thirteen, Florida, UFC, Air Force Sundown, or FM, then wet or dry and the governing hazard. Available presets change with framework. Check seeded values, dry-area adjustments, wet-only cases, and UFC height categories against project criteria.
+
+03:59  3 · SPRINKLER | Build flow and document duration
+Point-two density times fifteen hundred square feet gives three hundred gallons per minute. Add the enabled two-hundred-fifty-gallon hose allowance for five hundred fifty total. Auto duration follows framework presets. Our manually entered sixty minutes is a training assumption, recorded in the duration basis.
+
+04:16  3 · SPRINKLER | Establish remote-head pressure
+Enter elevation from pump discharge to highest head, K factor, and coverage. A head-flow override replaces density times coverage. Automatic head pressure uses flow divided by K, squared, subject to the minimum floor. K eight and twenty-six gallons per minute give ten-point-six psi.
+
+04:34  3 · SPRINKLER | Add backflow and friction losses
+Select backflow type or custom pressure loss, planning margin, and other losses. Hazen-Williams inputs are diameter, length, C factor, and fitting equivalent length for lead-in, riser, and roof main. Calculated friction replaces matching fixed allowances. Avoid counting losses twice.
+
+04:51  3 · SPRINKLER | Review allowances and supply overlay
+Enable only applicable equipment: riser assembly, zone valve, meter, and other documented losses. Record the loss methodology. Click Use saved flow test, check the imported readings, and enable the overlay. Compare supply and demand at the same flow and reference location.
+
+05:08  3 · SPRINKLER | Understand the example result
+Our completed demand is five hundred fifty gallons per minute at sixty-four-point-seven psi for sixty minutes. Estimated supply is sixty-six-point-eight psi: a small preliminary margin. Review the stack and actual conditions before deciding a pump is needed. Capture for Pump Sizer saves this demand.
+
+05:26  3 · SPRINKLER | Use storage and ESFR mode carefully
+Storage mode needs commodity, storage and ceiling heights, K, orientation, response, and fire arrangement. Check each method's heads, pressure, hose, and duration. Record edition, FM revision, and references; choose the governing result. Built-in cases are limited. Recheck retained pressure inputs when changing modes.
+
+05:46  4 · PUMP | Import before trusting the dashboard
+In Pump Sizer, click Import Sprinkler Demand first. Verify imported test readings, flow, pressure, and duration; capture pills alone do not prove the form is current. Import Fire Flow supports that demand alone. Pump Serves Both combines the saved demands into a planning envelope.
+
+06:03  4 · PUMP | Check both duty points
+Our actual duties are one thousand gallons per minute at twenty psi, and five hundred fifty at sixty-four-point-seven psi. Pump Serves Both takes the larger flow and pressure. That envelope does not establish simultaneous flow; retain actual duty points and verify project demand rules.
+
+06:21  4 · PUMP | Use the correct suction-pressure basis
+Choose hydrant curve or direct suction. Curve mode subtracts entered backflow, pipe, and elevation losses. Direct mode takes minimum and maximum suction. Maximum static checks churn discharge. A tank-fed pump needs tank-level and suction-loss conditions; remove municipal pressure credit.
+
+06:38  4 · PUMP | Separate boost from required discharge
+At the combined envelope, municipal supply is about fifty-six-point-three psi, leaving eight-point-four psi boost. This is conservative compared with checking the actual duties separately. Required discharge and net pump pressure differ. Additional demand rows take names, flows, and discharge pressures for other cases.
+
+06:57  4 · PUMP | Enter the proposed pump and curve
+Enter proposed rated flow, net pressure, and certified churn pressure. Our one-thousand-gallon, seventy-psi rating and ninety-psi churn are illustrative. Choose a certified point or at least three ascending-flow curve points. Identify net versus discharge pressure so suction is treated correctly.
+
+07:16  4 · PUMP | Select and coordinate the driver
+Electric mode uses voltage, locked-rotor current, and other motor or accessory full-load current. Diesel adds engine, runtime, consumption, and fuel-storage planning. Apply UFC mode when appropriate. Coordinate these estimates with electrical and mechanical engineers and the selected equipment data.
+
+07:33  4 · PUMP | Verify the curve and room layout
+On Verify and Curve, check rated and one-hundred-fifty-percent flow, churn, maximum discharge, and every demand point. A pass depends on entered or assumed data; confirm the manufacturer curve. Pump Room Size provides a preliminary layout; coordinate equipment, access, electrical clearance, and diesel provisions.
+
+07:52  4 · PUMP | Capture the demand for storage
+Return to System Calculation and Supply, then Capture for Tank or Capture and Open. Preserve both upstream demands. Pump flow and tank volume can have different governing scenarios: a smaller flow over a longer duration may require more gallons than the largest flow.
+
+08:06  5 · TANK | Import the governing water volume
+Use Governing Demand compares fire-flow and sprinkler captures. Import Upstream prefers that comparison, with other captures as fallbacks. Individual buttons import pump, fire-flow, or sprinkler demand. Verify the driver note, flow, and duration. Here, one hundred twenty thousand gallons exceeds thirty-three thousand.
+
+08:26  5 · TANK | Understand the built-in fire-flow panel
+The tank's NFPA One panel offers another fire-flow calculation. Edition, construction, area, sprinklers, quick-response, and paired overrides mirror the earlier app. Apply to tank demand replaces demand fields. Avoid overwriting a saved calculation with unrelated entries; recheck the driver note.
+
+08:44  5 · TANK | Set tank count and allowances
+Enter the number of identical tanks. NFPA, UFC, and FM planning frameworks default to five, ten, and fifteen percent contingency; these are app defaults, not universal code additions. Blank override retains the default. Unusable allowance separately accounts for water unavailable as effective storage.
+
+09:03  5 · TANK | Follow usable water to shell volume
+One hundred twenty thousand gallons plus five percent gives a one-hundred-twenty-six-thousand-gallon usable target. Divide by point nine five for five percent unusable volume: approximately one hundred thirty-two thousand six hundred thirty-two shell gallons. Confirm effective capacity with the final geometry.
+
+09:19  5 · TANK | Enter height, footprint, and pad limits
+Enter actual height and diameter limits; zero means unlimited. Pad extension is each side: two feet adds four feet to diameter. Thickness estimates concrete quantity only. Coordinate setbacks, access, overhead limits, geotechnical conditions, and tank manufacturer requirements.
+
+09:37  5 · TANK | Choose a tank that meets the requirement
+The selected example is thirty-six feet across and eighteen feet high: about one hundred thirty-seven thousand fifty-six shell gallons, with a forty-foot pad. Check spare volume and constraint status. Catalog rows are planning sizes; select an eligible row and confirm manufacturer usable capacity.
+
+09:53  5 · TANK | Handle multiple tanks or custom sizes
+Lower height limits favor wider or multiple tanks; tight footprints may require taller tanks. Multiple tanks do not automatically establish redundancy. Custom diameter and height calculate cylinder volume. When prefab sizes fail, review field-erected screening options and constraint warnings with the supplier.
+
+10:11  FINISH | Save the engineering record
+Use Clean Report or Print, then Save Report for available HTML and project data. Save tank handoff preserves the selection. Keep source tests, criteria, assumptions, and captures. Verify project identity and timestamps. Final hydraulics, certified curves, effective storage, and approval remain separate engineering deliverables.
